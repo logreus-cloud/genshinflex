@@ -2,8 +2,15 @@
 import '../styles/global.css';
 import QuickSearch from '../components/QuickSearch.astro';
 
-interface Props { title?: string; description?: string; wide?: boolean; }
-const { title, description = 'Открытый справочник по Genshin Impact: билды, команды и рейтинг под текущие Бездну, Театр и Натиск.', wide = false } = Astro.props;
+interface Props { title?: string; description?: string; wide?: boolean; image?: string | null; type?: 'website' | 'article'; jsonLd?: object; }
+const {
+  title, description = 'Справочник по Genshin Impact на русском: билды, команды, проверка команды для Бездны и трекер круток.',
+  wide = false, image, type = 'website', jsonLd,
+} = Astro.props;
+const fullTitle = title ? `${title} — GenshinFlex` : 'GenshinFlex — билды и команды Genshin Impact под текущую Бездну';
+// Cloudflare отдаёт страницы с «/» на конце — canonical должен совпадать с реальным адресом
+const canonical = new URL(Astro.url.pathname.replace(/\/?$/, '/'), Astro.site).toString();
+const ogImage = image ?? new URL('/og.png', Astro.site).toString();
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const path = Astro.url.pathname.replace(base, '').replace(/\/$/, '') || '/';
 
@@ -37,11 +44,22 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:site_name" content="GenshinFlex" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <title>{title ? `${title} — GenshinFlex` : 'GenshinFlex — билды и команды под текущий эндгейм'}</title>
+    <title>{fullTitle}</title>
     <script is:inline>
       try { const t = localStorage.getItem('gf:theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
     </script>

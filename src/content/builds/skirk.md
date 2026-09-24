@@ -31,6 +31,15 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/skirk/
+videos:
+  - id: "_AHA2WycC28"
+    author: "Prеtender"
+    title: "6.4 UPDATED Skirk Guide: Updated Calcs, Best Weapons, Artifacts & Teams"
+    lang: en
+  - id: "XK73fRnQa4g"
+    author: "IWinToLose Gaming"
+    title: "ULTIMATE Skirk Guide! [Best Builds, Weapons, Artifacts, and MORE]"
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — главный дд, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

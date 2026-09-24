@@ -36,6 +36,16 @@ sources:
     url: https://genshin.gg/characters/columbina/
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/382106
+videos:
+  - id: "NgR6-L-4abI"
+    author: "Бутонная соль"
+    title: "Анализ Коломбины от Анимекула: способности, сигнатурка, созвездия"
+  - id: "OviJLfwfER4"
+    author: "Miron MinMax"
+    title: "Коломбина — то, чего все ждали? Гайд в 6.3"
+  - id: "AC1hmQMC6Fk"
+    author: "Bambi"
+    title: "Полный гайд на Коломбину: билд, артефакты, оружие и команды"
 ---
 
 **Суть:** усиливает урон Лунных реакций всей команды, поэтому раскрывается только рядом с персонажами Лунного знамения: Инеффой, Лаумой, Цзы Бай, Нефер.

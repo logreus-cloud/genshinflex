@@ -33,6 +33,17 @@ teams:
 sources:
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/606901
+videos:
+  - id: "Of6koHTNnmY"
+    author: "Бутонная соль"
+    title: "Анализ Весны от Анимекула: способности, сигнатурка, созвездия"
+  - id: "MXjOhr21FBc"
+    author: "rensantau"
+    title: "Стоит ли крутить Весну? Разбор и гайд"
+  - id: "mirfJTbl1Ck"
+    author: "IWinToLose Gaming"
+    title: "ULTIMATE Vesna Guide! [Best Teams, Builds, and MORE]"
+    lang: en
 ---
 
 **Суть:** весь кит Весны построен вокруг Звёздного рассеивания, поэтому другие архетипы ей почти не подходят. Звёздное рассеивание масштабируется от атаки, отсюда атака в часах и кубке.

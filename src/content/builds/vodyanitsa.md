@@ -32,6 +32,17 @@ teams:
 sources:
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/606400
+videos:
+  - id: "35LhbAbSfnE"
+    author: "Бутонная соль"
+    title: "Анализ Водяницы от Анимекула: способности, сигнатурка, созвездия"
+  - id: "lGk_Kb-HGPU"
+    author: "FieryBlow"
+    title: "Реально лучший хил? Гайд на Водяницу"
+  - id: "vWiXfDh3yTI"
+    author: "IWinToLose Gaming"
+    title: "ULTIMATE Vodyanitsa Guide! [Best Teams, Builds, and MORE]"
+    lang: en
 ---
 
 **Суть:** Гидро-саппорт, которому нужен только HP: от него зависят и баффы, и личный урон, поэтому HP во всех трёх слотах. Снижает сопротивление Крио и Гидро, а при активном Звёздном вихре — ещё и Анемо.

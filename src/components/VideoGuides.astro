@@ -1,0 +1,50 @@
+---
+// Видео-гайды: сначала только превью, плеер youtube-nocookie грузится по клику — страница не тяжелеет
+interface Props { videos: { id: string; title: string; author: string; lang: 'ru' | 'en' }[] }
+const { videos } = Astro.props;
+---
+<div class="videos">
+  {videos.map((v) => (
+    <figure class="video">
+      <button class="play" type="button" data-yt={v.id} aria-label={`Смотреть: ${v.title}`}>
+        <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" width="480" height="360" />
+        <svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true"><path class="bg" d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.3 34 .3 34 .3s-21.2 0-26.5 1.4a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3Z"/><path class="tri" d="M45 24 27 14v20Z"/></svg>
+        {v.lang === 'en' && <span class="lang">EN</span>}
+      </button>
+      <figcaption>
+        <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noopener">{v.title}</a>
+        <span class="muted small">{v.author}</span>
+      </figcaption>
+    </figure>
+  ))}
+</div>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-yt]');
+    if (!btn) return;
+    const frame = document.createElement('iframe');
+    frame.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.yt}?autoplay=1&rel=0`;
+    frame.title = btn.getAttribute('aria-label') ?? 'Видео';
+    frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    frame.allowFullscreen = true;
+    frame.className = 'yt-frame';
+    btn.replaceWith(frame);
+  });
+</script>
+
+<style>
+  .videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 12px; }
+  .video { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .play, .video :global(.yt-frame) { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+  .play { position: relative; padding: 0; cursor: pointer; background: #000; }
+  .play img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .9; }
+  .play svg { position: absolute; left: 50%; top: 50%; translate: -50% -50%; }
+  .play .bg { fill: #212121; opacity: .85; transition: fill .15s, opacity .15s; }
+  .play .tri { fill: #fff; }
+  .play:hover .bg, .play:focus-visible .bg { fill: #f00; opacity: 1; }
+  .lang { position: absolute; top: 8px; left: 8px; background: rgb(0 0 0 / .75); color: #fff; font-size: .72rem; font-weight: 600; padding: .1rem .4rem; border-radius: 4px; }
+  figcaption { display: grid; gap: .2rem; padding: .7rem .9rem .8rem; }
+  figcaption a { text-decoration: none; font-weight: 500; line-height: 1.3; }
+  figcaption a:hover { text-decoration: underline; }
+</style>

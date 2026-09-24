@@ -19,6 +19,10 @@ const builds = defineCollection({
     talents: z.array(z.enum(['normal', 'skill', 'burst'])).default([]),
     teams: z.array(z.object({ name: z.string(), members: z.array(z.string()).length(4), note: z.string().optional() })),
     sources: z.array(source).default([]),
+    // Видео-гайды с YouTube: id ролика (11 символов), название и автор — как на YouTube (проверены через oEmbed)
+    videos: z.array(z.object({
+      id: z.string().regex(/^[\w-]{11}$/), title: z.string(), author: z.string(), lang: z.enum(['ru', 'en']).default('ru'),
+    })).default([]),
   }),
 });
 

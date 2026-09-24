@@ -33,6 +33,13 @@ sources:
     url: https://genshin.gg/characters/zibai/
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/570263
+videos:
+  - id: "9jAJnci_-HM"
+    author: "Miron MinMax"
+    title: "Цзы Бай — очередная имба Нод-Края? Гайд в 6.3"
+  - id: "PqhK68SZd3g"
+    author: "Genshin Academy"
+    title: "От простого к сложному — гайд на Цзы Бай"
 ---
 
 **Суть:** Гео-ДД, весь урон которой масштабируется от защиты и идёт через Лунный кристалл (Гео + Гидро). Для её усиления нужны персонажи Лунного знамения: Коломбина, Иллуги или Айно.

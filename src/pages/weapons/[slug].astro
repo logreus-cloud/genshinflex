@@ -17,7 +17,7 @@ const users = (await getCollection('builds'))
   .filter((u) => u.place >= 0)
   .sort((a, b) => a.place - b.place);
 ---
-<Layout title={w.name} description={`${w.name}: статы, эффект на всех пробуждениях и персонажи, которым оно подходит.`}>
+<Layout title={`${w.name}: статы, эффект и кому подходит — Genshin Impact`} description={`${w.name} (${stars(w.rarity)}, ${w.weaponText.toLowerCase()}): статы на каждом уровне, эффект на всех пробуждениях R1–R5 и персонажи, которым оружие подходит лучше всего.`} image={w.icon}>
   <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/weapons/${w.slug}`, name: w.name, icon: w.icon, kind: 'Оружие' })}>
     <nav class="crumbs small muted" aria-label="Путь"><a href={`${base}/weapons`}>Оружие</a> / {w.name}</nav>
     <header class:list={['head', `r${w.rarity}`]}>

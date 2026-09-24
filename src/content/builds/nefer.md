@@ -27,6 +27,13 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/nefer/
+videos:
+  - id: "ZN43-Ww5csw"
+    author: "Miron MinMax"
+    title: "Подробный и актуальный гайд на Нефер в 6.5"
+  - id: "DcbkdNYCaqM"
+    author: "Miron MinMax"
+    title: "Нефер — новая Дендро-имба? Гайд в 6.1"
 ---
 
 **Суть:** Дендро-ДД, урон которой идёт через Лунную бутонизацию (Дендро + Гидро). Ядро команды — Лаума и Коломбина.

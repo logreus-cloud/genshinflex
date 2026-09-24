@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /data/
+
+Sitemap: https://genshinflex.com/sitemap.xml

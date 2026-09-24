@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Team from '../../components/Team.astro';
 import LevelStats from '../../components/LevelStats.astro';
+import VideoGuides from '../../components/VideoGuides.astro';
 import { characters, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, type Character } from '../../lib/data';
 
 export function getStaticPaths() {
@@ -38,7 +39,7 @@ for (const t of [
 const related = [...merged.values()];
 
 const talentKeys = ['normal', 'skill', 'burst'] as const;
-const tabs = [['profile', 'Профиль'], ...(b ? [['build', 'Билд'], ['teams', 'Команды']] : []), ['talents', 'Таланты'], ['constellations', 'Созвездия']];
+const tabs = [['profile', 'Профиль'], ...(b ? [['build', 'Билд'], ['teams', 'Команды']] : []), ...(b?.videos.length ? [['videos', 'Видео']] : []), ['talents', 'Таланты'], ['constellations', 'Созвездия']];
 const meta = [
   ['Созвездие', c.constellationName], ['Регион', c.region], ['День рождения', c.birthday], ['В игре с версии', c.version],
 ].filter(([, v]) => v);
@@ -48,8 +49,28 @@ const slotIcons = {
   circlet: 'M3 8l3.5 3L10 5l3.5 6L17 8l-1.5 8h-11Z',
 };
 const slotNames = { sands: 'Часы', goblet: 'Кубок', circlet: 'Корона' } as const;
+
+// SEO: заголовок и описание под запросы вида «гайд на Водяницу», «билд Весна»
+const seoTitle = b ? `${c.name}: гайд и билд — Genshin Impact ${b.patch}` : `${c.name}: таланты и созвездия — Genshin Impact`;
+const seoDescription = b
+  ? `${c.name} (${c.elementText}, ${c.rarity}★) — гайд и билд: лучшее оружие — ${getWeapon(b.weapons[0].slug).name}, артефакты — ${b.artifacts[0].sets.map((s) => getArtifact(s).name).join(' + ')}, статы, команды и таланты. Актуально для патча ${b.patch}.`
+  : `${c.name} в Genshin Impact: ${c.elementText}, ${c.weaponText.toLowerCase()}, таланты с множителями, созвездия и статы на любом уровне.`;
+const pageUrl = new URL(`/characters/${c.slug}/`, Astro.site).toString();
+const jsonLd = b && {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: seoTitle,
+  description: seoDescription,
+  image: c.splash ?? c.icon,
+  dateModified: b.updated.toISOString().slice(0, 10),
+  inLanguage: 'ru',
+  mainEntityOfPage: pageUrl,
+  author: { '@type': 'Organization', name: 'GenshinFlex', url: Astro.site?.toString() },
+  publisher: { '@type': 'Organization', name: 'GenshinFlex' },
+  about: { '@type': 'VideoGame', name: 'Genshin Impact' },
+};
 ---
-<Layout title={`${c.name}: билд и команды`} description={`${c.name} в Genshin Impact: лучшее оружие, артефакты, команды, таланты и созвездия.`} wide>
+<Layout title={seoTitle} description={seoDescription} image={c.splash ?? c.icon} type={b ? 'article' : 'website'} jsonLd={jsonLd} wide>
   <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/characters/${c.slug}`, name: c.name, icon: c.icon, kind: 'Персонаж' })}>
     <nav class="crumbs small muted" aria-label="Путь"><a href={`${base}/characters`}>Персонажи</a> / {c.name}</nav>
 
@@ -156,6 +177,13 @@ const slotNames = { sands: 'Часы', goblet: 'Кубок', circlet: 'Коро�
             </>
           )}
         </section>
+
+        {b.videos.length > 0 && (
+          <section id="videos" data-pagefind-ignore>
+            <h2 class="h-sec">Видео-гайды <small>YouTube, по клику</small></h2>
+            <VideoGuides videos={b.videos} />
+          </section>
+        )}
       </>
     ) : (
       <p class="notice" data-pagefind-ignore>

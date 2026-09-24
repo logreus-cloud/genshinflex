@@ -29,6 +29,13 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/sandrone/
+videos:
+  - id: "ZwzmqLy67U4"
+    author: "Miron MinMax"
+    title: "Сандроне — первая имба Снежной? Гайд в 6.7"
+  - id: "VkkBYnPzbJU"
+    author: "Бутонная соль"
+    title: "Анализ Сандроне от Анимекула: способности, сигнатурка"
 ---
 
 **Суть:** Крио-ДД для новой реакции Звёздный проводник (Крио + Электро). Ядро команды — Одетта и Электро-партнёры Яэ Мико и Алёша.
