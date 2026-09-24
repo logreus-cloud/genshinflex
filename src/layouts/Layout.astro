@@ -26,6 +26,7 @@ const nav = [
   { group: 'Эндгейм', items: [['Все режимы', '/rotation', 'moon'], ['Витая бездна', '/abyss', 'spiral'], ['Театр воображариума', '/theater', 'mask'], ['Натиск', '/onslaught', 'flame'], ['Рейтинг', '/rating', 'chart']] },
   { group: 'Таймлайн', items: [['Баннеры', '/banners', 'moon']] },
   { group: 'Гайды', items: [['Руководства', '/guides', 'book']] },
+  { group: 'Сайт', items: [['Новости сайта', '/news', 'book']] },
   { group: 'Инструменты', items: [['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
 ] as const;
 
@@ -52,7 +53,7 @@ const footerCols: [string, [string, string][]][] = [
   ['Эндгейм', [['Витая бездна', '/abyss/'], ['Театр воображариума', '/theater/'], ['Натиск', '/onslaught/'], ['Баннеры', '/banners/'], ['История баннеров', '/banners/#history'], ['Рейтинг', '/rating/']]],
   ['Инструменты', [['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'], ['Калькулятор прокачки', '/tools/calculator/'],
     ['Карта Тейвата', `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`]]],
-  ['Сайт', [['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Sitemap', '/sitemap.xml']]],
+  ['Сайт', [['Новости сайта', '/news/'], ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Sitemap', '/sitemap.xml']]],
 ];
 const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 ---

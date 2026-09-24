@@ -2,10 +2,12 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CharacterCard from '../../components/CharacterCard.astro';
+import { siteNews, newsDate } from '../../lib/news';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { characters, weapons, artifacts, getCharacter, getWeapon, MODES, resetAt, fmtServerDate, base, t } = useData(Astro.currentLocale);
+const { characters, weapons, artifacts, getCharacter, getWeapon, MODES, resetAt, fmtServerDate, base, t, lang } = useData(Astro.currentLocale);
+const latestNews = (await siteNews(lang))[0];
 
 const now = new Date();
 const builds = await getCollection('builds');
@@ -81,6 +83,17 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
       </div>
     </div>
   </section>
+
+  {latestNews && (
+    <a class="site-news" href={`${base}/news/#${latestNews.data.anchor}`}>
+      <div class="news-copy">
+        <div class="news-meta"><span>{t('Новости сайта')}</span><time datetime={latestNews.data.date.toISOString()}>{newsDate(latestNews.data.date, lang)}</time></div>
+        <h2>{latestNews.data.title}</h2>
+        <p>{latestNews.data.summary}</p>
+      </div>
+      <span class="news-link">{t('Все новости и обновления')} <span aria-hidden="true">→</span></span>
+    </a>
+  )}
 
   <section class="tiles">
     <a class="tile" href={`${base}/tools/team-check`}>
@@ -237,6 +250,14 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   .left-time { font: 600 1.25rem var(--font-display); color: var(--accent); margin-top: .5rem; line-height: 1.15; }
   .tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .5rem; }
 
+  .site-news { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin: .2rem 0 1.2rem; padding: 1.1rem 1.3rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--accent-soft), var(--surface)); text-decoration: none; }
+  .site-news:hover { border-color: var(--accent); }
+  .news-copy { flex: 1 1 32rem; min-width: 0; overflow-wrap: anywhere; }
+  .news-meta { display: flex; flex-wrap: wrap; gap: .35rem 1rem; font-size: .78rem; color: var(--muted); }
+  .news-meta > span { color: var(--accent); font-weight: 600; }
+  .site-news h2 { margin: .4rem 0; font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.45; }
+  .site-news p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .news-link { color: var(--accent); font-size: .85rem; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: .6rem; }
   .tile {
     display: grid; align-content: start; gap: .2rem; padding: 1rem 1.1rem; border-radius: var(--radius-lg); text-decoration: none;

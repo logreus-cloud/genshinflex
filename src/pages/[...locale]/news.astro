@@ -1,0 +1,67 @@
+---
+import { render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { useData, LANGS } from '../../lib/data';
+import { siteNews, newsDate } from '../../lib/news';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { lang, t } = useData(Astro.currentLocale);
+const entries = await siteNews(lang);
+const articles = await Promise.all(entries.map(async (entry) => ({ ...entry.data, ...(await render(entry)) })));
+---
+<Layout title={t('Новости сайта')} description={t('Новости GenshinFlex и полная история обновлений сайта — от открытия до последних изменений.')}>
+  <header class="news-heading">
+    <p class="eyebrow">GenshinFlex</p>
+    <h1>{t('Новости сайта')}</h1>
+    <p class="lead">{t('Всё, что появляется и меняется на сайте. Свежие записи — сверху, история сохраняется здесь целиком.')}</p>
+  </header>
+
+  {articles.length > 0 ? (
+    <>
+      <nav class="archive panel" aria-label={t('Все новости и обновления')} data-pagefind-ignore>
+        <h2>{t('Все новости и обновления')}</h2>
+        <ol>
+          {articles.map((article) => (
+            <li><a href={`#${article.anchor}`}><time datetime={article.date.toISOString()}>{newsDate(article.date, lang)}</time><span>{article.title}</span></a></li>
+          ))}
+        </ol>
+      </nav>
+      <div class="news-feed">
+        {articles.map(({ anchor, title, summary, date, Content }) => (
+          <article class="news-entry panel" id={anchor} aria-labelledby={`${anchor}-title`} tabindex="-1" data-pagefind-body>
+            <header>
+              <time class="muted small" datetime={date.toISOString()}>{newsDate(date, lang)}</time>
+              <h2 id={`${anchor}-title`}><a href={`#${anchor}`}>{title}</a></h2>
+              <p class="entry-summary">{summary}</p>
+            </header>
+            <div class="prose"><Content /></div>
+            <footer><a href={`#${anchor}`}>{t('Ссылка на эту новость')}</a> <span aria-hidden="true">·</span> <a href="#content">{t('К списку новостей')}</a></footer>
+          </article>
+        ))}
+      </div>
+    </>
+  ) : <p class="notice">{t('Здесь скоро появятся первые новости сайта.')}</p>}
+</Layout>
+
+<style>
+  .news-heading { margin-bottom: 1.5rem; }
+  .eyebrow { color: var(--accent); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .5rem; }
+  .archive { margin-bottom: 1.5rem; }
+  .archive h2 { margin: 0 0 .7rem; font-size: 1rem; }
+  .archive ol { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; }
+  .archive a { display: flex; flex-wrap: wrap; gap: .25rem 1rem; text-decoration: none; }
+  .archive a:hover span { text-decoration: underline; }
+  .archive time { color: var(--muted); font-size: .85rem; }
+  .news-feed { display: grid; gap: 1.5rem; }
+  .news-entry { padding: clamp(1rem, 3vw, 2rem); overflow-wrap: anywhere; }
+  .news-entry:target { border-color: var(--accent); }
+  .news-entry h2 { margin: .5rem 0 .8rem; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.4; }
+  .news-entry h2 a { text-decoration: none; }
+  .news-entry h2 a:hover { text-decoration: underline; }
+  .entry-summary { color: var(--muted); max-width: 75ch; }
+  .prose { max-width: 75ch; }
+  .prose :global(h3) { margin-top: 1.8rem; }
+  .prose :global(li) { margin-bottom: .5rem; }
+  .prose :global(a) { text-underline-offset: .2em; }
+  footer { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+</style>

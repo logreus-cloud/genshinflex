@@ -117,4 +117,17 @@ const endgameGuides = defineCollection({
   schema: z.object({ cycle: z.string(), updated: z.coerce.date(), teams: z.array(guideTeam).default([]), authors: z.array(z.string()).default([]), external }),
 });
 
-export const collections = { builds, rotations, banners, buildsI18n, weaponGuides, endgameGuides };
+// Общий anchor сохраняется во всех переводах и в постоянных ссылках из баннера.
+const news = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/news' }),
+  schema: z.object({
+    lang: z.enum(['ru', 'en', 'es']),
+    anchor: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    title: z.string().min(1),
+    summary: z.string().min(1),
+    date: z.coerce.date(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { builds, rotations, banners, buildsI18n, weaponGuides, endgameGuides, news };
