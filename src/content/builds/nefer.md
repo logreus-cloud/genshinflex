@@ -34,6 +34,11 @@ videos:
   - id: "DcbkdNYCaqM"
     author: "Miron MinMax"
     title: "Нефер — новая Дендро-имба? Гайд в 6.1"
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/nefer-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Дендро-ДД, урон которой идёт через Лунную бутонизацию (Дендро + Гидро). Ядро команды — Лаума и Коломбина.

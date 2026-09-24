@@ -1,0 +1,25 @@
+---
+// Враг в зале Бездны: иконка и название на языке страницы из genshin-db; строка — если врага в базе ещё нет
+import enemies from '../data/generated/enemies.json';
+import { useData } from '../lib/data';
+
+type E = string | { id: string; n?: number; note?: string };
+interface Props { e: E }
+const { e } = Astro.props;
+const { lang, t } = useData(Astro.currentLocale);
+const db = enemies as Record<string, { ru: string; en: string; es: string; icon: string | null }>;
+const item = typeof e === 'string' ? undefined : db[e.id];
+const name = typeof e === 'string' ? t(e) : item?.[lang] ?? e.id;
+const extra = typeof e === 'string' ? {} : e;
+---
+<li class="enemy">
+  {item?.icon ? <img src={item.icon} alt="" width="36" height="36" loading="lazy" /> : <span class="ph" aria-hidden="true">?</span>}
+  <span>{name}{extra.n && <b class="n"> ×{extra.n}</b>}{extra.note && <small class="muted"> · {t(extra.note)}</small>}</span>
+</li>
+
+<style>
+  .enemy { display: flex; align-items: center; gap: .55rem; font-size: .9rem; line-height: 1.25; }
+  img, .ph { width: 36px; height: 36px; flex: none; border-radius: 50%; background: var(--surface-3); }
+  .ph { display: grid; place-items: center; color: var(--muted); font-size: .8rem; }
+  .n { color: var(--accent); font-weight: 600; }
+</style>

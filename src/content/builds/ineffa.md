@@ -34,6 +34,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/ineffa/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/ineffa-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** офф-филдовый Электро-урон, включает Лунный заряд в любой команде с Гидро. Одна из самых гибких саппортов Лунного знамения.

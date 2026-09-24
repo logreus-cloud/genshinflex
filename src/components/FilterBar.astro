@@ -4,8 +4,9 @@
 import { useData, LANGS } from '../lib/data';
 const { ELEMENTS, WEAPON_TYPES, t } = useData(Astro.currentLocale);
 
-interface Props { target: string; placeholder: string; groups: ('rarity' | 'element' | 'weapon')[]; rarities?: number[]; extra?: { key: string; label: string }; }
-const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
+// choices — дополнительная группа кнопок: элементы списка несут data-<key> с одним из значений
+interface Props { target: string; placeholder: string; groups: ('rarity' | 'element' | 'weapon')[]; rarities?: number[]; extra?: { key: string; label: string }; choices?: { key: string; label: string; values: [string, string][] }; }
+const { target, placeholder, groups, rarities = [5, 4], extra, choices } = Astro.props;
 ---
 <form class="fb" data-filter={target} role="search">
   <input class="input" type="search" name="q" placeholder={placeholder} aria-label={placeholder} />
@@ -27,6 +28,11 @@ const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
     {groups.includes('weapon') && (
       <div class="grp" role="group" aria-label={t('Оружие')}>
         {Object.entries(WEAPON_TYPES).map(([k, v]) => <button type="button" class="t" data-key="weapon" data-value={k} aria-pressed="false">{v}</button>)}
+      </div>
+    )}
+    {choices && (
+      <div class="grp" role="group" aria-label={choices.label}>
+        {choices.values.map(([v, label]) => <button type="button" class="t" data-key={choices.key} data-value={v} aria-pressed="false">{label}</button>)}
       </div>
     )}
     {extra && <button type="button" class="t" data-key={extra.key} data-value="1" aria-pressed="false">{extra.label}</button>}

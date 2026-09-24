@@ -31,6 +31,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/linnea/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/linnea-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Гео-саппорт Лунного знамения; главный партнёр Цзы Бай, но подходит и в Лунную бутонизацию.

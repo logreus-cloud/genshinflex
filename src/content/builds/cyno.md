@@ -36,6 +36,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/cyno/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/cyno-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** в форме взрыва стихии обычные атаки становятся Электро и масштабируются от атаки и МС. Задача ротации — удержать форму как можно дольше.

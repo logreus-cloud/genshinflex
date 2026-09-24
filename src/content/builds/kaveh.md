@@ -35,6 +35,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/kaveh/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/kaveh-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** во время взрыва стихии обычные атаки Кавеха сами взрывают Дендро-ядра, поэтому он работает как главный персонаж на поле в командах Нилу.

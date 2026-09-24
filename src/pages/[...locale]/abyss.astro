@@ -1,0 +1,96 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import ModeTop from '../../components/ModeTop.astro';
+import ModeExtras from '../../components/ModeExtras.astro';
+import Enemy from '../../components/Enemy.astro';
+import { useData, LANGS } from '../../lib/data';
+// Витая бездна: этажи 9–12 (обновляются каждый цикл), враги по залам и половинам, требования и команды для 12 этажа
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t, base, ELEMENTS } = useData(Astro.currentLocale);
+
+const r = (await getCollection('rotations')).find((x) => x.data.mode === 'abyss')!.data;
+const floors = [...r.floors].sort((a, b) => a.floor - b.floor);
+const top = floors.at(-1)?.floor;
+---
+<Layout title={t('Витая бездна: этажи 9–12, враги и команды')} description={t('Текущий цикл Витой бездны: враги на этажах 9–12 по залам и половинам, аномалии, условия звёзд и команды для 12 этажа.')} wide>
+  <ModeTop mode="abyss" start={r.start} end={r.end} tags={r.tags} cycle={r.cycle} />
+
+  {r.buffs.length > 0 && <div class="panel blessing">{r.buffs.map((b) => <p>{t(b)}</p>)}</div>}
+
+  <nav class="floor-nav" aria-label={t('Этажи')}>
+    {floors.map((f) => <a href={`#floor-${f.floor}`}>{t('Этаж {n}', { n: f.floor })}</a>)}
+  </nav>
+
+  {floors.map((f) => (
+    <section id={`floor-${f.floor}`} class="floor">
+      <h2 class="h-sec">{t('Этаж {n}', { n: f.floor })} <small>{t('уровни врагов {lv}', { lv: f.levels })}</small></h2>
+      {f.disorder.length > 0 && (
+        <ul class="disorder">{f.disorder.map((d) => <li><span class="chip">{t('Аномалия')}</span> {t(d)}</li>)}</ul>
+      )}
+      <div class="chambers">
+        {f.chambers.map((c) => (
+          <article class="panel chamber">
+            <header>
+              <h3>{t('Зал {n}', { n: c.name.replace(/^Зал\s*/, '') })}</h3>
+              <span class="muted small">★ {t(c.stars)}</span>
+            </header>
+            <div class="halves">
+              {c.halves.map((h, i) => (
+                <div class="half">
+                  <span class="hl">{t('{n}-я половина', { n: i + 1 })}</span>
+                  <ul>{h.enemies.map((e) => <Enemy e={e} />)}</ul>
+                  {h.note && <p class="muted small">{t(h.note)}</p>}
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {f.floor === top && r.halves.length > 0 && (
+        <div class="needs">
+          {r.halves.map((h) => (
+            <div class="panel need">
+              <h3>{t(h.label)}</h3>
+              <div class="row">
+                {h.need.map((group, gi) => (
+                  <>{gi > 0 && <span class="muted">+</span>}
+                    {group.map((el, i) => <>{i > 0 && <span class="muted small">{t('или')}</span>}<span class="chip" data-el={el}>{ELEMENTS[el]}</span></>)}
+                  </>
+                ))}
+              </div>
+              <p class="muted small">{t(h.tip)}</p>
+            </div>
+          ))}
+          <a class="btn primary" href={`${base}/tools/team-check`}>{t('Проверить свои команды')}</a>
+        </div>
+      )}
+    </section>
+  ))}
+
+  <ModeExtras buffs={[]} teams={r.teams} sources={r.sources} teamsTitle={t('Команды для {n} этажа', { n: top ?? 12 })} />
+</Layout>
+
+<style>
+  .blessing { margin-bottom: 1rem; border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+  .blessing p { margin: 0; }
+  .floor-nav { position: sticky; top: var(--top-h); z-index: 5; display: flex; gap: .4rem; padding: .6rem 0; background: var(--bg); overflow-x: auto; scrollbar-width: none; }
+  .floor-nav a { flex: none; padding: .4rem .9rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); text-decoration: none; font-size: .9rem; }
+  .floor-nav a:hover { border-color: var(--accent); color: var(--accent); }
+  .floor { scroll-margin-top: calc(var(--top-h) + 56px); margin-top: 1rem; }
+  .disorder { list-style: none; margin: 0 0 .8rem; padding: 0; display: grid; gap: .35rem; }
+  .disorder .chip { margin-right: .3rem; }
+  .chambers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+  .chamber header { display: grid; gap: .1rem; margin-bottom: .7rem; }
+  .chamber h3 { margin: 0; }
+  .halves { display: grid; gap: .8rem; }
+  .half { display: grid; gap: .45rem; padding-top: .7rem; border-top: 1px solid var(--border); }
+  .hl { font: 600 .78rem var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .half ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+  .half p { margin: 0; }
+  .needs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 12px; align-items: start; }
+  .need h3 { margin-bottom: .5rem; }
+  .need p { margin: .6rem 0 0; }
+  .needs .btn { justify-self: start; }
+</style>

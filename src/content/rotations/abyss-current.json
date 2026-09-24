@@ -1,6 +1,6 @@
 {
   "mode": "abyss",
-  "cycle": "Версия 7.0 — 12-й этаж (уровни врагов 95 / 98 / 100, звёзды за 180 / 300 / 420 с. остатка)",
+  "cycle": "Версия 7.0 — этажи 9–12",
   "start": "2026-09-16",
   "end": "2026-10-16",
   "tags": [
@@ -8,59 +8,374 @@
     "Лунный заряд"
   ],
   "buffs": [
-    "1-я половина: урон Рассеивания +200%, Звёздного рассеивания +75%, бонус Анемо урона +60%",
-    "2-я половина: урон Заряда +200%, Лунного заряда +75%, бонус Электро урона +60%",
     "Благословение Бездны: Рассеивание и Звёздное рассеивание вызывают ударную волну с истинным уроном (раз в 4 с.)"
   ],
-  "stages": [
+  "floors": [
     {
-      "name": "Зал 12-1",
-      "halves": [
+      "floor": 9,
+      "levels": "72–76",
+      "disorder": [
+        "Урон Звёздного рассеивания +50%"
+      ],
+      "chambers": [
         {
-          "enemies": [
-            "Химера-землерой (закалённая)"
-          ],
-          "note": "один босс"
+          "name": "Зал 9-1",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Halberd-Knight"
+                },
+                {
+                  "id": "Winged Soarer Knight"
+                }
+              ],
+              "note": "15 врагов, 3 волны"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                }
+              ]
+            }
+          ]
         },
         {
-          "enemies": [
-            "Изгнанник пустошей ×9",
-            "Опричник: Штурмовик огненного клинка («Раскольников»)"
+          "name": "Зал 9-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Halberd-Knight"
+                },
+                {
+                  "id": "Volkodlak Basher"
+                }
+              ],
+              "note": "12 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser",
+                  "n": 2
+                }
+              ],
+              "note": "появляются по очереди"
+            }
+          ]
+        },
+        {
+          "name": "Зал 9-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Rugged Elder Leshy"
+                },
+                {
+                  "id": "Juvenile Tree Segment"
+                }
+              ],
+              "note": "5 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser"
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                }
+              ],
+              "note": "появляются одновременно"
+            }
           ]
         }
       ]
     },
     {
-      "name": "Зал 12-2",
-      "halves": [
+      "floor": 10,
+      "levels": "80–85",
+      "disorder": [
+        "Урон Звёздного проводника +50%"
+      ],
+      "chambers": [
         {
-          "enemies": [
-            "Бессмертный конструкт"
-          ],
-          "note": "один босс"
+          "name": "Зал 10-1",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Volkodlak Lobber"
+                },
+                {
+                  "id": "Volkodlak Raider"
+                }
+              ],
+              "note": "15 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "n": 2
+                }
+              ]
+            }
+          ]
         },
         {
-          "enemies": [
-            "Рыболов скрытых глубин ×4",
-            "Повелитель скрытых глубин: Шёпот кошмаров"
+          "name": "Зал 10-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Leomastiff Guard"
+                },
+                {
+                  "id": "Channel Contact"
+                }
+              ],
+              "note": "8 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 10-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Glaciomancer"
+                },
+                {
+                  "id": "Glacial Warden"
+                }
+              ],
+              "note": "5 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya"
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper"
+                },
+                {
+                  "id": "Oprichniki Medic"
+                }
+              ],
+              "note": "5 врагов"
+            }
           ]
         }
       ]
     },
     {
-      "name": "Зал 12-3",
-      "halves": [
+      "floor": 11,
+      "levels": "88–92",
+      "disorder": [
+        "1-я половина: бонус Анемо урона +60%",
+        "2-я половина: бонус Электро урона +60%"
+      ],
+      "chambers": [
         {
-          "enemies": [
-            "Domovoy Sculptor («Чурин», закалённый)"
-          ],
-          "note": "один босс"
+          "name": "Зал 11-1",
+          "stars": "Прочность монолита выше 20 / 40 / 60%",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Volkodlak Sharpshooter",
+                  "n": 20
+                },
+                {
+                  "id": "Volkodlak Lobber",
+                  "n": 10
+                }
+              ],
+              "note": "защита монолита, 10 волн"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Scout Landcruiser",
+                  "n": 8
+                },
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser",
+                  "n": 8
+                },
+                {
+                  "id": "Force Recon Ground Effect Landcruiser",
+                  "n": 8
+                }
+              ],
+              "note": "защита монолита"
+            }
+          ]
         },
         {
-          "enemies": [
-            "Lightkeeper («Сигурд», закалённый)"
-          ],
-          "note": "большинство врагов под щитами — ломаются Зарядом / Лунным зарядом"
+          "name": "Зал 11-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Glacial Warden"
+                },
+                {
+                  "id": "Glaciomancer",
+                  "n": 2
+                },
+                {
+                  "id": "Rugged Elder Leshy"
+                },
+                {
+                  "id": "Juvenile Tree Segment",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm"
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm"
+                }
+              ],
+              "note": "появляются по очереди"
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Hunter"
+                },
+                {
+                  "id": "Wilderness Exile",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 12,
+      "levels": "95–100",
+      "disorder": [
+        "1-я половина: урон Рассеивания +200%, Звёздного рассеивания +75%, бонус Анемо урона +60%",
+        "2-я половина: урон Заряда +200%, Лунного заряда +75%, бонус Электро урона +60%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Chimeric Burrowbeast",
+                  "note": "закалённая"
+                }
+              ],
+              "note": "один босс"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile",
+                  "n": 9
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "note": "«Раскольников»"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Immortal Construct"
+                }
+              ],
+              "note": "один босс"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fisher of Hidden Depths",
+                  "n": 4
+                },
+                {
+                  "id": "Lord of the Hidden Depths: Whisperer of Nightmares"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                "Domovoy Sculptor («Чурин», закалённый)"
+              ],
+              "note": "один босс"
+            },
+            {
+              "enemies": [
+                "Lightkeeper («Сигурд», закалённый)"
+              ],
+              "note": "большинство врагов под щитами — ломаются Зарядом / Лунным зарядом"
+            }
+          ]
         }
       ]
     }
@@ -135,6 +450,22 @@
     {
       "title": "allthings.how",
       "url": "https://allthings.how/genshin-impact-7-0-spiral-abyss-floor-12-guide-reset/"
+    },
+    {
+      "title": "Game8 — этаж 9",
+      "url": "https://game8.co/games/Genshin-Impact/archives/324575"
+    },
+    {
+      "title": "Game8 — этаж 10",
+      "url": "https://game8.co/games/Genshin-Impact/archives/324621"
+    },
+    {
+      "title": "Game8 — этаж 11",
+      "url": "https://game8.co/games/Genshin-Impact/archives/326290"
+    },
+    {
+      "title": "timesaver.gg — этаж 11",
+      "url": "https://timesaver.gg/blog/genshin-spiral-abyss-floor-11-7-0"
     }
   ],
   "halves": [

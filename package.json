@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "import": "node scripts/import-data.mjs && node scripts/import-banners.mjs",
+    "import": "node scripts/import-data.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/import-weapon-sources.mjs",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
@@ -15,7 +15,9 @@
     "deploy": "npm run build && wrangler pages deploy dist --project-name genshinflex",
     "feedback": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, kind, page, contact, substr(message,1,300) AS message FROM feedback ORDER BY id DESC LIMIT 30\"",
     "guides": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, character, mode, author, contact, status, length(payload) AS size FROM guide_submissions ORDER BY id DESC LIMIT 30\"",
-    "guide:md": "node scripts/guide-to-md.mjs"
+    "guide:md": "node scripts/guide-to-md.mjs",
+    "sim": "node scripts/sim-investments.mjs",
+    "import:sources": "node scripts/import-weapon-sources.mjs"
   },
   "dependencies": {
     "astro": "^7.3.4"

@@ -15,12 +15,16 @@ export async function GET({ params }: { params: { locale?: string } }) {
     artifacts: artifacts.map((a) => ({ s: a.slug, n: a.name, e: a.nameEn, r: a.rarity, i: a.icon })),
     pages: [
       ['Текущая ротация: Бездна, Театр, Натиск', '/rotation'],
+      ['Витая бездна: этажи 9–12', '/abyss'],
+      ['Театр воображариума', '/theater'],
+      ['Натиск', '/onslaught'],
       ['Баннеры: текущие и следующие', '/banners'],
       ['Рейтинг ELO', '/rating'],
       ['Руководства', '/guides'],
       ['Проверка команды для Бездны', '/tools/team-check'],
       ['Трекер круток: гарант и 50/50', '/tools/wishes'],
       ['Конструктор ротаций', '/tools/rotation-builder'],
+      ['Калькулятор прокачки', '/tools/calculator'],
     ],
   };
   return new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });

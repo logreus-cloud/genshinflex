@@ -185,3 +185,17 @@ for (const [file, data] of Object.entries({ characters, weapons, artifacts })) {
   console.log(`${code} ${file}: ${data.length}`);
 }
 }
+
+// Враги для страниц эндгейма: ключ — английское название (как в гайдах по Бездне), названия на трёх языках и иконка.
+// Иконок врагов нет на enka.network — берём с gi.yatta.moe (открытая база ассетов игры)
+const enemies = {};
+for (const en of names(genshin.enemies)) {
+  const base = genshin.enemies(en);
+  const icon = base?.images?.filename_icon;
+  enemies[en] = {
+    ...Object.fromEntries(Object.entries(LOCALES).map(([code, { lang }]) => [code, genshin.enemies(en, { resultLanguage: lang })?.name ?? en])),
+    icon: icon ? `https://gi.yatta.moe/assets/UI/monster/${icon}.png` : null,
+  };
+}
+writeFileSync(new URL('enemies.json', OUT), JSON.stringify(enemies));
+console.log(`enemies: ${Object.keys(enemies).length}`);

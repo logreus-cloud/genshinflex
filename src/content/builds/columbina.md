@@ -46,6 +46,11 @@ videos:
   - id: "AC1hmQMC6Fk"
     author: "Bambi"
     title: "Полный гайд на Коломбину: билд, артефакты, оружие и команды"
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/columbina-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** усиливает урон Лунных реакций всей команды, поэтому раскрывается только рядом с персонажами Лунного знамения: Инеффой, Лаумой, Цзы Бай, Нефер.

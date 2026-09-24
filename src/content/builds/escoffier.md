@@ -31,6 +31,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/escoffier/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/escoffier-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — саб-дд, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

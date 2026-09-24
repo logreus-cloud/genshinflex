@@ -4,6 +4,8 @@ import Layout from '../../../layouts/Layout.astro';
 import Team from '../../../components/Team.astro';
 import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
+import Investments from '../../../components/Investments.astro';
+import investments from '../../../data/investments.json';
 import { useData, LANGS, type Character } from '../../../lib/data';
 import { makeLookup, renderGuide } from '../../../lib/guide-markup';
 const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
@@ -13,6 +15,7 @@ export function getStaticPaths() {
 }
 
 const { c } = Astro.props as { c: Character };
+const slug = c.slug;
 const allBuilds = await getCollection('builds');
 const build = allBuilds.find((b) => b.data.character === c.slug);
 // На английском и испанском — переведённый текст разбора; сгенерированные разборы собираем из переведённого шаблона
@@ -45,7 +48,7 @@ for (const t of [
 const related = [...merged.values()];
 
 const talentKeys = ['normal', 'skill', 'burst'] as const;
-const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ['talents', t('Таланты')], ['constellations', t('Созвездия')]];
+const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ['talents', t('Таланты')], ['constellations', t('Созвездия')]];
 const meta = [
   [t('Созвездие'), c.constellationName], [t('Регион'), c.region], [t('День рождения'), c.birthday], [t('В игре с версии'), c.version],
 ].filter(([, v]) => v);
@@ -172,6 +175,21 @@ const jsonLd = b && {
           {bodyHtml && <div class="panel prose" set:html={bodyHtml} />}
           {b.authors.length > 0 && <p class="muted small">{t('Авторы гайда')}: {b.authors.join(', ')}</p>}
           {templated && <div class="panel prose"><p>{t('Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.', { role: t(b.role).toLowerCase() })}</p></div>}
+          {b.external.length > 0 && (
+            <div class="panel more">
+              <h3>{t('Также можете посмотреть')}</h3>
+              <ul>
+                {b.external.map((g) => (
+                  <li>
+                    <a href={g.url} rel="noopener" target="_blank">{g.title}</a>
+                    {g.author && <span class="muted small"> — {g.author}</span>}
+                    <span class="chip">{g.lang.toUpperCase()}</span>
+                  </li>
+                ))}
+              </ul>
+              <p class="muted small">{t('Гайды других авторов на сторонних сайтах — подробные разборы, написанные игроками.')}</p>
+            </div>
+          )}
           {b.sources.length > 0 && (
             <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`}>{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Дополнить гайд')}</a></p>
           )}
@@ -189,6 +207,8 @@ const jsonLd = b && {
             </>
           )}
         </section>
+
+        <Investments slug={c.slug} />
 
         {b.videos.length > 0 && (
           <section id="videos" data-pagefind-ignore>
@@ -354,6 +374,11 @@ const jsonLd = b && {
   .slot div, .prio div { display: grid; }
   .prio { display: grid; gap: .6rem; margin-top: 12px; }
   .prose { margin-top: 12px; }
+  .more { margin-top: 12px; }
+  .more h3 { margin: 0 0 .5rem; }
+  .more ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; }
+  .more li .chip { margin-left: .4rem; font-size: .7rem; }
+  .more p { margin: .6rem 0 0; }
   .prose :global(p) { margin: .4rem 0; max-width: 80ch; }
 
   .sub { margin: 1.6rem 0 .7rem; }

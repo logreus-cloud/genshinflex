@@ -2,9 +2,10 @@
 import Layout from '../../../layouts/Layout.astro';
 import FilterBar from '../../../components/FilterBar.astro';
 import { useData, LANGS } from '../../../lib/data';
+import { weaponSource } from '../../../lib/weapon-source';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { weapons, fmtStat, stars, base, t } = useData(Astro.currentLocale);
+const { weapons, fmtStat, stars, base, t, lang } = useData(Astro.currentLocale);
 
 const groups = [5, 4, 3].map((r) => ({ r, list: weapons.filter((w) => w.rarity === r) }));
 const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
@@ -13,7 +14,8 @@ const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
   <h1>{t('Оружие')}</h1>
   <p class="lead">{t('{n} видов оружия. Наведите курсор или выделите карточку — появятся статы на 90 уровне и эффект.', { n: weapons.length })}</p>
 
-  <FilterBar target=".wlist" placeholder={t('Найти оружие')} groups={['rarity', 'weapon']} rarities={[5, 4, 3]} />
+  <FilterBar target=".wlist" placeholder={t('Найти оружие')} groups={['rarity', 'weapon']} rarities={[5, 4, 3]}
+    choices={{ key: 'source', label: t('Как получить'), values: [['event-wish', t('Молитва события')], ['wish', t('Стандартная молитва')], ['forge', t('Кузница')], ['bp', t('Боевой пропуск')], ['starglitter', t('Магазин Паймон')], ['free', t('Бесплатно: ивенты, задания, сундуки')]] }} />
 
   {groups.map(({ r, list }) => (
     <section>
@@ -22,7 +24,7 @@ const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
         {list.map((w) => {
           const top = w.stats.at(-1)!;
           return (
-            <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-rarity={String(w.rarity)} data-weapon={w.weapon}>
+            <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
               <a class:list={['wc', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
                 <span class="pic">
                   <img src={w.icon} alt="" width="96" height="96" loading="lazy" />

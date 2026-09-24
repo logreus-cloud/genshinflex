@@ -34,6 +34,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/sucrose/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/sucrose-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** 4★-саппорт на все времена: снижает сопротивление через Изумрудную тень, раздаёт мастерство стихий команде и стягивает врагов.

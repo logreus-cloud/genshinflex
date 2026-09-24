@@ -34,6 +34,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/qiqi/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/qiqi-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** лечение масштабируется от атаки, поэтому билд в ATK%. Внезапно вернулась в мету: закрывает Крио-слот хилера в командах Звёздного проводника.

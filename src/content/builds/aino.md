@@ -31,6 +31,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/aino/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/aino-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** 4★ Гидро-саппорт, который закрывает Гидро-слот в Лунном кристалле и Лунном заряде — доступная замена Коломбине.

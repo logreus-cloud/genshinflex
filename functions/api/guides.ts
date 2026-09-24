@@ -41,6 +41,8 @@ export async function onRequestPost({ request, env }: Ctx) {
     talents: (Array.isArray(g.talents) ? g.talents : []).filter((t) => ['normal', 'skill', 'burst'].includes(t as string)).slice(0, 3),
     teams: list(g.teams, 8).map((t) => ({ name: str(t.name, 80), members: slugs(t.members, 4), note: str(t.note, 300) })).filter((t) => t.members.length),
     body: text,
+    external: list(g.external, 6).map((x) => ({ title: str(x.title, 100), url: str(x.url, 300), author: str(x.author, 60), lang: ['ru', 'en', 'es'].includes(x.lang as string) ? x.lang as string : 'ru' }))
+      .filter((x) => x.title && /^https:\/\/\S+\.\S+$/.test(x.url)),
   };
   if (!guide.weapons.length && !guide.artifacts.length && !guide.teams.length && text.length < 50)
     return json({ error: 'Гайд почти пустой: добавьте оружие, артефакты, команды или хотя бы пару абзацев текста' }, 400);

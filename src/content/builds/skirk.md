@@ -40,6 +40,11 @@ videos:
     author: "IWinToLose Gaming"
     title: "ULTIMATE Skirk Guide! [Best Builds, Weapons, Artifacts, and MORE]"
     lang: en
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/skirk-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — главный дд, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

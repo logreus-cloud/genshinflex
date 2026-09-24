@@ -1,0 +1,53 @@
+---
+// «Как получить»: категории из официальной вики, подробности (ивент, задание) и история баннера оружия
+import { useData } from '../lib/data';
+import { weaponSource, type SourceKind } from '../lib/weapon-source';
+
+interface Props { slug: string }
+const { slug } = Astro.props;
+const { t, lang, base, fmtServerDate } = useData(Astro.currentLocale);
+const src = weaponSource(slug, lang);
+
+const INFO: Record<SourceKind, [string, string]> = {
+  'event-wish': [t('Молитва события'), t('Только на баннерах событий: если его нет сейчас, остаётся ждать повтора.')],
+  wish: [t('Стандартная молитва'), t('Выпадает в стандартной молитве и в молитвах событий — повтора ждать не нужно.')],
+  forge: [t('Кузница'), t('Куётся у кузнеца из заготовки оружия и руды; чертёж некоторых нужно сначала открыть.')],
+  bp: [t('Боевой пропуск'), t('Награда на выбор в платной части боевого пропуска.')],
+  starglitter: [t('Магазин Паймон'), t('Обмен на звёздный блеск в магазине Паймон.')],
+  event: [t('Ивент'), t('Награда временного ивента — после его окончания получить нельзя.')],
+  quest: [t('Задание'), t('Награда за задание или прогресс в мире.')],
+  fishing: [t('Рыбалка'), t('Обмен на рыбу в Ассоциации рыболовов.')],
+  chest: [t('Сундуки'), t('Выпадает из сундуков в открытом мире.')],
+  console: [t('Награда на PlayStation'), t('Выдаётся почтой на PlayStation, на ПК и телефоне доступно через общий аккаунт.')],
+  other: [t('Другое'), ''],
+};
+const last = src.banners[0];
+---
+{src.kinds.length > 0 && (
+  <section class="panel ws">
+    <h2>{t('Как получить')}</h2>
+    <ul>
+      {src.kinds.map((k) => (
+        <li><span class:list={['chip', { gold: k === 'event-wish' }]}>{INFO[k][0]}</span> {INFO[k][1] && <span class="muted small">{INFO[k][1]}</span>}</li>
+      ))}
+    </ul>
+    {src.text && <p class="small detail">{src.text}</p>}
+    {src.banners.length > 0 && (
+      <p class="small banners">
+        {src.onBannerNow && <><a class="chip gold now" href={`${base}/banners/`}>{t('Сейчас на баннере')}</a>{' '}</>}
+        {t('Появлений на баннере оружия: {n}.', { n: src.banners.length })}{' '}
+        {!src.onBannerNow && last && t('Последний раз — версия {v}, {date}.', { v: last.version, date: fmtServerDate(last.start) })}
+      </p>
+    )}
+  </section>
+)}
+
+<style>
+  .ws { display: grid; gap: .6rem; }
+  .ws h2 { margin: 0; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+  li .chip { margin-right: .3rem; }
+  .detail { margin: 0; padding: .5rem .7rem; border-radius: var(--radius); background: var(--surface-2); }
+  .banners { margin: 0; }
+  .now { text-decoration: none; }
+</style>

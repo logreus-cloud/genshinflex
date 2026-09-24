@@ -1,0 +1,42 @@
+---
+// Шапка страницы режима эндгейма: название, даты, обратный отсчёт и переключатель Бездна / Театр / Натиск
+import { useData } from '../lib/data';
+
+interface Props { mode: 'abyss' | 'theater' | 'onslaught'; start: Date; end: Date; tags: string[]; cycle: string; draft?: boolean }
+const { mode, start, end, tags, cycle, draft } = Astro.props;
+const { MODES, base, t, fmtDate, resetAt } = useData(Astro.currentLocale);
+const upcoming = start > new Date();
+const links = { abyss: '/abyss/', theater: '/theater/', onslaught: '/onslaught/' } as const;
+---
+<nav class="crumbs small muted"><a href={`${base}/rotation/`}>{t('Эндгейм')}</a> / {MODES[mode].title}</nav>
+<nav class="modes" aria-label={t('Режимы эндгейма')}>
+  {(Object.keys(links) as (keyof typeof links)[]).map((m) => (
+    <a href={`${base}${links[m]}`} aria-current={m === mode ? 'page' : undefined}>{MODES[m].short}</a>
+  ))}
+</nav>
+<header class="top">
+  <div>
+    <h1>{MODES[mode].title}</h1>
+    <p class="muted">{t(cycle)}</p>
+    {!draft && tags.length > 0 && <div class="row">{tags.map((tag) => <span class="chip gold">{t(tag)}</span>)}</div>}
+  </div>
+  <div class="panel when">
+    <span class="muted small">{fmtDate(start)} — {fmtDate(end)}</span>
+    <b data-until={resetAt(upcoming ? start : end)} data-prefix={upcoming ? t('откроется через') + ' ' : ''} data-done={t('обновилось')}>…</b>
+    <span class="muted small">{upcoming ? t('до нового сезона') : t('до обновления')}</span>
+  </div>
+</header>
+
+<style>
+  .crumbs { margin-bottom: .6rem; }
+  .crumbs a { color: var(--muted); }
+  .modes { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+  .modes a { padding: .6rem 1rem; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+  .modes a:hover { color: var(--text); }
+  .modes a[aria-current] { color: var(--accent); border-bottom-color: var(--accent); }
+  .top { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
+  .top h1 { margin-bottom: .2rem; }
+  .top p { margin: 0 0 .5rem; }
+  .when { display: grid; gap: .15rem; min-width: 200px; }
+  .when b { font: 700 1.3rem var(--font-display); color: var(--accent); }
+</style>

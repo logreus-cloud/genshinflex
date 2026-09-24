@@ -1,0 +1,255 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { useData, LANGS } from '../../../lib/data';
+// Калькулятор прокачки: персонаж (уровень и таланты) и оружие → материалы, книги опыта, руда и мора.
+// Данные — public/data/levelup.json (scripts/import-levelup.mjs), список персонажей и оружия — /data/index.json
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t, TALENTS } = useData(Astro.currentLocale);
+---
+<Layout title={t('Калькулятор прокачки')} description={t('Сколько материалов, книг опыта и моры нужно, чтобы прокачать персонажа, таланты и оружие в Genshin Impact.')} wide>
+  <h1>{t('Калькулятор прокачки')}</h1>
+  <p class="muted lead">{t('Выберите персонажа и оружие, укажите текущий и целевой уровень — посчитаем материалы, книги опыта и мору. Ссылкой на расчёт можно поделиться.')}</p>
+
+  <div class="calc">
+    <form class="setup" id="calc" autocomplete="off">
+      <section class="panel">
+        <h2>{t('Персонаж')}</h2>
+        <label class="pick"><img alt="" width="44" height="44" hidden /><input class="input" name="char" list="dl-char" placeholder={t('Начните вводить имя')} /></label>
+        <div class="range">
+          <label><span class="muted small">{t('Уровень сейчас')}</span><select class="input" name="cFrom"></select></label>
+          <span class="arrow" aria-hidden="true">→</span>
+          <label><span class="muted small">{t('Цель')}</span><select class="input" name="cTo"></select></label>
+        </div>
+        <div class="talents">
+          {(['normal', 'skill', 'burst'] as const).map((k, i) => (
+            <div class="range">
+              <span class="tn small">{TALENTS[k]}</span>
+              <select class="input" name={`t${i}From`}>{Array.from({ length: 10 }, (_, n) => <option value={n + 1}>{n + 1}</option>)}</select>
+              <span class="arrow" aria-hidden="true">→</span>
+              <select class="input" name={`t${i}To`}>{Array.from({ length: 10 }, (_, n) => <option value={n + 1}>{n + 1}</option>)}</select>
+            </div>
+          ))}
+        </div>
+        <div class="row presets">
+          <button type="button" class="btn small" data-preset="max">{t('Всё на максимум')}</button>
+          <button type="button" class="btn small" data-preset="main">{t('90 и таланты 9/9/9')}</button>
+          <button type="button" class="btn small" data-preset="sup">{t('80 и таланты 1/9/9')}</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>{t('Оружие')} <small class="muted">{t('необязательно')}</small></h2>
+        <label class="pick"><img alt="" width="44" height="44" hidden /><input class="input" name="weapon" list="dl-weapon" placeholder={t('Название оружия')} /></label>
+        <div class="range">
+          <label><span class="muted small">{t('Уровень сейчас')}</span><select class="input" name="wFrom"></select></label>
+          <span class="arrow" aria-hidden="true">→</span>
+          <label><span class="muted small">{t('Цель')}</span><select class="input" name="wTo"></select></label>
+        </div>
+      </section>
+      <datalist id="dl-char"></datalist>
+      <datalist id="dl-weapon"></datalist>
+    </form>
+
+    <section class="panel result" aria-live="polite">
+      <div class="res-head">
+        <h2>{t('Понадобится')}</h2>
+        <button type="button" class="btn small" id="share">{t('Скопировать ссылку')}</button>
+      </div>
+      <div class="totals" id="totals"></div>
+      <div class="mats" id="mats"><p class="muted">{t('Выберите персонажа или оружие.')}</p></div>
+      <p class="muted small note">{t('Книги опыта и руда посчитаны самыми дорогими вариантами; мора включает прокачку уровня. Опыт — по игровым таблицам, материалы — по данным genshin-db.')}</p>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { store } from '../../../scripts/common';
+  import { BASE, LANG, t } from '../../../scripts/search';
+
+  type Cost = [number, number][];
+  type Data = {
+    exp: { avatar: number[]; weapon: number[][] };
+    characters: Record<string, { asc: Cost[]; talents: Cost[] }>;
+    weapons: Record<string, { rarity: number; asc: Cost[] }>;
+    materials: Record<string, { rarity: number; sort: number; icon: string | null; ru: string; en: string; es: string }>;
+  };
+  type Named = { s: string; n: string; i: string; r: number; el?: string };
+
+  const MORA = 202, WIT = 104003, MYSTIC = 104013;
+  // Ступени прокачки: [уровень, число возвышений]; «80★» — возвышенный 80-й, лимит поднят до 90
+  const STATES: [number, number][] = [[1, 0], [20, 0], [20, 1], [40, 1], [40, 2], [50, 2], [50, 3], [60, 3], [60, 4], [70, 4], [70, 5], [80, 5], [80, 6], [90, 6]];
+  const label = ([lvl]: [number, number], i: number) => (i > 0 && STATES[i - 1][0] === lvl ? `${lvl}★` : String(lvl));
+  const LOCALE = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG];
+  const fmt = (n: number) => n.toLocaleString(LOCALE);
+  const form = document.querySelector<HTMLFormElement>('#calc')!;
+  const el = (name: string) => form.elements.namedItem(name) as HTMLInputElement & HTMLSelectElement;
+  const norm = (s: string) => s.trim().toLowerCase().replace(/ё/g, 'е');
+
+  init();
+
+  async function init() {
+    const [data, index]: [Data, { characters: Named[]; weapons: Named[] }] = await Promise.all([
+      fetch('/data/levelup.json').then((r) => r.json()),
+      fetch(`${BASE}/data/index.json`).then((r) => r.json()),
+    ]);
+    const chars = index.characters.filter((c) => data.characters[c.s]);
+    const weapons = index.weapons.filter((w) => data.weapons[w.s]);
+    document.querySelector('#dl-char')!.innerHTML = chars.map((c) => `<option value="${c.n}">`).join('');
+    document.querySelector('#dl-weapon')!.innerHTML = weapons.map((w) => `<option value="${w.n}">${'★'.repeat(w.r)}</option>`).join('');
+    const find = (list: Named[], v: string) => list.find((x) => norm(x.n) === norm(v) || x.s === v.trim());
+
+    // Оружию 1–2★ доступно только 70 уровней и 4 возвышения
+    const statesFor = (max: number) => STATES.filter(([lvl]) => lvl <= max);
+    const fillStates = (sel: HTMLSelectElement, states: [number, number][], value: number) => {
+      sel.innerHTML = states.map((s, i) => `<option value="${i}">${label(s, i)}</option>`).join('');
+      sel.value = String(Math.min(value, states.length - 1));
+    };
+    fillStates(el('cFrom'), STATES, 0); fillStates(el('cTo'), STATES, STATES.length - 1);
+    fillStates(el('wFrom'), STATES, 0); fillStates(el('wTo'), STATES, STATES.length - 1);
+
+    const pick = (input: HTMLInputElement, item?: Named) => {
+      const img = input.previousElementSibling as HTMLImageElement;
+      if (item) { img.src = item.i; img.hidden = false; } else img.hidden = true;
+      input.toggleAttribute('aria-invalid', Boolean(input.value.trim() && !item));
+    };
+
+    const add = (acc: Map<number, number>, cost: Cost = []) => { for (const [id, n] of cost) acc.set(id, (acc.get(id) ?? 0) + n); };
+    const expBetween = (table: number[], from: number, to: number) => table.slice(from - 1, to - 1).reduce((s, x) => s + x, 0);
+
+    function compute() {
+      const acc = new Map<number, number>();
+      let charExp = 0, weaponExp = 0;
+      const c = find(chars, el('char').value);
+      if (c) {
+        const [f, tt] = [Number(el('cFrom').value), Number(el('cTo').value)];
+        if (tt > f) {
+          const [fl, fa] = STATES[f], [tl, ta] = STATES[tt];
+          charExp = expBetween(data.exp.avatar, fl, tl);
+          for (let a = fa; a < ta; a++) add(acc, data.characters[c.s].asc[a]);
+        }
+        for (let i = 0; i < 3; i++) {
+          const [a, b] = [Number(el(`t${i}From`).value), Number(el(`t${i}To`).value)];
+          for (let lvl = a + 1; lvl <= b; lvl++) add(acc, data.characters[c.s].talents[lvl - 2]);
+        }
+      }
+      const w = find(weapons, el('weapon').value);
+      if (w) {
+        const [f, tt] = [Number(el('wFrom').value), Number(el('wTo').value)];
+        if (tt > f) {
+          const [fl, fa] = STATES[f], [tl, ta] = STATES[tt];
+          weaponExp = data.exp.weapon.slice(fl - 1, tl - 1).reduce((s, x) => s + x[w.r - 1], 0);
+          for (let a = fa; a < ta; a++) add(acc, data.weapons[w.s].asc[a]);
+        }
+      }
+      // Опыт: книги «Опыт героя» (20 000) — 1 мора за 5 опыта; руда: «Волшебная руда усиления» (10 000) — 1 мора за 10 опыта
+      if (charExp) { add(acc, [[WIT, Math.ceil(charExp / 20000)], [MORA, Math.round(charExp / 5)]]); }
+      if (weaponExp) { add(acc, [[MYSTIC, Math.ceil(weaponExp / 10000)], [MORA, Math.round(weaponExp / 10)]]); }
+      render(acc, charExp, weaponExp, Boolean(c || w));
+      save();
+    }
+
+    const totals = document.querySelector<HTMLElement>('#totals')!;
+    const mats = document.querySelector<HTMLElement>('#mats')!;
+    function render(acc: Map<number, number>, charExp: number, weaponExp: number, any: boolean) {
+      const mora = acc.get(MORA) ?? 0;
+      totals.innerHTML = any ? [
+        [t('Мора'), fmt(mora)],
+        charExp ? [t('Опыт персонажа'), fmt(charExp)] : null,
+        weaponExp ? [t('Опыт оружия'), fmt(weaponExp)] : null,
+      ].filter(Boolean).map((x) => `<div><span class="muted small">${x![0]}</span><b>${x![1]}</b></div>`).join('') : '';
+      const list = [...acc].filter(([id]) => id !== MORA).map(([id, n]) => ({ id, n, m: data.materials[id] }))
+        .sort((a, b) => (a.m?.sort ?? 0) - (b.m?.sort ?? 0) || a.id - b.id);
+      mats.innerHTML = list.length
+        ? list.map(({ n, m }) => `<div class="mat r${m?.rarity ?? 1}" title="${m?.[LANG] ?? ''}">${m?.icon ? `<img src="${m.icon}" alt="" width="56" height="56" loading="lazy" />` : ''}<b>${fmt(n)}</b><span class="small">${m?.[LANG] ?? '?'}</span></div>`).join('')
+        : `<p class="muted">${any ? t('Ничего не нужно — цель уже достигнута.') : t('Выберите персонажа или оружие.')}</p>`;
+    }
+
+    // Состояние — в адресе страницы (для ссылки) и в браузере (чтобы вернуться к расчёту)
+    const FIELDS = ['char', 'cFrom', 'cTo', 't0From', 't0To', 't1From', 't1To', 't2From', 't2To', 'weapon', 'wFrom', 'wTo'];
+    function save() {
+      const c = find(chars, el('char').value), w = find(weapons, el('weapon').value);
+      const state = Object.fromEntries(FIELDS.map((f) => [f, f === 'char' ? c?.s ?? '' : f === 'weapon' ? w?.s ?? '' : el(f).value]));
+      store.set('gf:calc', state);
+      history.replaceState(null, '', `#${new URLSearchParams(state)}`);
+    }
+    function load() {
+      const fromHash = new URLSearchParams(location.hash.slice(1));
+      const state: Record<string, string> = fromHash.has('char') || fromHash.has('weapon') ? Object.fromEntries(fromHash) : store.get('gf:calc', {});
+      const c = find(chars, state.char ?? ''), w = find(weapons, state.weapon ?? '');
+      el('char').value = c?.n ?? ''; el('weapon').value = w?.n ?? '';
+      pick(el('char'), c); pick(el('weapon'), w);
+      if (w) weaponLimit(w);
+      for (const f of FIELDS) if (!['char', 'weapon'].includes(f) && state[f]) el(f).value = state[f];
+      if (!state.t0To) ['t0To', 't1To', 't2To'].forEach((f) => { el(f).value = '10'; });
+    }
+    const weaponLimit = (w: Named) => {
+      const states = statesFor(w.r <= 2 ? 70 : 90);
+      fillStates(el('wFrom'), states, Number(el('wFrom').value)); fillStates(el('wTo'), states, states.length - 1);
+    };
+
+    form.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.name === 'char') pick(target, find(chars, target.value));
+      if (target.name === 'weapon') { const w = find(weapons, target.value); pick(target, w); if (w) weaponLimit(w); }
+      compute();
+    });
+    form.addEventListener('change', compute);
+    const PRESETS: Record<string, [number, number[]]> = { max: [13, [10, 10, 10]], main: [13, [9, 9, 9]], sup: [11, [1, 9, 9]] };
+    form.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-preset]');
+      if (!b) return;
+      const [lvl, tl] = PRESETS[b.dataset.preset!];
+      el('cTo').value = String(lvl);
+      tl.forEach((v, i) => { el(`t${i}To`).value = String(Math.max(v, Number(el(`t${i}From`).value))); });
+      compute();
+    });
+    const share = document.querySelector<HTMLButtonElement>('#share')!;
+    share.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(location.href); share.textContent = t('Ссылка скопирована'); } catch { share.textContent = location.href; }
+      setTimeout(() => { share.textContent = t('Скопировать ссылку'); }, 2500);
+    });
+    load();
+    compute();
+  }
+</script>
+
+<style>
+  .lead { max-width: 80ch; }
+  .calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: start; margin-top: 1rem; }
+  .setup { display: grid; gap: 12px; }
+  .setup h2, .result h2 { margin: 0 0 .8rem; font-size: 1.1rem; }
+  .pick { position: relative; display: flex; align-items: center; margin-bottom: .8rem; }
+  .pick img { position: absolute; left: .35rem; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-3); pointer-events: none; }
+  .pick img:not([hidden]) + input { padding-left: 2.9rem; }
+  .input[aria-invalid] { border-color: var(--pyro); }
+  .range { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .5rem; align-items: end; }
+  .range label { display: grid; gap: .25rem; }
+  .arrow { color: var(--muted); padding-bottom: .55rem; }
+  .talents { display: grid; gap: .5rem; margin-top: .9rem; }
+  .talents .range { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+  .tn { color: var(--muted); }
+  .talents .arrow { padding: 0; }
+  .presets { margin-top: .9rem; }
+  .btn.small { font-size: .82rem; padding: .35rem .7rem; }
+  .result { position: sticky; top: calc(var(--top-h) + 12px); }
+  .res-head { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+  .res-head h2 { margin: 0; }
+  .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: .8rem 0; }
+  .totals :global(div) { display: grid; background: var(--surface-2); border-radius: var(--radius); padding: .5rem .7rem; }
+  .totals :global(b) { font: 700 1.15rem var(--font-display); color: var(--accent); }
+  .mats { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  .mats :global(.mat) { display: grid; justify-items: center; gap: .15rem; text-align: center; padding: .5rem .3rem; border-radius: var(--radius); background: var(--surface-2); }
+  .mats :global(.mat img) { border-radius: 8px; }
+  .mats :global(.r5 img) { background: linear-gradient(160deg, #7a5226, #d1953f); }
+  .mats :global(.r4 img) { background: linear-gradient(160deg, #5b4b82, #9679c4); }
+  .mats :global(.r3 img) { background: linear-gradient(160deg, #3b5a8a, #5c8bc4); }
+  .mats :global(.r2 img) { background: linear-gradient(160deg, #3f6b56, #5fa487); }
+  .mats :global(.r1 img) { background: linear-gradient(160deg, #5b5f6b, #868b98); }
+  .mats :global(.mat b) { font: 700 1rem var(--font-display); }
+  .mats :global(.mat span) { color: var(--muted); line-height: 1.2; overflow-wrap: anywhere; }
+  .note { margin: .9rem 0 0; }
+  @media (max-width: 960px) {
+    .calc { grid-template-columns: 1fr; }
+    .result { position: static; }
+  }
+</style>

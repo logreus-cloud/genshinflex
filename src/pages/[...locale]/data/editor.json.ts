@@ -20,6 +20,7 @@ export async function GET({ params }: { params: { locale?: string } }) {
       mainStats: { sands: stat(b.mainStats.sands), goblet: stat(b.mainStats.goblet), circlet: stat(b.mainStats.circlet) },
       substats: b.substats.map(stat), talents: b.talents,
       teams: b.teams.map((tm) => ({ name: note(tm.name), members: tm.members, note: note(tm.note) })),
+      external: b.external,
       body: text.startsWith(TEMPLATED) ? '' : text,
     }];
   }));

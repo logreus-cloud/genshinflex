@@ -36,9 +36,10 @@ const lines = [
   ...(g.talents.length ? [`talents: [${g.talents.join(', ')}]`] : []),
   'teams:', ...g.teams.flatMap((t) => [`  - name: ${q(t.name || 'Команда')}`, `    members: [${t.members.join(', ')}]`, ...(t.note ? [`    note: ${q(t.note)}`] : [])]),
   `authors: ${JSON.stringify([...new Set([...oldAuthors, row.author])])}`,
+  ...(g.external?.length ? ['external:', ...g.external.flatMap((x) => [`  - title: ${q(x.title)}`, `    url: ${x.url}`, ...(x.author ? [`    author: ${q(x.author)}`] : []), `    lang: ${x.lang}`])] : []),
 ].join('\n');
 const lang = g.lang ?? 'ru';
-const md = `${lines}\n${keep('sources')}${keep('videos')}---\n\n${g.body}\n`;
+const md = `${lines}\n${keep('sources')}${keep('videos')}${g.external?.length ? '' : keep('external')}---\n\n${g.body}\n`;
 const i18nFile = `src/content/builds-i18n/${lang}/${g.character}.md`;
 if (process.argv.includes('--dry')) {
   console.log(`# заявка ${id} · ${lang} · ${row.mode === 'edit' ? 'правка' : 'новый гайд'} · ${row.author} · ${row.contact ?? 'без контакта'} · ${row.status}`);

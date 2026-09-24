@@ -34,6 +34,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/xingqiu/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/xingqiu-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** почти весь урон — клинки дождя от взрыва стихии, которые бьют вместе с обычными атаками активного персонажа. Заодно даёт снижение урона и сопротивление прерыванию.

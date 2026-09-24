@@ -30,6 +30,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/nicole/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/nicole-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Пиро-саппорт, которого ставят ради поддержки команды, а не собственного урона: билд в атаку и энергию, крит — по остаточному принципу.

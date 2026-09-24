@@ -35,6 +35,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/chevreuse/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/chevreuse-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — саппорт, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

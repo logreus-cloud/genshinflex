@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import ModeTop from '../../components/ModeTop.astro';
+import ModeExtras from '../../components/ModeExtras.astro';
+import { useData, LANGS } from '../../lib/data';
+// Страница режима эндгейма: текущий цикл, баффы, состав и команды
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t, MODES } = useData(Astro.currentLocale);
+
+const r = (await getCollection('rotations')).find((x) => x.data.mode === 'onslaught')!.data;
+---
+<Layout title={t('{mode}: текущий цикл и команды', { mode: MODES.onslaught.title })} description={t('{mode} в Genshin Impact: текущий цикл, баффы и рекомендованные команды.', { mode: MODES.onslaught.title })}>
+  <ModeTop mode="onslaught" start={r.start} end={r.end} tags={r.tags} cycle={r.cycle} draft={r.draft} />
+  {r.note && <p class="notice">{t(r.note)}</p>}
+  {r.draft ? (
+    !r.note && <p class="notice">{t('Цикл «{c}» ещё не заполнен: нужны враги, баффы и команды.', { c: t(r.cycle) })}</p>
+  ) : (
+    <ModeExtras buffs={r.buffs} cast={r.cast} teams={r.teams} sources={[]} />
+  )}
+  <ModeExtras buffs={[]} teams={[]} sources={r.sources} />
+</Layout>

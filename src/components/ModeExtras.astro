@@ -1,0 +1,44 @@
+---
+// Общие блоки режима эндгейма: баффы, стартовый состав (Театр), рекомендованные команды и источники
+import Team from './Team.astro';
+import CharacterIcon from './CharacterIcon.astro';
+import { useData } from '../lib/data';
+
+interface Props {
+  buffs: string[];
+  cast?: { title: string; members: string[] }[];
+  teams: { name?: string; members: string[]; note?: string }[];
+  sources: { title: string; url: string }[];
+  teamsTitle?: string;
+}
+const { buffs, cast = [], teams, sources, teamsTitle } = Astro.props;
+const { t } = useData(Astro.currentLocale);
+---
+{buffs.length > 0 && (
+  <section>
+    <h2 class="h-sec">{t('Баффы и особенности')}</h2>
+    <ul class="panel buffs">{buffs.map((b) => <li>{t(b)}</li>)}</ul>
+  </section>
+)}
+{cast.map((c) => (
+  <section>
+    <h2 class="h-sec">{t(c.title)}</h2>
+    <div class="panel cast">{c.members.map((m) => <CharacterIcon slug={m} size={56} />)}</div>
+  </section>
+))}
+{teams.length > 0 && (
+  <section>
+    <h2 class="h-sec">{teamsTitle ?? t('Команды')}</h2>
+    <div class="grid">{teams.map((tm) => <Team {...tm} />)}</div>
+  </section>
+)}
+{sources.length > 0 && (
+  <p class="muted small src">{t('Источники')}: {sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{t(s.title)}</a></>)}</p>
+)}
+
+<style>
+  section { margin-top: 1.6rem; }
+  .buffs { margin: 0; padding-left: 2.2rem; display: grid; gap: .4rem; }
+  .cast { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .src { margin-top: 1.6rem; }
+</style>

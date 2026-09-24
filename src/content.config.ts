@@ -19,6 +19,8 @@ const builds = defineCollection({
     talents: z.array(z.enum(['normal', 'skill', 'burst'])).default([]),
     teams: z.array(z.object({ name: z.string(), members: z.array(z.string()).length(4), note: z.string().optional() })),
     sources: z.array(source).default([]),
+    // Гайды сообщества на других сайтах — блок «Также можете посмотреть»
+    external: z.array(z.object({ title: z.string(), url: z.url(), author: z.string().optional(), lang: z.enum(['ru', 'en', 'es']) })).default([]),
     // Авторы из редактора гайдов (подпись на странице персонажа)
     authors: z.array(z.string()).default([]),
     // Видео-гайды с YouTube: id ролика (11 символов), название и автор — как на YouTube (проверены через oEmbed)
@@ -48,6 +50,20 @@ const rotations = defineCollection({
       label: z.string(),
       need: z.array(z.array(z.enum(['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo']))),
       tip: z.string(),
+    })).default([]),
+    // Этажи Бездны: враг — английское название из genshin-db (src/data/generated/enemies.json) или готовая строка, если врага нет в базе
+    floors: z.array(z.object({
+      floor: z.number().int(),
+      levels: z.string(),
+      disorder: z.array(z.string()).default([]),
+      chambers: z.array(z.object({
+        name: z.string(),
+        stars: z.string(),
+        halves: z.array(z.object({
+          enemies: z.array(z.union([z.string(), z.object({ id: z.string(), n: z.number().int().optional(), note: z.string().optional() })])),
+          note: z.string().optional(),
+        })),
+      })),
     })).default([]),
     stages: z.array(z.object({
       name: z.string(),

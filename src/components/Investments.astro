@@ -1,0 +1,131 @@
+---
+// «Стоит ли выбивать»: прирост урона команды от созвездий и лучшего 5★ оружия по симуляциям gcsim (scripts/sim-investments.mjs)
+import CharacterIcon from './CharacterIcon.astro';
+import { useData } from '../lib/data';
+import data from '../data/investments.json';
+
+// four — оружие, с которым считали созвездия (refine — его пробуждение); five и weapon — сравнение с лучшим 5★, если оно есть в гайде
+interface Row { team: string[]; source: string; four: string | null; refine?: number; five: string | null; cons: (number | null)[]; weapon: number | null; dps: number; optimized?: boolean }
+interface Props { slug: string }
+const { slug } = Astro.props;
+const { t, getWeapon, characters, base, fmtNumber } = useData(Astro.currentLocale);
+const all = data as unknown as Record<string, Row> & { _meta?: { gcsim: string; date: string; iterations: number } };
+const row = all[slug] as Row | undefined;
+const meta = all._meta;
+
+// Оценка шага для игрока без доната: сколько урона добавляет именно этот шаг
+const verdict = (g: number) =>
+  g < 5 ? { cls: 'skip', text: t('можно пропустить') }
+  : g < 15 ? { cls: 'nice', text: t('приятно, но не обязательно') }
+  : { cls: 'big', text: t('заметный прирост') };
+
+const key = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
+const bySimKey = new Map(characters.map((c) => [key(c.nameEn), c.slug]));
+
+// Шаг — прирост к предыдущему посчитанному созвездию; null — gcsim не смог прогнать это созвездие
+const steps = (row?.cons ?? []).map((total, i, all) => {
+  const prev = all.slice(0, i).reverse().find((v) => v !== null) ?? 0;
+  return { label: `C${i + 1}`, total, step: total === null ? null : Math.round((total - prev) * 10) / 10 };
+});
+const max = Math.max(1, row?.weapon ?? 0, ...(row?.cons ?? []).map((v) => v ?? 0));
+const five = row?.five ? getWeapon(row.five) : null;
+const four = row?.four ? getWeapon(row.four) : null;
+const weapon = row?.weapon ?? null;
+const c1 = row?.cons[0] ?? 0;
+const tuned = row?.optimized !== false;
+const signed = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v)}%`;
+---
+{row && four && (
+  <section id="value">
+    <h2 class="h-sec">{t('Стоит ли выбивать')} <small>{t('прирост урона команды, симуляция gcsim')}</small></h2>
+    <div class="panel inv">
+      <p class="muted lead">{t('Насколько вырастет урон всей команды по сравнению с C0 и оружием {four} (R{r}). Считается с нарастанием: C2 включает C1.', { four: four.name, r: row.refine ?? 5 })}</p>
+
+      {five && weapon !== null && (<>
+      <div class="pick">
+        <div class:list={['opt', { best: weapon >= c1 }]}>
+          <img src={five.icon} alt="" width="44" height="44" loading="lazy" />
+          <div><span class="muted small">{t('Лучшее 5★ оружие (R1)')}</span><b>{five.name}</b></div>
+          <strong>{signed(weapon)}</strong>
+        </div>
+        <span class="vs muted small">{t('или')}</span>
+        <div class:list={['opt', { best: c1 > weapon }]}>
+          <span class="cbadge">C1</span>
+          <div><span class="muted small">{t('Первое созвездие')}</span><b>{t('ещё одна копия персонажа')}</b></div>
+          <strong>{signed(c1)}</strong>
+        </div>
+      </div>
+      <p class="small hint">{Math.max(weapon, c1) < 5
+        ? t('Ни оружие, ни первое созвездие почти ничего не добавляют — крутки лучше сберечь для новых персонажей.')
+        : weapon >= c1
+        ? t('Если выбирать одно, оружие даёт больше, а крутки с оружейного баннера ещё и не отнимают гарант на персонажей.')
+        : t('Если выбирать одно, первое созвездие даёт больше, чем оружие.')}</p>
+      </>)}
+
+      <ol class="bars">
+        {steps.map((s) => {
+          if (s.total === null || s.step === null) return (
+            <li><span class="lbl">{s.label}</span><span class="track"></span><span class="num muted">—</span><span class="tag skip">{t('нет данных')}</span></li>
+          );
+          const v = verdict(s.step);
+          return (
+            <li>
+              <span class="lbl">{s.label}</span>
+              <span class="track"><span class:list={['fill', v.cls]} style={`width:${Math.max(2, (Math.max(0, s.total) / max) * 100)}%`}></span></span>
+              <span class="num"><b>{signed(s.total)}</b> <small class="muted">({signed(s.step)} {t('к прошлому')})</small></span>
+              <span class:list={['tag', v.cls]}>{v.text}</span>
+            </li>
+          );
+        })}
+      </ol>
+
+      <details class="how small">
+        <summary>{t('Как считали')}</summary>
+        {tuned ? (
+          <p>{t('Команда из открытой базы симуляций gcsim — самая близкая к командам из гайда. Меняли только этого персонажа: созвездие и оружие. Напарники, сеты артефактов и ротация — как в исходной симуляции, доп. статы всей команды подобраны по стандарту KQM под каждое оружие отдельно. C0 с {four}: {dps} урона в секунду.', { four: four.name, dps: fmtNumber(row.dps) })}</p>
+        ) : (
+          <p>{t('Команда из открытой базы симуляций gcsim — самая близкая к командам из гайда. Меняли только созвездие этого персонажа; напарники, артефакты, статы и ротация — как в исходной симуляции. C0 с {four}: {dps} урона в секунду.', { four: four.name, dps: fmtNumber(row.dps) })}</p>
+        )}
+        <div class="team">{row.team.map((k) => bySimKey.get(k)).filter(Boolean).map((s) => <CharacterIcon slug={s!} size={40} />)}</div>
+        <p class="muted">{t('Прирост зависит от команды и вложений: это ориентир, а не точное число для вашего аккаунта.')}
+          {' '}<a href={row.source} rel="noopener">{t('Исходная симуляция')}</a>{meta && <> · gcsim {meta.gcsim}, {meta.date}</>}</p>
+      </details>
+    </div>
+  </section>
+)}
+
+<style>
+  .inv { display: grid; gap: .9rem; }
+  .lead { margin: 0; }
+  .pick { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .6rem; align-items: center; }
+  .opt { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); min-width: 0; }
+  .opt.best { border-color: var(--accent); background: var(--accent-soft); }
+  .opt img { border-radius: 8px; background: linear-gradient(160deg, #7a5226, #d1953f); flex: none; }
+  .opt div { display: grid; min-width: 0; flex: 1; }
+  .opt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .opt strong { font: 700 1.2rem var(--font-display); color: var(--accent); white-space: nowrap; }
+  .cbadge { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--surface-3); font: 700 .95rem var(--font-display); color: var(--accent); }
+  .hint { margin: -.3rem 0 0; color: var(--muted); }
+  .bars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 2.2rem minmax(80px, 1fr) max-content max-content; gap: .45rem .7rem; align-items: center; }
+  .bars li { display: contents; }
+  .lbl { font: 600 .9rem var(--font-display); color: var(--muted); }
+  .track { height: .7rem; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .fill { display: block; height: 100%; border-radius: inherit; }
+  .fill.skip { background: color-mix(in srgb, var(--muted) 55%, transparent); }
+  .fill.nice { background: color-mix(in srgb, var(--accent) 65%, transparent); }
+  .fill.big { background: var(--accent); }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tag { font-size: .78rem; padding: .15em .6em; border-radius: 999px; justify-self: start; white-space: nowrap; }
+  .tag.skip { background: var(--surface-2); color: var(--muted); }
+  .tag.nice { background: var(--accent-soft); color: var(--accent); }
+  .tag.big { background: var(--accent); color: var(--accent-ink); }
+  .how summary { cursor: pointer; color: var(--accent); }
+  .how p { margin: .5rem 0; max-width: 80ch; }
+  .team { display: flex; gap: .4rem; }
+  @media (max-width: 760px) {
+    .pick { grid-template-columns: 1fr; }
+    .vs { text-align: center; }
+    .bars { grid-template-columns: 2.2rem minmax(0, 1fr) auto; }
+    .bars .tag { grid-column: 2 / -1; }
+  }
+</style>

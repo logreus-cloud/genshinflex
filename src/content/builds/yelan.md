@@ -37,6 +37,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/yelan/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/yelan-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Урон Е Лань масштабируется от HP, поэтому HP % в часах, если энергии хватает; иначе — восстановление энергии. Порядок оружия поправлен нами: Aqua Simulacra — её сигнатурка.

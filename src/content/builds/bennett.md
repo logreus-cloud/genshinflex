@@ -38,6 +38,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/bennett/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/bennett-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Классический саппорт-билд: Беннет ценен баффом атаки от взрыва стихии, а он зависит от базовой атаки оружия — отсюда 5★-мечи с высокой базой. Статы — восстановление энергии и HP для лечения. genshin.gg предлагает боевой вариант с Пиро-кубком и критом, но для роли саппорта мы советуем этот.

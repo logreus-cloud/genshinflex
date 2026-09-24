@@ -31,6 +31,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/alyosha/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/alyosha-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Электро-саппорт 7.0, работающий в обеих Звёздных командах Одетты. Источники рекомендуют билд целиком в атаку и восстановление энергии.

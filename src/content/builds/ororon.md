@@ -32,6 +32,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/ororon/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/ororon-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Электро-саппорт с офф-филдовым уроном; в Натлане — лучший партнёр Часки, сейчас также закрывает четвёртый слот в командах Лунного заряда.

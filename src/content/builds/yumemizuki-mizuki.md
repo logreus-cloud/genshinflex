@@ -25,6 +25,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/yumemizukimizuki/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/mizuki-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Анемо-ДД, урон которой идёт через Рассеивание и, начиная с 7.0, Звёздное рассеивание в паре с Одеттой.

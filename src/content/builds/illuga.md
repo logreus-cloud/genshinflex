@@ -27,6 +27,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/illuga/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/illuga-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Гео-саппорт, собирается целиком в мастерство стихий. Хорош в командах Цзы Бай.

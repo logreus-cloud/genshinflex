@@ -33,6 +33,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/chiori/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/chiori-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — саб-дд, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

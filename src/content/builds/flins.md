@@ -40,6 +40,11 @@ videos:
   - id: "ShbOyJuWps8"
     author: "Бутонная соль"
     title: "Зачем нужен Флинс? Ответы на вопросы от Анимекула"
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/flins-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Электро-ДД, чей урон идёт через реакцию Лунный заряд, поэтому в команде нужен Гидро-партнёр (Коломбина или Айно) и второй Электро-персонаж Лунного знамения — Инеффа.

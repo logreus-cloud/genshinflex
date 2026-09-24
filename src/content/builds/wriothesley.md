@@ -35,6 +35,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/wriothesley/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/wriothesley-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Крио-ДД на обычных атаках: навык тратит HP и усиливает атаки, а Охотник-маршал получает стаки крита от потери HP.

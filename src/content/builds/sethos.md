@@ -26,6 +26,11 @@ teams: []
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/sethos/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/sethos-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — саб-дд, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

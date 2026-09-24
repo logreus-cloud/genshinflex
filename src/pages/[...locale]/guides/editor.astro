@@ -75,6 +75,12 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
         </details>
 
         <details class="panel sec" open>
+          <summary>{t('Гайды на других сайтах')} <small class="muted">{t('подробные разборы других авторов')}</small></summary>
+          <div class="rows" data-list="external"></div>
+          <button class="btn add" type="button" data-add="external">+ {t('Ссылка')}</button>
+        </details>
+
+        <details class="panel sec" open>
           <summary>{t('Текст гайда')}</summary>
           <div class="tb" role="toolbar" aria-label={t('Форматирование текста')}>
             <button type="button" data-md="h2" title={t('Заголовок')}>{t('Заголовок')}</button>
@@ -176,6 +182,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     weapons: { slug: string; note?: string }[]; artifacts: { sets: string[]; note?: string }[];
     mainStats: { sands: string; goblet: string; circlet: string }; substats: string[]; talents: string[];
     teams: { name?: string; members: string[]; note?: string }[]; body: string;
+    external?: { title: string; url: string; author?: string; lang: string }[];
   };
   type Data = {
     characters: Item[]; weapons: Item[]; artifacts: Item[]; elements: Record<string, string>; weaponTypes: Record<string, string>;
@@ -252,6 +259,9 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       artifacts: (a?: Guide['artifacts'][number]) => `${picker('set', a?.sets[0], t('Сет'))}${picker('set', a?.sets[1], t('Второй сет (для 2 + 2)'))}${note(a?.note, t('Заметка: «4 предмета» или «2 + 2»'))}${controls}`,
       teams: (tm?: Guide['teams'][number]) => `<input class="input tname" maxlength="80" placeholder="${esc(t('Название команды'))}" value="${esc(tm?.name ?? '')}" />${controls}`
         + `<div class="members">${[0, 1, 2, 3].map((i) => picker('char', tm?.members[i], t('Участник {n}', { n: i + 1 }))).join('')}</div>${note(tm?.note, t('Заметка к команде'))}`,
+      external: (x?: NonNullable<Guide['external']>[number]) => `<input class="input xtitle" maxlength="100" placeholder="${esc(t('Название: «Гайд на Фурину от …»'))}" value="${esc(x?.title ?? '')}" />`
+        + `<select class="input xlang">${['ru', 'en', 'es'].map((l) => `<option value="${l}"${(x?.lang ?? LANG) === l ? ' selected' : ''}>${l.toUpperCase()}</option>`).join('')}</select>${controls}`
+        + `<input class="input xurl" maxlength="300" inputmode="url" placeholder="https://…" value="${esc(x?.url ?? '')}" /><input class="input xauthor" maxlength="60" placeholder="${esc(t('Автор (необязательно)'))}" value="${esc(x?.author ?? '')}" />`,
     };
     type ListName = keyof typeof ROWS;
     const addRow = (name: ListName, value?: never) => {
@@ -277,6 +287,10 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       talents: [...new Set(['t1', 't2', 't3'].map((n) => field(n).value).filter(Boolean))],
       teams: rowsOf('teams').map((r) => ({ name: r.querySelector<HTMLInputElement>('.tname')!.value.trim(), members: slugsIn(r), note: noteIn(r) })).filter((tm) => tm.members.length || tm.name),
       body: ta.value,
+      external: rowsOf('external').map((r) => ({
+        title: r.querySelector<HTMLInputElement>('.xtitle')!.value.trim(), url: r.querySelector<HTMLInputElement>('.xurl')!.value.trim(),
+        author: r.querySelector<HTMLInputElement>('.xauthor')!.value.trim(), lang: r.querySelector<HTMLSelectElement>('.xlang')!.value,
+      })).filter((x) => x.title || x.url),
     });
     const fill = (g: Partial<Guide>) => {
       field('role').value = g.role ?? '';
@@ -355,6 +369,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
         if (tm.members.length !== 4) out.push(t('В команде {name}: {n} из 4 участников.', { name: tm.name ? `«${tm.name}»` : `№${i + 1}`, n: tm.members.length }));
       });
       if (!g.weapons.length && !g.artifacts.length && !g.teams.length && g.body.trim().length < 50) out.push(t('Гайд пока пустой: добавьте оружие, артефакты, команды или текст.'));
+      (g.external ?? []).forEach((x) => { if (!/^https:\/\/\S+\.\S+$/.test(x.url) || !x.title) out.push(t('Ссылка «{name}»: нужны название и адрес https://…', { name: x.title || x.url })); });
       if (!field('author').value.trim()) out.push(t('Укажите имя или ник для подписи.'));
       return out;
     };
@@ -387,7 +402,8 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
         </div>
         ${g.body.trim() ? `<div class="panel prose">${render(g.body)}</div>` : ''}
         <h3 class="h-sec">${esc(t('Команды'))}</h3>
-        ${g.teams.length ? `<div class="pv-teams">${g.teams.map((tm) => `<div class="panel team"><h4>${esc(tm.name || t('Без названия'))}</h4><div class="mems">${tm.members.map(member).join('')}${'<span class="mem ghost"></span>'.repeat(Math.max(0, 4 - tm.members.length))}</div>${tm.note ? `<p class="muted small">${esc(tm.note)}</p>` : ''}</div>`).join('')}</div>` : empty(t('Команды не добавлены'))}`;
+        ${g.teams.length ? `<div class="pv-teams">${g.teams.map((tm) => `<div class="panel team"><h4>${esc(tm.name || t('Без названия'))}</h4><div class="mems">${tm.members.map(member).join('')}${'<span class="mem ghost"></span>'.repeat(Math.max(0, 4 - tm.members.length))}</div>${tm.note ? `<p class="muted small">${esc(tm.note)}</p>` : ''}</div>`).join('')}</div>` : empty(t('Команды не добавлены'))}
+        ${g.external?.length ? `<div class="panel pv-more"><h4>${esc(t('Также можете посмотреть'))}</h4><ul>${g.external.map((x) => `<li>${esc(x.title || x.url)}${x.author ? ` <span class="muted small">— ${esc(x.author)}</span>` : ''} <span class="chip">${esc(x.lang.toUpperCase())}</span></li>`).join('')}</ul></div>` : ''}`;
     };
 
     const count = document.querySelector<HTMLElement>('#count')!;
@@ -653,6 +669,10 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .item.teams { grid-template-columns: minmax(0, 1fr) auto; }
   .ge .item.teams .members { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem; }
   .ge .item.teams > .note { grid-column: 1 / -1; }
+  .ge .item.external { grid-template-columns: minmax(0, 1fr) 4.5rem auto; }
+  .ge .item.external .xurl { grid-column: 1 / 3; }
+  .ge .pv-more { margin-top: 10px; }
+  .ge .pv-more ul { margin: .5rem 0 0; padding-left: 1.1rem; display: grid; gap: .3rem; }
   .ge .item .input { background: var(--surface); padding-top: .4rem; padding-bottom: .4rem; }
   .ge .ctl { display: inline-flex; gap: 2px; }
   .ge .ctl button { width: 1.9rem; height: 1.9rem; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; color: var(--muted); }

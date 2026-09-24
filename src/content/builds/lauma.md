@@ -34,6 +34,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/lauma/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/lauma-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Дендро-саппорт, который работает и в новой Лунной бутонизации (с Нефер), и в классическом Цветении Нилу.

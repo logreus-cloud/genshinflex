@@ -36,6 +36,11 @@ videos:
   - id: "VkkBYnPzbJU"
     author: "Бутонная соль"
     title: "Анализ Сандроне от Анимекула: способности, сигнатурка"
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/sandrone-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Крио-ДД для новой реакции Звёздный проводник (Крио + Электро). Ядро команды — Одетта и Электро-партнёры Яэ Мико и Алёша.

@@ -27,6 +27,11 @@ teams:
     members: [raiden-shogun, kujou-sara, kaedehara-kazuha, bennett]
     note: Максимум баффов в ульту Райдэн
 sources: []
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/raiden-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** почти весь урон — в Взрыве стихии. Навык ставит Глаз Злобы и копит Решимость

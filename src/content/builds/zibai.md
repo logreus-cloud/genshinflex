@@ -40,6 +40,11 @@ videos:
   - id: "PqhK68SZd3g"
     author: "Genshin Academy"
     title: "От простого к сложному — гайд на Цзы Бай"
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/zibai-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Гео-ДД, весь урон которой масштабируется от защиты и идёт через Лунный кристалл (Гео + Гидро). Для её усиления нужны персонажи Лунного знамения: Коломбина, Иллуги или Айно.

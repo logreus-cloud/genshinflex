@@ -31,6 +31,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/wanderer/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/wanderer-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Краткий билд по данным сообщества: роль — главный дд, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.

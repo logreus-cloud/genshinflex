@@ -36,6 +36,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/yaemiko/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/yae-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** три тотема навыка дают стабильный офф-филдовый Электро урон, почти весь урон — навык. Хорошо встала в новые команды Звёздного проводника.

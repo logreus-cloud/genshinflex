@@ -44,6 +44,11 @@ videos:
   - id: "ToF5vQSWtrc"
     author: "Анимекул"
     title: "Зачем нужна Одетта? Подробный гайд"
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/odette-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** новый Крио-персонаж 7.0, вокруг которого строятся обе Звёздные реакции — Звёздный проводник (с Электро) и Звёздное рассеивание (с Анемо).

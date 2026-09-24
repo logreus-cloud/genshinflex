@@ -70,7 +70,7 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
         {rotations.map(({ data: r }) => {
           const upcoming = r.start > now;
           return (
-            <a class="mode" href={`${base}/rotation#${r.mode}`} data-mode={r.mode}>
+            <a class="mode" href={`${base}/${r.mode}/`} data-mode={r.mode}>
               <span class="mname">{MODES[r.mode].short}</span>
               <b class="left-time" data-until={resetAt(upcoming ? r.start : r.end)} data-prefix={upcoming ? t('откроется через') + ' ' : ''} data-done={t('обновилось')}>…</b>
               <span class="muted small">{upcoming ? t('до нового сезона') : t('до обновления')}</span>

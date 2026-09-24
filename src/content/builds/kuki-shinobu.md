@@ -38,6 +38,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/kukishinobu/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/shinobu-quickguide/
+    author: KQM
+    lang: en
 ---
 
 **Суть:** Электро-триггер Гиперцветения и лечение с одного навыка — один из самых недооценённых 4★. Весь урон от мастерства стихий, поэтому МС во всех трёх слотах.

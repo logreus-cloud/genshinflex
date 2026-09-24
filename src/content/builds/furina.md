@@ -35,6 +35,11 @@ teams:
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/furina/
+external:
+  - title: "KeqingMains Quick Guide"
+    url: https://keqingmains.com/q/furina-quickguide/
+    author: KQM
+    lang: en
 ---
 
 Урон и лечение Фурины зависят от HP, поэтому HP % в часах. Кубок на HP % или Гидро урон — если HP уже много. Главный сет — Золотая труппа.

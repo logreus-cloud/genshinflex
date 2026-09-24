@@ -1,0 +1,2427 @@
+{
+ "furina": {
+  "team": [
+   "bennett",
+   "xiangling",
+   "furina",
+   "xingqiu"
+  ],
+  "source": "https://gcsim.app/db/HCtjNgmWP9jw",
+  "four": "festering-desire",
+  "five": "splendor-of-tranquil-waters",
+  "cons": [
+   13.2,
+   26.7,
+   36.5,
+   36.5,
+   43.3,
+   43
+  ],
+  "weapon": 2.6,
+  "dps": 60112
+ },
+ "_meta": {
+  "gcsim": "8c57786",
+  "date": "2026-09-24",
+  "iterations": 500
+ },
+ "albedo": {
+  "team": [
+   "gorou",
+   "zhongli",
+   "chiori",
+   "albedo"
+  ],
+  "source": "https://gcsim.app/db/mJTKggHtDndC",
+  "four": "flute-of-ezpitzal",
+  "refine": 5,
+  "five": "peak-patrol-song",
+  "cons": [
+   0,
+   4.3,
+   7.3,
+   7.2,
+   8,
+   8.1
+  ],
+  "weapon": 4.9,
+  "dps": 49688,
+  "optimized": true
+ },
+ "aino": {
+  "team": [
+   "flins",
+   "ineffa",
+   "aino",
+   "sucrose"
+  ],
+  "source": "https://gcsim.app/db/Gjb9dqBQkNhp",
+  "four": "favonius-greatsword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   3.1,
+   4,
+   4,
+   4,
+   4.1,
+   10.1
+  ],
+  "weapon": null,
+  "dps": 137264
+ },
+ "alhaitham": {
+  "team": [
+   "alhaitham",
+   "nahida",
+   "xingqiu",
+   "kukishinobu"
+  ],
+  "source": "https://gcsim.app/db/BFpPptmHjKNr",
+  "four": "the-black-sword",
+  "refine": 5,
+  "five": "light-of-foliar-incision",
+  "cons": [
+   0,
+   3.3,
+   5.6,
+   9.9,
+   10.3,
+   15.2
+  ],
+  "weapon": 6.5,
+  "dps": 73933
+ },
+ "arataki-itto": {
+  "team": [
+   "aratakiitto",
+   "albedo",
+   "gorou",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/ntJkdW8nddCK",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "redhorn-stonethresher",
+  "cons": [
+   null,
+   -2.5,
+   0.1,
+   4.2,
+   12.2,
+   21.6
+  ],
+  "weapon": 8.4,
+  "dps": 48606,
+  "optimized": true
+ },
+ "arlecchino": {
+  "team": [
+   "arlecchino",
+   "fischl",
+   "chevreuse",
+   "yanfei"
+  ],
+  "source": "https://gcsim.app/db/HbdLWwCnbP7f",
+  "four": "deathmatch",
+  "refine": 5,
+  "five": "crimson-moon-s-semblance",
+  "cons": [
+   14.1,
+   25.4,
+   37.9,
+   37.9,
+   38.7,
+   80.7
+  ],
+  "weapon": 14.6,
+  "dps": 61420,
+  "optimized": true
+ },
+ "baizhu": {
+  "team": [
+   "cyno",
+   "xingqiu",
+   "baizhu",
+   "nahida"
+  ],
+  "source": "https://gcsim.app/db/fpWHwpzNb6DF",
+  "four": "prototype-amber",
+  "refine": 5,
+  "five": "jadefall-s-splendor",
+  "cons": [
+   0,
+   2.8,
+   3.3,
+   6.2,
+   6.4,
+   12
+  ],
+  "weapon": 0.1,
+  "dps": 61888
+ },
+ "beidou": {
+  "team": [
+   "kaedeharakazuha",
+   "xingqiu",
+   "fischl",
+   "beidou"
+  ],
+  "source": "https://gcsim.app/db/PH9BFtK6J6qk",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "wolf-s-gravestone",
+  "cons": [
+   0,
+   -0.1,
+   0.8,
+   0.9,
+   2.8,
+   5.7
+  ],
+  "weapon": -1.8,
+  "dps": 41834
+ },
+ "bennett": {
+  "team": [
+   "bennett",
+   "xiangling",
+   "xingqiu",
+   "raidenshogun"
+  ],
+  "source": "https://gcsim.app/db/WTq8ddtFDHjz",
+  "four": "sapwood-blade",
+  "refine": 5,
+  "five": "aquila-favonia",
+  "cons": [
+   3.6,
+   3.7,
+   5.7,
+   5.5,
+   9.7,
+   17.4
+  ],
+  "weapon": 6.3,
+  "dps": 45313
+ },
+ "candace": {
+  "team": [
+   "mualani",
+   "candace",
+   "kaedeharakazuha",
+   "xiangling"
+  ],
+  "source": "https://gcsim.app/db/mwqjNtjMQNrF",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   1.8,
+   2,
+   2.9,
+   2.4,
+   2.5,
+   null
+  ],
+  "weapon": null,
+  "dps": 60860
+ },
+ "charlotte": {
+  "team": [
+   "razor",
+   "nahida",
+   "furina",
+   "charlotte"
+  ],
+  "source": "https://gcsim.app/db/GctLFp9pDnCp",
+  "four": "prototype-amber",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   1,
+   0.9,
+   0.9,
+   0.9,
+   1.2,
+   2.2
+  ],
+  "weapon": null,
+  "dps": 55911
+ },
+ "chevreuse": {
+  "team": [
+   "raidenshogun",
+   "chevreuse",
+   "bennett",
+   "kujousara"
+  ],
+  "source": "https://gcsim.app/db/rPNPQF6KB8Bn",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0.4,
+   1.4,
+   1.7,
+   1.6,
+   2,
+   13.7
+  ],
+  "weapon": null,
+  "dps": 67667
+ },
+ "chiori": {
+  "team": [
+   "navia",
+   "xiangling",
+   "bennett",
+   "chiori"
+  ],
+  "source": "https://gcsim.app/db/NL67Mbmkz6dg",
+  "four": "cinnabar-spindle",
+  "refine": 5,
+  "five": "uraku-misugiri",
+  "cons": [
+   9.3,
+   12.7,
+   17.6,
+   27.7,
+   28.2,
+   25.3
+  ],
+  "weapon": 4.4,
+  "dps": 61587
+ },
+ "chongyun": {
+  "team": [
+   "arlecchino",
+   "rosaria",
+   "chongyun",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/8kgbpHMpLKJk",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "wolf-s-gravestone",
+  "cons": [
+   0.3,
+   0.1,
+   1.3,
+   1.5,
+   1.8,
+   4
+  ],
+  "weapon": 0,
+  "dps": 60223
+ },
+ "citlali": {
+  "team": [
+   "mavuika",
+   "citlali",
+   "xilonen",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/dB9HJwcjPM6Q",
+  "four": "favonius-codex",
+  "refine": 5,
+  "five": "starcaller-s-watch",
+  "cons": [
+   3.2,
+   28.7,
+   29.1,
+   30.4,
+   31.2,
+   34
+  ],
+  "weapon": 11.8,
+  "dps": 121577
+ },
+ "clorinde": {
+  "team": [
+   "clorinde",
+   "fischl",
+   "kaedeharakazuha",
+   "nahida"
+  ],
+  "source": "https://gcsim.app/db/JdrmHFCPGBPr",
+  "four": "finale-of-the-deep",
+  "refine": 5,
+  "five": "absolution",
+  "cons": [
+   11.6,
+   22.1,
+   25.7,
+   25.8,
+   25.8,
+   55.5
+  ],
+  "weapon": 12.3,
+  "dps": 85629
+ },
+ "collei": {
+  "team": [
+   "keqing",
+   "collei",
+   "fischl",
+   "kaedeharakazuha"
+  ],
+  "source": "https://gcsim.app/db/bwBnrgj9MLCH",
+  "four": "sacrificial-bow",
+  "refine": 5,
+  "five": "elegy-for-the-end",
+  "cons": [
+   7,
+   7.5,
+   7,
+   9,
+   9.6,
+   10.1
+  ],
+  "weapon": 14.8,
+  "dps": 53279
+ },
+ "columbina": {
+  "team": [
+   "flins",
+   "ineffa",
+   "columbina",
+   "sucrose"
+  ],
+  "source": "https://gcsim.app/db/mjnq86pKQKPp",
+  "four": "sacrificial-jade",
+  "refine": 5,
+  "five": "nocturne-s-curtain-call",
+  "cons": [
+   5.2,
+   29.6,
+   36.3,
+   38.5,
+   42.2,
+   82.5
+  ],
+  "weapon": -0.4,
+  "dps": 183383
+ },
+ "cyno": {
+  "team": [
+   "cyno",
+   "fischl",
+   "nahida",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/PnJQRr8N9MrK",
+  "four": "ballad-of-the-fjords",
+  "refine": 5,
+  "five": "staff-of-the-scarlet-sands",
+  "cons": [
+   -2.9,
+   8.2,
+   11.4,
+   11.3,
+   12.6,
+   24.9
+  ],
+  "weapon": 7.2,
+  "dps": 54569
+ },
+ "dahlia": {
+  "team": [
+   "columbina",
+   "ineffa",
+   "lauma",
+   "dahlia"
+  ],
+  "source": "https://gcsim.app/db/MjqBJjtCpBdT",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0.2,
+   0.1,
+   0.2,
+   0.1,
+   0.1,
+   0.3
+  ],
+  "weapon": null,
+  "dps": 125859
+ },
+ "aloy": {
+  "team": [
+   "aloy",
+   "bennett",
+   "xiangling",
+   "rosaria"
+  ],
+  "source": "https://gcsim.app/db/R6DD9kttq6pj",
+  "four": "the-stringless",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.1,
+   0.1,
+   0.4,
+   0.4,
+   1.9,
+   1.6
+  ],
+  "weapon": null,
+  "dps": 41169,
+  "optimized": false
+ },
+ "amber": {
+  "team": [
+   "amber",
+   "furina",
+   "bennett",
+   "rosaria"
+  ],
+  "source": "https://gcsim.app/db/PmjnHMfHQPMM",
+  "four": "favonius-warbow",
+  "refine": 5,
+  "five": "elegy-for-the-end",
+  "cons": [
+   1.8,
+   1.8,
+   2.9,
+   2.9,
+   3.5,
+   5.5
+  ],
+  "weapon": 12.8,
+  "dps": 36964,
+  "optimized": true
+ },
+ "barbara": {
+  "team": [
+   "barbara",
+   "fischl",
+   "kaedeharakazuha",
+   "beidou"
+  ],
+  "source": "https://gcsim.app/db/69F6RFTNTTKJ",
+  "four": "prototype-amber",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.1,
+   -2.9,
+   -2.9,
+   -2.9,
+   -2.8,
+   -2.8
+  ],
+  "weapon": null,
+  "dps": 39334,
+  "optimized": false
+ },
+ "chasca": {
+  "team": [
+   "chasca",
+   "ororon",
+   "furina",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/p6g7qjMcLCwL",
+  "four": "flower-wreathed-feathers",
+  "refine": 5,
+  "five": "astral-vulture-s-crimson-plumage",
+  "cons": [
+   13.6,
+   32.3,
+   46.8,
+   50,
+   50.8,
+   null
+  ],
+  "weapon": 17.8,
+  "dps": 80746,
+  "optimized": true
+ },
+ "dehya": {
+  "team": [
+   "dehya",
+   "furina",
+   "bennett",
+   "xilonen"
+  ],
+  "source": "https://gcsim.app/db/HwmzLNdLtWpP",
+  "four": "favonius-greatsword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   13.4,
+   15.6,
+   19.8,
+   19.8,
+   22.1,
+   26.9
+  ],
+  "weapon": null,
+  "dps": 50748,
+  "optimized": true
+ },
+ "diluc": {
+  "team": [
+   "diluc",
+   "xianyun",
+   "furina",
+   "chevreuse"
+  ],
+  "source": "https://gcsim.app/db/G9d7RJptfjbm",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   2.8,
+   2.8,
+   4.2,
+   3.6,
+   4.8,
+   4.4
+  ],
+  "weapon": null,
+  "dps": 79644,
+  "optimized": true
+ },
+ "diona": {
+  "team": [
+   "kamisatoayaka",
+   "diona",
+   "mona",
+   "kaedeharakazuha"
+  ],
+  "source": "https://gcsim.app/db/JR9WjMjknh9q",
+  "four": "favonius-warbow",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.1,
+   0.4,
+   0.7,
+   0.5,
+   1.1,
+   2.1
+  ],
+  "weapon": null,
+  "dps": 44767,
+  "optimized": true
+ },
+ "dori": {
+  "team": [
+   "dori",
+   "fischl",
+   "kaedeharakazuha",
+   "nahida"
+  ],
+  "source": "https://gcsim.app/db/wwnJwcpBGRtn",
+  "four": "favonius-greatsword",
+  "refine": 5,
+  "five": "skyward-pride",
+  "cons": [
+   5.2,
+   9.7,
+   10.4,
+   10.5,
+   11,
+   35.6
+  ],
+  "weapon": 3.6,
+  "dps": 41464,
+  "optimized": true
+ },
+ "durin": {
+  "team": [
+   "durin",
+   "yelan",
+   "fischl",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/DLQPFr8qQTT9",
+  "four": "wolf-fang",
+  "refine": 5,
+  "five": "athame-artis",
+  "cons": [
+   19.4,
+   38.5,
+   48.8,
+   63.7,
+   65,
+   124.8
+  ],
+  "weapon": 7.6,
+  "dps": 114885,
+  "optimized": true
+ },
+ "emilie": {
+  "team": [
+   "arlecchino",
+   "emilie",
+   "kaedeharakazuha",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/zCWkzTDnR89K",
+  "four": "deathmatch",
+  "refine": 5,
+  "five": "lumidouce-elegy",
+  "cons": [
+   10.6,
+   17.5,
+   20.1,
+   26.2,
+   28.5,
+   30.8
+  ],
+  "weapon": 6.3,
+  "dps": 79321,
+  "optimized": true
+ },
+ "escoffier": {
+  "team": [
+   "kamisatoayaka",
+   "furina",
+   "shenhe",
+   "escoffier"
+  ],
+  "source": "https://gcsim.app/db/WP8ztdHW6thj",
+  "four": "kitain-cross-spear",
+  "refine": 5,
+  "five": "symphonist-of-scents",
+  "cons": [
+   14.4,
+   17.7,
+   21.6,
+   20.6,
+   21.5,
+   38.4
+  ],
+  "weapon": 18.1,
+  "dps": 90088,
+  "optimized": true
+ },
+ "eula": {
+  "team": [
+   "eula",
+   "rosaria",
+   "raidenshogun",
+   "mika"
+  ],
+  "source": "https://gcsim.app/db/nCCHtrJkfptT",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "song-of-broken-pines",
+  "cons": [
+   5.5,
+   5.5,
+   18.6,
+   18.2,
+   18.4,
+   51
+  ],
+  "weapon": -1.7,
+  "dps": 43856,
+  "optimized": true
+ },
+ "faruzan": {
+  "team": [
+   "xiao",
+   "faruzan",
+   "zhongli",
+   "albedo"
+  ],
+  "source": "https://gcsim.app/db/gJ8nWBBtbkHK",
+  "four": "favonius-warbow",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.3,
+   0.7,
+   1.1,
+   1,
+   2.5,
+   22.5
+  ],
+  "weapon": null,
+  "dps": 38750,
+  "optimized": true
+ },
+ "fischl": {
+  "team": [
+   "yaemiko",
+   "kaedeharakazuha",
+   "fischl",
+   "sangonomiyakokomi"
+  ],
+  "source": "https://gcsim.app/db/rjThbWbLkfbm",
+  "four": "chain-breaker",
+  "refine": 5,
+  "five": "the-daybreak-chronicles",
+  "cons": [
+   0,
+   0.7,
+   2.7,
+   1.5,
+   2.1,
+   16
+  ],
+  "weapon": 7.1,
+  "dps": 46283,
+  "optimized": true
+ },
+ "flins": {
+  "team": [
+   "flins",
+   "ineffa",
+   "columbina",
+   "sucrose"
+  ],
+  "source": "https://gcsim.app/db/6h7dhCQQCNbc",
+  "four": "ballad-of-the-fjords",
+  "refine": 5,
+  "five": "bloodsoaked-ruins",
+  "cons": [
+   -0.1,
+   14.9,
+   20.9,
+   25.8,
+   26.7,
+   58.6
+  ],
+  "weapon": 7.5,
+  "dps": 151398,
+  "optimized": true
+ },
+ "freminet": {
+  "team": [
+   "freminet",
+   "xingqiu",
+   "fischl",
+   "mika"
+  ],
+  "source": "https://gcsim.app/db/mCzhk7WnqcrG",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.1,
+   0,
+   5,
+   8.3,
+   12.6,
+   20.1
+  ],
+  "weapon": null,
+  "dps": 38702,
+  "optimized": false
+ },
+ "gaming": {
+  "team": [
+   "gaming",
+   "xingqiu",
+   "sucrose",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/fPdRTNncBRnQ",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "gest-of-the-mighty-wolf",
+  "cons": [
+   0,
+   4.8,
+   14.3,
+   14.7,
+   17.5,
+   38.5
+  ],
+  "weapon": -0.1,
+  "dps": 49603,
+  "optimized": true
+ },
+ "ganyu": {
+  "team": [
+   "ganyu",
+   "zhongli",
+   "bennett",
+   "xiangling"
+  ],
+  "source": "https://gcsim.app/db/QLDnLL9pwz7C",
+  "four": "prototype-crescent",
+  "refine": 5,
+  "five": "hunter-s-path",
+  "cons": [
+   4.6,
+   3.6,
+   4.2,
+   10,
+   11.6,
+   13.8
+  ],
+  "weapon": 2,
+  "dps": 52631,
+  "optimized": true
+ },
+ "gorou": {
+  "team": [
+   "aratakiitto",
+   "albedo",
+   "gorou",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/PzCDKn6bjhT6",
+  "four": "favonius-warbow",
+  "refine": 5,
+  "five": "elegy-for-the-end",
+  "cons": [
+   0.2,
+   0,
+   1.2,
+   1.4,
+   1.5,
+   9.7
+  ],
+  "weapon": 0.9,
+  "dps": 87681,
+  "optimized": true
+ },
+ "hu-tao": {
+  "team": [
+   "hutao",
+   "yelan",
+   "xingqiu",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/QRPdQhKh9bMt",
+  "four": "ballad-of-the-fjords",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   16.4,
+   21.2,
+   26.2,
+   26.1,
+   26.2,
+   26.4
+  ],
+  "weapon": null,
+  "dps": 74082,
+  "optimized": false
+ },
+ "ifa": {
+  "team": [
+   "ifa",
+   "ineffa",
+   "columbina",
+   "ororon"
+  ],
+  "source": "https://gcsim.app/db/C9jwQ8jjfk67",
+  "four": "flowing-purity",
+  "refine": 5,
+  "five": "tulaytullah-s-remembrance",
+  "cons": [
+   -0.6,
+   0.7,
+   1.1,
+   1.9,
+   2.1,
+   2.7
+  ],
+  "weapon": 0.6,
+  "dps": 94277,
+  "optimized": true
+ },
+ "ineffa": {
+  "team": [
+   "flins",
+   "ineffa",
+   "columbina",
+   "sucrose"
+  ],
+  "source": "https://gcsim.app/db/mjnq86pKQKPp",
+  "four": "deathmatch",
+  "refine": 5,
+  "five": "fractured-halo",
+  "cons": [
+   12.9,
+   19,
+   19.2,
+   19.3,
+   19.6,
+   39.6
+  ],
+  "weapon": 8.3,
+  "dps": 183354,
+  "optimized": true
+ },
+ "jahoda": {
+  "team": [
+   "flins",
+   "ineffa",
+   "columbina",
+   "jahoda"
+  ],
+  "source": "https://gcsim.app/db/bJDRFmBGNWFm",
+  "four": "favonius-warbow",
+  "refine": 5,
+  "five": "elegy-for-the-end",
+  "cons": [
+   0.3,
+   0.4,
+   0.3,
+   0.6,
+   0.7,
+   15.9
+  ],
+  "weapon": 5.1,
+  "dps": 144388,
+  "optimized": true
+ },
+ "jean": {
+  "team": [
+   "kamisatoayato",
+   "furina",
+   "fischl",
+   "jean"
+  ],
+  "source": "https://gcsim.app/db/dF67rjtLTfgm",
+  "four": "amenoma-kageuchi",
+  "refine": 5,
+  "five": "primordial-jade-cutter",
+  "cons": [
+   -0.4,
+   2.2,
+   2.7,
+   3.3,
+   3.7,
+   4
+  ],
+  "weapon": -1,
+  "dps": 56971,
+  "optimized": true
+ },
+ "kaedehara-kazuha": {
+  "team": [
+   "kamisatoayaka",
+   "sangonomiyakokomi",
+   "kaedeharakazuha",
+   "shenhe"
+  ],
+  "source": "https://gcsim.app/db/mCz6FFpwGBkm",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0,
+   2.7,
+   2.9,
+   2.7,
+   3,
+   4.6
+  ],
+  "weapon": null,
+  "dps": 64603,
+  "optimized": true
+ },
+ "kaeya": {
+  "team": [
+   "rosaria",
+   "bennett",
+   "xiangling",
+   "kaeya"
+  ],
+  "source": "https://gcsim.app/db/q6Cqpg97nFqg",
+  "four": "lion-s-roar",
+  "refine": 5,
+  "five": "primordial-jade-cutter",
+  "cons": [
+   0,
+   0,
+   0.6,
+   0.7,
+   3.1,
+   7
+  ],
+  "weapon": 2.9,
+  "dps": 48091,
+  "optimized": true
+ },
+ "kamisato-ayaka": {
+  "team": [
+   "kamisatoayaka",
+   "xilonen",
+   "shenhe",
+   "furina"
+  ],
+  "source": "https://gcsim.app/db/7BHw8hnw8bHr",
+  "four": "amenoma-kageuchi",
+  "refine": 5,
+  "five": "mistsplitter-reforged",
+  "cons": [
+   0,
+   14.6,
+   23.6,
+   41.6,
+   42.7,
+   46.1
+  ],
+  "weapon": 17,
+  "dps": 63816,
+  "optimized": true
+ },
+ "kamisato-ayato": {
+  "team": [
+   "kamisatoayato",
+   "fischl",
+   "kaedeharakazuha",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/cDgPtj7ngqc8",
+  "four": "the-black-sword",
+  "refine": 5,
+  "five": "haran-geppaku-futsu",
+  "cons": [
+   0.1,
+   4.1,
+   10.4,
+   15.7,
+   16.9,
+   28.3
+  ],
+  "weapon": 5.6,
+  "dps": 49727,
+  "optimized": true
+ },
+ "kaveh": {
+  "team": [
+   "kaveh",
+   "baizhu",
+   "xingqiu",
+   "raidenshogun"
+  ],
+  "source": "https://gcsim.app/db/8R8GpnWdzDD6",
+  "four": "favonius-greatsword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0,
+   0.8,
+   0.9,
+   1.1,
+   1.4,
+   27.2
+  ],
+  "weapon": null,
+  "dps": 54980,
+  "optimized": true
+ },
+ "keqing": {
+  "team": [
+   "keqing",
+   "collei",
+   "fischl",
+   "kaedeharakazuha"
+  ],
+  "source": "https://gcsim.app/db/bwBnrgj9MLCH",
+  "four": "wolf-fang",
+  "refine": 1,
+  "five": "mistsplitter-reforged",
+  "cons": [
+   0.6,
+   1,
+   2,
+   5,
+   6.1,
+   10.5
+  ],
+  "weapon": 1.9,
+  "dps": 60367,
+  "optimized": true
+ },
+ "kinich": {
+  "team": [
+   "kinich",
+   "emilie",
+   "xiangling",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/fFm8GzMjbHqd",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "fang-of-the-mountain-king",
+  "cons": [
+   12.6,
+   32,
+   47.1,
+   48.3,
+   49.7,
+   92.4
+  ],
+  "weapon": 1,
+  "dps": 85177,
+  "optimized": true
+ },
+ "kirara": {
+  "team": [
+   "kaedeharakazuha",
+   "keqing",
+   "fischl",
+   "kirara"
+  ],
+  "source": "https://gcsim.app/db/fkwWdRNzNBjP",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": "key-of-khaj-nisut",
+  "cons": [
+   0.9,
+   1,
+   1,
+   1.5,
+   1.6,
+   6.6
+  ],
+  "weapon": 3.4,
+  "dps": 58982,
+  "optimized": true
+ },
+ "klee": {
+  "team": [
+   "klee",
+   "xiangling",
+   "kaedeharakazuha",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/Qqj6rJGMzHNp",
+  "four": "the-widsith",
+  "refine": 5,
+  "five": "reliquary-of-truth",
+  "cons": [
+   3.7,
+   9.8,
+   11.8,
+   14.6,
+   18.6,
+   22.3
+  ],
+  "weapon": 4.8,
+  "dps": 52643,
+  "optimized": true
+ },
+ "kujou-sara": {
+  "team": [
+   "raidenshogun",
+   "kaedeharakazuha",
+   "bennett",
+   "kujousara"
+  ],
+  "source": "https://gcsim.app/db/GNDdpbgWr8WW",
+  "four": "fading-twilight",
+  "refine": 5,
+  "five": "skyward-harp",
+  "cons": [
+   0.1,
+   1.2,
+   2.7,
+   3.8,
+   5.4,
+   21.4
+  ],
+  "weapon": 2,
+  "dps": 94461,
+  "optimized": true
+ },
+ "kuki-shinobu": {
+  "team": [
+   "yaemiko",
+   "nahida",
+   "kukishinobu",
+   "alhaitham"
+  ],
+  "source": "https://gcsim.app/db/TJqJL9hkmdkH",
+  "four": "xiphos-moonlight",
+  "refine": 5,
+  "five": "freedom-sworn",
+  "cons": [
+   0,
+   0.2,
+   0.2,
+   1.3,
+   1.4,
+   1.3
+  ],
+  "weapon": 2.4,
+  "dps": 63018,
+  "optimized": true
+ },
+ "lan-yan": {
+  "team": [
+   "arlecchino",
+   "yelan",
+   "lanyan",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/jQKN9pHf8NQp",
+  "four": "favonius-codex",
+  "refine": 5,
+  "five": "angelos-heptades",
+  "cons": [
+   6.9,
+   7,
+   7.5,
+   7.6,
+   7.6,
+   7.6
+  ],
+  "weapon": 8.5,
+  "dps": 78258,
+  "optimized": true
+ },
+ "lauma": {
+  "team": [
+   "columbina",
+   "nilou",
+   "lauma",
+   "nahida"
+  ],
+  "source": "https://gcsim.app/db/ckj8qKr9kDjM",
+  "four": "etherlight-spindlelute",
+  "refine": 5,
+  "five": "nightweaver-s-looking-glass",
+  "cons": [
+   -0.1,
+   37,
+   42.5,
+   42.8,
+   49.1,
+   118.1
+  ],
+  "weapon": 2.2,
+  "dps": 137008,
+  "optimized": true
+ },
+ "layla": {
+  "team": [
+   "hutao",
+   "yelan",
+   "layla",
+   "xingqiu"
+  ],
+  "source": "https://gcsim.app/db/tQWwzRhbGCGm",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": "key-of-khaj-nisut",
+  "cons": [
+   -0.1,
+   0,
+   0.1,
+   1.8,
+   2.2,
+   3.4
+  ],
+  "weapon": 0.2,
+  "dps": 63223,
+  "optimized": true
+ },
+ "lisa": {
+  "team": [
+   "kukishinobu",
+   "nahida",
+   "lisa",
+   "alhaitham"
+  ],
+  "source": "https://gcsim.app/db/cWNtGNNqDKFh",
+  "four": "the-widsith",
+  "refine": 5,
+  "five": "kagura-s-verity",
+  "cons": [
+   0.3,
+   0.2,
+   0.9,
+   0.7,
+   0.8,
+   1.3
+  ],
+  "weapon": -0.5,
+  "dps": 60312,
+  "optimized": true
+ },
+ "lynette": {
+  "team": [
+   "bennett",
+   "lynette",
+   "xiangling",
+   "lyney"
+  ],
+  "source": "https://gcsim.app/db/jNtRRhR8NM9m",
+  "four": "sacrificial-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.4,
+   0.5,
+   0.2,
+   2,
+   2.2,
+   2.6
+  ],
+  "weapon": null,
+  "dps": 57192,
+  "optimized": true
+ },
+ "lyney": {
+  "team": [
+   "lyney",
+   "xiangling",
+   "kaedeharakazuha",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/FjBmbfbTGPWR",
+  "four": "prototype-crescent",
+  "refine": 5,
+  "five": "the-first-great-magic",
+  "cons": [
+   7.9,
+   19.3,
+   29.9,
+   40.3,
+   44,
+   68.9
+  ],
+  "weapon": 15.9,
+  "dps": 75154,
+  "optimized": true
+ },
+ "mavuika": {
+  "team": [
+   "mavuika",
+   "furina",
+   "xilonen",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/bfBMTFGb7WDM",
+  "four": "mailed-flower",
+  "refine": 5,
+  "five": "a-thousand-blazing-suns",
+  "cons": [
+   9,
+   41.3,
+   53,
+   60.8,
+   70.6,
+   105.7
+  ],
+  "weapon": 26.4,
+  "dps": 104298,
+  "optimized": true
+ },
+ "mika": {
+  "team": [
+   "wanderer",
+   "faruzan",
+   "mika",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/FhgbRq9WKMDK",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   -0.3,
+   0.4,
+   -0.4,
+   7,
+   8.3,
+   8.3
+  ],
+  "weapon": 4.2,
+  "dps": 45645,
+  "optimized": true
+ },
+ "mona": {
+  "team": [
+   "diona",
+   "mona",
+   "venti",
+   "ganyu"
+  ],
+  "source": "https://gcsim.app/db/wrBkRpLrbrqh",
+  "four": "favonius-codex",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0,
+   0.1,
+   1.8,
+   4.6,
+   5.2,
+   5.2
+  ],
+  "weapon": null,
+  "dps": 35972,
+  "optimized": true
+ },
+ "mualani": {
+  "team": [
+   "mualani",
+   "xiangling",
+   "xilonen",
+   "chiori"
+  ],
+  "source": "https://gcsim.app/db/fKzfLbrbfhj9",
+  "four": "sacrificial-jade",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   9.6,
+   22.5,
+   28.3,
+   33,
+   35.3,
+   51.4
+  ],
+  "weapon": null,
+  "dps": 123056,
+  "optimized": false
+ },
+ "nahida": {
+  "team": [
+   "cyno",
+   "zhongli",
+   "fischl",
+   "nahida"
+  ],
+  "source": "https://gcsim.app/db/zfcQmD7JWdcf",
+  "four": "sacrificial-fragments",
+  "refine": 5,
+  "five": "a-thousand-floating-dreams",
+  "cons": [
+   4.4,
+   23.1,
+   25.1,
+   26.3,
+   29.5,
+   33.6
+  ],
+  "weapon": 6,
+  "dps": 47278,
+  "optimized": true
+ },
+ "navia": {
+  "team": [
+   "navia",
+   "zhongli",
+   "bennett",
+   "xiangling"
+  ],
+  "source": "https://gcsim.app/db/gcM79T9qhQq7",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "verdict",
+  "cons": [
+   0.9,
+   3.8,
+   10.8,
+   18.2,
+   21,
+   47.9
+  ],
+  "weapon": 1.4,
+  "dps": 62564,
+  "optimized": true
+ },
+ "neuvillette": {
+  "team": [
+   "neuvillette",
+   "zhongli",
+   "kaedeharakazuha",
+   "fischl"
+  ],
+  "source": "https://gcsim.app/db/NJLpFKj6LPPd",
+  "four": "sacrificial-jade",
+  "refine": 5,
+  "five": "tome-of-the-eternal-flow",
+  "cons": [
+   0.4,
+   7.9,
+   22.7,
+   22.7,
+   23.7,
+   null
+  ],
+  "weapon": 0.3,
+  "dps": 69939,
+  "optimized": true
+ },
+ "nicole": {
+  "team": [
+   "venti",
+   "durin",
+   "mona",
+   "nicole"
+  ],
+  "source": "https://gcsim.app/db/g69Ltmh6dkBd",
+  "four": "oathsworn-eye",
+  "refine": 5,
+  "five": "angelos-heptades",
+  "cons": [
+   11.2,
+   39.6,
+   43.7,
+   62.7,
+   63,
+   117.6
+  ],
+  "weapon": 9.8,
+  "dps": 120742,
+  "optimized": true
+ },
+ "nilou": {
+  "team": [
+   "sangonomiyakokomi",
+   "nilou",
+   "nahida",
+   "luminedendro"
+  ],
+  "source": "https://gcsim.app/db/hc7MQmfk9kNc",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": "key-of-khaj-nisut",
+  "cons": [
+   -0.8,
+   15.1,
+   15.3,
+   15.3,
+   15.3,
+   17.2
+  ],
+  "weapon": 14.7,
+  "dps": 74001,
+  "optimized": true
+ },
+ "ningguang": {
+  "team": [
+   "ningguang",
+   "xilonen",
+   "fischl",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/7b88PK7cJd7W",
+  "four": "solar-pearl",
+  "refine": 5,
+  "five": "lost-prayer-to-the-sacred-winds",
+  "cons": [
+   0.1,
+   56.3,
+   62.5,
+   62.8,
+   65.5,
+   72.6
+  ],
+  "weapon": 3.6,
+  "dps": 33661,
+  "optimized": true
+ },
+ "noelle": {
+  "team": [
+   "noelle",
+   "albedo",
+   "furina",
+   "gorou"
+  ],
+  "source": "https://gcsim.app/db/jTkjFFp9NDzF",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "redhorn-stonethresher",
+  "cons": [
+   1,
+   0.9,
+   1.7,
+   6,
+   10.8,
+   29.7
+  ],
+  "weapon": 4.2,
+  "dps": 39444,
+  "optimized": true
+ },
+ "ororon": {
+  "team": [
+   "chasca",
+   "ororon",
+   "furina",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/hcNnMTLjNjPW",
+  "four": "chain-breaker",
+  "refine": 5,
+  "five": "polar-star",
+  "cons": [
+   0.1,
+   0.9,
+   1.5,
+   9.9,
+   10.3,
+   17.8
+  ],
+  "weapon": 0.8,
+  "dps": 55986,
+  "optimized": true
+ },
+ "prune": {
+  "team": [
+   "mualani",
+   "mona",
+   "prune",
+   "mavuika"
+  ],
+  "source": "https://gcsim.app/db/hCGnNHkNFTmH",
+  "four": "favonius-codex",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   11.3,
+   13.7,
+   14.1,
+   15.7,
+   16.1,
+   20.7
+  ],
+  "weapon": null,
+  "dps": 118834,
+  "optimized": true
+ },
+ "qiqi": {
+  "team": [
+   "xiao",
+   "raidenshogun",
+   "kamisatoayaka",
+   "qiqi"
+  ],
+  "source": "https://gcsim.app/db/RtTWTtqWP9Fc",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": "peak-patrol-song",
+  "cons": [
+   0.1,
+   0,
+   0.7,
+   2,
+   2.4,
+   2.3
+  ],
+  "weapon": 0.3,
+  "dps": 28804,
+  "optimized": true
+ },
+ "raiden-shogun": {
+  "team": [
+   "raidenshogun",
+   "kaedeharakazuha",
+   "bennett",
+   "kujousara"
+  ],
+  "source": "https://gcsim.app/db/k97rtdnznz6K",
+  "four": "the-catch",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   5.3,
+   33.3,
+   47.6,
+   48.4,
+   51.4,
+   51.2
+  ],
+  "weapon": 5.3,
+  "dps": 52824,
+  "optimized": true
+ },
+ "razor": {
+  "team": [
+   "razor",
+   "chevreuse",
+   "fischl",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/bMjkb8jcrgRH",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "gest-of-the-mighty-wolf",
+  "cons": [
+   2.8,
+   2.7,
+   5.8,
+   14.4,
+   17.1,
+   23.3
+  ],
+  "weapon": 9.7,
+  "dps": 79502,
+  "optimized": true
+ },
+ "rosaria": {
+  "team": [
+   "kamisatoayaka",
+   "sangonomiyakokomi",
+   "kaedeharakazuha",
+   "rosaria"
+  ],
+  "source": "https://gcsim.app/db/zztM6TNQ8h9W",
+  "four": "wavebreaker-s-fin",
+  "refine": 5,
+  "five": "staff-of-homa",
+  "cons": [
+   -0.2,
+   2.8,
+   3.1,
+   3.3,
+   5,
+   4.8
+  ],
+  "weapon": 0.9,
+  "dps": 44602,
+  "optimized": true
+ },
+ "sangonomiya-kokomi": {
+  "team": [
+   "yaemiko",
+   "kaedeharakazuha",
+   "fischl",
+   "sangonomiyakokomi"
+  ],
+  "source": "https://gcsim.app/db/rjThbWbLkfbm",
+  "four": "prototype-amber",
+  "refine": 5,
+  "five": "everlasting-moonglow",
+  "cons": [
+   -0.1,
+   -0.1,
+   0.8,
+   0.2,
+   0.8,
+   3
+  ],
+  "weapon": 0.7,
+  "dps": 54542,
+  "optimized": true
+ },
+ "sayu": {
+  "team": [
+   "sayu",
+   "furina",
+   "xiangling",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/GF8rG7tt6gKN",
+  "four": "favonius-greatsword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0.3,
+   1.2,
+   1.7,
+   1.8,
+   3.4,
+   3.8
+  ],
+  "weapon": null,
+  "dps": 46626,
+  "optimized": true
+ },
+ "sethos": {
+  "team": [
+   "sethos",
+   "ineffa",
+   "columbina",
+   "sucrose"
+  ],
+  "source": "https://gcsim.app/db/htPBrkGBNQNb",
+  "four": "slingshot",
+  "refine": 5,
+  "five": "hunter-s-path",
+  "cons": [
+   0.3,
+   2.3,
+   3.4,
+   3.3,
+   5.2,
+   8.9
+  ],
+  "weapon": 0.7,
+  "dps": 102591,
+  "optimized": true
+ },
+ "shenhe": {
+  "team": [
+   "kamisatoayaka",
+   "furina",
+   "xianyun",
+   "shenhe"
+  ],
+  "source": "https://gcsim.app/db/GQkPnKHDrfbC",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0,
+   6.5,
+   8.4,
+   9.1,
+   10,
+   11.2
+  ],
+  "weapon": null,
+  "dps": 69978,
+  "optimized": true
+ },
+ "shikanoin-heizou": {
+  "team": [
+   "kamisatoayaka",
+   "sangonomiyakokomi",
+   "shikanoinheizou",
+   "shenhe"
+  ],
+  "source": "https://gcsim.app/db/FW7q8mQhFQkw",
+  "four": "sacrificial-fragments",
+  "refine": 5,
+  "five": "a-thousand-floating-dreams",
+  "cons": [
+   0.9,
+   0.5,
+   0.8,
+   4.5,
+   4.5,
+   5
+  ],
+  "weapon": 1,
+  "dps": 59466,
+  "optimized": true
+ },
+ "sigewinne": {
+  "team": [
+   "kaedeharakazuha",
+   "furina",
+   "yaemiko",
+   "sigewinne"
+  ],
+  "source": "https://gcsim.app/db/6Q7JMm6TTkWR",
+  "four": "sequence-of-solitude",
+  "refine": 5,
+  "five": "silvershower-heartstrings",
+  "cons": [
+   11.3,
+   20.5,
+   22.1,
+   21,
+   20.9,
+   27.9
+  ],
+  "weapon": 1.1,
+  "dps": 45153,
+  "optimized": true
+ },
+ "skirk": {
+  "team": [
+   "skirk",
+   "furina",
+   "shenhe",
+   "escoffier"
+  ],
+  "source": "https://gcsim.app/db/CWghGjbztRKj",
+  "four": "calamity-of-eshu",
+  "refine": 5,
+  "five": "azurelight",
+  "cons": [
+   13,
+   29.2,
+   30.9,
+   43.3,
+   61.5,
+   81.6
+  ],
+  "weapon": 34.2,
+  "dps": 117190,
+  "optimized": true
+ },
+ "sucrose": {
+  "team": [
+   "bennett",
+   "sucrose",
+   "xiangling",
+   "xingqiu"
+  ],
+  "source": "https://gcsim.app/db/BTJLjFNrhGb6",
+  "four": "wandering-evenstar",
+  "refine": 5,
+  "five": "a-thousand-floating-dreams",
+  "cons": [
+   0.1,
+   0.6,
+   0.9,
+   0.8,
+   1.1,
+   2.3
+  ],
+  "weapon": -2.2,
+  "dps": 51464,
+  "optimized": true
+ },
+ "tartaglia": {
+  "team": [
+   "tartaglia",
+   "bennett",
+   "xiangling",
+   "kaedeharakazuha"
+  ],
+  "source": "https://gcsim.app/db/jn8qcb8TjjqK",
+  "four": "the-viridescent-hunt",
+  "refine": 5,
+  "five": "polar-star",
+  "cons": [
+   -0.2,
+   0.4,
+   6.7,
+   8,
+   10.7,
+   10.9
+  ],
+  "weapon": 8.2,
+  "dps": 67980,
+  "optimized": true
+ },
+ "thoma": {
+  "team": [
+   "sangonomiyakokomi",
+   "fischl",
+   "nahida",
+   "thoma"
+  ],
+  "source": "https://gcsim.app/db/gmRhmPPtWnb9",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   -0.1,
+   7.4,
+   8.1,
+   10.1,
+   10.1,
+   11.1
+  ],
+  "weapon": 1.5,
+  "dps": 55739,
+  "optimized": true
+ },
+ "tighnari": {
+  "team": [
+   "tighnari",
+   "collei",
+   "fischl",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/z7LcNCFCgBrR",
+  "four": "fading-twilight",
+  "refine": 5,
+  "five": "hunter-s-path",
+  "cons": [
+   4.7,
+   8.8,
+   10.8,
+   15.1,
+   14.9,
+   35.6
+  ],
+  "weapon": 25.5,
+  "dps": 38790,
+  "optimized": true
+ },
+ "varesa": {
+  "team": [
+   "mavuika",
+   "varesa",
+   "ororon",
+   "chevreuse"
+  ],
+  "source": "https://gcsim.app/db/bpDgLhHJWkM6",
+  "four": "the-widsith",
+  "refine": 5,
+  "five": "vivid-notions",
+  "cons": [
+   4.8,
+   8.7,
+   11.7,
+   18.2,
+   22.8,
+   52.5
+  ],
+  "weapon": 12.1,
+  "dps": 116397,
+  "optimized": true
+ },
+ "venti": {
+  "team": [
+   "yaemiko",
+   "venti",
+   "fischl",
+   "sangonomiyakokomi"
+  ],
+  "source": "https://gcsim.app/db/kwRKDwqhWm8t",
+  "four": "the-stringless",
+  "refine": 5,
+  "five": "the-daybreak-chronicles",
+  "cons": [
+   0.1,
+   1.3,
+   1.7,
+   2.4,
+   2.8,
+   8
+  ],
+  "weapon": 0,
+  "dps": 52516,
+  "optimized": true
+ },
+ "wanderer": {
+  "team": [
+   "wanderer",
+   "faruzan",
+   "zhongli",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/LqK7rR6ckNDW",
+  "four": "the-widsith",
+  "refine": 5,
+  "five": "tulaytullah-s-remembrance",
+  "cons": [
+   11.4,
+   11.2,
+   12.7,
+   17.4,
+   20.6,
+   43.5
+  ],
+  "weapon": 6.3,
+  "dps": 56368,
+  "optimized": true
+ },
+ "wriothesley": {
+  "team": [
+   "shenhe",
+   "wriothesley",
+   "bennett",
+   "xiangling"
+  ],
+  "source": "https://gcsim.app/db/Jp8PGBfFk8Dp",
+  "four": "flowing-purity",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   3.3,
+   9,
+   22,
+   23.4,
+   25.3,
+   37.4
+  ],
+  "weapon": null,
+  "dps": 52437,
+  "optimized": false
+ },
+ "xiangling": {
+  "team": [
+   "raidenshogun",
+   "xingqiu",
+   "bennett",
+   "xiangling"
+  ],
+  "source": "https://gcsim.app/db/HFzmKCw7rzMh",
+  "four": "the-catch",
+  "refine": 5,
+  "five": "staff-of-the-scarlet-sands",
+  "cons": [
+   3.7,
+   3.7,
+   8.7,
+   22.5,
+   23.4,
+   24.4
+  ],
+  "weapon": 1.8,
+  "dps": 56938,
+  "optimized": true
+ },
+ "xianyun": {
+  "team": [
+   "diluc",
+   "furina",
+   "xianyun",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/HCbwBq8frJBq",
+  "four": "oathsworn-eye",
+  "refine": 5,
+  "five": "crane-s-echoing-call",
+  "cons": [
+   -0.3,
+   33.9,
+   33.6,
+   34.4,
+   34.3,
+   33.3
+  ],
+  "weapon": 18.2,
+  "dps": 78055,
+  "optimized": true
+ },
+ "xiao": {
+  "team": [
+   "xiao",
+   "faruzan",
+   "furina",
+   "xianyun"
+  ],
+  "source": "https://gcsim.app/db/drKFLJDcMNTF",
+  "four": "deathmatch",
+  "refine": 5,
+  "five": "primordial-jade-winged-spear",
+  "cons": [
+   -0.2,
+   0.1,
+   0.8,
+   0.7,
+   3,
+   3.1
+  ],
+  "weapon": 2.8,
+  "dps": 128489,
+  "optimized": true
+ },
+ "xilonen": {
+  "team": [
+   "neuvillette",
+   "kaedeharakazuha",
+   "xilonen",
+   "furina"
+  ],
+  "source": "https://gcsim.app/db/TMFtkdkpcjDG",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": "peak-patrol-song",
+  "cons": [
+   0,
+   12.3,
+   15.8,
+   18.3,
+   18.5,
+   19.3
+  ],
+  "weapon": 5.7,
+  "dps": 156938,
+  "optimized": true
+ },
+ "xingqiu": {
+  "team": [
+   "hutao",
+   "xingqiu",
+   "zhongli",
+   "yelan"
+  ],
+  "source": "https://gcsim.app/db/pLhWwmDbNKKR",
+  "four": "sacrificial-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.5,
+   4.5,
+   5.5,
+   6.2,
+   6.5,
+   10.2
+  ],
+  "weapon": null,
+  "dps": 55852,
+  "optimized": true
+ },
+ "xinyan": {
+  "team": [
+   "rosaria",
+   "fischl",
+   "xinyan",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/Dn7MNbDqzP8H",
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "redhorn-stonethresher",
+  "cons": [
+   0.5,
+   4.8,
+   6.1,
+   6.9,
+   9.1,
+   10
+  ],
+  "weapon": 0,
+  "dps": 31282,
+  "optimized": true
+ },
+ "yae-miko": {
+  "team": [
+   "yaemiko",
+   "nahida",
+   "kukishinobu",
+   "alhaitham"
+  ],
+  "source": "https://gcsim.app/db/TJqJL9hkmdkH",
+  "four": "solar-pearl",
+  "refine": 5,
+  "five": "kagura-s-verity",
+  "cons": [
+   0.2,
+   15.4,
+   18.8,
+   23.5,
+   24,
+   38.4
+  ],
+  "weapon": 6.8,
+  "dps": 63674,
+  "optimized": true
+ },
+ "yanfei": {
+  "team": [
+   "yanfei",
+   "xingqiu",
+   "yelan",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/kn9NbdTMbfK7",
+  "four": "the-widsith",
+  "refine": 5,
+  "five": "skyward-atlas",
+  "cons": [
+   0.8,
+   0.8,
+   2.6,
+   2.5,
+   3.3,
+   4.2
+  ],
+  "weapon": -2.3,
+  "dps": 50248,
+  "optimized": true
+ },
+ "yaoyao": {
+  "team": [
+   "kaedeharakazuha",
+   "yaemiko",
+   "fischl",
+   "yaoyao"
+  ],
+  "source": "https://gcsim.app/db/t6HbKnfRFGHD",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   0,
+   0,
+   0.1,
+   0.2,
+   0.2,
+   -2.4
+  ],
+  "weapon": 0.8,
+  "dps": 66556,
+  "optimized": true
+ },
+ "yelan": {
+  "team": [
+   "hutao",
+   "xingqiu",
+   "zhongli",
+   "yelan"
+  ],
+  "source": "https://gcsim.app/db/7CCFFqzRzHLK",
+  "four": "favonius-warbow",
+  "refine": 5,
+  "five": "aqua-simulacra",
+  "cons": [
+   0.1,
+   5.2,
+   8.8,
+   18,
+   18.6,
+   24
+  ],
+  "weapon": -0.1,
+  "dps": 68822,
+  "optimized": true
+ },
+ "yoimiya": {
+  "team": [
+   "yoimiya",
+   "xingqiu",
+   "sucrose",
+   "thoma"
+  ],
+  "source": "https://gcsim.app/db/MpjbKCfPTbJm",
+  "four": "rust",
+  "refine": 5,
+  "five": "thundering-pulse",
+  "cons": [
+   0.5,
+   5.5,
+   8.9,
+   8.9,
+   9.9,
+   21.8
+  ],
+  "weapon": 8.5,
+  "dps": 44923,
+  "optimized": true
+ },
+ "yumemizuki-mizuki": {
+  "team": [
+   "yumemizukimizuki",
+   "ineffa",
+   "columbina",
+   "ororon"
+  ],
+  "source": "https://gcsim.app/db/td98bJWKcqjH",
+  "four": "sacrificial-fragments",
+  "refine": 5,
+  "five": "sunny-morning-sleep-in",
+  "cons": [
+   2.8,
+   5.9,
+   6.9,
+   8.2,
+   8.2,
+   12.8
+  ],
+  "weapon": 2.8,
+  "dps": 96324,
+  "optimized": true
+ },
+ "zhongli": {
+  "team": [
+   "yoimiya",
+   "bennett",
+   "xiangling",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/fJKcb87pB9HH",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": "staff-of-homa",
+  "cons": [
+   2.1,
+   2.4,
+   2.9,
+   2.9,
+   3.1,
+   3.2
+  ],
+  "weapon": -2.6,
+  "dps": 43721,
+  "optimized": true
+ }
+}
