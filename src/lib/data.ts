@@ -39,3 +39,12 @@ export const MODES: Record<string, { title: string; short: string }> = {
 export const TALENTS = { normal: 'Обычная атака', skill: 'Элементальный навык', burst: 'Взрыв стихии' } as const;
 
 export const fmtDate = (d: Date) => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+
+// Эндгейм обновляется в 04:00 по времени сервера — строка для data-until
+export const resetAt = (d: Date) => `${d.toISOString().slice(0, 10)}T04:00`;
+// Дата из строки времени сервера «2026-10-13T18:00» — для подписей без часового пояса
+export const fmtServerDate = (s: string) =>
+  new Date(`${s.slice(0, 10)}T12:00:00Z`).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+export const fmtStat = (v: number | null, percent: boolean) =>
+  v === null ? '—' : percent ? `${v.toLocaleString('ru-RU', { minimumFractionDigits: 1 })}%` : v.toLocaleString('ru-RU');
+export const stars = (n: number) => '★'.repeat(n);

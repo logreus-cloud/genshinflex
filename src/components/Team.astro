@@ -4,7 +4,7 @@ import CharacterIcon from './CharacterIcon.astro';
 interface Props { members: string[]; name?: string; note?: string; }
 const { members, name, note } = Astro.props;
 ---
-<div class="team card">
+<div class="team panel">
   {name && <h3>{name}</h3>}
   <div class="members">{members.map((m) => <CharacterIcon slug={m} size={52} />)}</div>
   {note && <p class="muted">{note}</p>}

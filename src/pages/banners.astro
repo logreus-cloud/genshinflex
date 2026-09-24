@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import CharacterIcon from '../components/CharacterIcon.astro';
+import { getCharacter, getWeapon, fmtServerDate, stars } from '../lib/data';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const now = new Date();
+const builds = new Set((await getCollection('builds')).map((b) => b.data.character));
+const all = (await getCollection('banners')).map((b) => b.data).sort((a, b) => a.start.localeCompare(b.start));
+const current = all.filter((b) => new Date(b.start) <= now && new Date(b.end) > now);
+const next = all.filter((b) => new Date(b.start) > now);
+const sections = [
+  { title: 'Сейчас', list: current, empty: 'Сейчас между фазами — загляните позже.' },
+  { title: 'Следующие', list: next, empty: 'Следующие баннеры ещё не объявлены.' },
+];
+---
+<Layout title="Баннеры" description="Текущие и следующие баннеры Genshin Impact с таймерами по времени вашего сервера.">
+  <h1>Баннеры</h1>
+  <p class="lead">Текущие и объявленные баннеры персонажей и оружия. Таймеры считают время вашего сервера.</p>
+
+  <div class="region panel">
+    <span>Сервер</span>
+    <div class="row" role="group" aria-label="Регион сервера">
+      <button class="btn" type="button" data-region="eu" aria-pressed="false">Европа</button>
+      <button class="btn" type="button" data-region="asia" aria-pressed="false">Азия</button>
+      <button class="btn" type="button" data-region="na" aria-pressed="false">Америка</button>
+    </div>
+    <span class="muted small">Выбор запоминается и применяется ко всем таймерам сайта</span>
+  </div>
+
+  {sections.map((s) => (
+    <section>
+      <h2 class="h-sec">{s.title}</h2>
+      {s.list.length === 0 && <p class="muted">{s.empty}</p>}
+      {s.list.map((b) => (
+        <article class="banner">
+          <header class="bhead">
+            <div>
+              <h3>Версия {b.version}, фаза {b.phase}</h3>
+              <p class="muted small">{fmtServerDate(b.start)} — {fmtServerDate(b.end)}</p>
+            </div>
+            <span class="timer">
+              {s.title === 'Сейчас'
+                ? <>До конца: <b data-until={b.end} data-done="закончился">…</b></>
+                : <>До начала: <b data-until={b.start} data-done="уже идёт">…</b></>}
+            </span>
+          </header>
+          <div class="featured">
+            {b.featured.map((f) => {
+              const c = getCharacter(f.slug);
+              return (
+                <a class="feat" href={`${base}/characters/${c.slug}`} data-el={c.element}>
+                  {c.splash && <img class="art" src={c.splash} alt="" loading="lazy" />}
+                  <div class="feat-info">
+                    <span class="chip gold">{f.rerun ? 'повтор' : 'новый'}</span>
+                    <h4>{c.name}</h4>
+                    <span class="small">{stars(c.rarity)} {c.elementText}, {c.weaponText.toLowerCase()}</span>
+                    <span class="small muted">{builds.has(c.slug) ? 'Есть билд' : 'Билд готовится'}</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+          <div class="extras">
+            {b.fourStars.length > 0 && (
+              <div>
+                <span class="muted small">4★ персонажи с повышенным шансом</span>
+                <div class="row">{b.fourStars.map((s) => <CharacterIcon slug={s} size={48} />)}</div>
+              </div>
+            )}
+            {b.weapons.length > 0 && (
+              <div>
+                <span class="muted small">Баннер оружия</span>
+                <div class="row">
+                  {b.weapons.map((s) => {
+                    const w = getWeapon(s);
+                    return <a class="wpn" href={`${base}/weapons/${w.slug}`}><img src={w.icon} alt="" width="44" height="44" loading="lazy" /><span>{w.name}</span></a>;
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+          {b.sources.length > 0 && <p class="muted small src">Источник: {b.sources.map((x) => <a href={x.url} rel="noopener">{x.title}</a>)}</p>}
+        </article>
+      ))}
+    </section>
+  ))}
+</Layout>
+
+<script>
+  import { region, type Region } from '../scripts/common';
+  const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-region]')];
+  const paint = () => btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
+  btns.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); }));
+  paint();
+</script>
+
+<style>
+  .region { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .region .btn { padding: .35rem .8rem; }
+  .banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 14px; }
+  .bhead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .9rem; }
+  .bhead h3 { margin: 0; font-size: 1.05rem; }
+  .bhead p { margin: .15rem 0 0; }
+  .timer { background: var(--accent-soft); border-radius: var(--radius); padding: .45rem .8rem; font-size: .92rem; }
+  .timer b { color: var(--accent); }
+  .featured { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .feat {
+    position: relative; min-height: 210px; border-radius: var(--radius); overflow: hidden; text-decoration: none; isolation: isolate;
+    background: linear-gradient(130deg, color-mix(in srgb, var(--el) 45%, var(--surface-2)), var(--surface-2));
+    display: flex; align-items: flex-end;
+  }
+  .art { position: absolute; right: -15%; top: -10%; height: 150%; z-index: -1; }
+  .feat::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(12 14 24 / .85), transparent 75%); }
+  .feat-info { display: grid; gap: .15rem; padding: 1rem; color: #fff; }
+  .feat-info .chip { justify-self: start; }
+  .feat-info .muted { color: rgb(255 255 255 / .7); }
+  .feat h4 { font: 600 1.4rem var(--font-display); margin: .3rem 0 0; }
+  .feat:hover { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .extras { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-top: 1rem; }
+  .extras > div { display: grid; gap: .5rem; }
+  .wpn { display: flex; align-items: center; gap: .5rem; text-decoration: none; background: var(--surface-2); border-radius: var(--radius); padding: .3rem .7rem .3rem .3rem; font-size: .88rem; }
+  .wpn img { border-radius: 8px; background: linear-gradient(170deg, #6b4520, #d1953f); }
+  .src { margin: .8rem 0 0; }
+</style>

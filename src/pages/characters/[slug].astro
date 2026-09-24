@@ -2,126 +2,342 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Team from '../../components/Team.astro';
-import { characters, getWeapon, getArtifact, TALENTS, type Character } from '../../lib/data';
+import LevelStats from '../../components/LevelStats.astro';
+import { characters, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, type Character } from '../../lib/data';
 
 export function getStaticPaths() {
   return characters.map((c) => ({ params: { slug: c.slug }, props: { c } }));
 }
 
 const { c } = Astro.props as { c: Character };
-const build = (await getCollection('builds')).find((b) => b.data.character === c.slug);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const allBuilds = await getCollection('builds');
+const build = allBuilds.find((b) => b.data.character === c.slug);
 const Content = build ? (await render(build)).Content : null;
 const b = build?.data;
+
+// Где ещё встречается персонаж: команды других билдов и рекомендации текущего эндгейма
+const elsewhere = allBuilds
+  .filter((x) => x.data.character !== c.slug)
+  .flatMap((x) => x.data.teams.filter((t) => t.members.includes(c.slug)).map((t) => ({ ...t, owner: x.data.character })));
+const endgame = (await getCollection('rotations'))
+  .flatMap((r) => r.data.teams.filter((t) => t.members.includes(c.slug)).map((t) => ({ ...t, mode: r.data.mode })));
+// Один и тот же состав встречается в нескольких билдах — склеиваем по набору участников
+const key = (m: string[]) => [...m].sort().join();
+const own = new Set((b?.teams ?? []).map((t) => key(t.members)));
+const merged = new Map<string, { name?: string; members: string[]; from: string[] }>();
+for (const t of [
+  ...endgame.map((t) => ({ name: t.name, members: t.members, from: MODES[t.mode].title })),
+  ...elsewhere.map((t) => ({ name: t.name, members: t.members, from: getCharacter(t.owner).name })),
+]) {
+  const k = key(t.members);
+  if (own.has(k)) continue;
+  const m = merged.get(k);
+  if (m) { if (!m.from.includes(t.from)) m.from.push(t.from); } else merged.set(k, { name: t.name, members: t.members, from: [t.from] });
+}
+const related = [...merged.values()];
+
+const talentKeys = ['normal', 'skill', 'burst'] as const;
+const tabs = [['profile', 'Профиль'], ...(b ? [['build', 'Билд'], ['teams', 'Команды']] : []), ['talents', 'Таланты'], ['constellations', 'Созвездия']];
+const meta = [
+  ['Созвездие', c.constellationName], ['Регион', c.region], ['День рождения', c.birthday], ['В игре с версии', c.version],
+].filter(([, v]) => v);
+const slotIcons = {
+  sands: 'M6 3h8M6 17h8M7 3c0 4 6 4 6 7s-6 3-6 7M13 3c0 4-6 4-6 7s6 3 6 7',
+  goblet: 'M6 3h8l-1 6a3 3 0 0 1-6 0Zm4 9v4m-3 1h6',
+  circlet: 'M3 8l3.5 3L10 5l3.5 6L17 8l-1.5 8h-11Z',
+};
+const slotNames = { sands: 'Часы', goblet: 'Кубок', circlet: 'Корона' } as const;
 ---
-<Layout title={c.name} description={`${c.name}: билд, команды, таланты и созвездия.`}>
-  <article data-pagefind-body>
+<Layout title={`${c.name}: билд и команды`} description={`${c.name} в Genshin Impact: лучшее оружие, артефакты, команды, таланты и созвездия.`} wide>
+  <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/characters/${c.slug}`, name: c.name, icon: c.icon, kind: 'Персонаж' })}>
+    <nav class="crumbs small muted" aria-label="Путь"><a href={`${base}/characters`}>Персонажи</a> / {c.name}</nav>
+
     <header class="head" data-el={c.element}>
-      {c.icon && <img class="portrait" src={c.icon} alt="" width="120" height="120" />}
-      <div>
-        <p class="muted title">{c.title}</p>
+      {c.splash && <img class="splash" src={c.splash} alt="" aria-hidden="true" />}
+      <div class="head-info">
+        <p class="muted" data-pagefind-ignore>{c.title}</p>
         <h1>{c.name}</h1>
-        <div class="chips" data-pagefind-ignore>
+        <div class="row" data-pagefind-ignore>
+          <span class="chip gold">{stars(c.rarity)}</span>
           <span class="chip" data-el={c.element}>{c.elementText}</span>
-          <span class="chip">{'★'.repeat(c.rarity)}</span>
           <span class="chip">{c.weaponText}</span>
-          {c.region && <span class="chip">{c.region}</span>}
-          <span class="chip">Версия {c.version}</span>
         </div>
+        <dl class="meta" data-pagefind-ignore>
+          {meta.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
+        <button class="btn fav" type="button" aria-pressed="false" data-pagefind-ignore>
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m10 3.5 1.9 4 4.3.5-3.2 3 .9 4.3L10 13.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5Z" /></svg>
+          <span>В избранное</span>
+        </button>
       </div>
     </header>
 
-    <section class="ratings" data-pagefind-ignore>
-      <div class="card"><h3>ELO сообщества</h3><p class="muted">Скоро: попарные голосования по текущему циклу</p></div>
-      <div class="card"><h3>ELO по забегам</h3><p class="muted">Скоро: рейтинг по отправленным прохождениям</p></div>
+    <nav class="tabs" aria-label="Разделы страницы" data-pagefind-ignore>
+      {tabs.map(([id, label]) => <a href={`#${id}`}>{label}</a>)}
+    </nav>
+
+    <section id="profile">
+      <h2 class="h-sec">Профиль</h2>
+      <div class="two">
+        <div class="panel">
+          <p>{c.description}</p>
+          <div class="ratings" data-pagefind-ignore>
+            <div><span class="muted small">ELO сообщества</span><b>скоро</b></div>
+            <div><span class="muted small">ELO по забегам</span><b>скоро</b></div>
+          </div>
+        </div>
+        <LevelStats stats={c.stats} substat={c.substat} substatPercent={c.substatPercent} />
+      </div>
     </section>
 
     {b ? (
-      <section>
-        <h2>Билд <span class="chip">патч {b.patch}</span></h2>
-        <p class="muted">{b.role}</p>
-        <div class="build">
-          <div class="card">
-            <h3>Оружие</h3>
-            <ol>{b.weapons.map((w) => {
-              const it = getWeapon(w.slug);
-              return <li><img src={it.icon} alt="" width="36" height="36" loading="lazy" /><span><b>{it.name}</b> {'★'.repeat(it.rarity)}{w.note && <small class="muted"> — {w.note}</small>}</span></li>;
-            })}</ol>
+      <>
+        <section id="build">
+          <h2 class="h-sec">Билд <small>патч {b.patch}, обновлено {b.updated.toLocaleDateString('ru-RU')}</small></h2>
+          <p class="muted">{b.role}</p>
+          <div class="build">
+            <div class="panel">
+              <h3>Оружие</h3>
+              <ol class="rank">
+                {b.weapons.map((w, i) => {
+                  const it = getWeapon(w.slug);
+                  return (
+                    <li>
+                      <span class="n">{i + 1}</span>
+                      <img class:list={[`r${it.rarity}`]} src={it.icon} alt="" width="40" height="40" loading="lazy" />
+                      <span><a href={`${base}/weapons/${it.slug}`}><b>{it.name}</b></a> <span class="muted small">{stars(it.rarity)}</span>
+                        {w.note && <small class="muted note">{w.note}</small>}</span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+            <div class="panel">
+              <h3>Артефакты</h3>
+              <ol class="rank">
+                {b.artifacts.map((a, i) => (
+                  <li>
+                    <span class="n">{i + 1}</span>
+                    <span class="sets">{a.sets.map((s) => <img src={getArtifact(s).icon} alt="" width="40" height="40" loading="lazy" />)}</span>
+                    <span><b>{a.sets.map((s) => getArtifact(s).name).join(' + ')}</b>{a.note && <small class="muted note">{a.note}</small>}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
-          <div class="card">
-            <h3>Артефакты</h3>
-            <ol>{b.artifacts.map((a) => (
-              <li>
-                {a.sets.map((s) => <img src={getArtifact(s).icon} alt="" width="36" height="36" loading="lazy" />)}
-                <span><b>{a.sets.map((s) => getArtifact(s).name).join(' + ')}</b>{a.note && <small class="muted"> — {a.note}</small>}</span>
-              </li>
-            ))}</ol>
+          <div class="stats-row">
+            {(['sands', 'goblet', 'circlet'] as const).map((slot) => (
+              <div class="panel slot">
+                <svg viewBox="0 0 20 20" width="30" height="30" aria-hidden="true"><path d={slotIcons[slot]} /></svg>
+                <div><span class="muted small">{slotNames[slot]}</span><b>{b.mainStats[slot]}</b></div>
+              </div>
+            ))}
           </div>
-          <div class="card">
-            <h3>Статы</h3>
-            <dl>
-              <dt>Часы</dt><dd>{b.mainStats.sands}</dd>
-              <dt>Кубок</dt><dd>{b.mainStats.goblet}</dd>
-              <dt>Корона</dt><dd>{b.mainStats.circlet}</dd>
-              <dt>Доп. статы</dt><dd>{b.substats.join(' > ')}</dd>
-              <dt>Таланты</dt><dd>{b.talents.map((t) => TALENTS[t]).join(' > ')}</dd>
-            </dl>
+          <div class="panel prio">
+            <div><span class="muted small">Доп. статы</span><b>{b.substats.join('  >  ')}</b></div>
+            {b.talents.length > 0 && <div><span class="muted small">Прокачка талантов</span><b>{b.talents.map((t) => TALENTS[t]).join('  >  ')}</b></div>}
           </div>
-        </div>
+          {Content && <div class="panel prose"><Content /></div>}
+          {b.sources.length > 0 && (
+            <p class="muted small">Источники: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. Тексты — наш пересказ.</p>
+          )}
+        </section>
 
-        <h2>Команды</h2>
-        <div class="grid">{b.teams.map((t) => <Team {...t} />)}</div>
-
-        {Content && <div class="card prose"><Content /></div>}
-
-        {b.sources.length > 0 && (
-          <p class="muted small">Источники: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}</p>
-        )}
-        <p class="muted small">Обновлено {b.updated.toLocaleDateString('ru-RU')}</p>
-      </section>
+        <section id="teams">
+          <h2 class="h-sec">Команды</h2>
+          <div class="grid">{b.teams.map((t) => <Team {...t} />)}</div>
+          {related.length > 0 && (
+            <>
+              <h3 class="sub">Встречается в других командах</h3>
+              <div class="grid">
+                {related.map((t) => <Team members={t.members} name={t.name} note={`Где рекомендуют: ${t.from.join(', ')}`} />)}
+              </div>
+            </>
+          )}
+        </section>
+      </>
     ) : (
-      <p class="notice">Билда для этого персонажа пока нет — его можно добавить через PR, см. CONTRIBUTING.md.</p>
+      <p class="notice" data-pagefind-ignore>
+        Билда для этого персонажа пока нет. Его можно добавить через pull request: формат описан в CONTRIBUTING.md репозитория.
+      </p>
     )}
 
-    <h2>Таланты</h2>
-    <div class="stack">
-      {(['normal', 'skill', 'burst'] as const).map((k) => c.talents[k] && (
-        <details class="card"><summary>{TALENTS[k]}: {c.talents[k].name}</summary><div>{c.talents[k].description}</div></details>
-      ))}
-      {c.talents.passives.map((p) => p && (
-        <details class="card"><summary>Пассивный: {p.name}</summary><div>{p.description}</div></details>
-      ))}
-    </div>
+    <section id="talents">
+      <h2 class="h-sec">Таланты
+        <small data-pagefind-ignore>
+          <label class="lvl">Уровень <output>10</output>
+            <input type="range" min="1" max={c.talents.skill?.scaling?.[0]?.values.length ?? 15} value="10" data-talent-level /></label>
+        </small>
+      </h2>
+      <div class="talents">
+        {talentKeys.map((k) => c.talents[k] && (
+          <div class="panel talent" data-el={c.element}>
+            <div class="t-head">
+              {c.talents[k].icon && <img src={c.talents[k].icon} alt="" width="44" height="44" loading="lazy" />}
+              <div><span class="muted small">{TALENTS[k]}</span><h3>{c.talents[k].name}</h3></div>
+            </div>
+            <p class="desc">{c.talents[k].description}</p>
+            {c.talents[k].scaling?.length > 0 && (
+              <details data-pagefind-ignore>
+                <summary>Множители</summary>
+                <table>
+                  <tbody>
+                    {c.talents[k].scaling.map((r) => (
+                      <tr><th scope="row">{r.name}</th><td data-values={JSON.stringify(r.values)}>{r.values[9] ?? r.values.at(-1)}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              </details>
+            )}
+          </div>
+        ))}
+      </div>
+      <h3 class="sub">Пассивные таланты</h3>
+      <div class="small-grid">
+        {c.talents.passives.map((p) => p && (
+          <div class="panel talent" data-el={c.element}>
+            <div class="t-head">{p.icon && <img src={p.icon} alt="" width="36" height="36" loading="lazy" />}<h3>{p.name}</h3></div>
+            <p class="desc">{p.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
 
-    <h2>Созвездия</h2>
-    <div class="stack">
-      {c.constellations.map((k, i) => k && (
-        <details class="card"><summary>C{i + 1}: {k.name}</summary><div>{k.description}</div></details>
-      ))}
-    </div>
+    <section id="constellations">
+      <h2 class="h-sec">Созвездия</h2>
+      <div class="small-grid">
+        {c.constellations.map((k, i) => k && (
+          <div class="panel talent" data-el={c.element}>
+            <div class="t-head">
+              {k.icon && <img src={k.icon} alt="" width="36" height="36" loading="lazy" />}
+              <div><span class="chip gold">C{i + 1}</span><h3>{k.name}</h3></div>
+            </div>
+            <p class="desc">{k.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="browse" data-pagefind-ignore>
+      <h2 class="h-sec">Другие персонажи</h2>
+      <div class="panel browse-grid">
+        <div><span class="muted small">По редкости</span><div class="row">{[5, 4].map((r) => <a class="chip" href={`${base}/characters?rarity=${r}`}>{r}★</a>)}</div></div>
+        <div><span class="muted small">По стихии</span><div class="row">{Object.entries(ELEMENTS).map(([k, v]) => <a class="chip" href={`${base}/characters?element=${k}`}><span class="el-dot" data-el={k}></span>{v}</a>)}</div></div>
+        <div><span class="muted small">По оружию</span><div class="row">{Object.entries(WEAPON_TYPES).map(([k, v]) => <a class="chip" href={`${base}/characters?weapon=${k}`}>{v}</a>)}</div></div>
+      </div>
+    </section>
   </article>
 </Layout>
 
+<script>
+  import { recent, favorites } from '../../scripts/common';
+
+  const art = document.querySelector<HTMLElement>('[data-visit]')!;
+  const entry = JSON.parse(art.dataset.visit!);
+  recent.push(entry);
+
+  const fav = document.querySelector<HTMLButtonElement>('.fav')!;
+  const paint = (on: boolean) => { fav.setAttribute('aria-pressed', String(on)); fav.querySelector('span')!.textContent = on ? 'В избранном' : 'В избранное'; };
+  paint(favorites.has(entry.href));
+  fav.addEventListener('click', () => paint(favorites.toggle(entry)));
+
+  // Один ползунок уровня для всех таблиц множителей
+  const range = document.querySelector<HTMLInputElement>('[data-talent-level]');
+  const cells = [...document.querySelectorAll<HTMLElement>('[data-values]')].map((el) => [el, JSON.parse(el.dataset.values!)] as const);
+  range?.addEventListener('input', () => {
+    const i = Number(range.value) - 1;
+    range.closest('label')!.querySelector('output')!.textContent = range.value;
+    for (const [el, values] of cells) el.textContent = values[Math.min(i, values.length - 1)];
+  });
+
+  // Подсветка текущего раздела во вкладках
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.tabs a')];
+  const obs = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) links.forEach((a) => a.toggleAttribute('aria-current', a.hash === `#${e.target.id}`));
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  links.forEach((a) => { const s = document.querySelector(a.hash); if (s) obs.observe(s); });
+</script>
+
 <style>
+  .crumbs { margin-bottom: .8rem; }
+  .crumbs a { color: var(--muted); }
   .head {
-    display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; padding: 1.2rem;
-    border-radius: var(--radius); border: 1px solid var(--border);
-    background: linear-gradient(120deg, color-mix(in srgb, var(--el) 22%, var(--surface)), var(--surface));
+    position: relative; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--border); min-height: 300px;
+    background: linear-gradient(110deg, var(--surface) 35%, color-mix(in srgb, var(--el) 30%, var(--surface)));
+    display: flex; align-items: center; isolation: isolate;
   }
-  .portrait { border-radius: 16px; background: color-mix(in srgb, var(--el) 35%, transparent); }
-  .title { margin: 0; }
-  .head h1 { margin: .1rem 0 .6rem; }
-  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
-  .ratings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 14px; }
-  .ratings p { margin: 0; font-size: .9rem; }
-  .build { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-  ol { margin: 0; padding: 0; list-style: none; display: grid; gap: .5rem; }
-  li { display: flex; gap: .5rem; align-items: center; }
-  li img { border-radius: 8px; background: var(--surface-2); flex: none; }
-  dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; }
-  dt { color: var(--muted); }
-  dd { margin: 0; }
-  .prose { margin-top: 14px; }
-  .prose :global(p) { margin: .4rem 0; }
-  .stack { display: grid; gap: .6rem; }
-  .small { font-size: .85rem; }
+  .splash { position: absolute; right: -4%; top: 50%; translate: 0 -50%; height: 150%; z-index: -1; mask-image: linear-gradient(90deg, transparent 15%, #000 55%); }
+  .head-info { padding: 1.6rem 1.8rem; max-width: 560px; }
+  .head-info > p { margin: 0; }
+  .head h1 { font-size: clamp(2rem, 4vw, 2.9rem); margin: .1rem 0 .7rem; }
+  .meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem 1.2rem; margin: 1rem 0; font-size: .88rem; }
+  .meta div { display: grid; }
+  .meta dt { color: var(--muted); font-size: .78rem; }
+  .meta dd { margin: 0; }
+  .fav svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+  .fav[aria-pressed="true"] svg { fill: currentColor; }
+
+  .tabs {
+    position: sticky; top: var(--top-h); z-index: 5; display: flex; gap: 2px; overflow-x: auto; margin-top: 12px;
+    background: var(--bg); border-bottom: 1px solid var(--border); scrollbar-width: none;
+  }
+  .tabs a { padding: .75rem 1rem; text-decoration: none; color: var(--muted); white-space: nowrap; border-bottom: 2px solid transparent; font-size: .93rem; }
+  .tabs a:hover { color: var(--text); }
+  .tabs a[aria-current] { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; }
+  .ratings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+  .ratings div { display: grid; background: var(--surface-2); border-radius: var(--radius); padding: .6rem .8rem; }
+
+  .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+  .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }
+  .rank li { display: flex; gap: .7rem; align-items: center; }
+  .rank .n { width: 1.4rem; text-align: center; color: var(--muted); font: 600 .85rem var(--font-display); flex: none; }
+  .rank li:first-child .n { color: var(--accent); }
+  .rank img { border-radius: 8px; background: var(--surface-3); flex: none; }
+  .rank img.r5 { background: linear-gradient(160deg, #7a5226, #d1953f); }
+  .rank img.r4 { background: linear-gradient(160deg, #5b4b82, #9679c4); }
+  .rank a { text-decoration: none; }
+  .rank a:hover { text-decoration: underline; }
+  .sets { display: flex; flex: none; }
+  .sets img + img { margin-left: -14px; }
+  .note { display: block; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .slot { display: flex; gap: .8rem; align-items: center; }
+  .slot svg { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .slot div, .prio div { display: grid; }
+  .prio { display: grid; gap: .6rem; margin-top: 12px; }
+  .prose { margin-top: 12px; }
+  .prose :global(p) { margin: .4rem 0; max-width: 80ch; }
+
+  .sub { margin: 1.6rem 0 .7rem; }
+  .lvl { display: inline-flex; align-items: center; gap: .5rem; }
+  .lvl output { color: var(--accent); font-weight: 600; min-width: 1.4em; }
+  .lvl input { accent-color: var(--accent); width: 140px; }
+  .talents { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+  .small-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .t-head { display: flex; gap: .7rem; align-items: center; margin-bottom: .6rem; }
+  .t-head img { border-radius: 50%; background: color-mix(in srgb, var(--el) 30%, var(--surface-3)); padding: 4px; flex: none; }
+  .t-head h3 { margin: .1rem 0 0; }
+  .desc { white-space: pre-line; color: var(--muted); font-size: .9rem; margin: 0; }
+  .talent details { margin-top: .8rem; }
+  .talent summary { color: var(--accent); font-size: .9rem; }
+  .talent table { margin-top: .5rem; }
+  .talent td { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .talent th { font-weight: 400; }
+
+  .browse-grid { display: grid; gap: .9rem; }
+  .browse-grid > div { display: grid; gap: .4rem; }
+
+  @media (max-width: 900px) {
+    .two { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .head { min-height: 0; flex-direction: column; align-items: stretch; }
+    .splash { position: static; translate: none; height: 220px; width: 100%; object-fit: cover; object-position: center 20%; mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
+    .head-info { padding: 0 1.1rem 1.2rem; }
+    .talents, .small-grid, .build { grid-template-columns: 1fr; }
+  }
 </style>

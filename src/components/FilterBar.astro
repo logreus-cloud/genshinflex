@@ -1,0 +1,82 @@
+---
+// Панель фильтров для списков: элементы списка несут data-* атрибуты, кнопки переключают значения.
+// Параметры URL (?element=anemo&weapon=sword) применяются при загрузке — на них ссылается «Другие персонажи».
+import { ELEMENTS, WEAPON_TYPES } from '../lib/data';
+
+interface Props { target: string; placeholder: string; groups: ('rarity' | 'element' | 'weapon')[]; rarities?: number[]; extra?: { key: string; label: string }; }
+const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
+---
+<form class="fb" data-filter={target} role="search">
+  <input class="input" type="search" name="q" placeholder={placeholder} aria-label={placeholder} />
+  <div class="toggles">
+    {groups.includes('rarity') && (
+      <div class="grp" role="group" aria-label="Редкость">
+        {rarities.map((r) => <button type="button" class="t" data-key="rarity" data-value={String(r)} aria-pressed="false">{r}★</button>)}
+      </div>
+    )}
+    {groups.includes('element') && (
+      <div class="grp" role="group" aria-label="Стихия">
+        {Object.entries(ELEMENTS).map(([k, v]) => (
+          <button type="button" class="t el" data-key="element" data-value={k} data-el={k} aria-pressed="false" title={v}>
+            <span class="el-dot"></span><span class="sr-only">{v}</span>
+          </button>
+        ))}
+      </div>
+    )}
+    {groups.includes('weapon') && (
+      <div class="grp" role="group" aria-label="Оружие">
+        {Object.entries(WEAPON_TYPES).map(([k, v]) => <button type="button" class="t" data-key="weapon" data-value={k} aria-pressed="false">{v}</button>)}
+      </div>
+    )}
+    {extra && <button type="button" class="t" data-key={extra.key} data-value="1" aria-pressed="false">{extra.label}</button>}
+    <button type="reset" class="t reset">Сбросить</button>
+  </div>
+  <p class="count muted small" aria-live="polite"></p>
+</form>
+
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-filter]')) {
+    const items = [...document.querySelectorAll<HTMLElement>(`${form.dataset.filter} > [data-name]`)];
+    const buttons = [...form.querySelectorAll<HTMLButtonElement>('button[data-key]')];
+    const input = form.querySelector('input')!;
+    const count = form.querySelector('.count')!;
+    const empty = document.querySelector<HTMLElement>(`${form.dataset.filter} ~ .empty`);
+
+    const apply = () => {
+      const q = input.value.trim().toLowerCase().replace(/ё/g, 'е');
+      const on: Record<string, string[]> = {};
+      for (const b of buttons) if (b.getAttribute('aria-pressed') === 'true') (on[b.dataset.key!] ??= []).push(b.dataset.value!);
+      let shown = 0;
+      for (const el of items) {
+        const ok = (!q || el.dataset.name!.includes(q)) && Object.entries(on).every(([k, vals]) => vals.includes(el.dataset[k] ?? ''));
+        el.hidden = !ok;
+        if (ok) shown++;
+      }
+      count.textContent = `Показано: ${shown} из ${items.length}`;
+      if (empty) empty.hidden = shown > 0;
+    };
+    for (const b of buttons) b.addEventListener('click', () => { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); apply(); });
+    input.addEventListener('input', apply);
+    form.addEventListener('submit', (e) => e.preventDefault());
+    form.addEventListener('reset', () => { buttons.forEach((b) => b.setAttribute('aria-pressed', 'false')); setTimeout(apply); });
+
+    const params = new URLSearchParams(location.search);
+    for (const b of buttons) if (params.getAll(b.dataset.key!).includes(b.dataset.value!)) b.setAttribute('aria-pressed', 'true');
+    apply();
+  }
+</script>
+
+<style>
+  .fb { display: grid; gap: .7rem; margin-bottom: 1.2rem; }
+  .toggles { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .grp { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2px; }
+  .t { border: 0; background: none; border-radius: 7px; padding: .35rem .6rem; font-size: .85rem; color: var(--muted); cursor: pointer; }
+  .t:hover { color: var(--text); background: var(--surface-2); }
+  .t[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .t.el { padding: .35rem .5rem; }
+  .t.el .el-dot { width: 14px; height: 14px; }
+  .t.el[aria-pressed="true"] { background: color-mix(in srgb, var(--el) 25%, transparent); }
+  .toggles > .t { border: 1px solid var(--border); background: var(--surface); }
+  .reset { margin-left: auto; }
+  .count { margin: 0; }
+</style>

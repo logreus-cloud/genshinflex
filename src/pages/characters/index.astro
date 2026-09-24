@@ -1,70 +1,31 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import CharacterIcon from '../../components/CharacterIcon.astro';
-import { characters, ELEMENTS, WEAPON_TYPES } from '../../lib/data';
+import CharacterCard from '../../components/CharacterCard.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import { characters } from '../../lib/data';
 
 const withBuild = new Set((await getCollection('builds')).map((b) => b.data.character));
+const latest = Math.max(...characters.map((c) => parseFloat(c.version)));
 ---
-<Layout title="Персонажи">
+<Layout title="Персонажи" wide>
   <h1>Персонажи</h1>
-  <form class="filters" id="filters">
-    <input type="search" name="q" placeholder="Имя…" aria-label="Поиск по имени" />
-    <select name="element" aria-label="Стихия">
-      <option value="">Все стихии</option>
-      {Object.entries(ELEMENTS).map(([k, v]) => <option value={k}>{v}</option>)}
-    </select>
-    <select name="weapon" aria-label="Оружие">
-      <option value="">Всё оружие</option>
-      {Object.entries(WEAPON_TYPES).map(([k, v]) => <option value={k}>{v}</option>)}
-    </select>
-    <select name="rarity" aria-label="Редкость">
-      <option value="">★4 и ★5</option><option value="5">★5</option><option value="4">★4</option>
-    </select>
-    <label><input type="checkbox" name="build" /> только с билдом</label>
-  </form>
+  <p class="lead">Все {characters.length} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.</p>
 
-  <div class="list" id="list">
+  <FilterBar target="#chars" placeholder="Найти персонажа" groups={['rarity', 'element', 'weapon']} extra={{ key: 'build', label: 'Только с билдом' }} />
+
+  <div class="cards" id="chars">
     {characters.map((c) => (
-      <div data-name={`${c.name} ${c.nameEn}`.toLowerCase()} data-element={c.element} data-weapon={c.weapon}
-        data-rarity={c.rarity} data-build={withBuild.has(c.slug) ? '1' : ''}>
-        <CharacterIcon slug={c.slug} size={84} />
+      <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-element={c.element} data-weapon={c.weapon}
+        data-rarity={String(c.rarity)} data-build={withBuild.has(c.slug) ? '1' : ''}>
+        <CharacterCard slug={c.slug} badge={parseFloat(c.version) === latest ? 'новый' : withBuild.has(c.slug) ? 'билд' : undefined} />
       </div>
     ))}
   </div>
-  <p class="muted" id="empty" hidden>Никого не нашлось.</p>
+  <p class="empty muted" hidden>Никого не нашлось. Сбросьте часть фильтров.</p>
 </Layout>
 
-<script>
-  const form = document.getElementById('filters') as HTMLFormElement;
-  const items = [...document.querySelectorAll<HTMLElement>('#list > div')];
-  const apply = () => {
-    const f = new FormData(form);
-    const q = String(f.get('q') ?? '').trim().toLowerCase();
-    let shown = 0;
-    for (const el of items) {
-      const d = el.dataset;
-      const ok = (!q || d.name!.includes(q))
-        && (!f.get('element') || d.element === f.get('element'))
-        && (!f.get('weapon') || d.weapon === f.get('weapon'))
-        && (!f.get('rarity') || d.rarity === f.get('rarity'))
-        && (!f.get('build') || d.build === '1');
-      el.hidden = !ok;
-      if (ok) shown++;
-    }
-    document.getElementById('empty')!.hidden = shown > 0;
-  };
-  form.addEventListener('input', apply);
-  form.addEventListener('submit', (e) => e.preventDefault());
-</script>
-
 <style>
-  .filters { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.4rem; align-items: center; }
-  .filters input[type="search"], .filters select {
-    font: inherit; padding: .45rem .7rem; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text);
-  }
-  .filters input[type="search"] { flex: 1 1 180px; }
-  .filters label { color: var(--muted); font-size: .92rem; }
-  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem .4rem; justify-items: center; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .empty { text-align: center; margin: 3rem 0; }
 </style>

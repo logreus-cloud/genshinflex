@@ -1,0 +1,49 @@
+---
+// Статы на уровне: ползунок по точкам возвышения, «20+» — после возвышения
+import { fmtStat } from '../lib/data';
+
+type Point = { level: string; hp?: number; atk: number; def?: number; sub: number | null };
+interface Props { stats: Point[]; substat: string | null; substatPercent: boolean; }
+const { stats, substat, substatPercent } = Astro.props;
+const last = stats.length - 1;
+const start = Math.max(0, stats.findIndex((s) => s.level === '90'));
+const rows = [
+  ['hp', 'Базовое HP', false], ['atk', 'Базовая атака', false], ['def', 'Базовая защита', false], ['sub', substat ?? 'Доп. стат', substatPercent],
+].filter(([k]) => stats[0][k as keyof Point] !== undefined) as [keyof Point, string, boolean][];
+const fmt = (p: Point, k: keyof Point, pct: boolean) => fmtStat((p[k] as number | null) ?? null, pct);
+---
+<div class="panel ls" data-level-stats={JSON.stringify(stats.map((p) => rows.map(([k, , pct]) => fmt(p, k, pct))))}>
+  <div class="ls-head">
+    <h3>Статы на уровне</h3>
+    <span class="chip gold">ур. <output>{stats[start].level}</output></span>
+  </div>
+  <input type="range" min="0" max={last} value={start} aria-label="Уровень" data-labels={JSON.stringify(stats.map((s) => s.level))} />
+  <dl>
+    {rows.map(([k, label, pct]) => <div><dt>{label}</dt><dd>{fmt(stats[start], k, pct)}</dd></div>)}
+  </dl>
+</div>
+
+<script>
+  for (const box of document.querySelectorAll<HTMLElement>('[data-level-stats]')) {
+    const table: string[][] = JSON.parse(box.dataset.levelStats!);
+    const range = box.querySelector('input')!;
+    const labels: string[] = JSON.parse(range.dataset.labels!);
+    const out = box.querySelector('output')!;
+    const dds = [...box.querySelectorAll('dd')];
+    range.addEventListener('input', () => {
+      const i = Number(range.value);
+      out.textContent = labels[i];
+      dds.forEach((dd, j) => (dd.textContent = table[i][j]));
+    });
+  }
+</script>
+
+<style>
+  .ls-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .6rem; }
+  .ls-head h3 { margin: 0; }
+  input { width: 100%; accent-color: var(--accent); }
+  dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: .8rem 0 0; }
+  dl div { background: var(--surface-2); border-radius: var(--radius); padding: .55rem .75rem; }
+  dt { color: var(--muted); font-size: .78rem; }
+  dd { margin: 0; font: 600 1.1rem var(--font-display); font-variant-numeric: tabular-nums; }
+</style>

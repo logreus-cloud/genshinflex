@@ -1,63 +1,264 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import Search from '../components/Search.astro';
-import CharacterIcon from '../components/CharacterIcon.astro';
-import { characters, MODES, fmtDate } from '../lib/data';
+import CharacterCard from '../components/CharacterCard.astro';
+import { characters, weapons, artifacts, getCharacter, getWeapon, MODES, resetAt, fmtServerDate } from '../lib/data';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - +a.data.updated);
+const now = new Date();
+const builds = await getCollection('builds');
 const order = Object.keys(MODES);
 const rotations = (await getCollection('rotations')).sort((a, b) => order.indexOf(a.data.mode) - order.indexOf(b.data.mode));
-const newest = [...characters].sort((a, b) => parseFloat(b.version) - parseFloat(a.version)).slice(0, 8);
 
-const tiles = [
-  { href: '/rating', title: 'Рейтинг', text: 'Два ELO: по мнению сообщества и по реальным забегам' },
-  { href: '/characters', title: 'Персонажи', text: `${characters.length} персонажей: таланты, созвездия, билды` },
-  { href: '/guides', title: 'Руководства', text: `${builds.length} билдов и команд` },
-  { href: '/rotation', title: 'Ротация', text: 'Текущие Бездна, Театр и Натиск' },
-];
+// Текущий баннер — тот, чей конец ещё не наступил (на момент сборки)
+const banners = (await getCollection('banners')).map((b) => b.data).sort((a, b) => a.start.localeCompare(b.start));
+const banner = banners.find((b) => new Date(b.end) > now) ?? banners.at(-1)!;
+const heroes = banner.featured.map((f) => getCharacter(f.slug));
+const buildSet = new Set(builds.map((b) => b.data.character));
+
+const newest = [...characters].sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 8);
+const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(0, 6);
 ---
 <Layout>
   <section class="hero">
-    <h1>Всё по текущей ротации на одной странице</h1>
-    <p class="muted">Билды, команды и рейтинг персонажей под актуальные Бездну, Театр и Натиск. Открыто и без рекламы.</p>
-    <Search />
+    <div class="art" aria-hidden="true">
+      {heroes[0]?.splash && <img src={heroes[0].splash} alt="" />}
+    </div>
+
+    <div class="left">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+        <div>
+          <h1>Genshin<span>Flex</span></h1>
+          <p>Билды, команды и рейтинг под текущие Бездну, Театр и Натиск</p>
+        </div>
+      </div>
+
+      <div class="search" data-home-search>
+        <label class="field">
+          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" /><path d="m13.2 13.2 3.3 3.3" /></svg>
+          <span class="sr-only">Поиск</span>
+          <input type="search" placeholder="Кого ищем? Например, Коломбина или «Лунный заряд»" autocomplete="off" />
+        </label>
+        <div class="tabs" role="tablist" aria-label="Список под поиском">
+          <button role="tab" type="button" data-tab="recent" aria-selected="true">Недавние</button>
+          <button role="tab" type="button" data-tab="favs" aria-selected="false">Избранное</button>
+          <button role="tab" type="button" data-tab="results" aria-selected="false">Результаты</button>
+        </div>
+        <div class="list" role="tabpanel" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <a class="promo" href={`${base}/banners`}>
+        <div class="promo-text">
+          <p class="muted small">Баннеры {banner.version}, фаза {banner.phase}</p>
+          <h2>{heroes.map((h) => h.name).join(' и ')}</h2>
+          <p class="small">
+            До {fmtServerDate(banner.end)}. Осталось <b data-until={banner.end} data-done="уже закончился">…</b>
+          </p>
+          <span class="btn primary small">Все баннеры</span>
+        </div>
+        <div class="promo-faces">
+          {heroes.map((h) => <img src={h.icon} alt="" width="84" height="84" data-el={h.element} />)}
+        </div>
+      </a>
+
+      <div class="now">
+        {rotations.map(({ data: r }) => {
+          const upcoming = r.start > now;
+          return (
+            <a class="mode" href={`${base}/rotation#${r.mode}`} data-mode={r.mode}>
+              <span class="mname">{MODES[r.mode].short}</span>
+              <b class="left-time" data-until={resetAt(upcoming ? r.start : r.end)} data-prefix={upcoming ? 'откроется через ' : ''} data-done="обновилось">…</b>
+              <span class="muted small">{upcoming ? 'до нового сезона' : 'до обновления'}</span>
+              <span class="tags">{(upcoming ? ['перерыв'] : r.tags).map((t) => <span class="chip">{t}</span>)}</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
   </section>
 
   <section class="tiles">
-    {tiles.map((t) => (
-      <a class="card tile" href={`${base}${t.href}`}>
-        <h2>{t.title}</h2>
-        <p class="muted">{t.text}</p>
-      </a>
-    ))}
+    <a class="tile" href={`${base}/rating`}>
+      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
+        {[6, 10, 15, 22, 30, 36, 33, 26, 18, 12, 8, 5].map((h, i) => <rect x={i * 10} y={40 - h} width="7" height={h} rx="1.5" />)}
+      </svg>
+      <h3>Рейтинг ELO</h3>
+      <p class="muted small">Вместо тир-листа: голоса сообщества и реальные забеги</p>
+      <span class="chip gold">скоро</span>
+    </a>
+    <a class="tile" href={`${base}/tools/rotation-builder`}>
+      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
+        {[0, 1, 2, 3].map((i) => <><circle cx={14 + i * 31} cy="20" r="11" />{i < 3 && <path d={`M${27 + i * 31} 20h5`} />}</>)}
+      </svg>
+      <h3>Конструктор ротаций</h3>
+      <p class="muted small">Соберите команду и порядок действий, поделитесь ссылкой</p>
+    </a>
+    <a class="tile" href={`${base}/guides`}>
+      <b class="big">{builds.length}</b>
+      <h3>Руководства</h3>
+      <p class="muted small">Билды и команды, обновлённые под патч {newest[0].version}</p>
+    </a>
+    <a class="tile" href={`${base}/characters`}>
+      <b class="big">{characters.length}</b>
+      <h3>База</h3>
+      <p class="muted small">{weapons.length} видов оружия и {artifacts.length} сетов артефактов</p>
+    </a>
   </section>
 
-  <h2>Сейчас в игре</h2>
-  <div class="grid">
-    {rotations.map(({ data }) => (
-      <a class="card rot" href={`${base}/rotation#${data.mode}`}>
-        <h3>{MODES[data.mode].title}</h3>
-        <p class="muted">{data.draft ? 'Данные цикла ещё не заполнены' : data.cycle}</p>
-        <span class="chip">{fmtDate(data.start)} — {fmtDate(data.end)}</span>
-      </a>
-    ))}
-  </div>
+  <h2 class="h-sec">Новые персонажи <small><a href={`${base}/characters`}>Все персонажи</a></small></h2>
+  <div class="cards">{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? 'новый' : buildSet.has(c.slug) ? 'билд' : undefined} />)}</div>
 
-  <h2>Новые персонажи</h2>
-  <div class="row">{newest.map((c) => <CharacterIcon slug={c.slug} size={72} />)}</div>
+  {newWeapons.length > 0 && (
+    <>
+      <h2 class="h-sec">Новое оружие <small><a href={`${base}/weapons`}>Всё оружие</a></small></h2>
+      <div class="weapons">
+        {newWeapons.map((w) => (
+          <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
+            <img src={w.icon} alt="" width="64" height="64" loading="lazy" />
+            <span>{w.name}</span>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
 </Layout>
 
+<script>
+  import { recent, favorites, type Entry } from '../scripts/common';
+  import { searchNames, searchText } from '../scripts/search';
+
+  const root = document.querySelector<HTMLElement>('[data-home-search]')!;
+  const input = root.querySelector('input')!;
+  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+  const list = root.querySelector<HTMLElement>('.list')!;
+  let tab = 'recent';
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const row = (e: Entry) =>
+    `<a class="item" href="${e.href}">${e.icon ? `<img src="${e.icon}" alt="" width="36" height="36" loading="lazy">` : '<span class="ph"></span>'}<span>${esc(e.name)}</span><small>${e.kind}</small></a>`;
+
+  async function render() {
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === tab)));
+    if (tab === 'recent') {
+      const items = recent.list();
+      list.innerHTML = items.length ? items.map(row).join('') : '<p class="empty">Здесь появятся страницы, которые вы открывали.</p>';
+    } else if (tab === 'favs') {
+      const items = favorites.list();
+      list.innerHTML = items.length ? items.map(row).join('') : '<p class="empty">Нажмите «В избранное» на странице персонажа, чтобы он был под рукой.</p>';
+    } else {
+      const q = input.value;
+      if (!q.trim()) { list.innerHTML = '<p class="empty">Начните вводить имя, оружие или реакцию.</p>'; return; }
+      const [names, texts] = await Promise.all([searchNames(q, 6), searchText(q, 4)]);
+      if (q !== input.value) return;
+      const textRows = texts.map((t) => `<a class="item text" href="${t.url}"><span><b>${esc(t.meta.title ?? t.url)}</b><small>${t.excerpt}</small></span></a>`);
+      list.innerHTML = names.length || textRows.length
+        ? names.map(row).join('') + (textRows.length ? `<p class="sub">В тексте гайдов</p>${textRows.join('')}` : '')
+        : `<p class="empty">По запросу «${esc(q)}» ничего нет. Попробуйте имя на английском.</p>`;
+    }
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab!; render(); }));
+  input.addEventListener('input', () => { tab = input.value.trim() ? 'results' : 'recent'; render(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') list.querySelector<HTMLAnchorElement>('a.item')?.click();
+  });
+  render();
+</script>
+
 <style>
-  .hero { padding: 2rem 0 1.5rem; max-width: 720px; }
-  .hero p { font-size: 1.1rem; margin: 0 0 1.4rem; }
-  .tiles { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-  .tile { text-decoration: none; transition: border-color .15s, transform .15s; }
-  .tile:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .tile h2 { margin: 0 0 .3rem; color: var(--accent); }
-  .tile p { margin: 0; font-size: .92rem; }
-  .rot { text-decoration: none; }
-  .rot p { margin: 0 0 .6rem; }
-  .row { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .hero {
+    position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px;
+    padding: 2.4rem 0 2rem; isolation: isolate;
+  }
+  .art { position: absolute; inset: -1.8rem -24px 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .art img { position: absolute; right: -6%; top: -10%; width: 80%; opacity: .32; filter: saturate(1.1); mask-image: radial-gradient(closest-side, #000 40%, transparent); }
+  .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 25%, transparent 70%), linear-gradient(0deg, var(--bg), transparent 40%); }
+
+  .brand { display: flex; align-items: center; gap: 1rem; color: var(--accent); margin-bottom: 1.6rem; }
+  .brand h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 700; margin: 0; color: var(--text); letter-spacing: -.02em; }
+  .brand h1 span { color: var(--accent); }
+  .brand p { margin: .2rem 0 0; color: var(--muted); }
+
+  .search { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 10px; }
+  .field { position: relative; display: block; }
+  .field svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; }
+  .field input {
+    width: 100%; height: 54px; padding: 0 1rem 0 46px; font-size: 1.02rem; border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border)); background: var(--bg-deep);
+  }
+  .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 10px 0 6px; }
+  .tabs button { border: 0; background: var(--surface-2); padding: .5rem; border-radius: var(--radius-sm); cursor: pointer; font-size: .9rem; color: var(--muted); }
+  .tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .list { min-height: 110px; display: grid; align-content: start; }
+  .list :global(.item) { display: flex; align-items: center; gap: .7rem; padding: .45rem .5rem; border-radius: var(--radius-sm); text-decoration: none; }
+  .list :global(.item:hover) { background: var(--surface-2); }
+  .list :global(.item img), .list :global(.ph) { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; background: var(--surface-3); flex: none; }
+  .list :global(.item > small) { margin-left: auto; color: var(--muted); font-size: .78rem; }
+  .list :global(.item.text span) { display: grid; gap: .1rem; }
+  .list :global(.item.text small) { color: var(--muted); font-size: .8rem; }
+  .list :global(.item.text mark) { background: var(--accent-soft); color: var(--accent); }
+  .list :global(.empty) { color: var(--muted); text-align: center; margin: 2rem 0; font-size: .92rem; }
+  .list :global(.sub) { margin: .6rem .5rem .2rem; color: var(--muted); font-size: .8rem; }
+
+  .right { display: grid; gap: 12px; align-content: start; }
+  .promo {
+    position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; padding: 1.2rem 1.3rem;
+    border-radius: var(--radius-lg); text-decoration: none; overflow: hidden;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 22%, var(--surface)), var(--surface) 70%);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  }
+  .promo h2 { margin: .1rem 0 .4rem; font-size: 1.35rem; }
+  .promo p { margin: 0 0 .6rem; }
+  .promo b { color: var(--accent); }
+  .promo .btn { padding: .35rem .8rem; }
+  .promo-faces { display: flex; }
+  .promo-faces img { width: 84px; height: 84px; border-radius: 50%; border: 3px solid var(--el); background: var(--surface-2); }
+  .promo-faces img + img { margin-left: -18px; }
+
+  .now { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mode {
+    display: grid; gap: .15rem; align-content: start; padding: .9rem 1rem; border-radius: var(--radius-lg); text-decoration: none;
+    background: var(--surface); border: 1px solid var(--border); min-height: 138px;
+  }
+  .mode:hover { border-color: var(--accent); }
+  .mname { font: 600 .95rem var(--font-display); }
+  .left-time { font: 600 1.25rem var(--font-display); color: var(--accent); margin-top: .5rem; line-height: 1.15; }
+  .tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .5rem; }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: .6rem; }
+  .tile {
+    display: grid; align-content: start; gap: .2rem; padding: 1rem 1.1rem; border-radius: var(--radius-lg); text-decoration: none;
+    background: var(--surface); border: 1px solid var(--border);
+  }
+  .tile:hover { border-color: var(--accent); }
+  .tile h3 { margin: .4rem 0 0; }
+  .tile p { margin: 0 0 .3rem; }
+  .tile .chip { justify-self: start; }
+  .viz { width: 120px; height: 40px; fill: var(--accent); stroke: var(--accent); stroke-width: 2; }
+  .viz circle { fill: var(--surface-3); }
+  .big { font: 700 2rem/40px var(--font-display); color: var(--accent); }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+  .weapons { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .wcard { display: flex; align-items: center; gap: .6rem; padding: .5rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; font-size: .86rem; }
+  .wcard img { border-radius: 8px; background: linear-gradient(160deg, #5b4b82, #9679c4); flex: none; }
+  .wcard.r5 img { background: linear-gradient(160deg, #7a5226, #d1953f); }
+  .wcard:hover { border-color: var(--accent); }
+
+  @media (max-width: 1100px) {
+    .hero { grid-template-columns: 1fr; }
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .hero { padding-top: 1.2rem; }
+    .brand svg { width: 44px; height: 44px; }
+    .now { grid-template-columns: 1fr; }
+    .mode { min-height: 0; }
+    .promo { grid-template-columns: 1fr; }
+    .promo-faces { order: -1; }
+    .tiles { grid-template-columns: 1fr; }
+  }
 </style>

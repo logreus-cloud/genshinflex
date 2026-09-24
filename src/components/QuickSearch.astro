@@ -1,0 +1,74 @@
+---
+// Быстрый поиск в шапке: выпадающий список, стрелки + Enter, «/» — фокус
+---
+<div class="qs" data-qs>
+  <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="5.5" /><path d="m13.2 13.2 3.3 3.3" /></svg>
+  <input class="qs-input" type="search" placeholder="Персонаж, оружие, артефакт…" aria-label="Поиск по сайту"
+    role="combobox" aria-expanded="false" aria-controls="qs-list" aria-autocomplete="list" autocomplete="off" />
+  <kbd aria-hidden="true">/</kbd>
+  <ul class="qs-list" id="qs-list" role="listbox" hidden></ul>
+</div>
+
+<script>
+  import { searchNames } from '../scripts/search';
+
+  const root = document.querySelector<HTMLElement>('[data-qs]')!;
+  const input = root.querySelector<HTMLInputElement>('input')!;
+  const list = root.querySelector<HTMLUListElement>('ul')!;
+  let active = -1;
+
+  const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
+  const highlight = () => [...list.children].forEach((li, i) => li.setAttribute('aria-selected', String(i === active)));
+
+  input.addEventListener('input', async () => {
+    const q = input.value;
+    const items = await searchNames(q);
+    if (q !== input.value) return;
+    list.replaceChildren(...items.map((it) => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.innerHTML = `<a href="${it.href}">${it.icon ? `<img src="${it.icon}" alt="" width="28" height="28" loading="lazy">` : '<span class="ph"></span>'}<span>${it.name}</span><small>${it.kind}</small></a>`;
+      return li;
+    }));
+    if (!items.length && q.trim()) list.innerHTML = '<li class="empty">Ничего не нашлось — попробуйте имя на английском</li>';
+    list.hidden = !q.trim();
+    input.setAttribute('aria-expanded', String(!list.hidden));
+    active = -1;
+  });
+  input.addEventListener('keydown', (e) => {
+    const n = list.querySelectorAll('[role="option"]').length;
+    if (e.key === 'ArrowDown' && n) { e.preventDefault(); active = (active + 1) % n; highlight(); }
+    else if (e.key === 'ArrowUp' && n) { e.preventDefault(); active = (active - 1 + n) % n; highlight(); }
+    else if (e.key === 'Enter') {
+      const a = list.querySelectorAll('a')[Math.max(active, 0)];
+      if (a) location.href = a.href;
+    } else if (e.key === 'Escape') { close(); input.blur(); }
+  });
+  input.addEventListener('blur', () => setTimeout(close, 150));
+  document.addEventListener('keydown', (e) => {
+    const t = e.target as HTMLElement;
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName)) { e.preventDefault(); input.focus(); }
+  });
+</script>
+
+<style>
+  .qs { position: relative; flex: 1; max-width: 520px; display: flex; align-items: center; }
+  .qs > svg { position: absolute; left: .75rem; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; pointer-events: none; }
+  .qs-input {
+    width: 100%; height: 40px; padding: 0 2.4rem 0 2.4rem; border-radius: var(--radius); border: 1px solid var(--border);
+    background: var(--surface); font-size: .93rem;
+  }
+  .qs-input:focus { outline: none; border-color: var(--accent); }
+  kbd { position: absolute; right: .6rem; font: .75rem var(--font); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 .35rem; }
+  .qs-list {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; margin: 0; padding: .3rem; list-style: none;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 40px rgb(0 0 0 / .35);
+    max-height: 70vh; overflow-y: auto;
+  }
+  .qs-list :global(a) { display: flex; align-items: center; gap: .6rem; padding: .4rem .5rem; border-radius: var(--radius-sm); text-decoration: none; }
+  .qs-list :global(li[aria-selected="true"] a), .qs-list :global(a:hover) { background: var(--surface-2); }
+  .qs-list :global(img), .qs-list :global(.ph) { width: 28px; height: 28px; border-radius: 6px; background: var(--surface-3); flex: none; object-fit: cover; }
+  .qs-list :global(small) { margin-left: auto; color: var(--muted); font-size: .76rem; }
+  .qs-list :global(.empty) { padding: .6rem; color: var(--muted); font-size: .9rem; }
+  @media (max-width: 560px) { kbd { display: none; } }
+</style>

@@ -16,7 +16,7 @@ const builds = defineCollection({
     artifacts: z.array(z.object({ sets: z.array(z.string()).min(1), note: z.string().optional() })),
     mainStats: z.object({ sands: z.string(), goblet: z.string(), circlet: z.string() }),
     substats: z.array(z.string()),
-    talents: z.array(z.enum(['normal', 'skill', 'burst'])),
+    talents: z.array(z.enum(['normal', 'skill', 'burst'])).default([]),
     teams: z.array(z.object({ name: z.string(), members: z.array(z.string()).length(4), note: z.string().optional() })),
     sources: z.array(source).default([]),
   }),
@@ -31,14 +31,36 @@ const rotations = defineCollection({
     start: z.coerce.date(),
     end: z.coerce.date(),
     draft: z.boolean().default(false),
+    note: z.string().optional(),
+    // Короткие метки для карточки на главной: «Рассеивание», «Лунный заряд»
+    tags: z.array(z.string()).default([]),
     buffs: z.array(z.string()).default([]),
+    cast: z.array(z.object({ title: z.string(), members: z.array(z.string()) })).default([]),
     stages: z.array(z.object({
       name: z.string(),
       halves: z.array(z.object({ enemies: z.array(z.string()), note: z.string().optional() })),
     })).default([]),
-    teams: z.array(z.object({ members: z.array(z.string()).length(4), note: z.string().optional() })).default([]),
+    teams: z.array(z.object({
+      name: z.string().optional(), members: z.array(z.string()).length(4), note: z.string().optional(),
+    })).default([]),
     sources: z.array(source).default([]),
   }),
 });
 
-export const collections = { builds, rotations };
+// Баннеры: время начала/конца — по времени сервера («2026-10-13T18:00»), таймеры пересчитываются под регион
+const serverTime = z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/);
+const banners = defineCollection({
+  loader: glob({ pattern: '**/*.json', base: './src/content/banners' }),
+  schema: z.object({
+    version: z.string(),
+    phase: z.number().int(),
+    start: serverTime,
+    end: serverTime,
+    featured: z.array(z.object({ slug: z.string(), rerun: z.boolean().default(false) })),
+    fourStars: z.array(z.string()).default([]),
+    weapons: z.array(z.string()).default([]),
+    sources: z.array(source).default([]),
+  }),
+});
+
+export const collections = { builds, rotations, banners };

@@ -1,0 +1,10 @@
+{
+  "version": "7.1",
+  "phase": 1,
+  "start": "2026-09-23T11:00",
+  "end": "2026-10-13T18:00",
+  "featured": [{ "slug": "vesna" }, { "slug": "vodyanitsa" }],
+  "fourStars": ["faruzan", "diona", "chongyun"],
+  "weapons": ["beyond-the-chrysalis", "hymn-of-the-maelstrom"],
+  "sources": [{ "title": "Game8", "url": "https://game8.co/games/Genshin-Impact/archives/622056" }]
+}

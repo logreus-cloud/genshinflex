@@ -13,7 +13,7 @@ const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - 
     {builds.map(({ data }) => {
       const c = getCharacter(data.character);
       return (
-        <a class="card guide" href={`${base}/characters/${c.slug}`} data-el={c.element}>
+        <a class="panel guide" href={`${base}/characters/${c.slug}`} data-el={c.element}>
           {c.icon && <img src={c.icon} alt="" width="56" height="56" loading="lazy" />}
           <div>
             <h3>{c.name}</h3>

@@ -1,0 +1,10 @@
+{
+  "version": "7.1",
+  "phase": 2,
+  "start": "2026-10-13T18:00",
+  "end": "2026-11-03T15:00",
+  "featured": [{ "slug": "skirk", "rerun": true }, { "slug": "escoffier", "rerun": true }],
+  "fourStars": [],
+  "weapons": ["azurelight", "symphonist-of-scents"],
+  "sources": [{ "title": "Game8", "url": "https://game8.co/games/Genshin-Impact/archives/622056" }]
+}

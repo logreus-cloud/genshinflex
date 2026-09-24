@@ -5,12 +5,12 @@ import Layout from '../layouts/Layout.astro';
   <h1>Рейтинг</h1>
   <p class="muted">Вместо тир-листа — два независимых рейтинга. Оба считаются отдельно для каждого режима и цикла.</p>
   <div class="grid">
-    <div class="card">
+    <div class="panel">
       <h2>ELO сообщества</h2>
       <p>Сайт показывает двух персонажей или две команды под конкретную комнату текущего цикла, вы выбираете, кто лучше. Каждый голос — «матч» для рейтинга.</p>
       <span class="chip">в разработке</span>
     </div>
-    <div class="card">
+    <div class="panel">
       <h2>ELO по забегам</h2>
       <p>Игроки отправляют команду и время прохождения. Команда, прошедшая ту же комнату быстрее, «выигрывает». Рейтинг открывается, когда набирается достаточно забегов.</p>
       <span class="chip">в разработке</span>
@@ -23,6 +23,6 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .card h2 { margin-top: 0; }
+  .panel h2 { margin-top: 0; }
   .note { margin-top: 1.4rem; }
 </style>
