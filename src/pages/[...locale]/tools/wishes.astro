@@ -5,12 +5,10 @@ import { useData, LANGS, characters as ruCharacters } from '../../../lib/data';
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { t } = useData(Astro.currentLocale);
 
-// Стандартный пул 5★: выпадение такого персонажа на баннере события — проигранные 50/50
-// История хранится с русскими именами (так её отдаёт игра на наш запрос), поэтому пул — тоже по-русски
-const STANDARD = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari', 'yumemizuki-mizuki'].map((s) => {
-  const c = ruCharacters.find((x) => x.slug === s)!;
-  return [c.name, c.nameEn];
-}).flat();
+// Стандартный пул 5★ (слаги): выпадение такого персонажа на баннере события — проигранные 50/50.
+// Молитвы сопоставляются со слагом по ID предмета или имени на любом языке — см. slugOf в скрипте.
+const STANDARD = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari', 'yumemizuki-mizuki']
+  .filter((s) => ruCharacters.some((c) => c.slug === s));
 const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m.default as string);
 ---
 <Layout title={t('Трекер круток')} description={t('Счётчик гаранта, история молитв и статистика 50/50 в Genshin Impact. Данные хранятся только в вашем браузере.')}>
@@ -117,7 +115,17 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
     ...idx.characters.map((c) => [c.s, { n: c.n, i: c.i, kind: 'c' as const }] as const),
     ...idx.weapons.map((w) => [w.s, { n: w.n, i: w.i, kind: 'w' as const }] as const),
   ]);
-  const shown = (ruName: string) => { const s = slugByRuName.get(ruName.toLowerCase()); return s ? { ...bySlug.get(s)!, s } : undefined; };
+  // История может прийти на любом языке: из игры по ссылке, из UIGF другого трекера (часто en-us) или вручную.
+  // Поэтому предмет узнаём по игровому ID, а если его нет — по имени на русском, английском или испанском.
+  const namesByLang = await Promise.all(['', '/en', '/es'].map((p) =>
+    fetch(`${p}/data/index.json`).then((r) => r.json()).catch(() => ({ characters: [], weapons: [] }))));
+  const slugOfName = new Map<string, string>(slugByRuName);
+  for (const n of namesByLang) for (const x of [...n.characters, ...n.weapons]) slugOfName.set(x.n.toLowerCase(), x.s);
+  const slugOfId = new Map([...ruIdx.characters, ...ruIdx.weapons].filter((x) => x.id).map((x) => [String(x.id), x.s]));
+  const characterSlugs = new Set(ruIdx.characters.map((c) => c.s));
+  const slugOf = (w: { name: string; item_id?: string }) =>
+    (w.item_id ? slugOfId.get(String(w.item_id)) : undefined) ?? slugOfName.get(w.name.trim().toLowerCase());
+  const shown = (name: string) => { const s = slugOfName.get(name.trim().toLowerCase()); return s && bySlug.has(s) ? { ...bySlug.get(s)!, s } : undefined; };
   for (const c of idx.characters) byName.set(c.n.toLowerCase(), { i: c.i, kind: 'c', s: c.s, r: c.r });
   for (const w of idx.weapons) byName.set(w.n.toLowerCase(), { i: w.i, kind: 'w', s: w.s, r: w.r });
   for (const c of ruIdx.characters) if (c.id) byId.set(String(c.id), { n: c.n, kind: 'c', r: c.r });
@@ -281,7 +289,9 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
       if (w.rank_type === '5') {
         let outcome: Five['outcome'] = null;
         if (g.fiftyFifty) {
-          const lost = w.item_type === 'Персонаж' && STANDARD.has(w.name);
+          // Проигрыш 50/50 — стандартный 5★ персонаж; язык названий в истории не важен
+          const slug = slugOf(w);
+          const lost = !!slug && characterSlugs.has(slug) && STANDARD.has(slug);
           outcome = lost ? 'lose' : guaranteed ? 'guar' : 'win';
           guaranteed = lost;
         }
