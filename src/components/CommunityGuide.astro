@@ -1,0 +1,38 @@
+---
+// Гайд сообщества из редактора (оружие или эндгейм): текст с баблами, команды, ссылки и подпись авторов
+import Team from './Team.astro';
+import { useData } from '../lib/data';
+import { makeLookup, renderGuide } from '../lib/guide-markup';
+
+interface Props {
+  title: string;
+  body?: string;
+  authors: string[];
+  external?: { title: string; url: string; author?: string; lang: string }[];
+  teams?: { name?: string; members: string[]; note?: string }[];
+}
+const { title, body = '', authors, external = [], teams = [] } = Astro.props;
+const { t, base, characters, weapons, artifacts, ELEMENTS } = useData(Astro.currentLocale);
+const html = body.trim() ? renderGuide(body, makeLookup({ characters, weapons, artifacts, elements: ELEMENTS }, base), { tip: t('Совет'), warn: t('Важно'), info: t('На заметку') }) : '';
+---
+<div class="cg">
+  <h3 class="cg-title">{title}</h3>
+  {html && <div class="panel prose" set:html={html} />}
+  {teams.length > 0 && <div class="grid">{teams.map((tm) => <Team {...tm} />)}</div>}
+  {external.length > 0 && (
+    <div class="panel more">
+      <h4>{t('Также можете посмотреть')}</h4>
+      <ul>{external.map((g) => <li><a href={g.url} rel="noopener nofollow ugc" target="_blank">{g.title}</a>{g.author && <span class="muted small"> — {g.author}</span>} <span class="chip">{g.lang.toUpperCase()}</span></li>)}</ul>
+    </div>
+  )}
+  {authors.length > 0 && <p class="muted small">{t('Авторы гайда')}: {authors.join(', ')}</p>}
+</div>
+
+<style>
+  .cg { display: grid; gap: 10px; margin-top: 1rem; }
+  .cg-title { margin: 0; font-size: 1rem; }
+  .cg p { margin: 0; }
+  .more h4 { margin: 0 0 .4rem; }
+  .more ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .3rem; }
+  .more .chip { margin-left: .3rem; font-size: .7rem; }
+</style>

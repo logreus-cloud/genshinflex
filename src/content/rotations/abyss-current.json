@@ -96,6 +96,46 @@
             }
           ]
         }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздное рассеивание",
+          "members": [
+            "yumemizuki-mizuki",
+            "odette",
+            "sucrose",
+            "alyosha"
+          ],
+          "note": "Прямо под аномалию этажа"
+        },
+        {
+          "name": "1-я половина: без 5★",
+          "members": [
+            "traveler-cryo",
+            "sucrose",
+            "faruzan",
+            "diona"
+          ],
+          "note": "Бесплатный вариант Звёздного рассеивания"
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ]
+        },
+        {
+          "name": "2-я половина: Перегрузка без 5★",
+          "members": [
+            "razor",
+            "fischl",
+            "bennett",
+            "xiangling"
+          ]
+        }
       ]
     },
     {
@@ -184,6 +224,46 @@
               ],
               "note": "5 врагов"
             }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздный проводник",
+          "members": [
+            "sandrone",
+            "odette",
+            "qiqi",
+            "yae-miko"
+          ],
+          "note": "Прямо под аномалию этажа"
+        },
+        {
+          "name": "1-я половина: Мавуика",
+          "members": [
+            "mavuika",
+            "citlali",
+            "xilonen",
+            "bennett"
+          ],
+          "note": "Пиро быстро снимает щиты Стражника льдов в зале 10-3"
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ]
+        },
+        {
+          "name": "2-я половина: Лунная бутонизация",
+          "members": [
+            "nefer",
+            "lauma",
+            "columbina",
+            "kuki-shinobu"
           ]
         }
       ]
@@ -297,6 +377,46 @@
             }
           ]
         }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздное рассеивание",
+          "members": [
+            "yumemizuki-mizuki",
+            "odette",
+            "sucrose",
+            "alyosha"
+          ],
+          "note": "Алёша отвлекает врагов от монолита, Сахароза собирает их"
+        },
+        {
+          "name": "1-я половина: Звёздный проводник",
+          "members": [
+            "sandrone",
+            "odette",
+            "qiqi",
+            "yae-miko"
+          ]
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ],
+          "note": "Бонус Электро урона этажа ровно под него"
+        },
+        {
+          "name": "2-я половина: Перегрузка",
+          "members": [
+            "arlecchino",
+            "fischl",
+            "chevreuse",
+            "bennett"
+          ]
+        }
       ]
     },
     {
@@ -365,13 +485,19 @@
           "halves": [
             {
               "enemies": [
-                "Domovoy Sculptor («Чурин», закалённый)"
+                {
+                  "id": "Churin",
+                  "note": "закалённый"
+                }
               ],
               "note": "один босс"
             },
             {
               "enemies": [
-                "Lightkeeper («Сигурд», закалённый)"
+                {
+                  "id": "Sigurd",
+                  "note": "закалённый"
+                }
               ],
               "note": "большинство врагов под щитами — ломаются Зарядом / Лунным зарядом"
             }

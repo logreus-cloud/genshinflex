@@ -1,0 +1,17 @@
+---
+// Мини-кнопка «Редактировать» — ведёт в редактор гайдов на нужную цель (?c=, ?w=, ?m=)
+import { useData } from '../lib/data';
+interface Props { query: string; label?: string }
+const { query, label } = Astro.props;
+const { t, base } = useData(Astro.currentLocale);
+---
+<a class="edit-link" href={`${base}/guides/editor/?${query}`} title={t('Предложить правку или написать гайд')} data-pagefind-ignore>
+  <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4 16h3l8.5-8.5-3-3L4 13Zm7-10 3 3" /></svg>
+  <span>{label ?? t('Редактировать')}</span>
+</a>
+
+<style>
+  .edit-link { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .55rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font: 500 .75rem var(--font); text-decoration: none; letter-spacing: 0; text-transform: none; vertical-align: middle; white-space: nowrap; }
+  .edit-link:hover { color: var(--accent); border-color: var(--accent); }
+  svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+</style>

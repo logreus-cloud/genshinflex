@@ -1,0 +1,35 @@
+# Перевод интерфейса, часть 8: гайды сообщества на оружие и эндгейм, команды для этажей 9–11
+T = [
+# Редактор и кнопки
+("О чём гайд", "Guide topic", "Tema de la guía"),
+("Этаж или режим", "Floor or mode", "Piso o modo"),
+("Выберите…", "Choose…", "Elige…"),
+("Выберите, о чём гайд.", "Choose what the guide is about.", "Elige de qué trata la guía."),
+("Выберите, о чём гайд", "Choose what the guide is about", "Elige de qué trata la guía"),
+("Выберите, о чём гайд — здесь появится превью.", "Choose what the guide is about — the preview will appear here.", "Elige de qué trata la guía: aquí aparecerá la vista previa."),
+("Гайд пока пустой: добавьте текст, команды или ссылки.", "The guide is empty so far: add text, teams or links.", "La guía está vacía: añade texto, equipos o enlaces."),
+("Гайда здесь ещё нет — вы можете написать первый.", "There's no guide here yet — you can write the first one.", "Aún no hay guía aquí: puedes escribir la primera."),
+("Загружен текущий гайд — правьте и дополняйте что нужно.", "The current guide is loaded — edit and add whatever you need.", "Se cargó la guía actual: edita y añade lo que haga falta."),
+("Подставлены текущие рекомендованные команды — поправьте их и добавьте свои советы.", "The current recommended teams are filled in — adjust them and add your own tips.", "Se rellenaron los equipos recomendados actuales: ajústalos y añade tus consejos."),
+("Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации он появится на сайте.", "Thanks! Your guide has been sent for review. The draft has been cleared — once published, it will appear on the site.", "¡Gracias! Tu guía se ha enviado a revisión. El borrador se ha borrado: cuando se publique, aparecerá en el sitio."),
+("так гайд будет выглядеть на сайте", "this is how the guide will look on the site", "así se verá la guía en el sitio"),
+("Текст ещё не написан", "No text yet", "Aún no hay texto"),
+("Предложить правку или написать гайд", "Suggest an edit or write a guide", "Proponer un cambio o escribir una guía"),
+("Редактировать", "Edit", "Editar"),
+("Редактировать гайд", "Edit guide", "Editar guía"),
+("Гайд", "Guide", "Guía"),
+("Гайд от сообщества", "Community guide", "Guía de la comunidad"),
+("Советы сообщества", "Community tips", "Consejos de la comunidad"),
+
+# Команды этажей 9–11
+("Прямо под аномалию этажа", "Built right for the floor's disorder", "Justo para la anomalía del piso"),
+("1-я половина: без 5★", "1st half: no 5★", "1.ª mitad: sin 5★"),
+("Бесплатный вариант Звёздного рассеивания", "A free Stellar Swirl option", "Una opción gratuita de Torbellino Estelar"),
+("2-я половина: Перегрузка без 5★", "2nd half: Overloaded with no 5★", "2.ª mitad: Sobrecarga sin 5★"),
+("1-я половина: Мавуика", "1st half: Mavuika", "1.ª mitad: Mavuika"),
+("Пиро быстро снимает щиты Стражника льдов в зале 10-3", "Pyro quickly breaks the Glacial Warden's shields in chamber 10-3", "El Pyro rompe rápido los escudos del Guardián Glacial en la sala 10-3"),
+("Алёша отвлекает врагов от монолита, Сахароза собирает их", "Alyosha draws enemies away from the monolith, Sucrose groups them", "Aliosha aleja a los enemigos del monolito y Sacarosa los agrupa"),
+("Бонус Электро урона этажа ровно под него", "The floor's Electro DMG Bonus fits it perfectly", "La bonificación de Daño Electro del piso le va perfecta"),
+("2-я половина: Перегрузка", "2nd half: Overloaded", "2.ª mitad: Sobrecarga"),
+("закалённый", "hardened", "endurecido"),
+]

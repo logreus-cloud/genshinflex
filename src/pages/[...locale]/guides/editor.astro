@@ -13,7 +13,20 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     <p class="muted lead">{t('Напишите новый гайд или дополните существующий. Слева — редактор, справа — как гайд будет выглядеть на сайте. Всё сохраняется в черновик в этом браузере. После отправки гайд проверяет модератор и только потом публикует.')}</p>
 
     <div class="panel who">
-      <label class="who-pick">
+      <div class="seg kind" role="radiogroup" aria-label={t('О чём гайд')}>
+        <button type="button" role="radio" aria-checked="true" data-gk="char">{t('Персонаж')}</button>
+        <button type="button" role="radio" aria-checked="false" data-gk="weapon">{t('Оружие')}</button>
+        <button type="button" role="radio" aria-checked="false" data-gk="endgame">{t('Эндгейм')}</button>
+      </div>
+      <label class="who-pick" data-for="weapon" hidden>
+        <span class="muted small">{t('Оружие')}</span>
+        <span class="pick big"><img alt="" width="40" height="40" hidden /><input class="input" id="weap" list="dl-weapon-all" data-kind="weapon" placeholder={t('Название оружия')} autocomplete="off" /></span>
+      </label>
+      <label class="who-pick" data-for="endgame" hidden>
+        <span class="muted small">{t('Этаж или режим')}</span>
+        <select class="input" id="eg"></select>
+      </label>
+      <label class="who-pick" data-for="char">
         <span class="muted small">{t('Персонаж')}</span>
         <span class="pick big"><img alt="" width="40" height="40" hidden /><input class="input" id="char" list="dl-char" data-kind="char" placeholder={t('Начните вводить имя — например, Фурина')} autocomplete="off" /></span>
       </label>
@@ -28,7 +41,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
 
     <div class="split" data-view="edit">
       <form class="editor" id="ed" novalidate autocomplete="off">
-        <details class="panel sec" open>
+        <details class="panel sec" open data-for="char">
           <summary>{t('Основное')}</summary>
           <div class="cols">
             <label><span class="muted small">{t('Роль')}</span><input class="input" name="role" list="dl-role" maxlength="60" placeholder={t('ДД, Саппорт, Хилер…')} /></label>
@@ -36,19 +49,19 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
           </div>
         </details>
 
-        <details class="panel sec" open>
+        <details class="panel sec" open data-for="char">
           <summary>{t('Оружие')} <small class="muted">{t('от лучшего к запасному')}</small></summary>
           <div class="rows" data-list="weapons"></div>
           <button class="btn add" type="button" data-add="weapons">+ {t('Оружие')}</button>
         </details>
 
-        <details class="panel sec" open>
+        <details class="panel sec" open data-for="char">
           <summary>{t('Артефакты')} <small class="muted">{t('второй сет — для вариантов 2 + 2')}</small></summary>
           <div class="rows" data-list="artifacts"></div>
           <button class="btn add" type="button" data-add="artifacts">+ {t('Вариант сетов')}</button>
         </details>
 
-        <details class="panel sec" open>
+        <details class="panel sec" open data-for="char">
           <summary>{t('Статы и таланты')}</summary>
           <div class="cols three">
             <label><span class="muted small">{t('Часы')}</span><input class="input" name="sands" list="dl-sands" maxlength="80" /></label>
@@ -68,16 +81,10 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
           </div>
         </details>
 
-        <details class="panel sec" open>
+        <details class="panel sec" open data-for="char endgame">
           <summary>{t('Команды')}</summary>
           <div class="rows" data-list="teams"></div>
           <button class="btn add" type="button" data-add="teams">+ {t('Команда')}</button>
-        </details>
-
-        <details class="panel sec" open>
-          <summary>{t('Гайды на других сайтах')} <small class="muted">{t('подробные разборы других авторов')}</small></summary>
-          <div class="rows" data-list="external"></div>
-          <button class="btn add" type="button" data-add="external">+ {t('Ссылка')}</button>
         </details>
 
         <details class="panel sec" open>
@@ -143,6 +150,12 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
           </details>
         </details>
 
+        <details class="panel sec" open>
+          <summary>{t('Гайды на других сайтах')} <small class="muted">{t('подробные разборы других авторов')}</small></summary>
+          <div class="rows" data-list="external"></div>
+          <button class="btn add" type="button" data-add="external">+ {t('Ссылка')}</button>
+        </details>
+
         <div class="panel sec send">
           <h2 class="h-sec">{t('Отправка на проверку')}</h2>
           <ul class="checks small" id="checks"></ul>
@@ -163,7 +176,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       </form>
 
       <aside class="preview" aria-label={t('Превью гайда')}>
-        <div class="pv-bar small muted"><span>{t('Превью')}</span><span>{t('так гайд будет выглядеть на странице персонажа')}</span></div>
+        <div class="pv-bar small muted"><span>{t('Превью')}</span><span>{t('так гайд будет выглядеть на сайте')}</span></div>
         <div class="pv" id="pv"><p class="muted">{t('Выберите персонажа — здесь появится превью.')}</p></div>
       </aside>
     </div>
@@ -177,7 +190,9 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   import { BASE, LANG, t } from '../../../scripts/search';
 
   type Item = { slug: string; name: string; icon: string | null; element?: string; weapon?: string; rarity?: number; splash?: string | null; title?: string };
+  type Kind = 'char' | 'weapon' | 'endgame';
   type Guide = {
+    kind?: Kind; target?: string; cycle?: string;
     character: string; role: string; patch: string;
     weapons: { slug: string; note?: string }[]; artifacts: { sets: string[]; note?: string }[];
     mainStats: { sands: string; goblet: string; circlet: string }; substats: string[]; talents: string[];
@@ -188,6 +203,8 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     characters: Item[]; weapons: Item[]; artifacts: Item[]; elements: Record<string, string>; weaponTypes: Record<string, string>;
     talents: Record<string, string>; options: Record<'role' | 'sands' | 'goblet' | 'circlet', string[]>;
     builds: Record<string, Guide & { updated: string }>;
+    weaponGuides: Record<string, Partial<Guide> & { updated: string }>;
+    endgame: Record<string, Partial<Guide> & { mode: string; title: string; cycle: string; hasGuide: boolean }>;
   };
   type Drafts = Record<string, { guide: Guide; ts: number }>;
   type PickKind = 'char' | 'weapon' | 'set';
@@ -201,6 +218,8 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   const pv = document.querySelector<HTMLElement>('#pv')!;
   const ta = form.elements.namedItem('body') as HTMLTextAreaElement;
   const charInput = document.querySelector<HTMLInputElement>('#char')!;
+  const weapInput = document.querySelector<HTMLInputElement>('#weap')!;
+  const egSelect = document.querySelector<HTMLSelectElement>('#eg')!;
   const notice = document.querySelector<HTMLElement>('#notice')!;
   const modeChip = document.querySelector<HTMLElement>('#mode')!;
   const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
@@ -222,6 +241,14 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     const idx = { char: index(data.characters), weapon: index(data.weapons), set: index(data.artifacts) };
     const latestPatch = Object.values(data.builds).map((b) => b.patch).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0] ?? '';
     let cur: Item | undefined;
+    // Что редактируем: вид гайда и цель (слаг персонажа/оружия или ключ эндгейма вроде abyss-12)
+    let kind: Kind = 'char';
+    let key = '';
+    egSelect.innerHTML = `<option value="">${esc(t('Выберите…'))}</option>` + Object.entries(data.endgame).map(([k, e]) => `<option value="${k}">${esc(e.title)}</option>`).join('');
+    const showKind = () => {
+      document.querySelectorAll<HTMLElement>('.ge [data-for]').forEach((el) => { el.hidden = !el.dataset.for!.split(' ').includes(kind); });
+      document.querySelectorAll('.ge [data-gk]').forEach((b) => b.setAttribute('aria-checked', String((b as HTMLElement).dataset.gk === kind)));
+    };
 
     // Подсказки для полей ввода
     const options = (list: string[]) => list.map((s) => `<option value="${esc(s)}">`).join('');
@@ -277,7 +304,8 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     const slugsIn = (row: Element) => [...row.querySelectorAll<HTMLInputElement>('.pick input')].map((i) => resolve(i)?.slug ?? '').filter(Boolean);
     const noteIn = (row: Element) => row.querySelector<HTMLInputElement>('.note')!.value.trim();
     const collect = (): Guide => ({
-      character: cur?.slug ?? '',
+      kind, target: key, cycle: kind === 'endgame' ? data.endgame[key]?.cycle : undefined,
+      character: kind === 'char' ? cur?.slug ?? '' : '',
       role: field('role').value.trim(),
       patch: field('patch').value.trim(),
       weapons: rowsOf('weapons').map((r) => ({ slug: slugsIn(r)[0] ?? '', note: noteIn(r) })).filter((w) => w.slug),
@@ -310,19 +338,45 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
 
     // ---------- Выбор персонажа и черновики ----------
     const drafts = () => store.get<Drafts>(DRAFTS, {});
+    // Ключ черновика: у персонажей — просто слаг (как раньше), у остальных — «weapon:слаг» / «endgame:abyss-12»
+    const dk = () => (kind === 'char' ? key : `${kind}:${key}`);
     const saveDraft = debounce(() => {
-      if (!cur) return;
+      if (!key) return;
       const all = drafts();
-      all[cur.slug] = { guide: collect(), ts: Date.now() };
+      all[dk()] = { guide: collect(), ts: Date.now() };
       // Храним черновики пяти последних персонажей
       store.set(DRAFTS, Object.fromEntries(Object.entries(all).sort((a, b) => b[1].ts - a[1].ts).slice(0, 5)));
     }, 400);
     const dropDraft = (slug: string) => { const all = drafts(); delete all[slug]; store.set(DRAFTS, all); };
     const when = (ts: number) => new Date(ts).toLocaleString(LOCALE, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 
+    // Выбор цели: оружие или этаж/режим эндгейма
+    const openOther = (k: 'weapon' | 'endgame', target: string) => {
+      kind = k; key = target; cur = undefined; showKind();
+      const existing = k === 'weapon' ? data.weaponGuides[target] : data.endgame[target]?.hasGuide ? data.endgame[target] : undefined;
+      if (k === 'weapon') { const w = idx.weapon.bySlug.get(target)!; weapInput.value = w.name; paintPick(weapInput); history.replaceState(null, '', `?w=${target}`); }
+      else { egSelect.value = target; history.replaceState(null, '', `?m=${target}`); }
+      modeChip.hidden = false;
+      modeChip.textContent = existing ? t('Правка существующего гайда') : t('Новый гайд');
+      modeChip.classList.toggle('gold', !existing);
+      const draft = drafts()[dk()];
+      if (draft) {
+        fill(draft.guide);
+        notice.innerHTML = `${esc(t('Восстановлен черновик от {date}.', { date: when(draft.ts) }))} <button type="button" class="link" data-restart>${esc(existing ? t('Начать с текущего гайда') : t('Начать с чистого листа'))}</button>`;
+      } else if (existing) {
+        fill(existing);
+        notice.textContent = t('Загружен текущий гайд — правьте и дополняйте что нужно.');
+      } else {
+        fill(k === 'endgame' ? { teams: data.endgame[target].teams } : {});
+        notice.textContent = k === 'endgame' ? t('Подставлены текущие рекомендованные команды — поправьте их и добавьте свои советы.') : t('Гайда здесь ещё нет — вы можете написать первый.');
+      }
+    };
+    const open = (k: Kind, target: string) => (k === 'char' ? setCharacter(target) : openOther(k, target));
+
     const setCharacter = (slug: string) => {
       cur = idx.char.bySlug.get(slug);
       if (!cur) return;
+      kind = 'char'; key = slug; showKind();
       charInput.value = cur.name;
       paintPick(charInput);
       history.replaceState(null, '', `?c=${cur.slug}`);
@@ -344,9 +398,9 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       }
     };
     const restart = () => {
-      if (!cur) return;
-      dropDraft(cur.slug);
-      setCharacter(cur.slug);
+      if (!key) return;
+      dropDraft(dk());
+      open(kind, key);
     };
 
     charInput.addEventListener('change', () => {
@@ -355,6 +409,15 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       if (it && it.slug !== cur?.slug) setCharacter(it.slug);
     });
     charInput.addEventListener('input', () => { const it = resolve(charInput); if (it && it.slug !== cur?.slug) setCharacter(it.slug); });
+    weapInput.addEventListener('input', () => { const w = resolve(weapInput); paintPick(weapInput); if (w && w.slug !== key) openOther('weapon', w.slug); });
+    egSelect.addEventListener('change', () => { if (egSelect.value) openOther('endgame', egSelect.value); });
+    document.querySelector('.ge .kind')!.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-gk]');
+      if (!b || b.dataset.gk === kind) return;
+      kind = b.dataset.gk as Kind; key = ''; cur = undefined; showKind();
+      modeChip.hidden = true; notice.textContent = '';
+      fill({});
+    });
     notice.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('[data-restart]')) restart(); });
     document.querySelector('#reset')!.addEventListener('click', restart);
 
@@ -362,13 +425,14 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     const checksEl = document.querySelector<HTMLElement>('#checks')!;
     const problems = (g: Guide) => {
       const out: string[] = [];
-      if (!cur) out.push(t('Выберите персонажа.'));
+      if (!key) out.push(kind === 'char' ? t('Выберите персонажа.') : t('Выберите, о чём гайд.'));
       const bad = [...form.querySelectorAll<HTMLInputElement>('.pick input[aria-invalid]')].map((i) => `«${i.value.trim()}»`);
       if (bad.length) out.push(t('Не нашли в списке: {list} — выберите вариант из подсказок.', { list: bad.join(', ') }));
       g.teams.forEach((tm, i) => {
         if (tm.members.length !== 4) out.push(t('В команде {name}: {n} из 4 участников.', { name: tm.name ? `«${tm.name}»` : `№${i + 1}`, n: tm.members.length }));
       });
-      if (!g.weapons.length && !g.artifacts.length && !g.teams.length && g.body.trim().length < 50) out.push(t('Гайд пока пустой: добавьте оружие, артефакты, команды или текст.'));
+      if (kind === 'char' && !g.weapons.length && !g.artifacts.length && !g.teams.length && g.body.trim().length < 50) out.push(t('Гайд пока пустой: добавьте оружие, артефакты, команды или текст.'));
+      if (kind !== 'char' && !g.teams.length && !g.external?.length && g.body.trim().length < 50) out.push(t('Гайд пока пустой: добавьте текст, команды или ссылки.'));
       (g.external ?? []).forEach((x) => { if (!/^https:\/\/\S+\.\S+$/.test(x.url) || !x.title) out.push(t('Ссылка «{name}»: нужны название и адрес https://…', { name: x.title || x.url })); });
       if (!field('author').value.trim()) out.push(t('Укажите имя или ник для подписи.'));
       return out;
@@ -377,7 +441,26 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     // ---------- Превью ----------
     const slotName = { sands: t('Часы'), goblet: t('Кубок'), circlet: t('Корона') } as const;
     const empty = (text: string) => `<p class="muted small empty">${esc(text)}</p>`;
+    const extras = (g: Guide) => `${g.body.trim() ? `<div class="panel prose">${render(g.body)}</div>` : ''}`
+      + `${g.external?.length ? `<div class="panel pv-more"><h4>${esc(t('Также можете посмотреть'))}</h4><ul>${g.external.map((x) => `<li>${esc(x.title || x.url)}${x.author ? ` <span class="muted small">— ${esc(x.author)}</span>` : ''} <span class="chip">${esc(x.lang.toUpperCase())}</span></li>`).join('')}</ul></div>` : ''}`;
+    const teamCards = (g: Guide) => {
+      const member = (s: string) => { const m = idx.char.bySlug.get(s)!; return `<span class="mem" data-el="${m.element}"><img src="${esc(m.icon ?? '')}" alt="" /><small>${esc(m.name)}</small></span>`; };
+      return g.teams.length ? `<div class="pv-teams">${g.teams.map((tm) => `<div class="panel team"><h4>${esc(tm.name || t('Без названия'))}</h4><div class="mems">${tm.members.map(member).join('')}${'<span class="mem ghost"></span>'.repeat(Math.max(0, 4 - tm.members.length))}</div>${tm.note ? `<p class="muted small">${esc(tm.note)}</p>` : ''}</div>`).join('')}</div>` : empty(t('Команды не добавлены'));
+    };
     const preview = (g: Guide) => {
+      if (kind !== 'char') {
+        if (!key) { pv.innerHTML = `<p class="muted">${esc(t('Выберите, о чём гайд — здесь появится превью.'))}</p>`; return; }
+        if (kind === 'weapon') {
+          const w = idx.weapon.bySlug.get(key)!;
+          pv.innerHTML = `<header class="pv-head pv-w r${w.rarity}"><img class="pv-wicon" src="${esc(w.icon ?? '')}" alt="" /><div><h2>${esc(w.name)}</h2><div class="row"><span class="chip gold">${'★'.repeat(w.rarity ?? 0)}</span><span class="chip">${esc(data.weaponTypes[w.weapon!] ?? '')}</span></div></div></header>`
+            + `<h3 class="h-sec">${esc(t('Гайд'))}</h3>${extras(g) || empty(t('Текст ещё не написан'))}`;
+        } else {
+          const e = data.endgame[key];
+          pv.innerHTML = `<header class="pv-head"><div><p class="muted small">${esc(t('Эндгейм'))}</p><h2>${esc(e.title)}</h2></div></header>`
+            + `<h3 class="h-sec">${esc(t('Советы сообщества'))}</h3>${extras(g) || empty(t('Текст ещё не написан'))}<h3 class="h-sec">${esc(t('Команды'))}</h3>${teamCards(g)}`;
+        }
+        return;
+      }
       if (!cur) { pv.innerHTML = `<p class="muted">${esc(t('Выберите персонажа — здесь появится превью.'))}</p>`; return; }
       const c = cur;
       const weapon = (s: string) => idx.weapon.bySlug.get(s)!;
@@ -595,16 +678,19 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
         const res = await fetch('/api/guides', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            guide: g, lang: LANG, mode: data.builds[g.character] ? 'edit' : 'new',
+            guide: g, lang: LANG,
+            mode: (kind === 'char' ? data.builds[key] : kind === 'weapon' ? data.weaponGuides[key] : data.endgame[key]?.hasGuide) ? 'edit' : 'new',
             author: field('author').value, contact: field('contact').value, comment: field('comment').value, website: field('website').value,
           }),
         });
         const out = await res.json().catch(() => ({}));
         // Сервер отвечает по-русски — переводим сообщение здесь
         if (!res.ok) throw new Error(t(out.error ?? 'Не удалось отправить — попробуйте позже'));
-        dropDraft(g.character);
+        dropDraft(dk());
         status.className = 'status small ok';
-        status.textContent = t('Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации гайд появится на странице персонажа.');
+        status.textContent = kind === 'char'
+          ? t('Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации гайд появится на странице персонажа.')
+          : t('Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации он появится на сайте.');
         (form.elements.namedItem('comment') as HTMLTextAreaElement).value = '';
       } catch (err) {
         status.className = 'status small err';
@@ -627,11 +713,14 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     const me = store.get<{ author?: string; contact?: string }>(ME, {});
     field('author').value = me.author ?? '';
     field('contact').value = me.contact ?? '';
-    const fromUrl = new URLSearchParams(location.search).get('c');
-    const lastDraft = Object.entries(drafts()).sort((a, b) => b[1].ts - a[1].ts)[0]?.[0];
-    const start = [fromUrl, lastDraft].find((s) => s && idx.char.bySlug.has(s));
-    if (start) setCharacter(start);
-    else { fill({}); charInput.focus(); }
+    // Что открыть: из ссылки (?c= персонаж, ?w= оружие, ?m= эндгейм), иначе последний черновик
+    const params = new URLSearchParams(location.search);
+    const lastDraft = Object.entries(drafts()).sort((a, b) => b[1].ts - a[1].ts)[0]?.[0] ?? '';
+    const fromDraft = lastDraft.includes(':') ? lastDraft.split(':') as [Kind, string] : ['char', lastDraft] as [Kind, string];
+    const valid = ([k, v]: [Kind, string | null]) => Boolean(v) && (k === 'char' ? idx.char.bySlug.has(v!) : k === 'weapon' ? idx.weapon.bySlug.has(v!) : Boolean(data.endgame[v!]));
+    const start = ([['char', params.get('c')], ['weapon', params.get('w')], ['endgame', params.get('m')], fromDraft] as [Kind, string | null][]).find(valid);
+    if (start) open(start[0], start[1]!);
+    else { showKind(); fill({}); charInput.focus(); }
   }
 </script>
 
@@ -640,6 +729,12 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .crumbs a { color: var(--muted); }
   .ge .lead { max-width: 80ch; }
   .ge .who { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; margin: 1rem 0; }
+  .ge .kind { flex: 1 1 100%; }
+  .ge [hidden] { display: none !important; }
+  .ge .pv-w { gap: 1rem; padding-left: 1rem; }
+  .ge .pv-wicon { width: 96px; height: 96px; border-radius: 12px; background: var(--surface-3); position: static; }
+  .ge .pv-w.r5 .pv-wicon { background: linear-gradient(160deg, #7a5226, #d1953f); }
+  .ge .pv-w.r4 .pv-wicon { background: linear-gradient(160deg, #5b4b82, #9679c4); }
   .ge .who-pick { display: grid; gap: .25rem; flex: 1 1 320px; max-width: 460px; }
   .ge #notice { flex: 1 1 100%; margin: 0; }
   .ge #notice:empty { display: none; }
@@ -656,7 +751,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
   .ge .editor { display: grid; gap: 12px; min-width: 0; }
   .ge .sec > summary { cursor: pointer; font: 600 1rem var(--font-display); }
-  .ge .sec > summary small { font: 400 .8rem var(--font-body, inherit); margin-left: .4rem; }
+  .ge .sec > summary small { font: 400 .8rem var(--font); margin-left: .4rem; }
   .ge .sec[open] > summary { margin-bottom: .8rem; }
   .ge .sec label { display: grid; gap: .25rem; margin-bottom: .6rem; }
   .ge .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 .7rem; }

@@ -64,6 +64,8 @@ const rotations = defineCollection({
           note: z.string().optional(),
         })),
       })),
+      // Команды для этажа (у верхнего этажа — общие teams режима)
+      teams: z.array(z.object({ name: z.string().optional(), members: z.array(z.string()).length(4), note: z.string().optional() })).default([]),
     })).default([]),
     stages: z.array(z.object({
       name: z.string(),
@@ -98,4 +100,21 @@ const buildsI18n = defineCollection({
   schema: z.object({}),
 });
 
-export const collections = { builds, rotations, banners, buildsI18n };
+// Гайды сообщества из редактора (npm run guide:md): текст, ссылки и подпись; id вида «ru/the-flute»
+const external = z.array(z.object({ title: z.string(), url: z.url(), author: z.string().optional(), lang: z.enum(['ru', 'en', 'es']) })).default([]);
+const guideTeam = z.object({ name: z.string().optional(), members: z.array(z.string()).length(4), note: z.string().optional() });
+
+// Гайды на оружие: src/content/weapon-guides/<язык>/<слаг>.md
+const weaponGuides = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/weapon-guides' }),
+  schema: z.object({ updated: z.coerce.date(), authors: z.array(z.string()).default([]), external }),
+});
+
+// Гайды на эндгейм: src/content/endgame-guides/<язык>/<abyss-12 | theater | onslaught>.md.
+// cycle — дата начала цикла: гайд показывается, только пока идёт тот же цикл
+const endgameGuides = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/endgame-guides' }),
+  schema: z.object({ cycle: z.string(), updated: z.coerce.date(), teams: z.array(guideTeam).default([]), authors: z.array(z.string()).default([]), external }),
+});
+
+export const collections = { builds, rotations, banners, buildsI18n, weaponGuides, endgameGuides };

@@ -4,13 +4,17 @@ import Layout from '../../../layouts/Layout.astro';
 import LevelStats from '../../../components/LevelStats.astro';
 import CharacterCard from '../../../components/CharacterCard.astro';
 import WeaponSource from '../../../components/WeaponSource.astro';
+import CommunityGuide from '../../../components/CommunityGuide.astro';
+import EditLink from '../../../components/EditLink.astro';
+import { weaponGuide } from '../../../lib/community-guides';
 import { useData, LANGS, type Weapon } from '../../../lib/data';
-const { weapons, stars, base, t } = useData(Astro.currentLocale);
+const { weapons, stars, base, t, lang } = useData(Astro.currentLocale);
 
 export function getStaticPaths() {
   return LANGS.flatMap((l) => useData(l).weapons.map((w) => ({ params: { locale: l === 'ru' ? undefined : l, slug: w.slug }, props: { w } })));
 }
 const { w } = Astro.props as { w: Weapon };
+const guide = await weaponGuide(w.slug, lang);
 
 // Кто использует: билды, где оружие в списке, по месту в рейтинге
 const users = (await getCollection('builds'))
@@ -32,6 +36,7 @@ const users = (await getCollection('builds'))
           <span class="chip">{w.weaponText}</span>
           {w.mainStat && <span class="chip">{w.mainStat}</span>}
           <span class="chip">{t('Версия {v}', { v: w.version })}</span>
+          <EditLink query={`w=${w.slug}`} label={guide ? t('Редактировать гайд') : t('Написать гайд')} />
         </div>
         {w.iconAwaken && <label class="aw small muted"><input type="checkbox" /> {t('Вид после возвышения')}</label>}
       </div>
@@ -53,6 +58,13 @@ const users = (await getCollection('builds'))
     </div>
 
     <WeaponSource slug={w.slug} />
+
+    {guide && (
+      <section>
+        <h2 class="h-sec">{t('Гайд')} <EditLink query={`w=${w.slug}`} /></h2>
+        <CommunityGuide title={t('Гайд от сообщества')} body={guide.body} authors={guide.data.authors} external={guide.data.external} />
+      </section>
+    )}
 
     <section>
       <h2 class="h-sec">{t('Кому подходит')}</h2>

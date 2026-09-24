@@ -4,14 +4,20 @@ import Layout from '../../layouts/Layout.astro';
 import ModeTop from '../../components/ModeTop.astro';
 import ModeExtras from '../../components/ModeExtras.astro';
 import Enemy from '../../components/Enemy.astro';
+import Team from '../../components/Team.astro';
+import CommunityGuide from '../../components/CommunityGuide.astro';
+import EditLink from '../../components/EditLink.astro';
+import { endgameGuide, endgameKey } from '../../lib/community-guides';
 import { useData, LANGS } from '../../lib/data';
 // Витая бездна: этажи 9–12 (обновляются каждый цикл), враги по залам и половинам, требования и команды для 12 этажа
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { t, base, ELEMENTS } = useData(Astro.currentLocale);
+const { t, base, ELEMENTS, lang } = useData(Astro.currentLocale);
 
 const r = (await getCollection('rotations')).find((x) => x.data.mode === 'abyss')!.data;
 const floors = [...r.floors].sort((a, b) => a.floor - b.floor);
 const top = floors.at(-1)?.floor;
+// Гайды сообщества на этажи — только текущего цикла
+const guides = new Map(await Promise.all(floors.map(async (f) => [f.floor, await endgameGuide(endgameKey('abyss', f.floor), lang, r.start)] as const)));
 ---
 <Layout title={t('Витая бездна: этажи 9–12, враги и команды')} description={t('Текущий цикл Витой бездны: враги на этажах 9–12 по залам и половинам, аномалии, условия звёзд и команды для 12 этажа.')} wide>
   <ModeTop mode="abyss" start={r.start} end={r.end} tags={r.tags} cycle={r.cycle} />
@@ -24,7 +30,7 @@ const top = floors.at(-1)?.floor;
 
   {floors.map((f) => (
     <section id={`floor-${f.floor}`} class="floor">
-      <h2 class="h-sec">{t('Этаж {n}', { n: f.floor })} <small>{t('уровни врагов {lv}', { lv: f.levels })}</small></h2>
+      <h2 class="h-sec">{t('Этаж {n}', { n: f.floor })} <EditLink query={`m=${endgameKey('abyss', f.floor)}`} /> <small>{t('уровни врагов {lv}', { lv: f.levels })}</small></h2>
       {f.disorder.length > 0 && (
         <ul class="disorder">{f.disorder.map((d) => <li><span class="chip">{t('Аномалия')}</span> {t(d)}</li>)}</ul>
       )}
@@ -48,6 +54,15 @@ const top = floors.at(-1)?.floor;
         ))}
       </div>
 
+      {guides.get(f.floor) && (() => { const g = guides.get(f.floor)!; return <CommunityGuide title={t('Советы сообщества')} body={g.body} authors={g.data.authors} external={g.data.external} teams={g.data.teams} />; })()}
+
+      {(f.floor === top ? r.teams : f.teams).length > 0 && (
+        <>
+          <h3 class="sub">{t('Команды для {n} этажа', { n: f.floor })}</h3>
+          <div class="grid">{(f.floor === top ? r.teams : f.teams).map((tm) => <Team {...tm} />)}</div>
+        </>
+      )}
+
       {f.floor === top && r.halves.length > 0 && (
         <div class="needs">
           {r.halves.map((h) => (
@@ -69,7 +84,7 @@ const top = floors.at(-1)?.floor;
     </section>
   ))}
 
-  <ModeExtras buffs={[]} teams={r.teams} sources={r.sources} teamsTitle={t('Команды для {n} этажа', { n: top ?? 12 })} />
+  <ModeExtras buffs={[]} teams={[]} sources={r.sources} />
 </Layout>
 
 <style>
@@ -89,6 +104,7 @@ const top = floors.at(-1)?.floor;
   .hl { font: 600 .78rem var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
   .half ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
   .half p { margin: 0; }
+  .sub { margin: 1.2rem 0 .6rem; font-size: 1rem; }
   .needs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; margin-top: 12px; align-items: start; }
   .need h3 { margin-bottom: .5rem; }
   .need p { margin: .6rem 0 0; }

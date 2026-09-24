@@ -16,6 +16,40 @@ const d1 = (sql) => JSON.parse(execSync(`npx wrangler d1 execute genshinflex-fee
 const [row] = d1(`SELECT * FROM guide_submissions WHERE id = ${id}`);
 if (!row) { console.error(`Заявка ${id} не найдена`); process.exit(1); }
 const g = JSON.parse(row.payload);
+
+// Гайды на оружие и эндгейм — отдельные файлы на языке заявки:
+// src/content/weapon-guides/<язык>/<слаг>.md и src/content/endgame-guides/<язык>/<abyss-12 | theater | onslaught>.md
+if (g.kind === 'weapon' || g.kind === 'endgame') {
+  const lang = g.lang ?? 'ru';
+  const dir = `src/content/${g.kind === 'weapon' ? 'weapon-guides' : 'endgame-guides'}/${lang}`;
+  const path = `${dir}/${g.target}.md`;
+  const prev = existsSync(path) ? readFileSync(path, 'utf8') : '';
+  const prevAuthors = prev.match(/^authors: (\[.*\])$/m)?.[1];
+  const qq = (s) => JSON.stringify(s ?? '');
+  const head = [
+    '---',
+    ...(g.kind === 'endgame' ? [`cycle: ${qq(g.cycle)}`] : []),
+    `updated: ${new Date().toISOString().slice(0, 10)}`,
+    `authors: ${JSON.stringify([...new Set([...(prevAuthors ? JSON.parse(prevAuthors) : []), row.author])])}`,
+    ...(g.kind === 'endgame' && g.teams?.length ? ['teams:', ...g.teams.flatMap((t) => [`  - name: ${qq(t.name || 'Команда')}`, `    members: [${t.members.join(', ')}]`, ...(t.note ? [`    note: ${qq(t.note)}`] : [])])] : []),
+    ...(g.external?.length ? ['external:', ...g.external.flatMap((x) => [`  - title: ${qq(x.title)}`, `    url: ${x.url}`, ...(x.author ? [`    author: ${qq(x.author)}`] : []), `    lang: ${x.lang}`])] : []),
+    '---',
+  ].join('\n');
+  const text = `${head}\n\n${g.body.trim()}\n`;
+  if (process.argv.includes('--dry')) {
+    console.log(`# заявка ${id} · ${g.kind} ${g.target} · ${lang} · ${row.author} · ${row.contact ?? 'без контакта'} · ${row.status}`);
+    if (row.comment) console.log(`# комментарий: ${row.comment}`);
+    console.log(`# → ${path}\n${text}`);
+    process.exit(0);
+  }
+  if (g.kind === 'endgame' && g.teams?.some((t) => t.members.length !== 4)) { console.error('В команде не 4 участника — поправьте заявку вручную (--dry покажет файл)'); process.exit(1); }
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(path, text);
+  d1(`UPDATE guide_submissions SET status = 'approved' WHERE id = ${id}`);
+  console.log(`Готово: ${path} (автор — ${row.author}). Проверьте и запустите npm run build.`);
+  process.exit(0);
+}
+
 const file = `src/content/builds/${g.character}.md`;
 // Источники и видео из старого билда сохраняем — редактор их не трогает
 const old = existsSync(file) ? readFileSync(file, 'utf8').replace(/\r\n/g, '\n') : '';

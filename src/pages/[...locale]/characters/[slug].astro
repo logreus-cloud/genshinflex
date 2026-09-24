@@ -31,7 +31,7 @@ const elsewhere = allBuilds
   .filter((x) => x.data.character !== c.slug)
   .flatMap((x) => x.data.teams.filter((t) => t.members.includes(c.slug)).map((t) => ({ ...t, owner: x.data.character })));
 const endgame = (await getCollection('rotations'))
-  .flatMap((r) => r.data.teams.filter((t) => t.members.includes(c.slug)).map((t) => ({ ...t, mode: r.data.mode })));
+  .flatMap((r) => [...r.data.teams, ...r.data.floors.flatMap((f) => f.teams)].filter((t) => t.members.includes(c.slug)).map((t) => ({ ...t, mode: r.data.mode })));
 // Один и тот же состав встречается в нескольких билдах — склеиваем по набору участников
 const key = (m: string[]) => [...m].sort().join();
 const own = new Set((b?.teams ?? []).map((t) => key(t.members)));

@@ -3,20 +3,24 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import ModeTop from '../../components/ModeTop.astro';
 import ModeExtras from '../../components/ModeExtras.astro';
+import CommunityGuide from '../../components/CommunityGuide.astro';
+import { endgameGuide } from '../../lib/community-guides';
 import { useData, LANGS } from '../../lib/data';
 // Страница режима эндгейма: текущий цикл, баффы, состав и команды
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { t, MODES } = useData(Astro.currentLocale);
+const { t, MODES, lang } = useData(Astro.currentLocale);
 
 const r = (await getCollection('rotations')).find((x) => x.data.mode === 'theater')!.data;
+const guide = await endgameGuide('theater', lang, r.start);
 ---
 <Layout title={t('{mode}: текущий цикл и команды', { mode: MODES.theater.title })} description={t('{mode} в Genshin Impact: текущий цикл, баффы и рекомендованные команды.', { mode: MODES.theater.title })}>
-  <ModeTop mode="theater" start={r.start} end={r.end} tags={r.tags} cycle={r.cycle} draft={r.draft} />
+  <ModeTop mode="theater" start={r.start} end={r.end} tags={r.tags} cycle={r.cycle} draft={r.draft} edit="m=theater" />
   {r.note && <p class="notice">{t(r.note)}</p>}
   {r.draft ? (
     !r.note && <p class="notice">{t('Цикл «{c}» ещё не заполнен: нужны враги, баффы и команды.', { c: t(r.cycle) })}</p>
   ) : (
     <ModeExtras buffs={r.buffs} cast={r.cast} teams={r.teams} sources={[]} />
   )}
+  {guide && <CommunityGuide title={t('Советы сообщества')} body={guide.body} authors={guide.data.authors} external={guide.data.external} teams={guide.data.teams} />}
   <ModeExtras buffs={[]} teams={[]} sources={r.sources} />
 </Layout>

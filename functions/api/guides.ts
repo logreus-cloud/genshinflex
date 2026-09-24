@@ -21,15 +21,20 @@ export async function onRequestPost({ request, env }: Ctx) {
   if (typeof body.website === 'string' && body.website.trim()) return json({ ok: true }, 201);
 
   const g = (body.guide ?? {}) as Record<string, unknown>;
-  const character = str(g.character, 60);
-  if (!slug.test(character)) return json({ error: 'Выберите персонажа' }, 400);
+  // Вид гайда: персонаж, оружие или эндгейм (этаж Бездны / режим); target — слаг или ключ вроде abyss-12
+  const kind = ['char', 'weapon', 'endgame'].includes(g.kind as string) ? g.kind as string : 'char';
+  const target = str(kind === 'char' ? g.character ?? g.target : g.target, 60);
+  if (!slug.test(target)) return json({ error: kind === 'char' ? 'Выберите персонажа' : 'Выберите, о чём гайд' }, 400);
+  const character = kind === 'char' ? target : `${kind}:${target}`;
   const author = str(body.author, 60);
   if (author.length < 2) return json({ error: 'Укажите имя или ник — так мы подпишем гайд' }, 400);
   const text = str(g.body, 20_000);
 
   // Сохраняем только известные поля в понятной форме — в таком виде заявку легко превратить в файл билда
   const guide = {
-    character,
+    kind, target,
+    character: kind === 'char' ? target : '',
+    cycle: str(g.cycle, 20),
     // Язык страницы, на которой писали гайд: русский идёт в файл билда, en/es — в перевод текста
     lang: body.lang === 'en' || body.lang === 'es' ? body.lang : 'ru',
     role: str(g.role, 60),
@@ -44,7 +49,7 @@ export async function onRequestPost({ request, env }: Ctx) {
     external: list(g.external, 6).map((x) => ({ title: str(x.title, 100), url: str(x.url, 300), author: str(x.author, 60), lang: ['ru', 'en', 'es'].includes(x.lang as string) ? x.lang as string : 'ru' }))
       .filter((x) => x.title && /^https:\/\/\S+\.\S+$/.test(x.url)),
   };
-  if (!guide.weapons.length && !guide.artifacts.length && !guide.teams.length && text.length < 50)
+  if (!guide.weapons.length && !guide.artifacts.length && !guide.teams.length && !guide.external.length && text.length < 50)
     return json({ error: 'Гайд почти пустой: добавьте оружие, артефакты, команды или хотя бы пару абзацев текста' }, 400);
 
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';

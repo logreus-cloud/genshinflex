@@ -1,9 +1,11 @@
 ---
 // Шапка страницы режима эндгейма: название, даты, обратный отсчёт и переключатель Бездна / Театр / Натиск
+import EditLink from './EditLink.astro';
 import { useData } from '../lib/data';
 
-interface Props { mode: 'abyss' | 'theater' | 'onslaught'; start: Date; end: Date; tags: string[]; cycle: string; draft?: boolean }
-const { mode, start, end, tags, cycle, draft } = Astro.props;
+// edit — запрос для редактора гайдов (например, m=theater): рядом с заголовком появится «Редактировать»
+interface Props { mode: 'abyss' | 'theater' | 'onslaught'; start: Date; end: Date; tags: string[]; cycle: string; draft?: boolean; edit?: string }
+const { mode, start, end, tags, cycle, draft, edit } = Astro.props;
 const { MODES, base, t, fmtDate, resetAt } = useData(Astro.currentLocale);
 const upcoming = start > new Date();
 const links = { abyss: '/abyss/', theater: '/theater/', onslaught: '/onslaught/' } as const;
@@ -16,7 +18,7 @@ const links = { abyss: '/abyss/', theater: '/theater/', onslaught: '/onslaught/'
 </nav>
 <header class="top">
   <div>
-    <h1>{MODES[mode].title}</h1>
+    <h1>{MODES[mode].title} {edit && <EditLink query={edit} />}</h1>
     <p class="muted">{t(cycle)}</p>
     {!draft && tags.length > 0 && <div class="row">{tags.map((tag) => <span class="chip gold">{t(tag)}</span>)}</div>}
   </div>
