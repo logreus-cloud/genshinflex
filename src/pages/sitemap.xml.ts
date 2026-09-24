@@ -9,7 +9,7 @@ export async function GET({ site }: { site: URL }) {
   const pages: [string, string, string][] = [
     ['/', today, '1.0'], ['/characters/', today, '0.9'], ['/guides/', today, '0.9'], ['/rotation/', today, '0.9'],
     ['/banners/', today, '0.8'], ['/weapons/', today, '0.7'], ['/artifacts/', today, '0.7'], ['/rating/', today, '0.4'],
-    ['/tools/team-check/', today, '0.8'], ['/tools/wishes/', today, '0.8'], ['/tools/rotation-builder/', today, '0.6'],
+    ['/tools/team-check/', today, '0.8'], ['/about/', today, '0.3'], ['/feedback/', today, '0.3'], ['/tools/wishes/', today, '0.8'], ['/tools/rotation-builder/', today, '0.6'],
     ...characters.map((c) => [`/characters/${c.slug}/`, day(builds.get(c.slug) ?? new Date()), builds.has(c.slug) ? '0.8' : '0.5'] as [string, string, string]),
     ...weapons.map((w) => [`/weapons/${w.slug}/`, today, '0.4'] as [string, string, string]),
   ];

@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="О сайте" description="Что такое GenshinFlex, откуда данные и что сайт хранит у вас в браузере.">
+  <h1>О сайте</h1>
+  <div class="prose">
+    <p class="lead">
+      GenshinFlex — бесплатный справочник по Genshin Impact на русском: билды и команды для всех персонажей,
+      текущие Бездна, Театр и Натиск, проверка команды, трекер круток и история баннеров. Без рекламы и регистрации.
+    </p>
+
+    <h2 class="h-sec">Откуда данные</h2>
+    <ul>
+      <li>Статы, таланты, созвездия, оружие и артефакты — открытая база <a href="https://github.com/theBowja/genshin-db" rel="noopener">genshin-db</a>.</li>
+      <li>Изображения и витрина по UID — <a href="https://enka.network" rel="noopener">enka.network</a>.</li>
+      <li>История баннеров — открытые данные <a href="https://github.com/MadeBaruna/paimon-moe" rel="noopener">paimon.moe</a> (MIT).</li>
+      <li>Билды — по данным сообщества (genshin.gg, Game8) с нашими правками; источники указаны в каждом гайде.</li>
+      <li>Видео-гайды — ролики авторов с YouTube, ссылки ведут на оригиналы.</li>
+    </ul>
+
+    <h2 class="h-sec">Что хранится у вас</h2>
+    <ul>
+      <li>История молитв, ваши персонажи для проверки команды, избранное и недавние страницы — <b>только в вашем браузере</b>. На сервер они не отправляются.</li>
+      <li>Ссылка из игры для загрузки истории молитв передаётся через наш сервер напрямую в HoYoverse и нигде не сохраняется.</li>
+      <li>Форма обратной связи сохраняет текст сообщения, страницу и контакт, если вы его указали.</li>
+    </ul>
+
+    <h2 class="h-sec">Права</h2>
+    <p>Genshin Impact, персонажи, изображения и игровые тексты принадлежат HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.</p>
+
+    <p><a class="btn primary" href="/feedback/">Написать нам</a></p>
+  </div>
+</Layout>
+
+<style>
+  .prose { max-width: 75ch; }
+  ul { padding-left: 1.2rem; display: grid; gap: .5rem; }
+</style>

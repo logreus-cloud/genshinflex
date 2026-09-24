@@ -36,6 +36,14 @@ const icons: Record<string, string> = {
   check: 'M10 3 16 5.5v4.2c0 3.6-2.5 6.3-6 7.3-3.5-1-6-3.7-6-7.3V5.5Zm-2.7 7 2 2 3.7-4',
   tool: 'M12.5 3.5a3.5 3.5 0 0 0-3.3 4.6L4 13.3 6.7 16l5.2-5.2a3.5 3.5 0 0 0 4.6-3.3l-2 1.1-2-2 1.1-2Z',
 };
+// Колонки подвала
+const footerCols: [string, [string, string][]][] = [
+  ['База', [['Персонажи', '/characters/'], ['Оружие', '/weapons/'], ['Артефакты', '/artifacts/'], ['Руководства', '/guides/']]],
+  ['Эндгейм', [['Текущая ротация', '/rotation/'], ['Баннеры', '/banners/'], ['История баннеров', '/banners/#history'], ['Рейтинг', '/rating/']]],
+  ['Инструменты', [['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'],
+    ['Карта Тейвата', 'https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=ru-ru']]],
+  ['Сайт', [['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Карта сайта', '/sitemap.xml']]],
+];
 const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 ---
 <!doctype html>
@@ -124,11 +132,30 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         </button>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
-      <footer class="footer muted">
-        <p>
-          GenshinFlex — справочник без рекламы. Игровые данные — <a href="https://github.com/theBowja/genshin-db">genshin-db</a>,
-          изображения — enka.network. Genshin Impact, персонажи и арты © HoYoverse; проект не связан с HoYoverse.
-        </p>
+      <footer class="footer">
+        <div class="f-grid">
+          <div class="f-brand">
+            <a class="f-logo" href={`${base}/`}>
+              <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+              <span>Genshin<b>Flex</b></span>
+            </a>
+            <p>Билды, команды и инструменты для Genshin Impact. Без рекламы и регистрации.</p>
+            <a class="btn f-cta" href={`${base}/feedback/?from=${encodeURIComponent(path === '/' ? '/' : path + '/')}`}>Сообщить об ошибке</a>
+          </div>
+          {footerCols.map(([title, links]) => (
+            <nav class="f-col" aria-label={title}>
+              <h2>{title}</h2>
+              <ul>{links.map(([label, href]) => (
+                <li><a href={href.startsWith('http') ? href : `${base}${href}`} {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{label}</a></li>
+              ))}</ul>
+            </nav>
+          ))}
+        </div>
+        <div class="f-bottom">
+          <p>Данные — <a href="https://github.com/theBowja/genshin-db" rel="noopener">genshin-db</a>, изображения — enka.network, история баннеров — paimon.moe.
+            Genshin Impact, персонажи и арты © HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.</p>
+          <p>© {new Date().getFullYear()} GenshinFlex · обновлено {new Date().toLocaleDateString('ru-RU')}</p>
+        </div>
       </footer>
     </div>
 
@@ -214,8 +241,23 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .burger { display: none; }
   .content { width: 100%; max-width: 1180px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; }
   .content.wide { max-width: 1400px; }
-  .footer { max-width: 1180px; width: 100%; margin: 0 auto; padding: 1.2rem 24px 2rem; font-size: .8rem; border-top: 1px solid var(--border); }
-  .footer p { max-width: 90ch; margin: 0; }
+  /* Подвал в несколько колонок: бренд + разделы сайта + строка с правами */
+  .footer { background: var(--bg-deep); border-top: 1px solid var(--border); padding: 2.4rem 24px 1.6rem; margin-top: 2rem; }
+  .f-grid, .f-bottom { max-width: 1180px; margin: 0 auto; }
+  .f-grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 2rem 1.5rem; }
+  .f-logo { display: inline-flex; align-items: center; gap: .55rem; color: var(--accent); text-decoration: none; }
+  .f-logo span { font: 600 1.1rem var(--font-display); color: var(--text); }
+  .f-logo b { color: var(--accent); font-weight: 600; }
+  .f-brand p { color: var(--muted); font-size: .88rem; margin: .8rem 0 1rem; max-width: 34ch; }
+  .f-cta { font-size: .85rem; padding: .45rem .8rem; }
+  .f-col h2 { font: 600 .82rem var(--font); color: var(--text); margin: .3rem 0 .8rem; letter-spacing: .02em; }
+  .f-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+  .f-col a { color: var(--muted); text-decoration: none; font-size: .88rem; }
+  .f-col a:hover { color: var(--accent); }
+  .f-bottom { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1rem; display: grid; gap: .3rem; }
+  .f-bottom p { margin: 0; color: var(--muted); font-size: .78rem; max-width: 110ch; }
+  .f-bottom a { color: var(--muted); }
+  @media (max-width: 900px) { .f-grid { grid-template-columns: 1fr 1fr; } .f-brand { grid-column: 1 / -1; } }
   .skip:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; clip: auto; padding: .5rem 1rem; background: var(--accent); color: var(--accent-ink); z-index: 100; border-radius: var(--radius); }
   .scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .5); z-index: 35; }
 
@@ -226,6 +268,6 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     .burger { display: grid; }
     .top { padding: 0 16px; gap: .5rem; }
     .content { padding: 1.2rem 16px 2.5rem; }
-    .footer { padding: 1rem 16px 1.6rem; }
+    .footer { padding: 2rem 16px 1.4rem; }
   }
 </style>

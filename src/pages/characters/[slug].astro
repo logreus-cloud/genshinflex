@@ -161,7 +161,7 @@ const jsonLd = b && {
           </div>
           {Content && <div class="panel prose"><Content /></div>}
           {b.sources.length > 0 && (
-            <p class="muted small">Источники: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. Тексты — наш пересказ.</p>
+            <p class="muted small">Источники: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. Тексты — наш пересказ. <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`}>Нашли ошибку в билде?</a></p>
           )}
         </section>
 
@@ -295,7 +295,8 @@ const jsonLd = b && {
     background: linear-gradient(110deg, var(--surface) 35%, color-mix(in srgb, var(--el) 30%, var(--surface)));
     display: flex; align-items: center; isolation: isolate;
   }
-  .splash { position: absolute; right: -4%; top: 50%; translate: 0 -50%; height: 150%; z-index: -1; mask-image: linear-gradient(90deg, transparent 15%, #000 55%); }
+  /* Арт чуть крупнее шапки и прижат к верху: голова и корпус в кадре, обрезаются только ноги */
+  .splash { position: absolute; right: -4%; top: -8%; height: 130%; z-index: -1; mask-image: linear-gradient(90deg, transparent 15%, #000 55%); }
   .head-info { padding: 1.6rem 1.8rem; max-width: 560px; }
   .head-info > p { margin: 0; }
   .head h1 { font-size: clamp(2rem, 4vw, 2.9rem); margin: .1rem 0 .7rem; }

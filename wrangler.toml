@@ -1,3 +1,9 @@
 name = "genshinflex"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-09-01"
+
+# Обратная связь с сайта. Читать: npm run feedback
+[[d1_databases]]
+binding = "DB"
+database_name = "genshinflex-feedback"
+database_id = "100b65fe-1b52-41b9-9a5a-2689887fe496"
