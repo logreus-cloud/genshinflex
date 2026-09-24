@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import CharacterCard from '../../../components/CharacterCard.astro';
+import FilterBar from '../../../components/FilterBar.astro';
+import { useData, LANGS } from '../../../lib/data';
+// Каждая страница существует в трёх языках: / (ru), /en/, /es/
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { characters, t } = useData(Astro.currentLocale);
+
+const withBuild = new Set((await getCollection('builds')).map((b) => b.data.character));
+const latest = Math.max(...characters.map((c) => parseFloat(c.version)));
+---
+<Layout title={t('Персонажи')} wide>
+  <h1>{t('Персонажи')}</h1>
+  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.', { n: characters.length })}</p>
+
+  <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} extra={{ key: 'build', label: t('Только с билдом') }} />
+
+  <div class="cards" id="chars">
+    {characters.map((c) => (
+      <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-element={c.element} data-weapon={c.weapon}
+        data-rarity={String(c.rarity)} data-build={withBuild.has(c.slug) ? '1' : ''}>
+        <CharacterCard slug={c.slug} badge={parseFloat(c.version) === latest ? t('новый') : withBuild.has(c.slug) ? t('билд') : undefined} />
+      </div>
+    ))}
+  </div>
+  <p class="empty muted" hidden>{t('Никого не нашлось. Сбросьте часть фильтров.')}</p>
+</Layout>
+
+<style>
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .empty { text-align: center; margin: 3rem 0; }
+</style>

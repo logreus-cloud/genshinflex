@@ -1,7 +1,8 @@
 ---
 // Панель фильтров для списков: элементы списка несут data-* атрибуты, кнопки переключают значения.
 // Параметры URL (?element=anemo&weapon=sword) применяются при загрузке — на них ссылается «Другие персонажи».
-import { ELEMENTS, WEAPON_TYPES } from '../lib/data';
+import { useData, LANGS } from '../lib/data';
+const { ELEMENTS, WEAPON_TYPES, t } = useData(Astro.currentLocale);
 
 interface Props { target: string; placeholder: string; groups: ('rarity' | 'element' | 'weapon')[]; rarities?: number[]; extra?: { key: string; label: string }; }
 const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
@@ -10,12 +11,12 @@ const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
   <input class="input" type="search" name="q" placeholder={placeholder} aria-label={placeholder} />
   <div class="toggles">
     {groups.includes('rarity') && (
-      <div class="grp" role="group" aria-label="Редкость">
+      <div class="grp" role="group" aria-label={t('Редкость')}>
         {rarities.map((r) => <button type="button" class="t" data-key="rarity" data-value={String(r)} aria-pressed="false">{r}★</button>)}
       </div>
     )}
     {groups.includes('element') && (
-      <div class="grp" role="group" aria-label="Стихия">
+      <div class="grp" role="group" aria-label={t('Стихия')}>
         {Object.entries(ELEMENTS).map(([k, v]) => (
           <button type="button" class="t el" data-key="element" data-value={k} data-el={k} aria-pressed="false" title={v}>
             <span class="el-dot"></span><span class="sr-only">{v}</span>
@@ -24,17 +25,18 @@ const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
       </div>
     )}
     {groups.includes('weapon') && (
-      <div class="grp" role="group" aria-label="Оружие">
+      <div class="grp" role="group" aria-label={t('Оружие')}>
         {Object.entries(WEAPON_TYPES).map(([k, v]) => <button type="button" class="t" data-key="weapon" data-value={k} aria-pressed="false">{v}</button>)}
       </div>
     )}
     {extra && <button type="button" class="t" data-key={extra.key} data-value="1" aria-pressed="false">{extra.label}</button>}
-    <button type="reset" class="t reset">Сбросить</button>
+    <button type="reset" class="t reset">{t('Сбросить')}</button>
   </div>
   <p class="count muted small" aria-live="polite"></p>
 </form>
 
 <script>
+  import { t } from '../scripts/search';
   for (const form of document.querySelectorAll<HTMLFormElement>('[data-filter]')) {
     const items = [...document.querySelectorAll<HTMLElement>(`${form.dataset.filter} > [data-name]`)];
     const buttons = [...form.querySelectorAll<HTMLButtonElement>('button[data-key]')];
@@ -52,7 +54,7 @@ const { target, placeholder, groups, rarities = [5, 4], extra } = Astro.props;
         el.hidden = !ok;
         if (ok) shown++;
       }
-      count.textContent = `Показано: ${shown} из ${items.length}`;
+      count.textContent = t('Показано: {a} из {b}', { a: shown, b: items.length });
       if (empty) empty.hidden = shown > 0;
     };
     for (const b of buttons) b.addEventListener('click', () => { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); apply(); });

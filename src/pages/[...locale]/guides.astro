@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { useData, LANGS } from '../../lib/data';
+// Каждая страница существует в трёх языках: / (ru), /en/, /es/
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { getCharacter, base, t } = useData(Astro.currentLocale);
+
+const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - +a.data.updated);
+---
+<Layout title={t('Руководства')}>
+  <h1>{t('Руководства')}</h1>
+  <p class="muted">{t('Билды и команды для всех персонажей: оружие, артефакты, статы и составы. Разборы постепенно дополняются.')}</p>
+  <div class="grid">
+    {builds.map(({ data }) => {
+      const c = getCharacter(data.character);
+      return (
+        <a class="panel guide" href={`${base}/characters/${c.slug}`} data-el={c.element}>
+          {c.icon && <img src={c.icon} alt="" width="56" height="56" loading="lazy" />}
+          <div>
+            <h3>{c.name}</h3>
+            <p class="muted">{t(data.role)}</p>
+            <span class="chip">{t('патч {v}', { v: data.patch })}</span>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</Layout>
+
+<style>
+  .guide { display: flex; gap: .8rem; align-items: flex-start; text-decoration: none; }
+  .guide:hover { border-color: var(--accent); }
+  .guide img { border-radius: 12px; background: color-mix(in srgb, var(--el) 35%, transparent); flex: none; }
+  .guide p { margin: 0 0 .4rem; font-size: .9rem; }
+</style>

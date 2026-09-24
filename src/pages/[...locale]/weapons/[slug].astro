@@ -1,0 +1,105 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import LevelStats from '../../../components/LevelStats.astro';
+import CharacterCard from '../../../components/CharacterCard.astro';
+import { useData, LANGS, type Weapon } from '../../../lib/data';
+const { weapons, stars, base, t } = useData(Astro.currentLocale);
+
+export function getStaticPaths() {
+  return LANGS.flatMap((l) => useData(l).weapons.map((w) => ({ params: { locale: l === 'ru' ? undefined : l, slug: w.slug }, props: { w } })));
+}
+const { w } = Astro.props as { w: Weapon };
+
+// Кто использует: билды, где оружие в списке, по месту в рейтинге
+const users = (await getCollection('builds'))
+  .map((b) => ({ slug: b.data.character, place: b.data.weapons.findIndex((x) => x.slug === w.slug) }))
+  .filter((u) => u.place >= 0)
+  .sort((a, b) => a.place - b.place);
+---
+<Layout title={t('{name}: статы, эффект и кому подходит — Genshin Impact', { name: w.name })} description={t('{name} ({stars}, {type}): статы на каждом уровне, эффект на всех пробуждениях R1–R5 и персонажи, которым оружие подходит лучше всего.', { name: w.name, stars: stars(w.rarity), type: w.weaponText.toLowerCase() })} image={w.icon}>
+  <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/weapons/${w.slug}`, name: w.name, icon: w.icon, kind: t('Оружие') })}>
+    <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/weapons`}>{t('Оружие')}</a> / {w.name}</nav>
+    <header class:list={['head', `r${w.rarity}`]}>
+      <div class="pic">
+        <img src={w.icon} alt="" width="160" height="160" data-base={w.icon} data-awaken={w.iconAwaken} />
+      </div>
+      <div>
+        <h1>{w.name}</h1>
+        <div class="row">
+          <span class="chip gold">{stars(w.rarity)}</span>
+          <span class="chip">{w.weaponText}</span>
+          {w.mainStat && <span class="chip">{w.mainStat}</span>}
+          <span class="chip">{t('Версия {v}', { v: w.version })}</span>
+        </div>
+        {w.iconAwaken && <label class="aw small muted"><input type="checkbox" /> {t('Вид после возвышения')}</label>}
+      </div>
+    </header>
+
+    <div class="two">
+      {w.effectName ? (
+        <section class="panel">
+          <div class="eff-head">
+            <h2>{w.effectName}</h2>
+            <div class="refine" role="group" aria-label={t('Пробуждение')}>
+              {w.refinements.map((_, i) => <button type="button" class="btn" aria-pressed={String(i === 0)} data-r={i}>R{i + 1}</button>)}
+            </div>
+          </div>
+          {w.refinements.map((text, i) => <p class="eff" hidden={i !== 0} data-r-text={i}>{text}</p>)}
+        </section>
+      ) : <section class="panel"><p class="muted">{t('У этого оружия нет пассивного эффекта.')}</p></section>}
+      <LevelStats stats={w.stats} substat={w.mainStat} substatPercent={w.mainStatPercent} />
+    </div>
+
+    <section>
+      <h2 class="h-sec">{t('Кому подходит')}</h2>
+      {users.length ? (
+        <div class="cards">{users.map((u) => <CharacterCard slug={u.slug} badge={`#${u.place + 1}`} />)}</div>
+      ) : (
+        <p class="muted">{t('Пока не входит ни в один наш билд.')}</p>
+      )}
+    </section>
+
+    {w.description && (
+      <section>
+        <h2 class="h-sec">{t('Описание')}</h2>
+        <p class="lore muted">{w.description}</p>
+      </section>
+    )}
+  </article>
+</Layout>
+
+<script>
+  import { recent } from '../../../scripts/common';
+  recent.push(JSON.parse(document.querySelector<HTMLElement>('[data-visit]')!.dataset.visit!));
+
+  const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-r]')];
+  const texts = [...document.querySelectorAll<HTMLElement>('[data-r-text]')];
+  btns.forEach((b) => b.addEventListener('click', () => {
+    btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    texts.forEach((t) => (t.hidden = t.dataset.rText !== b.dataset.r));
+  }));
+  const img = document.querySelector<HTMLImageElement>('[data-base]')!;
+  document.querySelector<HTMLInputElement>('.aw input')?.addEventListener('change', (e) => {
+    img.src = (e.target as HTMLInputElement).checked ? img.dataset.awaken! : img.dataset.base!;
+  });
+</script>
+
+<style>
+  .crumbs { margin-bottom: .8rem; }
+  .crumbs a { color: var(--muted); }
+  .head { display: flex; gap: 1.4rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; }
+  .pic { width: 160px; height: 160px; border-radius: var(--radius-lg); display: grid; place-items: center; background: linear-gradient(170deg, #36436a, #4b7aa6); }
+  .r4 .pic { background: linear-gradient(170deg, #4a3d6d, #9679c4); }
+  .r5 .pic { background: linear-gradient(170deg, #6b4520, #d1953f); }
+  .aw { display: inline-flex; gap: .4rem; margin-top: .8rem; cursor: pointer; }
+  .two { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; }
+  .eff-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .6rem; }
+  .eff-head h2 { margin: 0; font-size: 1.05rem; }
+  .refine { display: flex; gap: 4px; }
+  .refine .btn { padding: .3rem .6rem; font-size: .82rem; }
+  .eff { white-space: pre-line; max-width: 75ch; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .lore { max-width: 75ch; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+</style>

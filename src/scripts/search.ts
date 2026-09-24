@@ -8,7 +8,11 @@ type Index = {
   pages: [string, string][];
 };
 
-export const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, '');
+import { pageLang, translate } from '../i18n/client';
+// Префикс ссылок по языку страницы: '' | '/en' | '/es'. Серверные функции (/api/…) живут в корне — для них префикс не нужен.
+export const LANG = pageLang();
+export const BASE = LANG === 'ru' ? '' : `/${LANG}`;
+export const t = translate(LANG);
 let indexPromise: Promise<Index> | null = null;
 export const loadIndex = () => (indexPromise ??= fetch(`${BASE}/data/index.json`).then((r) => r.json()));
 
@@ -28,10 +32,10 @@ export async function searchNames(query: string, limit = 8): Promise<Entry[]> {
   if (!q) return [];
   const idx = await loadIndex();
   const found: (Entry & { score: number })[] = [
-    ...idx.characters.map((c) => ({ score: score(q, c.n, c.e) + 0.3, href: `${BASE}/characters/${c.s}`, name: c.n, icon: c.i, kind: 'Персонаж' })),
-    ...idx.weapons.map((w) => ({ score: score(q, w.n, w.e), href: `${BASE}/weapons/${w.s}`, name: w.n, icon: w.i, kind: 'Оружие' })),
-    ...idx.artifacts.map((a) => ({ score: score(q, a.n, a.e), href: `${BASE}/artifacts#${a.s}`, name: a.n, icon: a.i, kind: 'Артефакты' })),
-    ...idx.pages.map(([n, h]) => ({ score: score(q, n), href: `${BASE}${h}`, name: n, icon: null, kind: 'Раздел' })),
+    ...idx.characters.map((c) => ({ score: score(q, c.n, c.e) + 0.3, href: `${BASE}/characters/${c.s}`, name: c.n, icon: c.i, kind: t('Персонаж') })),
+    ...idx.weapons.map((w) => ({ score: score(q, w.n, w.e), href: `${BASE}/weapons/${w.s}`, name: w.n, icon: w.i, kind: t('Оружие') })),
+    ...idx.artifacts.map((a) => ({ score: score(q, a.n, a.e), href: `${BASE}/artifacts#${a.s}`, name: a.n, icon: a.i, kind: t('Артефакты') })),
+    ...idx.pages.map(([n, h]) => ({ score: score(q, t(n)), href: `${BASE}${h}`, name: t(n), icon: null, kind: t('Раздел') })),
   ];
   return found.filter((x) => x.score >= 1).sort((a, b) => b.score - a.score).slice(0, limit);
 }

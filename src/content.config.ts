@@ -74,4 +74,10 @@ const banners = defineCollection({
   }),
 });
 
-export const collections = { builds, rotations, banners };
+// Переводы текстов разборов: src/content/builds-i18n/<язык>/<слаг>.md (id вида «en/vesna»)
+const buildsI18n = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/builds-i18n' }),
+  schema: z.object({}),
+});
+
+export const collections = { builds, rotations, banners, buildsI18n };

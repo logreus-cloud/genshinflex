@@ -1,0 +1,87 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+// Каждая страница существует в трёх языках: / (ru), /en/, /es/
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Обратная связь')} description={t('Сообщите об ошибке в билде, предложите идею или расскажите о проблеме на сайте GenshinFlex.')}>
+  <h1>{t('Обратная связь')}</h1>
+  <p class="lead">{t('Нашли ошибку в билде, устаревшие данные или есть идея? Напишите — мы читаем каждое сообщение.')}</p>
+
+  <form class="panel fb" id="feedback" novalidate>
+    <fieldset class="kinds">
+      <legend>{t('О чём сообщение')}</legend>
+      <label><input type="radio" name="kind" value="data" checked /> {t('Ошибка в билде или данных')}</label>
+      <label><input type="radio" name="kind" value="bug" /> {t('Что-то не работает на сайте')}</label>
+      <label><input type="radio" name="kind" value="idea" /> {t('Идея или пожелание')}</label>
+      <label><input type="radio" name="kind" value="other" /> {t('Другое')}</label>
+    </fieldset>
+
+    <label>{t('Страница')} <span class="muted">{t('(если сообщение про конкретную)')}</span>
+      <input class="input" name="page" placeholder={t('Например, /characters/vesna/')} maxlength="200" />
+    </label>
+
+    <label>{t('Сообщение')}
+      <textarea class="input" name="message" rows="7" minlength="10" maxlength="3000" required
+        placeholder={t('Что не так и как должно быть. Если это ошибка в билде — укажите источник, если знаете.')}></textarea>
+      <small class="muted" id="count">0 / 3000</small>
+    </label>
+
+    <label>{t('Как с вами связаться')} <span class="muted">{t('(необязательно)')}</span>
+      <input class="input" name="contact" placeholder={t('Telegram, Discord или почта — если хотите ответ')} maxlength="120" />
+    </label>
+
+    <!-- Ловушка для ботов: людям не видна -->
+    <label class="trap" aria-hidden="true">{t('Сайт')}<input name="website" tabindex="-1" autocomplete="off" /></label>
+
+    <div class="row">
+      <button class="btn primary" type="submit">{t('Отправить')}</button>
+      <p class="status small" id="status" aria-live="polite"></p>
+    </div>
+    <p class="muted small">{t('Мы сохраняем только текст сообщения, страницу и контакт, если вы его указали.')}</p>
+  </form>
+</Layout>
+
+<script>
+  import { t } from '../../scripts/search';
+  const form = document.getElementById('feedback') as HTMLFormElement;
+  const status = document.getElementById('status')!;
+  const params = new URLSearchParams(location.search);
+  if (params.get('from')) (form.elements.namedItem('page') as HTMLInputElement).value = params.get('from')!;
+  if (params.get('kind')) form.querySelector<HTMLInputElement>(`input[name="kind"][value="${params.get('kind')}"]`)?.click();
+
+  const msg = form.elements.namedItem('message') as HTMLTextAreaElement;
+  msg.addEventListener('input', () => { document.getElementById('count')!.textContent = `${msg.value.length} / 3000`; });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    if (String(data.message).trim().length < 10) { status.textContent = t('Напишите хотя бы пару предложений — от 10 символов.'); status.className = 'status small bad'; return; }
+    const btn = form.querySelector('button')!;
+    btn.disabled = true; status.textContent = t('Отправляю…'); status.className = 'status small';
+    try {
+      const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(t(body.error ?? 'Не удалось отправить. Попробуйте ещё раз.'));
+      form.reset(); msg.dispatchEvent(new Event('input'));
+      status.textContent = t('Спасибо! Сообщение отправлено.'); status.className = 'status small ok';
+    } catch (err) {
+      status.textContent = (err as Error).message; status.className = 'status small bad';
+    } finally { btn.disabled = false; }
+  });
+</script>
+
+<style>
+  .fb { display: grid; gap: 1rem; max-width: 720px; }
+  label { display: grid; gap: .35rem; font-size: .9rem; }
+  textarea { resize: vertical; min-height: 140px; color: var(--text); }
+  .kinds { border: 0; padding: 0; margin: 0; display: grid; gap: .45rem; }
+  .kinds legend { font-weight: 600; margin-bottom: .4rem; }
+  .kinds label { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
+  .kinds input { accent-color: var(--accent); }
+  .trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .status { margin: 0; }
+  .status.ok { color: var(--good); }
+  .status.bad { color: var(--bad); }
+</style>

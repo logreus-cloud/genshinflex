@@ -4,7 +4,8 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import genshin from 'genshin-db';
 
 const OUT = new URL('../src/data/generated/', import.meta.url);
-const LANG = { resultLanguage: 'Russian' };
+// Языки сайта: код → язык genshin-db и десятичный разделитель в множителях талантов
+const LOCALES = { ru: { lang: 'Russian', dec: ',' }, en: { lang: 'English', dec: '.' }, es: { lang: 'Spanish', dec: ',' } };
 const CDN = 'https://enka.network/ui/';
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -33,13 +34,13 @@ const at = (stats, l) => (l.endsWith('+') ? stats(Number(l.slice(0, -1)), '+') :
 const statValue = (v, type) => (FLAT.has(type) ? round(v, 0) : round(v * 100, 1));
 
 // «Урон навыка|{param1:F1P}» → строка значений по уровням таланта
-function formatParam(value, fmt) {
+function formatParam(value, fmt, dec) {
   const pct = fmt.endsWith('P');
   const digits = Number(fmt.match(/F(\d)/)?.[1] ?? 0);
   const v = pct ? value * 100 : value;
-  return (fmt.startsWith('I') ? Math.round(v) : v.toFixed(digits)).toString().replace('.', ',') + (pct ? '%' : '');
+  return (fmt.startsWith('I') ? Math.round(v) : v.toFixed(digits)).toString().replace('.', dec) + (pct ? '%' : '');
 }
-function scaling(attributes) {
+function scaling(attributes, dec) {
   if (!attributes?.labels) return [];
   const levels = attributes.parameters.param1?.length ?? 0;
   return attributes.labels.map((label) => {
@@ -47,22 +48,30 @@ function scaling(attributes) {
     const values = Array.from({ length: levels }, (_, i) =>
       template.replace(/\{(param\d+):([A-Z0-9]+)\}/g, (_, p, f) => {
         const v = attributes.parameters[p]?.[i];
-        return v === undefined ? '?' : formatParam(v, f);
+        return v === undefined ? '?' : formatParam(v, f, dec);
       }));
     return { name, values };
   });
 }
 
-const talent = (t, icon, withScaling = false) =>
-  t && { name: t.name, description: t.description, icon: img(icon), ...(withScaling && { scaling: scaling(t.attributes) }) };
+const talent = (t, icon, withScaling = false, dec = ',') =>
+  t && { name: t.name, description: t.description, icon: img(icon), ...(withScaling && { scaling: scaling(t.attributes, dec) }) };
 
-const ELEMENT_RU = { pyro: 'Пиро', hydro: 'Гидро', anemo: 'Анемо', electro: 'Электро', dendro: 'Дендро', cryo: 'Крио', geo: 'Гео' };
+const ELEMENT_EN = { pyro: 'Pyro', hydro: 'Hydro', anemo: 'Anemo', electro: 'Electro', dendro: 'Dendro', cryo: 'Cryo', geo: 'Geo' };
+const ELEMENT_NAMES = {
+  ru: { pyro: 'Пиро', hydro: 'Гидро', anemo: 'Анемо', electro: 'Электро', dendro: 'Дендро', cryo: 'Крио', geo: 'Гео' },
+  en: ELEMENT_EN, es: ELEMENT_EN,
+};
+const TRAVELER = { ru: 'Путешественник', en: 'Traveler', es: 'Viajero' };
 
 // Путешественник: статы и внешность — от Люмин, таланты и созвездия — от стихийной версии
 const travelers = Object.values(ELEMENTS).map((el) => ({
   en: `Traveler (${el[0].toUpperCase()}${el.slice(1)})`, base: 'Lumine', element: el,
 })).filter((t) => genshin.talents(t.en));
 
+mkdirSync(OUT, { recursive: true });
+for (const [code, { lang, dec }] of Object.entries(LOCALES)) {
+const LANG = { resultLanguage: lang };
 const characters = [
   ...names(genshin.characters).filter((n) => !SKIP.has(n)).map((en) => ({ en, base: en, element: null })),
   ...travelers,
@@ -77,12 +86,12 @@ const characters = [
       id: c.id,
       slug: slug(en),
       nameEn: en,
-      name: element ? `Путешественник (${ELEMENT_RU[element]})` : c.name,
+      name: element ? `${TRAVELER[code]} (${ELEMENT_NAMES[code][element]})` : c.name,
       title: c.title,
       description: c.description,
       rarity: c.rarity,
       element: element ?? ELEMENTS[c.elementType] ?? 'none',
-      elementText: element ? ELEMENT_RU[element] : c.elementText,
+      elementText: element ? ELEMENT_NAMES[code][element] : c.elementText,
       weapon: WEAPONS[c.weaponType],
       weaponText: c.weaponText,
       region: c.affiliation,
@@ -102,15 +111,15 @@ const characters = [
       }),
       substatPercent: !FLAT.has(c.substatType),
       talents: {
-        normal: talent(t.combat1, ti.filename_combat1, true),
-        skill: talent(t.combat2, ti.filename_combat2, true),
-        burst: talent(t.combat3, ti.filename_combat3, true),
+        normal: talent(t.combat1, ti.filename_combat1, true, dec),
+        skill: talent(t.combat2, ti.filename_combat2, true, dec),
+        burst: talent(t.combat3, ti.filename_combat3, true, dec),
         passives: [1, 2, 3, 4].map((i) => talent(t[`passive${i}`], ti[`filename_passive${i}`])).filter(Boolean),
       },
       constellations: [1, 2, 3, 4, 5, 6].map((i) => talent(k[`c${i}`], ki[`filename_c${i}`])).filter(Boolean),
     };
   })
-  .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+  .sort((a, b) => a.name.localeCompare(b.name, code));
 
 const weapons = names(genshin.weapons)
   .map((en) => {
@@ -140,7 +149,7 @@ const weapons = names(genshin.weapons)
   .filter((w) => w.rarity >= 3)
   // У некоторых предметов в genshin-db несколько вариантов с одним именем — оставляем первый
   .filter((w, i, all) => all.findIndex((x) => x.slug === w.slug) === i)
-  .sort((a, b) => b.rarity - a.rarity || a.name.localeCompare(b.name, 'ru'));
+  .sort((a, b) => b.rarity - a.rarity || a.name.localeCompare(b.name, code));
 
 const artifacts = names(genshin.artifacts)
   .map((en) => {
@@ -158,10 +167,11 @@ const artifacts = names(genshin.artifacts)
     };
   })
   .filter((a) => a.rarity >= 4)
-  .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+  .sort((a, b) => a.name.localeCompare(b.name, code));
 
-mkdirSync(OUT, { recursive: true });
+// Русский — основной язык, файлы без суффикса; остальные — characters.en.json и т. д.
 for (const [file, data] of Object.entries({ characters, weapons, artifacts })) {
-  writeFileSync(new URL(`${file}.json`, OUT), JSON.stringify(data));
-  console.log(`${file}: ${data.length}`);
+  writeFileSync(new URL(`${file}${code === 'ru' ? '' : `.${code}`}.json`, OUT), JSON.stringify(data));
+  console.log(`${code} ${file}: ${data.length}`);
+}
 }

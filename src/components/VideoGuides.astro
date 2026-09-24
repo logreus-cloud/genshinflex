@@ -1,12 +1,14 @@
 ---
+import { useData } from '../lib/data';
 // Видео-гайды: сначала только превью, плеер youtube-nocookie грузится по клику — страница не тяжелеет
 interface Props { videos: { id: string; title: string; author: string; lang: 'ru' | 'en' }[] }
 const { videos } = Astro.props;
+const { t } = useData(Astro.currentLocale);
 ---
 <div class="videos">
   {videos.map((v) => (
     <figure class="video">
-      <button class="play" type="button" data-yt={v.id} aria-label={`Смотреть: ${v.title}`}>
+      <button class="play" type="button" data-yt={v.id} aria-label={t('Смотреть: {title}', { title: v.title })}>
         <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" width="480" height="360" />
         <svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true"><path class="bg" d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.3 34 .3 34 .3s-21.2 0-26.5 1.4a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3Z"/><path class="tri" d="M45 24 27 14v20Z"/></svg>
         {v.lang === 'en' && <span class="lang">EN</span>}
@@ -25,7 +27,7 @@ const { videos } = Astro.props;
     if (!btn) return;
     const frame = document.createElement('iframe');
     frame.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.yt}?autoplay=1&rel=0`;
-    frame.title = btn.getAttribute('aria-label') ?? 'Видео';
+    frame.title = btn.getAttribute('aria-label') ?? 'Video';
     frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
     frame.allowFullscreen = true;
     frame.className = 'yt-frame';

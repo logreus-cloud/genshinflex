@@ -1,10 +1,10 @@
 ---
-import { getCharacter } from '../lib/data';
+import { useData, LANGS } from '../lib/data';
+const { getCharacter, base, t } = useData(Astro.currentLocale);
 
 interface Props { slug: string; badge?: string; }
 const { slug, badge } = Astro.props;
 const c = getCharacter(slug);
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <a class:list={['cc', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element}>
   <img src={c.icon} alt="" loading="lazy" width="140" height="160" />

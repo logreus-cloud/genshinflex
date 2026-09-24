@@ -1,0 +1,20 @@
+# Перевод интерфейса, часть 3: сообщения серверных функций (их текст переводится в браузере)
+T = [
+("Неверный формат UID", "Invalid UID format", "Formato de UID no válido"),
+("Игрок с таким UID не найден", "No player found with this UID", "No se encontró ningún jugador con ese UID"),
+("На enka.network идут технические работы", "enka.network is under maintenance", "enka.network está en mantenimiento"),
+("Слишком много запросов — подождите минуту", "Too many requests — wait a minute", "Demasiadas solicitudes: espera un minuto"),
+("enka.network временно недоступна", "enka.network is temporarily unavailable", "enka.network no está disponible temporalmente"),
+("UID — это 9 или 10 цифр", "A UID is 9 or 10 digits", "El UID tiene 9 o 10 dígitos"),
+("В ссылке нет authkey — скопируйте ссылку заново", "The link has no authkey — copy it again", "El enlace no tiene authkey: vuelve a copiarlo"),
+("Выберите тип сообщения", "Choose a message type", "Elige el tipo de mensaje"),
+("Напишите хотя бы пару предложений — от 10 символов", "Write at least a couple of sentences — 10 characters minimum", "Escribe al menos un par de frases: mínimo 10 caracteres"),
+("Не удалось прочитать форму", "Couldn't read the form", "No se pudo leer el formulario"),
+("Неизвестный тип баннера", "Unknown banner type", "Tipo de gachapón desconocido"),
+("Слишком длинно: до 3000 символов", "Too long: 3000 characters max", "Demasiado largo: máximo 3000 caracteres"),
+("Слишком много сообщений подряд — попробуйте через час", "Too many messages in a row — try again in an hour", "Demasiados mensajes seguidos: inténtalo dentro de una hora"),
+("Не удалось отправить. Попробуйте ещё раз.", "Couldn't send. Please try again.", "No se pudo enviar. Inténtalo de nuevo."),
+("Не удалось загрузить профиль.", "Couldn't load the profile.", "No se pudo cargar el perfil."),
+("Не удалось загрузить историю.", "Couldn't load the history.", "No se pudo cargar el historial."),
+("Оружие 3★", "3★ weapon", "Arma 3★"),
+]

@@ -1,10 +1,10 @@
 ---
-import { getWeapon } from '../lib/data';
+import { useData, LANGS } from '../lib/data';
+const { getWeapon, base, t } = useData(Astro.currentLocale);
 
 interface Props { slug: string; size?: number; label?: boolean; }
 const { slug, size = 48, label = true } = Astro.props;
 const w = getWeapon(slug);
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <a class="wi" href={`${base}/weapons/${w.slug}`} style={`--s:${size}px`} title={w.name}>
   <span class:list={['frame', `r${w.rarity}`]}><img src={w.icon} alt="" width={size} height={size} loading="lazy" /></span>

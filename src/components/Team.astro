@@ -1,13 +1,15 @@
 ---
 import CharacterIcon from './CharacterIcon.astro';
+import { useData } from '../lib/data';
 
 interface Props { members: string[]; name?: string; note?: string; }
 const { members, name, note } = Astro.props;
+const { t } = useData(Astro.currentLocale);
 ---
 <div class="team panel">
-  {name && <h3>{name}</h3>}
+  {name && <h3>{t(name)}</h3>}
   <div class="members">{members.map((m) => <CharacterIcon slug={m} size={52} />)}</div>
-  {note && <p class="muted">{note}</p>}
+  {note && <p class="muted">{t(note)}</p>}
 </div>
 
 <style>

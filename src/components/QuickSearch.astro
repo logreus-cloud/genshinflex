@@ -1,16 +1,18 @@
 ---
 // Быстрый поиск в шапке: выпадающий список, стрелки + Enter, «/» — фокус
+import { useData } from '../lib/data';
+const { t } = useData(Astro.currentLocale);
 ---
 <div class="qs" data-qs>
   <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="5.5" /><path d="m13.2 13.2 3.3 3.3" /></svg>
-  <input class="qs-input" type="search" placeholder="Персонаж, оружие, артефакт…" aria-label="Поиск по сайту"
+  <input class="qs-input" type="search" placeholder={t('Персонаж, оружие, артефакт…')} aria-label={t('Поиск по сайту')}
     role="combobox" aria-expanded="false" aria-controls="qs-list" aria-autocomplete="list" autocomplete="off" />
   <kbd aria-hidden="true">/</kbd>
   <ul class="qs-list" id="qs-list" role="listbox" hidden></ul>
 </div>
 
 <script>
-  import { searchNames } from '../scripts/search';
+  import { searchNames, t } from '../scripts/search';
 
   const root = document.querySelector<HTMLElement>('[data-qs]')!;
   const input = root.querySelector<HTMLInputElement>('input')!;
@@ -30,7 +32,7 @@
       li.innerHTML = `<a href="${it.href}">${it.icon ? `<img src="${it.icon}" alt="" width="28" height="28" loading="lazy">` : '<span class="ph"></span>'}<span>${it.name}</span><small>${it.kind}</small></a>`;
       return li;
     }));
-    if (!items.length && q.trim()) list.innerHTML = '<li class="empty">Ничего не нашлось — попробуйте имя на английском</li>';
+    if (!items.length && q.trim()) list.innerHTML = `<li class="empty">${t('Ничего не нашлось — попробуйте имя на английском')}</li>`;
     list.hidden = !q.trim();
     input.setAttribute('aria-expanded', String(!list.hidden));
     active = -1;

@@ -1,0 +1,226 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import CharacterIcon from '../../components/CharacterIcon.astro';
+import WeaponIcon from '../../components/WeaponIcon.astro';
+import BannerPhase from '../../components/BannerPhase.astro';
+import history from '../../data/generated/banner-history.json';
+import { useData, LANGS } from '../../lib/data';
+// Каждая страница существует в трёх языках: / (ru), /en/, /es/
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { getCharacter, getWeapon, fmtServerDate, stars, base, t } = useData(Astro.currentLocale);
+
+const now = new Date();
+const builds = new Set((await getCollection('builds')).map((b) => b.data.character));
+const all = (await getCollection('banners')).map((b) => b.data).sort((a, b) => a.start.localeCompare(b.start));
+const current = all.filter((b) => new Date(b.start) <= now && new Date(b.end) > now);
+const next = all.filter((b) => new Date(b.start) > now);
+// Все баннеры: текущая фаза из истории + постоянные баннеры
+const livePhase = [...history].reverse().find((p) => new Date(p.start.replace(' ', 'T')) <= now) ?? history.at(-1)!;
+const lastChronicled = [...history].reverse().find((p) => p.chronicled);
+const chronicledLive = livePhase.chronicled;
+const STANDARD_CHARS = ['diluc', 'jean', 'keqing', 'mona', 'qiqi', 'tighnari', 'dehya', 'yumemizuki-mizuki'];
+const STANDARD_WEAPONS = ['amos-bow', 'aquila-favonia', 'lost-prayer-to-the-sacred-winds', 'primordial-jade-winged-spear', 'skyward-atlas',
+  'skyward-blade', 'skyward-harp', 'skyward-pride', 'skyward-spine', 'wolf-s-gravestone'];
+// История: версии от новых к старым
+const versions = [...new Set(history.map((p) => p.version))].reverse();
+const sections = [
+  { title: 'Сейчас', list: current, empty: t('Сейчас между фазами — загляните позже.') },
+  { title: 'Следующие', list: next, empty: t('Следующие баннеры ещё не объявлены.') },
+];
+---
+<Layout title={t('Баннеры')} description={t('Текущие и следующие баннеры Genshin Impact с таймерами по времени вашего сервера.')}>
+  <h1>{t('Баннеры')}</h1>
+  <p class="lead">{t('Текущие и объявленные баннеры персонажей и оружия. Таймеры считают время вашего сервера.')}</p>
+
+  <div class="region panel">
+    <span>{t('Сервер')}</span>
+    <div class="row" role="group" aria-label={t('Регион сервера')}>
+      <button class="btn" type="button" data-region="eu" aria-pressed="false">{t('Европа')}</button>
+      <button class="btn" type="button" data-region="asia" aria-pressed="false">{t('Азия')}</button>
+      <button class="btn" type="button" data-region="na" aria-pressed="false">{t('Америка')}</button>
+    </div>
+    <span class="muted small">{t('Выбор запоминается и применяется ко всем таймерам сайта')}</span>
+  </div>
+
+  <div class="btabs" role="tablist" aria-label={t('Разделы баннеров')}>
+    <button type="button" role="tab" data-btab="now" aria-selected="true">{t('Сейчас')}</button>
+    <button type="button" role="tab" data-btab="all" aria-selected="false">{t('Все баннеры')}</button>
+    <button type="button" role="tab" data-btab="history" aria-selected="false">{t('История')}</button>
+  </div>
+
+  <div data-bpanel="now">
+
+  {sections.map((s) => (
+    <section>
+      <h2 class="h-sec">{t(s.title)}</h2>
+      {s.list.length === 0 && <p class="muted">{s.empty}</p>}
+      {s.list.map((b) => (
+        <article class="banner">
+          <header class="bhead">
+            <div>
+              <h3>{t('Версия {v}, фаза {p}', { v: b.version, p: b.phase })}</h3>
+              <p class="muted small">{fmtServerDate(b.start)} — {fmtServerDate(b.end)}</p>
+            </div>
+            <span class="timer">
+              {s.title === 'Сейчас'
+                ? <>{t('До конца:')} <b data-until={b.end} data-done={t('закончился')}>…</b></>
+                : <>{t('До начала:')} <b data-until={b.start} data-done={t('уже идёт')}>…</b></>}
+            </span>
+          </header>
+          <div class="featured">
+            {b.featured.map((f) => {
+              const c = getCharacter(f.slug);
+              return (
+                <a class="feat" href={`${base}/characters/${c.slug}`} data-el={c.element}>
+                  {c.splash && <img class="art" src={c.splash} alt="" loading="lazy" />}
+                  <div class="feat-info">
+                    <span class="chip gold">{f.rerun ? t('повтор') : t('новый')}</span>
+                    <h4>{c.name}</h4>
+                    <span class="small">{stars(c.rarity)} {c.elementText}, {c.weaponText.toLowerCase()}</span>
+                    <span class="small muted">{builds.has(c.slug) ? t('Есть билд') : t('Билд готовится')}</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+          <div class="extras">
+            {b.fourStars.length > 0 && (
+              <div>
+                <span class="muted small">{t('4★ персонажи с повышенным шансом')}</span>
+                <div class="row">{b.fourStars.map((s) => <CharacterIcon slug={s} size={48} />)}</div>
+              </div>
+            )}
+            {b.weapons.length > 0 && (
+              <div>
+                <span class="muted small">{t('Баннер оружия')}</span>
+                <div class="row">
+                  {b.weapons.map((s) => {
+                    const w = getWeapon(s);
+                    return <a class="wpn" href={`${base}/weapons/${w.slug}`}><img src={w.icon} alt="" width="44" height="44" loading="lazy" /><span>{w.name}</span></a>;
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+          {b.sources.length > 0 && <p class="muted small src">{t('Источник')}: {b.sources.map((x) => <a href={x.url} rel="noopener">{x.title}</a>)}</p>}
+        </article>
+      ))}
+    </section>
+  ))}
+  </div>
+
+  <div data-bpanel="all" hidden>
+    <p class="muted">{t('Все молитвы, доступные прямо сейчас, — версия {v}, фаза {p}.', { v: livePhase.version, p: livePhase.phase })}</p>
+    <BannerPhase phase={livePhase} showDates={false} />
+    <div class="perm">
+      <section class="panel">
+        <h2 class="h-sec">{t('Стандартная молитва')} <small>{t('Wanderlust Invocation, постоянно')}</small></h2>
+        <p class="muted small">{t('5★ персонажи — именно они выпадают, когда проигрываешь 50/50 на баннере события.')}</p>
+        <div class="row">{STANDARD_CHARS.map((s) => <CharacterIcon slug={s} size={52} />)}</div>
+        <p class="muted small">{t('5★ оружие')}</p>
+        <div class="row">{STANDARD_WEAPONS.map((s) => <WeaponIcon slug={s} size={44} />)}</div>
+      </section>
+      <section class="panel">
+        <h2 class="h-sec">{t('Хроники')}</h2>
+        {chronicledLive
+          ? <p>{t('Сейчас идёт: {name}.', { name: chronicledLive.name })}</p>
+          : <p class="muted">{t('Сейчас не проводятся.')}{lastChronicled && ' ' + t('Последние — в версии {v} ({date}): можно было выбрать любого персонажа или оружие из пула.', { v: lastChronicled.version, date: fmtServerDate(lastChronicled.start) })}</p>}
+        {!chronicledLive && lastChronicled?.chronicled && (
+          <div class="row">{lastChronicled.chronicled.five.slice(0, 5).map((s) => { try { getCharacter(s); return <CharacterIcon slug={s} size={40} />; } catch { return <WeaponIcon slug={s} size={40} />; } })}</div>
+        )}
+      </section>
+    </div>
+  </div>
+
+  <div data-bpanel="history" hidden>
+    <div class="hist-head">
+      <label>{t('Версия')}
+        <select class="input" id="version-select">
+          {versions.map((v) => <option value={v}>{v}</option>)}
+        </select>
+      </label>
+      <div class="vchips" role="group" aria-label={t('Быстрый выбор версии')}>
+        {[...new Set(versions.map((v) => v.split('.')[0]))].map((major) => <button type="button" class="btn" data-major={major}>{major}.x</button>)}
+      </div>
+    </div>
+    {versions.map((v, i) => (
+      <div class="version" data-version={v} hidden={i !== 0}>
+        {history.filter((p) => p.version === v).map((p) => <BannerPhase phase={p} />)}
+      </div>
+    ))}
+    <p class="muted small">{t('История баннеров — по открытым данным')} <a href="https://github.com/MadeBaruna/paimon-moe" rel="noopener">paimon.moe</a> (MIT).</p>
+  </div>
+</Layout>
+
+<script>
+  import { region, type Region } from '../../scripts/common';
+  const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-region]')];
+  const paint = () => btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
+  btns.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); }));
+  paint();
+
+  // Вкладки: состояние в адресе (#all, #history), чтобы можно было поделиться ссылкой
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-btab]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-bpanel]')];
+  const show = (id: string) => {
+    if (!panels.some((p) => p.dataset.bpanel === id)) id = 'now';
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.btab === id)));
+    panels.forEach((p) => (p.hidden = p.dataset.bpanel !== id));
+  };
+  tabs.forEach((t) => t.addEventListener('click', () => { history.replaceState(null, '', t.dataset.btab === 'now' ? location.pathname : `#${t.dataset.btab}`); show(t.dataset.btab!); }));
+  show(location.hash.slice(1));
+
+  const select = document.getElementById('version-select') as HTMLSelectElement;
+  const pick = (v: string) => {
+    select.value = v;
+    document.querySelectorAll<HTMLElement>('[data-version]').forEach((el) => (el.hidden = el.dataset.version !== v));
+  };
+  select.addEventListener('change', () => pick(select.value));
+  document.querySelectorAll<HTMLButtonElement>('[data-major]').forEach((b) => b.addEventListener('click', () => {
+    const first = [...select.options].map((o) => o.value).filter((v) => v.startsWith(`${b.dataset.major}.`)).pop();
+    if (first) pick(first);
+  }));
+</script>
+
+<style>
+  .region { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .region .btn { padding: .35rem .8rem; }
+  .btabs { display: flex; gap: 4px; margin: 1.2rem 0 1rem; border-bottom: 1px solid var(--border); }
+  .btabs button { border: 0; background: none; padding: .7rem 1rem; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; font-size: .95rem; }
+  .btabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  [data-bpanel="all"], [data-version] { display: grid; gap: 12px; }
+  [data-bpanel="all"][hidden], [data-version][hidden] { display: none; }
+  .perm { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 12px; }
+  .perm .h-sec { margin-top: 0; }
+  .perm .row { gap: 6px; align-items: flex-start; margin-bottom: .6rem; }
+  .hist-head { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1rem; }
+  .hist-head label { display: grid; gap: .3rem; font-size: .82rem; color: var(--muted); }
+  .hist-head select { width: 120px; color: var(--text); }
+  .vchips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .vchips .btn { padding: .35rem .7rem; font-size: .85rem; }
+  .banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 14px; }
+  .bhead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .9rem; }
+  .bhead h3 { margin: 0; font-size: 1.05rem; }
+  .bhead p { margin: .15rem 0 0; }
+  .timer { background: var(--accent-soft); border-radius: var(--radius); padding: .45rem .8rem; font-size: .92rem; }
+  .timer b { color: var(--accent); }
+  .featured { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .feat {
+    position: relative; min-height: 210px; border-radius: var(--radius); overflow: hidden; text-decoration: none; isolation: isolate;
+    background: linear-gradient(130deg, color-mix(in srgb, var(--el) 45%, var(--surface-2)), var(--surface-2));
+    display: flex; align-items: flex-end;
+  }
+  .art { position: absolute; right: -15%; top: -10%; height: 150%; z-index: -1; }
+  .feat::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(12 14 24 / .85), transparent 75%); }
+  .feat-info { display: grid; gap: .15rem; padding: 1rem; color: #fff; }
+  .feat-info .chip { justify-self: start; }
+  .feat-info .muted { color: rgb(255 255 255 / .7); }
+  .feat h4 { font: 600 1.4rem var(--font-display); margin: .3rem 0 0; }
+  .feat:hover { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .extras { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-top: 1rem; }
+  .extras > div { display: grid; gap: .5rem; }
+  .wpn { display: flex; align-items: center; gap: .5rem; text-decoration: none; background: var(--surface-2); border-radius: var(--radius); padding: .3rem .7rem .3rem .3rem; font-size: .88rem; }
+  .wpn img { border-radius: 8px; background: linear-gradient(170deg, #6b4520, #d1953f); }
+  .src { margin: .8rem 0 0; }
+</style>

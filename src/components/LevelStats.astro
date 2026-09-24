@@ -1,6 +1,7 @@
 ---
 // Статы на уровне: ползунок по точкам возвышения, «20+» — после возвышения
-import { fmtStat } from '../lib/data';
+import { useData, LANGS } from '../lib/data';
+const { fmtStat, t } = useData(Astro.currentLocale);
 
 type Point = { level: string; hp?: number; atk: number; def?: number; sub: number | null };
 interface Props { stats: Point[]; substat: string | null; substatPercent: boolean; }
@@ -8,16 +9,16 @@ const { stats, substat, substatPercent } = Astro.props;
 const last = stats.length - 1;
 const start = Math.max(0, stats.findIndex((s) => s.level === '90'));
 const rows = [
-  ['hp', 'Базовое HP', false], ['atk', 'Базовая атака', false], ['def', 'Базовая защита', false], ['sub', substat ?? 'Доп. стат', substatPercent],
+  ['hp', t('Базовое HP'), false], ['atk', t('Базовая атака'), false], ['def', t('Базовая защита'), false], ['sub', substat ?? t('Доп. стат'), substatPercent],
 ].filter(([k]) => stats[0][k as keyof Point] !== undefined) as [keyof Point, string, boolean][];
 const fmt = (p: Point, k: keyof Point, pct: boolean) => fmtStat((p[k] as number | null) ?? null, pct);
 ---
 <div class="panel ls" data-level-stats={JSON.stringify(stats.map((p) => rows.map(([k, , pct]) => fmt(p, k, pct))))}>
   <div class="ls-head">
-    <h3>Статы на уровне</h3>
-    <span class="chip gold">ур. <output>{stats[start].level}</output></span>
+    <h3>{t('Статы на уровне')}</h3>
+    <span class="chip gold">{t('ур.')} <output>{stats[start].level}</output></span>
   </div>
-  <input type="range" min="0" max={last} value={start} aria-label="Уровень" data-labels={JSON.stringify(stats.map((s) => s.level))} />
+  <input type="range" min="0" max={last} value={start} aria-label={t('Уровень')} data-labels={JSON.stringify(stats.map((s) => s.level))} />
   <dl>
     {rows.map(([k, label, pct]) => <div><dt>{label}</dt><dd>{fmt(stats[start], k, pct)}</dd></div>)}
   </dl>

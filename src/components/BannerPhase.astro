@@ -2,21 +2,21 @@
 // Одна фаза баннеров: персонажи (с отметкой «впервые/повтор»), оружие и хроники
 import CharacterIcon from './CharacterIcon.astro';
 import WeaponIcon from './WeaponIcon.astro';
-import { getCharacter, fmtServerDate } from '../lib/data';
+import { useData, LANGS } from '../lib/data';
 import type history from '../data/generated/banner-history.json';
+const { getCharacter, fmtServerDate, base, t } = useData(Astro.currentLocale);
 
 interface Props { phase: (typeof history)[number]; showDates?: boolean; }
 const { phase: p, showDates = true } = Astro.props;
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const isChar = (s: string) => { try { getCharacter(s); return true; } catch { return false; } };
-const rerun = (n: number) => (n === 0 ? 'впервые' : n === 1 ? 'повтор' : `${n}-й повтор`);
+const rerun = (n: number) => (n === 0 ? t('впервые') : n === 1 ? t('повтор') : t('{n}-й повтор', { n }));
 ---
 <article class="phase">
-  {showDates && <header><h3>Версия {p.version}, фаза {p.phase}</h3><span class="muted small">{fmtServerDate(p.start)} — {fmtServerDate(p.end)}</span></header>}
+  {showDates && <header><h3>{t('Версия {v}, фаза {p}', { v: p.version, p: p.phase })}</h3><span class="muted small">{fmtServerDate(p.start)} — {fmtServerDate(p.end)}</span></header>}
   <div class="cols">
     {p.characters.map((b) => (
       <section class="box">
-        <h4>Молитва события персонажа <span class="muted small">{b.name}</span></h4>
+        <h4>{t('Молитва события персонажа')} <span class="muted small">{b.name}</span></h4>
         <div class="fives">
           {b.five.map((s, i) => {
             const c = getCharacter(s);
@@ -33,14 +33,14 @@ const rerun = (n: number) => (n === 0 ? 'впервые' : n === 1 ? 'повто
     ))}
     {p.weapons && (
       <section class="box">
-        <h4>Молитва события оружия</h4>
+        <h4>{t('Молитва события оружия')}</h4>
         <div class="row">{p.weapons.five.map((s) => <WeaponIcon slug={s} size={52} />)}</div>
         <div class="row">{p.weapons.four.map((s) => <WeaponIcon slug={s} size={36} />)}</div>
       </section>
     )}
     {p.chronicled && (
       <section class="box wide">
-        <h4>Хроники <span class="muted small">{p.chronicled.name}</span></h4>
+        <h4>{t('Хроники')} <span class="muted small">{p.chronicled.name}</span></h4>
         <div class="row">{p.chronicled.five.map((s) => isChar(s) ? <CharacterIcon slug={s} size={44} /> : <WeaponIcon slug={s} size={44} />)}</div>
       </section>
     )}
