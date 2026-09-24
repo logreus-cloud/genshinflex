@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "import": "node scripts/import-data.mjs",
+    "import": "node scripts/import-data.mjs && node scripts/import-banners.mjs",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",

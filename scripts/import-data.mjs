@@ -93,6 +93,8 @@ const characters = [
       icon: img(c.images?.filename_icon),
       card: img(c.images?.filename_iconCard),
       splash: img(c.images?.filename_gachaSplash),
+      // У Путешественника одна внешность на все стихии — различаем по иконке элементального навыка
+      emblem: element ? img(ti.filename_combat2) : null,
       stats: CHAR_LEVELS.map((l) => {
         const s = at(c.stats, l);
         return { level: l, hp: round(s.hp, 0), atk: round(s.attack, 0), def: round(s.defense, 0), sub: statValue(s.specialized, c.substatType) };

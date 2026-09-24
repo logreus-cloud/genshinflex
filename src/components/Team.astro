@@ -12,6 +12,11 @@ const { members, name, note } = Astro.props;
 
 <style>
   /* Четыре равные колонки: иконки ужимаются в узкой карточке, а не вылезают за край */
-  .members { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .3rem; }
+  /* Название всегда занимает ровно две строки — иконки во всех карточках ряда стоят на одной линии */
+  h3 {
+    min-height: 2.4em; line-height: 1.2; margin-bottom: .6rem;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+  }
+  .members { align-items: start; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .3rem; }
   p { margin: .5rem 0 0; font-size: .9rem; }
 </style>

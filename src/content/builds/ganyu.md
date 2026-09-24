@@ -26,8 +26,8 @@ mainStats:
   circlet: "Крит. урон"
 substats: ["Шанс / Крит. урон", "Мастерство стихий", "Сила атаки %"]
 teams:
-  - name: "Заморозка (Аяка)"
-    members: [kamisato-ayaka, escoffier, shenhe, furina]
+  - name: "Заморозка (Гань Юй)"
+    members: [ganyu, escoffier, shenhe, furina]
   - name: "Таяние (Гань Юй)"
     members: [ganyu, xiangling, bennett, zhongli]
   - name: "Моно-Крио (Гань Юй)"

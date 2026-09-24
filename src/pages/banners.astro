@@ -2,6 +2,9 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import CharacterIcon from '../components/CharacterIcon.astro';
+import WeaponIcon from '../components/WeaponIcon.astro';
+import BannerPhase from '../components/BannerPhase.astro';
+import history from '../data/generated/banner-history.json';
 import { getCharacter, getWeapon, fmtServerDate, stars } from '../lib/data';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -10,6 +13,15 @@ const builds = new Set((await getCollection('builds')).map((b) => b.data.charact
 const all = (await getCollection('banners')).map((b) => b.data).sort((a, b) => a.start.localeCompare(b.start));
 const current = all.filter((b) => new Date(b.start) <= now && new Date(b.end) > now);
 const next = all.filter((b) => new Date(b.start) > now);
+// Все баннеры: текущая фаза из истории + постоянные баннеры
+const livePhase = [...history].reverse().find((p) => new Date(p.start.replace(' ', 'T')) <= now) ?? history.at(-1)!;
+const lastChronicled = [...history].reverse().find((p) => p.chronicled);
+const chronicledLive = livePhase.chronicled;
+const STANDARD_CHARS = ['diluc', 'jean', 'keqing', 'mona', 'qiqi', 'tighnari', 'dehya', 'yumemizuki-mizuki'];
+const STANDARD_WEAPONS = ['amos-bow', 'aquila-favonia', 'lost-prayer-to-the-sacred-winds', 'primordial-jade-winged-spear', 'skyward-atlas',
+  'skyward-blade', 'skyward-harp', 'skyward-pride', 'skyward-spine', 'wolf-s-gravestone'];
+// История: версии от новых к старым
+const versions = [...new Set(history.map((p) => p.version))].reverse();
 const sections = [
   { title: 'Сейчас', list: current, empty: 'Сейчас между фазами — загляните позже.' },
   { title: 'Следующие', list: next, empty: 'Следующие баннеры ещё не объявлены.' },
@@ -28,6 +40,14 @@ const sections = [
     </div>
     <span class="muted small">Выбор запоминается и применяется ко всем таймерам сайта</span>
   </div>
+
+  <div class="btabs" role="tablist" aria-label="Разделы баннеров">
+    <button type="button" role="tab" data-btab="now" aria-selected="true">Сейчас</button>
+    <button type="button" role="tab" data-btab="all" aria-selected="false">Все баннеры</button>
+    <button type="button" role="tab" data-btab="history" aria-selected="false">История</button>
+  </div>
+
+  <div data-bpanel="now">
 
   {sections.map((s) => (
     <section>
@@ -86,6 +106,49 @@ const sections = [
       ))}
     </section>
   ))}
+  </div>
+
+  <div data-bpanel="all" hidden>
+    <p class="muted">Все молитвы, доступные прямо сейчас, — версия {livePhase.version}, фаза {livePhase.phase}.</p>
+    <BannerPhase phase={livePhase} showDates={false} />
+    <div class="perm">
+      <section class="panel">
+        <h2 class="h-sec">Стандартная молитва <small>Wanderlust Invocation, постоянно</small></h2>
+        <p class="muted small">5★ персонажи — именно они выпадают, когда проигрываешь 50/50 на баннере события.</p>
+        <div class="row">{STANDARD_CHARS.map((s) => <CharacterIcon slug={s} size={52} />)}</div>
+        <p class="muted small">5★ оружие</p>
+        <div class="row">{STANDARD_WEAPONS.map((s) => <WeaponIcon slug={s} size={44} />)}</div>
+      </section>
+      <section class="panel">
+        <h2 class="h-sec">Хроники</h2>
+        {chronicledLive
+          ? <p>Сейчас идёт: {chronicledLive.name}.</p>
+          : <p class="muted">Сейчас не проводятся.{lastChronicled && ` Последние — в версии ${lastChronicled.version} (${fmtServerDate(lastChronicled.start)}): можно было выбрать любого персонажа или оружие из пула.`}</p>}
+        {!chronicledLive && lastChronicled?.chronicled && (
+          <div class="row">{lastChronicled.chronicled.five.slice(0, 5).map((s) => { try { getCharacter(s); return <CharacterIcon slug={s} size={40} />; } catch { return <WeaponIcon slug={s} size={40} />; } })}</div>
+        )}
+      </section>
+    </div>
+  </div>
+
+  <div data-bpanel="history" hidden>
+    <div class="hist-head">
+      <label>Версия
+        <select class="input" id="version-select">
+          {versions.map((v) => <option value={v}>{v}</option>)}
+        </select>
+      </label>
+      <div class="vchips" role="group" aria-label="Быстрый выбор версии">
+        {[...new Set(versions.map((v) => v.split('.')[0]))].map((major) => <button type="button" class="btn" data-major={major}>{major}.x</button>)}
+      </div>
+    </div>
+    {versions.map((v, i) => (
+      <div class="version" data-version={v} hidden={i !== 0}>
+        {history.filter((p) => p.version === v).map((p) => <BannerPhase phase={p} />)}
+      </div>
+    ))}
+    <p class="muted small">История баннеров — по открытым данным <a href="https://github.com/MadeBaruna/paimon-moe" rel="noopener">paimon.moe</a> (MIT).</p>
+  </div>
 </Layout>
 
 <script>
@@ -94,11 +157,46 @@ const sections = [
   const paint = () => btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
   btns.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); }));
   paint();
+
+  // Вкладки: состояние в адресе (#all, #history), чтобы можно было поделиться ссылкой
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-btab]')];
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-bpanel]')];
+  const show = (id: string) => {
+    if (!panels.some((p) => p.dataset.bpanel === id)) id = 'now';
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.btab === id)));
+    panels.forEach((p) => (p.hidden = p.dataset.bpanel !== id));
+  };
+  tabs.forEach((t) => t.addEventListener('click', () => { history.replaceState(null, '', t.dataset.btab === 'now' ? location.pathname : `#${t.dataset.btab}`); show(t.dataset.btab!); }));
+  show(location.hash.slice(1));
+
+  const select = document.getElementById('version-select') as HTMLSelectElement;
+  const pick = (v: string) => {
+    select.value = v;
+    document.querySelectorAll<HTMLElement>('[data-version]').forEach((el) => (el.hidden = el.dataset.version !== v));
+  };
+  select.addEventListener('change', () => pick(select.value));
+  document.querySelectorAll<HTMLButtonElement>('[data-major]').forEach((b) => b.addEventListener('click', () => {
+    const first = [...select.options].map((o) => o.value).filter((v) => v.startsWith(`${b.dataset.major}.`)).pop();
+    if (first) pick(first);
+  }));
 </script>
 
 <style>
   .region { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
   .region .btn { padding: .35rem .8rem; }
+  .btabs { display: flex; gap: 4px; margin: 1.2rem 0 1rem; border-bottom: 1px solid var(--border); }
+  .btabs button { border: 0; background: none; padding: .7rem 1rem; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; font-size: .95rem; }
+  .btabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  [data-bpanel="all"], [data-version] { display: grid; gap: 12px; }
+  [data-bpanel="all"][hidden], [data-version][hidden] { display: none; }
+  .perm { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 12px; }
+  .perm .h-sec { margin-top: 0; }
+  .perm .row { gap: 6px; align-items: flex-start; margin-bottom: .6rem; }
+  .hist-head { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1rem; }
+  .hist-head label { display: grid; gap: .3rem; font-size: .82rem; color: var(--muted); }
+  .hist-head select { width: 120px; color: var(--text); }
+  .vchips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .vchips .btn { padding: .35rem .7rem; font-size: .85rem; }
   .banner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 14px; }
   .bhead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .9rem; }
   .bhead h3 { margin: 0; font-size: 1.05rem; }

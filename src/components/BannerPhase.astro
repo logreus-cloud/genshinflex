@@ -1,0 +1,64 @@
+---
+// Одна фаза баннеров: персонажи (с отметкой «впервые/повтор»), оружие и хроники
+import CharacterIcon from './CharacterIcon.astro';
+import WeaponIcon from './WeaponIcon.astro';
+import { getCharacter, fmtServerDate } from '../lib/data';
+import type history from '../data/generated/banner-history.json';
+
+interface Props { phase: (typeof history)[number]; showDates?: boolean; }
+const { phase: p, showDates = true } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const isChar = (s: string) => { try { getCharacter(s); return true; } catch { return false; } };
+const rerun = (n: number) => (n === 0 ? 'впервые' : n === 1 ? 'повтор' : `${n}-й повтор`);
+---
+<article class="phase">
+  {showDates && <header><h3>Версия {p.version}, фаза {p.phase}</h3><span class="muted small">{fmtServerDate(p.start)} — {fmtServerDate(p.end)}</span></header>}
+  <div class="cols">
+    {p.characters.map((b) => (
+      <section class="box">
+        <h4>Молитва события персонажа <span class="muted small">{b.name}</span></h4>
+        <div class="fives">
+          {b.five.map((s, i) => {
+            const c = getCharacter(s);
+            return (
+              <a class="five" href={`${base}/characters/${s}`} data-el={c.element}>
+                <img src={c.icon} alt="" width="56" height="56" loading="lazy" />
+                <span><b>{c.name}</b><small class:list={['chip', { gold: b.reruns[i] === 0 }]}>{rerun(b.reruns[i])}</small></span>
+              </a>
+            );
+          })}
+        </div>
+        {b.four.length > 0 && <div class="row">{b.four.map((s) => <CharacterIcon slug={s} size={40} />)}</div>}
+      </section>
+    ))}
+    {p.weapons && (
+      <section class="box">
+        <h4>Молитва события оружия</h4>
+        <div class="row">{p.weapons.five.map((s) => <WeaponIcon slug={s} size={52} />)}</div>
+        <div class="row">{p.weapons.four.map((s) => <WeaponIcon slug={s} size={36} />)}</div>
+      </section>
+    )}
+    {p.chronicled && (
+      <section class="box wide">
+        <h4>Хроники <span class="muted small">{p.chronicled.name}</span></h4>
+        <div class="row">{p.chronicled.five.map((s) => isChar(s) ? <CharacterIcon slug={s} size={44} /> : <WeaponIcon slug={s} size={44} />)}</div>
+      </section>
+    )}
+  </div>
+</article>
+
+<style>
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: .8rem; }
+  h3 { margin: 0; font-size: 1rem; }
+  h4 { margin: 0 0 .6rem; font: 600 .9rem var(--font); display: grid; gap: .1rem; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 10px; }
+  .box { background: var(--surface-2); border-radius: var(--radius); padding: .8rem; display: grid; gap: .7rem; align-content: start; }
+  .box.wide { grid-column: 1 / -1; }
+  .fives { display: grid; gap: 6px; }
+  .five { display: flex; align-items: center; gap: .7rem; text-decoration: none; border-radius: var(--radius); padding: .3rem; border-left: 3px solid var(--el); background: var(--surface); }
+  .five img { border-radius: 10px; background: linear-gradient(170deg, #6b4520, #d1953f); }
+  .five span { display: grid; gap: .25rem; justify-items: start; }
+  .five:hover { outline: 1px solid var(--accent); }
+  .row { gap: 6px; align-items: flex-start; }
+</style>

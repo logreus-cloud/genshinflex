@@ -20,8 +20,6 @@ substats: ["Восст. энергии", "Сила атаки %", "Мастер�
 teams:
   - name: "Команда Арлекино"
     members: [arlecchino, bennett, xilonen, lan-yan]
-  - name: "Команда Нёвиллет"
-    members: [neuvillette, furina, xilonen, kaedehara-kazuha]
 sources:
   - title: genshin.gg
     url: https://genshin.gg/characters/lanyan/
