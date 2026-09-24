@@ -76,11 +76,16 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 }
 .chip[data-el] { color: #fff; background: color-mix(in srgb, var(--el) 80%, #000); }
 .chip.gold { background: var(--accent-soft); color: var(--accent); }
-[data-el="pyro"] { --el: var(--pyro); } [data-el="hydro"] { --el: var(--hydro); }
-[data-el="anemo"] { --el: var(--anemo); } [data-el="electro"] { --el: var(--electro); }
-[data-el="dendro"] { --el: var(--dendro); } [data-el="cryo"] { --el: var(--cryo); }
-[data-el="geo"] { --el: var(--geo); }
-.el-dot { width: .7em; height: .7em; border-radius: 50%; background: var(--el); display: inline-block; flex: none; }
+/* Стихия: цвет (--el) и официальная иконка (--el-icon) — наследуются от ближайшего [data-el] */
+[data-el="pyro"] { --el: var(--pyro); --el-icon: url(/elements/pyro.png); }
+[data-el="hydro"] { --el: var(--hydro); --el-icon: url(/elements/hydro.png); }
+[data-el="anemo"] { --el: var(--anemo); --el-icon: url(/elements/anemo.png); }
+[data-el="electro"] { --el: var(--electro); --el-icon: url(/elements/electro.png); }
+[data-el="dendro"] { --el: var(--dendro); --el-icon: url(/elements/dendro.png); }
+[data-el="cryo"] { --el: var(--cryo); --el-icon: url(/elements/cryo.png); }
+[data-el="geo"] { --el: var(--geo); --el-icon: url(/elements/geo.png); }
+.el-dot { width: 1.15em; height: 1.15em; background: var(--el-icon) center / contain no-repeat; display: inline-block; flex: none; }
+.chip[data-el]::before { content: ""; width: 1.15em; height: 1.15em; margin-left: -.2em; background: var(--el-icon) center / contain no-repeat; flex: none; }
 
 .btn {
   display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--border); background: var(--surface-2);

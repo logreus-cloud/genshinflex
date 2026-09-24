@@ -70,6 +70,16 @@ const travelers = Object.values(ELEMENTS).map((el) => ({
 })).filter((t) => genshin.talents(t.en));
 
 mkdirSync(OUT, { recursive: true });
+
+// Официальные иконки стихий: в genshin-db они лежат в base64 — выгружаем в public/elements/<стихия>.png
+const ICONS = new URL('../public/elements/', import.meta.url);
+mkdirSync(ICONS, { recursive: true });
+for (const [type, el] of Object.entries(ELEMENTS)) {
+  const b64 = genshin.elements(el[0].toUpperCase() + el.slice(1))?.images?.base64;
+  if (b64) writeFileSync(new URL(`${el}.png`, ICONS), Buffer.from(b64.split(',')[1], 'base64'));
+  else console.warn(`нет иконки стихии ${type}`);
+}
+
 for (const [code, { lang, dec }] of Object.entries(LOCALES)) {
 const LANG = { resultLanguage: lang };
 const characters = [
