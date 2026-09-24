@@ -1,0 +1,158 @@
+---
+import Layout from '../layouts/Layout.astro';
+// Админка: заявки гайдов и обратная связь. Страница и /api/admin закрыты Cloudflare Access (вход по почте),
+// данные приходят из /api/admin/inbox. Публикация гайда — локально: npm run guide:md -- <номер>
+---
+<Layout title="Админка" noindex wide>
+  <div class="adm">
+    <div class="top">
+      <h1>Админка</h1>
+      <span class="muted small" id="who"></span>
+    </div>
+    <div class="bar">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" aria-selected="true" data-tab="guides">Гайды <b id="c-guides">…</b></button>
+        <button type="button" role="tab" aria-selected="false" data-tab="feedback">Обратная связь <b id="c-feedback">…</b></button>
+      </div>
+      <label class="small"><input type="checkbox" id="all" /> показать обработанные</label>
+      <button type="button" class="btn small" id="reload">Обновить</button>
+    </div>
+    <p class="notice" id="error" hidden></p>
+    <section id="guides" class="list"></section>
+    <section id="feedback" class="list" hidden></section>
+  </div>
+</Layout>
+
+<script>
+  import { makeLookup, renderGuide, esc } from '../lib/guide-markup';
+
+  type Guide = {
+    id: number; created_at: string; character: string; mode: string; author: string; contact: string | null; comment: string | null; status: string;
+    payload: { kind?: string; target?: string; character?: string; lang?: string; role?: string; body: string; teams?: { name?: string; members: string[] }[];
+      weapons?: { slug: string; note?: string }[]; artifacts?: { sets: string[]; note?: string }[]; external?: { title: string; url: string }[] };
+  };
+  type Feedback = { id: number; created_at: string; kind: string; page: string | null; message: string; contact: string | null; status: string };
+
+  const KIND = { data: 'Ошибка в данных', idea: 'Идея', bug: 'Баг', other: 'Другое' } as Record<string, string>;
+  const STATUS = { pending: 'ждёт', approved: 'одобрен', rejected: 'отклонён', new: 'новое', done: 'прочитано' } as Record<string, string>;
+  const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s)!;
+  const when = (s: string) => new Date(`${s.replace(' ', 'T')}Z`).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+  const editor = await fetch('/data/editor.json').then((r) => r.json());
+  const lookup = makeLookup(editor, '');
+  const names = new Map<string, string>([...editor.characters, ...editor.weapons].map((x: { slug: string; name: string }) => [x.slug, x.name]));
+
+  // Куда ведёт заявка: страница персонажа, оружия или эндгейма
+  const target = (g: Guide) => {
+    const kind = g.payload.kind ?? 'char', t = g.payload.target ?? g.payload.character ?? '';
+    if (kind === 'weapon') return { label: `Оружие: ${names.get(t) ?? t}`, href: `/weapons/${t}/` };
+    if (kind === 'endgame') return { label: `Эндгейм: ${editor.endgame[t]?.title ?? t}`, href: t.startsWith('abyss') ? `/abyss/#floor-${t.split('-')[1]}` : `/${t}/` };
+    return { label: `Персонаж: ${names.get(t) ?? t}`, href: `/characters/${t}/` };
+  };
+
+  const guideCard = (g: Guide) => {
+    const tg = target(g), p = g.payload;
+    const extra = [
+      p.role && `Роль: ${esc(p.role)}`,
+      p.weapons?.length && `Оружие: ${p.weapons.map((w) => esc(names.get(w.slug) ?? w.slug)).join(', ')}`,
+      p.artifacts?.length && `Сеты: ${p.artifacts.length} вар.`,
+      p.teams?.length && `Команд: ${p.teams.length}`,
+      p.external?.length && `Ссылок: ${p.external.length}`,
+    ].filter(Boolean).join(' · ');
+    return `<article class="panel card" data-id="${g.id}">
+      <header>
+        <b>#${g.id}</b> <a href="${tg.href}" target="_blank" rel="noopener">${esc(tg.label)}</a>
+        <span class="chip ${g.status === 'pending' ? 'gold' : ''}">${STATUS[g.status] ?? g.status}</span>
+        <span class="chip">${g.mode === 'edit' ? 'правка' : 'новый'}</span>
+        <span class="chip">${(p.lang ?? 'ru').toUpperCase()}</span>
+        <span class="muted small">${when(g.created_at)}</span>
+      </header>
+      <p class="small">Автор: <b>${esc(g.author)}</b>${g.contact ? ` · ${esc(g.contact)}` : ''}</p>
+      ${g.comment ? `<p class="small comment">«${esc(g.comment)}»</p>` : ''}
+      ${extra ? `<p class="muted small">${extra}</p>` : ''}
+      <details><summary class="small">Текст и данные</summary>
+        ${p.body?.trim() ? `<div class="prose panel">${renderGuide(p.body, lookup)}</div>` : '<p class="muted small">Без текста</p>'}
+        <pre class="small">${esc(JSON.stringify(p, null, 2))}</pre>
+      </details>
+      <div class="row actions">
+        <button type="button" class="btn small copy" data-cmd="npm run guide:md -- ${g.id} --dry">Посмотреть файл: скопировать команду</button>
+        <button type="button" class="btn small primary copy" data-cmd="npm run guide:md -- ${g.id}">Опубликовать: скопировать команду</button>
+        ${g.status !== 'rejected' ? `<button type="button" class="btn small" data-set="rejected">Отклонить</button>` : ''}
+        ${g.status !== 'pending' ? `<button type="button" class="btn small" data-set="pending">Вернуть в очередь</button>` : ''}
+      </div>
+    </article>`;
+  };
+
+  const feedbackCard = (f: Feedback) => `<article class="panel card" data-id="${f.id}">
+      <header>
+        <b>#${f.id}</b> <span class="chip">${KIND[f.kind] ?? f.kind}</span>
+        <span class="chip ${f.status === 'new' ? 'gold' : ''}">${STATUS[f.status] ?? f.status}</span>
+        ${f.page ? `<a class="small" href="${esc(f.page)}" target="_blank" rel="noopener">${esc(f.page)}</a>` : ''}
+        <span class="muted small">${when(f.created_at)}</span>
+      </header>
+      <p class="msg">${esc(f.message)}</p>
+      ${f.contact ? `<p class="small">Контакт: <b>${esc(f.contact)}</b></p>` : ''}
+      <div class="row actions">
+        ${f.status === 'new' ? `<button type="button" class="btn small primary" data-set="done">Прочитано</button>` : `<button type="button" class="btn small" data-set="new">Вернуть в новые</button>`}
+      </div>
+    </article>`;
+
+  async function load() {
+    const res = await fetch(`/api/admin/inbox${$<HTMLInputElement>('#all').checked ? '?status=all' : ''}`);
+    const out = await res.json().catch(() => ({ error: 'Не удалось прочитать ответ' }));
+    const err = $('#error');
+    if (!res.ok) { err.hidden = false; err.textContent = out.error ?? `Ошибка ${res.status}`; return; }
+    err.hidden = true;
+    $('#who').textContent = out.admin === 'dev' ? 'локальный режим' : out.admin;
+    $('#c-guides').textContent = String(out.counts.guides);
+    $('#c-feedback').textContent = String(out.counts.feedback);
+    $('#guides').innerHTML = out.guides.length ? out.guides.map(guideCard).join('') : '<p class="muted">Заявок нет.</p>';
+    $('#feedback').innerHTML = out.feedback.length ? out.feedback.map(feedbackCard).join('') : '<p class="muted">Сообщений нет.</p>';
+  }
+
+  document.addEventListener('click', async (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+    if (!b) return;
+    if (b.dataset.tab) {
+      document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+      $('#guides').hidden = b.dataset.tab !== 'guides';
+      $('#feedback').hidden = b.dataset.tab !== 'feedback';
+    }
+    if (b.dataset.cmd) {
+      await navigator.clipboard.writeText(b.dataset.cmd).catch(() => {});
+      const text = b.textContent; b.textContent = `Скопировано: ${b.dataset.cmd}`; setTimeout(() => { b.textContent = text; }, 2500);
+    }
+    if (b.dataset.set) {
+      const card = b.closest<HTMLElement>('[data-id]')!;
+      b.disabled = true;
+      await fetch('/api/admin/inbox', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: card.closest('#guides') ? 'guide' : 'feedback', id: Number(card.dataset.id), status: b.dataset.set }),
+      });
+      load();
+    }
+    if (b.id === 'reload') load();
+  });
+  $('#all').addEventListener('change', load);
+  load();
+</script>
+
+<style>
+  .adm .top { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+  .bar { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
+  .tabs { display: flex; gap: 4px; }
+  .tabs button { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--muted); }
+  .tabs [aria-selected="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .tabs b { margin-left: .3rem; }
+  .btn.small { font-size: .82rem; padding: .35rem .7rem; }
+  .list { display: grid; gap: 10px; }
+  .list[hidden] { display: none; }
+  .list :global(.card) { display: grid; gap: .5rem; }
+  .list :global(.card header) { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .list :global(.card p) { margin: 0; }
+  .list :global(.msg) { white-space: pre-wrap; }
+  .list :global(.comment) { color: var(--muted); font-style: italic; }
+  .list :global(pre) { overflow: auto; max-height: 320px; background: var(--surface-2); padding: .6rem; border-radius: var(--radius); }
+  .list :global(details summary) { cursor: pointer; color: var(--accent); }
+  .list :global(.prose) { margin: .5rem 0; }
+</style>

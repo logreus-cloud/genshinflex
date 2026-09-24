@@ -27,3 +27,4 @@ pnpm-debug.log*
 .wrangler/
 .i18n-missing.json
 .cache/
+.dev.vars
