@@ -11,7 +11,7 @@ const rotations = (await getCollection('rotations'))
 ---
 <Layout title="Ротация">
   <h1>Текущая ротация</h1>
-  <p class="muted">Враги, баффы и рекомендованные команды под текущие циклы. Данные лежат в <code>src/content/rotations</code>.</p>
+  <p class="muted">Враги, баффы и рекомендованные команды под текущие циклы.</p>
 
   {rotations.map(({ data: r }) => (
     <section id={r.mode} class="mode">

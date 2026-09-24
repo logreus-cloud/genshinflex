@@ -74,6 +74,7 @@ const characters = [
     const ti = t.images ?? {};
     const ki = k.images ?? {};
     return {
+      id: c.id,
       slug: slug(en),
       nameEn: en,
       name: element ? `Путешественник (${ELEMENT_RU[element]})` : c.name,
@@ -112,6 +113,7 @@ const weapons = names(genshin.weapons)
   .map((en) => {
     const w = genshin.weapons(en, LANG);
     return {
+      id: w.id,
       slug: slug(en),
       nameEn: en,
       name: w.name,
@@ -141,6 +143,7 @@ const artifacts = names(genshin.artifacts)
   .map((en) => {
     const a = genshin.artifacts(en, LANG);
     return {
+      id: a.id,
       slug: slug(en),
       nameEn: en,
       name: a.name,

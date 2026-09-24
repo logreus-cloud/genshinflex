@@ -67,7 +67,7 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 .lead { font-size: 1.05rem; color: var(--muted); max-width: 68ch; }
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.2rem; }
 .panel > :last-child { margin-bottom: 0; }
-.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); }
 .row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 
 .chip {

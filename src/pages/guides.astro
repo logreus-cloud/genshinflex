@@ -8,7 +8,7 @@ const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - 
 ---
 <Layout title="Руководства">
   <h1>Руководства</h1>
-  <p class="muted">Билды и команды. Каждый гайд — Markdown-файл в <code>src/content/builds</code>, их можно дополнять через PR.</p>
+  <p class="muted">Билды и команды для всех персонажей: оружие, артефакты, статы и составы. Разборы постепенно дополняются.</p>
   <div class="grid">
     {builds.map(({ data }) => {
       const c = getCharacter(data.character);

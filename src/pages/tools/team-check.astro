@@ -1,0 +1,536 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { fmtDate } from '../../lib/data';
+
+const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'abyss')?.data;
+---
+<Layout title="Проверка команды для Бездны" description="Добавьте своих персонажей с их билдами и узнайте, хватит ли команды на текущую Витую бездну." wide>
+  <h1>Проверка команды для Бездны</h1>
+  <p class="lead">
+    Добавьте своих персонажей — вручную или по UID из игры, — соберите по команде на каждую половину и узнайте, потянут ли они
+    {abyss ? `текущую Бездну (до ${fmtDate(abyss.end)})` : 'текущую Бездну'}. Оценка сравнивает ваш билд с рекомендованным и проверяет
+    требования этажа; это ориентир, а не симуляция урона.
+  </p>
+
+  <div class="tc">
+    <section class="panel roster-panel">
+      <h2 class="h-sec">Мои персонажи <small id="roster-count"></small></h2>
+      <div class="add">
+        <label class="grow">Добавить вручную<input class="input" id="add-char" list="char-list" placeholder="Имя персонажа" /></label>
+        <label>Или по UID<span class="uidrow"><input class="input" id="uid" inputmode="numeric" placeholder="700000000" maxlength="10" /><button class="btn" type="button" id="load-uid">Загрузить</button></span></label>
+      </div>
+      <p class="muted small hint">Для загрузки по UID в игре нужно выставить персонажей на витрину профиля и включить «Показывать подробности».</p>
+      <p class="status small" id="status" aria-live="polite"></p>
+      <div class="roster" id="roster"></div>
+      <datalist id="char-list"></datalist>
+    </section>
+
+    <section class="panel editor-panel" id="editor" hidden></section>
+
+    <section class="teams">
+      {[1, 2].map((h) => (
+        <div class="panel team" data-half={h}>
+          <h2 class="h-sec">{h}-я половина</h2>
+          <p class="muted small need" data-need={h}></p>
+          <div class="slots" data-slots={h}></div>
+        </div>
+      ))}
+    </section>
+
+    <div class="actions">
+      <button class="btn primary big" type="button" id="check">Проверить команды</button>
+      <button class="btn" type="button" id="autofill">Подобрать из моих персонажей</button>
+    </div>
+
+    <section id="result" aria-live="polite"></section>
+  </div>
+</Layout>
+
+<script>
+  import { store } from '../../scripts/common';
+  import { BASE } from '../../scripts/search';
+
+  // ---------- Данные ----------
+  type Build = { role: string; cls: 'dps' | 'sub' | 'support'; weapons: string[]; sets: string[][]; main: Record<'sands' | 'goblet' | 'circlet', string[]>; subs: string[] };
+  type Char = { id: number | null; s: string; n: string; el: string; w: string; r: number; i: string; base: Record<string, [number, number, number]>; build?: Build };
+  type Weapon = { id: number; s: string; n: string; w: string; r: number; i: string; atk: number };
+  type Half = { half: number; label: string; need: string[][]; tip: string; teams: { name?: string; members: string[] }[] };
+  type Data = { characters: Char[]; weapons: Weapon[]; artifacts: { id: number; s: string; n: string; i: string }[]; abyss?: { cycle: string; halves: Half[] } };
+
+  type Stats = { hp: number; atk: number; def: number; em: number; cr: number; cd: number; er: number; dmg: number };
+  type Entry = {
+    key: string; s: string; level: number; cons: number; talents: [number, number, number];
+    weapon: string; refine: number; set1: string; set1pc: 4 | 2; set2: string;
+    sands: string; goblet: string; circlet: string; stats: Partial<Stats>;
+  };
+
+  const data: Data = await fetch(`${BASE}/data/checker.json`).then((r) => r.json());
+  const chars = new Map(data.characters.map((c) => [c.s, c]));
+  const byName = new Map(data.characters.flatMap((c) => [[c.n.toLowerCase(), c.s]]));
+  const weapons = new Map(data.weapons.map((w) => [w.s, w]));
+  const arts = new Map(data.artifacts.map((a) => [a.s, a]));
+  const halves = data.abyss?.halves ?? [];
+  const EL: Record<string, string> = { pyro: 'Пиро', hydro: 'Гидро', anemo: 'Анемо', electro: 'Электро', dendro: 'Дендро', cryo: 'Крио', geo: 'Гео' };
+  const STAT_OPTS: Record<'sands' | 'goblet' | 'circlet', [string, string][]> = {
+    sands: [['atk%', 'Сила атаки %'], ['hp%', 'HP %'], ['def%', 'Защита %'], ['em', 'Мастерство стихий'], ['er', 'Восст. энергии']],
+    goblet: [['dmg', 'Бонус урона стихии'], ['phys', 'Бонус физ. урона'], ['atk%', 'Сила атаки %'], ['hp%', 'HP %'], ['def%', 'Защита %'], ['em', 'Мастерство стихий']],
+    circlet: [['cr', 'Шанс крит. попадания'], ['cd', 'Крит. урон'], ['heal', 'Бонус лечения'], ['atk%', 'Сила атаки %'], ['hp%', 'HP %'], ['def%', 'Защита %'], ['em', 'Мастерство стихий']],
+  };
+  const STAT_FIELDS: [keyof Stats, string, string][] = [
+    ['hp', 'HP', ''], ['atk', 'Атака', ''], ['def', 'Защита', ''], ['em', 'Мастерство стихий', ''],
+    ['cr', 'Шанс крита', '%'], ['cd', 'Крит. урон', '%'], ['er', 'Восст. энергии', '%'], ['dmg', 'Бонус урона', '%'],
+  ];
+  const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const status = (t: string, bad = false) => { const s = $('status'); s.textContent = t; s.classList.toggle('bad', bad); };
+
+  // ---------- Состояние: ростер и составы живут в браузере ----------
+  let roster: Entry[] = store.get<Entry[]>('gf:roster', []).filter((e) => chars.has(e.s));
+  let teams: Record<number, string[]> = store.get('gf:abyss-teams', { 1: [], 2: [] });
+  let editing: string | null = null;
+  const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); };
+
+  // Новый персонаж получает рекомендованный билд как отправную точку
+  function fromBuild(s: string): Entry {
+    const b = chars.get(s)!.build;
+    const pick = (slot: 'sands' | 'goblet' | 'circlet') => {
+      const k = b?.main[slot][0];
+      if (k === 'crit') return 'cr';
+      return STAT_OPTS[slot].some(([o]) => o === k) ? k! : STAT_OPTS[slot][0][0];
+    };
+    const sets = b?.sets[0] ?? [];
+    return {
+      key: `${s}-${Date.now().toString(36)}`, s, level: 90, cons: 0, talents: [9, 9, 9],
+      weapon: b?.weapons[0] ?? '', refine: 1, set1: sets[0] ?? '', set1pc: sets.length > 1 ? 2 : 4, set2: sets[1] ?? '',
+      sands: pick('sands'), goblet: pick('goblet'), circlet: pick('circlet'), stats: {},
+    };
+  }
+
+  // ---------- Импорт по UID (enka.network через наш прокси) ----------
+  const PROP: Record<string, string> = {
+    FIGHT_PROP_HP_PERCENT: 'hp%', FIGHT_PROP_ATTACK_PERCENT: 'atk%', FIGHT_PROP_DEFENSE_PERCENT: 'def%', FIGHT_PROP_ELEMENT_MASTERY: 'em',
+    FIGHT_PROP_CHARGE_EFFICIENCY: 'er', FIGHT_PROP_CRITICAL: 'cr', FIGHT_PROP_CRITICAL_HURT: 'cd', FIGHT_PROP_HEAL_ADD: 'heal',
+    FIGHT_PROP_PHYSICAL_ADD_HURT: 'phys', FIGHT_PROP_FIRE_ADD_HURT: 'dmg', FIGHT_PROP_ELEC_ADD_HURT: 'dmg', FIGHT_PROP_WATER_ADD_HURT: 'dmg',
+    FIGHT_PROP_GRASS_ADD_HURT: 'dmg', FIGHT_PROP_WIND_ADD_HURT: 'dmg', FIGHT_PROP_ROCK_ADD_HURT: 'dmg', FIGHT_PROP_ICE_ADD_HURT: 'dmg',
+  };
+  const ELEM_BONUS: Record<string, string> = { pyro: '40', electro: '41', hydro: '42', dendro: '43', anemo: '44', geo: '45', cryo: '46' };
+  const charById = new Map(data.characters.filter((c) => c.id).map((c) => [c.id!, c]));
+  const weaponById = new Map(data.weapons.map((w) => [w.id, w]));
+  const setById = new Map(data.artifacts.map((a) => [a.id, a]));
+
+  $('load-uid').addEventListener('click', async () => {
+    const uid = $<HTMLInputElement>('uid').value.trim();
+    if (!/^\d{9,10}$/.test(uid)) return status('UID — это 9 или 10 цифр из правого нижнего угла экрана в игре.', true);
+    status('Загружаю витрину…');
+    try {
+      const res = await fetch(`${BASE}/api/enka/${uid}`);
+      const body = await res.json();
+      if (!res.ok) return status(body.error ?? 'Не удалось загрузить профиль.', true);
+      const list: any[] = body.avatarInfoList ?? [];
+      if (!list.length) return status('На витрине нет персонажей или скрыты подробности. Включите «Показывать подробности» в профиле игры.', true);
+      let added = 0, skipped: string[] = [];
+      for (const a of list) {
+        const c = charById.get(a.avatarId);
+        if (!c) { skipped.push(a.avatarId === 10000005 || a.avatarId === 10000007 ? 'Путешественник' : String(a.avatarId)); continue; }
+        const e = fromBuild(c.s);
+        e.level = Number(a.propMap?.['4001']?.val ?? 90);
+        e.cons = (a.talentIdList ?? []).length;
+        const f = a.fightPropMap ?? {};
+        e.stats = {
+          hp: Math.round(f['2000'] ?? 0), atk: Math.round(f['2001'] ?? 0), def: Math.round(f['2002'] ?? 0), em: Math.round(f['28'] ?? 0),
+          cr: +(100 * (f['20'] ?? 0)).toFixed(1), cd: +(100 * (f['22'] ?? 0)).toFixed(1), er: +(100 * (f['23'] ?? 0)).toFixed(1),
+          dmg: +(100 * (f[ELEM_BONUS[c.el]] ?? 0)).toFixed(1),
+        };
+        const sets = new Map<string, number>();
+        for (const item of a.equipList ?? []) {
+          if (item.weapon) {
+            const w = weaponById.get(item.itemId);
+            if (w) e.weapon = w.s;
+            e.refine = 1 + Number(Object.values(item.weapon.affixMap ?? { x: 0 })[0] ?? 0);
+          } else if (item.reliquary) {
+            const setId = Number(String(item.flat?.icon ?? '').match(/UI_RelicIcon_(\d+)_/)?.[1]);
+            const set = setById.get(setId);
+            if (set) sets.set(set.s, (sets.get(set.s) ?? 0) + 1);
+            const main = PROP[item.flat?.reliquaryMainstat?.mainPropId];
+            const slot = ({ EQUIP_SHOES: 'sands', EQUIP_RING: 'goblet', EQUIP_DRESS: 'circlet' } as const)[item.flat?.equipType as string];
+            if (slot && main) (e as any)[slot] = main;
+          }
+        }
+        const counted = [...sets.entries()].sort((x, y) => y[1] - x[1]);
+        e.set1 = counted[0]?.[0] ?? ''; e.set1pc = (counted[0]?.[1] ?? 0) >= 4 ? 4 : 2;
+        e.set2 = e.set1pc === 2 && (counted[1]?.[1] ?? 0) >= 2 ? counted[1][0] : '';
+        const sl = a.skillLevelMap ? Object.values(a.skillLevelMap).map(Number) : [];
+        if (sl.length >= 3) e.talents = [sl[0], sl[1], sl.at(-1)!] as [number, number, number];
+        roster = [e, ...roster.filter((x) => x.s !== c.s)];
+        added++;
+      }
+      persist(); renderRoster(); renderTeams();
+      status(`Загружено персонажей: ${added}.${skipped.length ? ` Пропущены: ${skipped.join(', ')} — добавьте вручную.` : ''}`);
+    } catch {
+      status('Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз.', true);
+    }
+  });
+
+  $('char-list').innerHTML = data.characters.map((c) => `<option value="${esc(c.n)}">`).join('');
+  $<HTMLInputElement>('add-char').addEventListener('change', (ev) => {
+    const input = ev.target as HTMLInputElement;
+    const s = byName.get(input.value.trim().toLowerCase());
+    if (!s) return;
+    const e = fromBuild(s);
+    roster = [e, ...roster];
+    input.value = '';
+    persist(); renderRoster(); openEditor(e.key); renderTeams();
+    status(`${chars.get(s)!.n} добавлен с рекомендованным билдом — поправьте его под свой.`);
+  });
+
+  // ---------- Ростер и редактор ----------
+  function renderRoster() {
+    $('roster-count').textContent = roster.length ? String(roster.length) : '';
+    $('roster').innerHTML = roster.length ? roster.map((e) => {
+      const c = chars.get(e.s)!;
+      const filled = Object.values(e.stats).some((v) => v);
+      return `<button type="button" class="rchip" data-edit="${e.key}" data-el="${c.el}" aria-pressed="${editing === e.key}">
+        <img src="${c.i}" alt="" width="40" height="40" loading="lazy"><span><b>${esc(c.n)}</b><small>ур. ${e.level} · C${e.cons}${filled ? '' : ' · без статов'}</small></span></button>`;
+    }).join('') : '<p class="muted small">Пока никого. Добавьте персонажа по имени или загрузите витрину по UID.</p>';
+  }
+
+  const opt = (list: [string, string][], v: string) => list.map(([k, l]) => `<option value="${k}" ${k === v ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  function openEditor(key: string | null) {
+    editing = key;
+    const box = $('editor');
+    const e = roster.find((x) => x.key === key);
+    if (!e) { box.hidden = true; renderRoster(); return; }
+    const c = chars.get(e.s)!;
+    const ws = data.weapons.filter((w) => w.w === c.w).map((w) => [w.s, `${w.n} ${'★'.repeat(w.r)}`] as [string, string]);
+    const sets = [['', '—'] as [string, string], ...data.artifacts.map((a) => [a.s, a.n] as [string, string])];
+    box.hidden = false;
+    box.innerHTML = `
+      <div class="ed-head"><img src="${c.i}" alt="" width="56" height="56"><div><h2>${esc(c.n)}</h2>
+        <span class="muted small">${c.build ? esc(c.build.role) : 'Нет рекомендованного билда — проверка будет общей'}</span></div>
+        <button class="btn" type="button" data-close>Готово</button></div>
+      <div class="ed-grid">
+        <fieldset><legend>Персонаж</legend>
+          <label>Уровень<input class="input" type="number" min="1" max="100" data-f="level" value="${e.level}"></label>
+          <label>Созвездие<select class="input" data-f="cons">${opt([0, 1, 2, 3, 4, 5, 6].map((k) => [String(k), `C${k}`]), String(e.cons))}</select></label>
+          <label>Таланты (атака / навык / взрыв)<span class="tri">${e.talents.map((t, i) => `<input class="input" type="number" min="1" max="15" data-t="${i}" value="${t}" aria-label="Уровень таланта ${i + 1}">`).join('')}</span></label>
+        </fieldset>
+        <fieldset><legend>Оружие</legend>
+          <label>Оружие<select class="input" data-f="weapon"><option value="">—</option>${opt(ws, e.weapon)}</select></label>
+          <label>Пробуждение<select class="input" data-f="refine">${opt([1, 2, 3, 4, 5].map((r) => [String(r), `R${r}`]), String(e.refine))}</select></label>
+        </fieldset>
+        <fieldset><legend>Артефакты</legend>
+          <label>Сет<select class="input" data-f="set1">${opt(sets, e.set1)}</select></label>
+          <label>Предметов<select class="input" data-f="set1pc">${opt([['4', '4 предмета'], ['2', '2 предмета']], String(e.set1pc))}</select></label>
+          <label ${e.set1pc === 4 ? 'hidden' : ''} data-set2>Второй сет (2 предмета)<select class="input" data-f="set2">${opt(sets, e.set2)}</select></label>
+          <label>Часы<select class="input" data-f="sands">${opt(STAT_OPTS.sands, e.sands)}</select></label>
+          <label>Кубок<select class="input" data-f="goblet">${opt(STAT_OPTS.goblet, e.goblet)}</select></label>
+          <label>Корона<select class="input" data-f="circlet">${opt(STAT_OPTS.circlet, e.circlet)}</select></label>
+        </fieldset>
+        <fieldset class="stats"><legend>Итоговые статы <span class="muted small">— как в игре на экране персонажа</span></legend>
+          ${STAT_FIELDS.map(([k, l, u]) => `<label>${l}${u ? ', %' : ''}<input class="input" type="number" step="0.1" min="0" data-s="${k}" value="${e.stats[k] ?? ''}" placeholder="—"></label>`).join('')}
+        </fieldset>
+      </div>
+      <button class="btn danger" type="button" data-remove>Убрать из моих персонажей</button>`;
+    renderRoster();
+  }
+
+  document.addEventListener('input', (ev) => {
+    const t = ev.target as HTMLInputElement;
+    if (!t.closest('#editor')) return;
+    const e = roster.find((x) => x.key === editing);
+    if (!e) return;
+    if (t.dataset.f) {
+      const f = t.dataset.f as keyof Entry;
+      (e as any)[f] = ['level', 'cons', 'refine', 'set1pc'].includes(f) ? Number(t.value) : t.value;
+      if (f === 'set1pc') $('editor').querySelector<HTMLElement>('[data-set2]')!.hidden = e.set1pc === 4;
+    } else if (t.dataset.t) e.talents[Number(t.dataset.t)] = Number(t.value);
+    else if (t.dataset.s) e.stats[t.dataset.s as keyof Stats] = t.value === '' ? undefined : Number(t.value);
+    persist(); renderRoster();
+  });
+  document.addEventListener('click', (ev) => {
+    const b = (ev.target as HTMLElement).closest('button');
+    if (!b) return;
+    if (b.dataset.edit) openEditor(editing === b.dataset.edit ? null : b.dataset.edit);
+    else if (b.hasAttribute('data-close')) openEditor(null);
+    else if (b.hasAttribute('data-remove') && editing) {
+      roster = roster.filter((x) => x.key !== editing);
+      for (const h of [1, 2]) teams[h] = teams[h].filter((k) => k !== editing);
+      persist(); openEditor(null); renderTeams();
+    }
+  });
+
+  // ---------- Команды ----------
+  function renderTeams() {
+    for (const h of [1, 2]) {
+      const half = halves.find((x) => x.half === h);
+      const need = document.querySelector<HTMLElement>(`[data-need="${h}"]`)!;
+      need.textContent = half ? `${half.label}. Нужно: ${half.need.map((g) => g.map((e) => EL[e]).join(' или ')).join(' + ')}.` : '';
+      teams[h] = (teams[h] ?? []).filter((k) => roster.some((e) => e.key === k));
+      const used = new Set(teams[h === 1 ? 2 : 1]);
+      const options = roster.filter((e) => !used.has(e.key));
+      document.querySelector<HTMLElement>(`[data-slots="${h}"]`)!.innerHTML = [0, 1, 2, 3].map((i) => {
+        const cur = teams[h][i] ?? '';
+        const e = roster.find((x) => x.key === cur);
+        const c = e && chars.get(e.s);
+        return `<label class="slot" ${c ? `data-el="${c.el}"` : ''}>${c ? `<img src="${c.i}" alt="" width="48" height="48">` : '<span class="ph">+</span>'}
+          <select class="input" data-half="${h}" data-i="${i}" aria-label="Персонаж ${i + 1}, ${h}-я половина"><option value="">Пусто</option>
+          ${options.filter((o) => o.key === cur || !teams[h].includes(o.key)).map((o) => `<option value="${o.key}" ${o.key === cur ? 'selected' : ''}>${esc(chars.get(o.s)!.n)}</option>`).join('')}</select></label>`;
+      }).join('');
+    }
+  }
+  document.addEventListener('change', (ev) => {
+    const t = ev.target as HTMLSelectElement;
+    if (!t.dataset.half) return;
+    const h = Number(t.dataset.half), i = Number(t.dataset.i);
+    const arr = [...(teams[h] ?? [])];
+    arr[i] = t.value;
+    teams[h] = arr.filter(Boolean);
+    persist(); renderTeams();
+  });
+
+  // Подбор: для каждой половины берём ростер и выбираем четвёрку, максимально похожую на рекомендованные команды
+  $('autofill').addEventListener('click', () => {
+    if (roster.length < 2) return status('Добавьте хотя бы двух персонажей.', true);
+    const taken = new Set<string>();
+    for (const h of [1, 2]) {
+      const half = halves.find((x) => x.half === h);
+      const free = roster.filter((e) => !taken.has(e.key));
+      const scored = free.map((e) => ({ e, sc: scoreChar(e).score + (half?.teams.some((t) => t.members.includes(e.s)) ? 25 : 0) }))
+        .sort((a, b) => b.sc - a.sc);
+      const pick: string[] = [];
+      for (const group of half?.need ?? []) {
+        if (scored.some((x) => pick.includes(x.e.key) && group.includes(chars.get(x.e.s)!.el))) continue;
+        const best = scored.find((x) => !pick.includes(x.e.key) && group.includes(chars.get(x.e.s)!.el));
+        if (best) pick.push(best.e.key);
+      }
+      for (const x of scored) if (pick.length < 4 && !pick.includes(x.e.key)) pick.push(x.e.key);
+      teams[h] = pick; pick.forEach((k) => taken.add(k));
+    }
+    persist(); renderTeams();
+    status('Составы подобраны — поправьте их, если нужно, и нажмите «Проверить».');
+  });
+
+  // ---------- Оценка ----------
+  type Note = { ok: boolean | null; text: string };
+  const clamp = (v: number) => Math.max(0, Math.min(1, v));
+  const lvlKey = (lvl: number) => { const pts = ['1', '20', '40', '50', '60', '70', '80', '90', '95', '100']; return [...pts].reverse().find((p) => lvl >= Number(p)) ?? '1'; };
+
+  function scoreChar(e: Entry): { score: number; notes: Note[] } {
+    const c = chars.get(e.s)!;
+    const b = c.build;
+    const notes: Note[] = [];
+    let score = 0;
+
+    // Уровень — 15 баллов
+    const lv = e.level >= 90 ? 15 : e.level >= 80 ? 11 : e.level >= 70 ? 6 : 2;
+    score += lv;
+    if (e.level < 80) notes.push({ ok: false, text: `Уровень ${e.level}: для 12-го этажа (враги 95–100 ур.) стоит поднять хотя бы до 80` });
+
+    // Оружие — 15
+    const w = weapons.get(e.weapon);
+    if (!w) notes.push({ ok: false, text: 'Не выбрано оружие' });
+    else if (b) {
+      const rank = b.weapons.indexOf(e.weapon);
+      score += rank === 0 ? 15 : rank >= 1 && rank <= 2 ? 12 : rank >= 3 ? 9 : w.r >= 4 ? 5 : 3;
+      notes.push(rank >= 0
+        ? { ok: true, text: `${w.n} — №${rank + 1} в рекомендованном списке` }
+        : { ok: null, text: `${w.n} нет в рекомендованном списке. Лучше: ${b.weapons.slice(0, 2).map((s) => weapons.get(s)?.n).join(' или ')}` });
+    } else score += w.r >= 5 ? 12 : 8;
+
+    // Артефакты — 15
+    const have = e.set1pc === 4 ? [e.set1] : [e.set1, e.set2].filter(Boolean);
+    if (!e.set1) notes.push({ ok: false, text: 'Не выбран сет артефактов' });
+    else if (b) {
+      const same = (opt: string[]) => opt.length === have.length && opt.every((s) => have.includes(s));
+      const idx = b.sets.findIndex(same);
+      const partial = b.sets.some((opt) => opt.some((s) => have.includes(s)));
+      score += idx === 0 ? 15 : idx > 0 ? 12 : partial ? 7 : 3;
+      const setName = (s: string) => arts.get(s)?.n ?? s;
+      notes.push(idx >= 0
+        ? { ok: true, text: `Сет ${have.map(setName).join(' + ')} — ${idx === 0 ? 'лучший вариант' : `вариант №${idx + 1}`}` }
+        : { ok: null, text: `Сет ${have.map(setName).join(' + ')} не из рекомендованных. Лучше: ${b.sets[0].map(setName).join(' + ')}` });
+    } else score += 10;
+
+    // Основные статы — 15 (по 5 за слот)
+    if (b) {
+      const names: Record<string, string> = Object.fromEntries([...STAT_OPTS.sands, ...STAT_OPTS.goblet, ...STAT_OPTS.circlet]);
+      for (const slot of ['sands', 'goblet', 'circlet'] as const) {
+        const want = b.main[slot].flatMap((k) => (k === 'crit' ? ['cr', 'cd'] : [k]));
+        if (!want.length || want.includes(e[slot])) score += 5;
+        else notes.push({ ok: false, text: `${{ sands: 'Часы', goblet: 'Кубок', circlet: 'Корона' }[slot]}: ${names[e[slot]]}, а нужно ${[...new Set(want)].map((k) => names[k] ?? k).join(' или ')}` });
+      }
+    } else score += 12;
+
+    // Итоговые статы — 40
+    const st = e.stats;
+    const filled = Object.values(st).some((v) => v);
+    if (!filled) {
+      score += 16;
+      notes.push({ ok: null, text: 'Статы не указаны — оценка неполная. Впишите их с экрана персонажа или загрузите по UID' });
+    } else {
+      const parts: number[] = [];
+      const cls = b?.cls ?? 'sub';
+      const usesCrit = !b || b.main.circlet.some((k) => ['crit', 'cr', 'cd'].includes(k));
+      if (usesCrit && st.cr !== undefined && st.cd !== undefined) {
+        const cv = Math.min(st.cr, 100) * 2 + st.cd;
+        const [lo, hi] = cls === 'support' ? [120, 190] : [130, 250];
+        parts.push(clamp((cv - lo) / (hi - lo)));
+        if (cv < (lo + hi) / 2) notes.push({ ok: false, text: `Крит ${st.cr}% / ${st.cd}%: для ${cls === 'dps' ? 'основного ДД' : 'этой роли'} маловато, ориентир — ${cls === 'support' ? '50% / 100%' : '65% / 130%'}` });
+        else notes.push({ ok: true, text: `Крит ${st.cr}% / ${st.cd}% — хорошо` });
+        if (st.cr > 85) notes.push({ ok: null, text: 'Шанс крита выше 85% — часть статов уходит впустую, можно перекинуть в крит. урон' });
+      }
+      // Масштабирующий стат: по основному стату часов из билда
+      const scale = b?.main.sands.find((k) => ['atk%', 'hp%', 'def%', 'em'].includes(k)) ?? 'atk%';
+      const base = c.base[lvlKey(e.level)] ?? c.base['90'];
+      if (scale === 'atk%' && st.atk) {
+        const ratio = st.atk / (base[1] + (w?.atk ?? 500));
+        parts.push(clamp((ratio - 1.3) / (2.0 - 1.3)));
+        if (ratio < 1.6) notes.push({ ok: false, text: `Атака ${st.atk}: мало относительно базовой — нужно больше Силы атаки % в статах` });
+      } else if (scale === 'hp%' && st.hp) {
+        const ratio = st.hp / base[0];
+        parts.push(clamp((ratio - 1.6) / (2.6 - 1.6)));
+        if (ratio < 2) notes.push({ ok: false, text: `HP ${st.hp}: для персонажа от HP нужно больше — ориентир от ${Math.round(base[0] * 2.3).toLocaleString('ru-RU')}` });
+      } else if (scale === 'def%' && st.def) {
+        const ratio = st.def / base[2];
+        parts.push(clamp((ratio - 1.8) / (2.8 - 1.8)));
+        if (ratio < 2.2) notes.push({ ok: false, text: `Защита ${st.def}: для персонажа от защиты маловато, ориентир — от ${Math.round(base[2] * 2.5)}` });
+      } else if (scale === 'em' && st.em !== undefined) {
+        parts.push(clamp((st.em - 300) / (750 - 300)));
+        if (st.em < 500) notes.push({ ok: false, text: `Мастерство стихий ${st.em}: для реакционного персонажа ориентир — от 600` });
+      }
+      // Энергия: если ВЭ в приоритете у билда — нужен запас
+      if (st.er !== undefined) {
+        const erFirst = b && (b.subs[0] === 'er' || b.main.sands[0] === 'er');
+        const target = erFirst ? (cls === 'support' ? 180 : 160) : 120;
+        parts.push(clamp((st.er - 100) / (target - 100)));
+        if (st.er < target - 10) notes.push({ ok: false, text: `Восст. энергии ${st.er}%: для этого персонажа лучше ${target}%+, иначе взрыв стихии не будет готов к ротации` });
+      }
+      score += 40 * (parts.length ? parts.reduce((s, p) => s + p, 0) / parts.length : 0.6);
+    }
+
+    // Созвездия и таланты — небольшой бонус сверху, если что-то сильно отстаёт — предупреждение
+    if (Math.max(...e.talents) < 8 && b?.cls !== 'support') notes.push({ ok: false, text: 'Таланты ниже 8 — прокачка основного таланта даст заметный прирост урона' });
+    return { score: Math.round(Math.min(100, score + Math.min(e.cons, 2) * 1.5)), notes };
+  }
+
+  function checkHalf(h: number) {
+    const half = halves.find((x) => x.half === h);
+    const members = (teams[h] ?? []).map((k) => roster.find((e) => e.key === k)!).filter(Boolean);
+    if (!members.length) return null;
+    const scored = members.map((e) => ({ e, c: chars.get(e.s)!, ...scoreChar(e) }));
+    const avg = scored.reduce((s, x) => s + x.score, 0) / scored.length;
+    const teamNotes: Note[] = [];
+    let fit = 1;
+    let missingCount = 0;
+    if (members.length < 4) { teamNotes.push({ ok: false, text: `В команде ${members.length} из 4 — пустые слоты сильно снижают урон и выживаемость` }); fit -= 0.3; }
+    if (half) {
+      const els = new Set(scored.map((x) => x.c.el));
+      const missing = half.need.filter((g) => !g.some((el) => els.has(el)));
+      missingCount = missing.length;
+      if (missing.length) { fit -= 0.5 * missing.length; teamNotes.push({ ok: false, text: `Не хватает стихии: ${missing.map((g) => g.map((el) => EL[el]).join(' или ')).join(', ')}. ${half.tip}` }); }
+      else teamNotes.push({ ok: true, text: `Стихии подходят под бафф этажа: ${half.label.split(': ')[1] ?? half.label}` });
+      const best = half.teams.map((t) => ({ t, n: t.members.filter((s) => scored.some((x) => x.c.s === s)).length })).sort((a, b) => b.n - a.n)[0];
+      if (best && best.n >= 3) teamNotes.push({ ok: true, text: `Почти совпадает с рекомендованной командой «${best.t.name?.split(': ')[1] ?? best.t.name}»` });
+      else if (best) teamNotes.push({ ok: null, text: `Рекомендованные составы на эту половину: ${half.teams.slice(0, 2).map((t) => t.members.map((s) => chars.get(s)?.n).join(', ')).join('; ')}` });
+    }
+    const healers = scored.filter((x) => x.e.circlet === 'heal' || /хил|лечени/i.test(x.c.build?.role ?? '')).length;
+    const supports = scored.filter((x) => x.c.build?.cls === 'support').length;
+    if (!healers && !supports) { fit -= 0.15; teamNotes.push({ ok: null, text: 'В команде нет саппорта или хилера — на 12-м этаже будет сложно выживать' }); }
+    let total = Math.round(avg * 0.7 + Math.max(0, fit) * 30);
+    // Без нужной стихии бафф этажа не работает, а щиты снимаются медленно — «готова» быть не может
+    if (missingCount > 0) total = Math.min(total, missingCount > 1 ? 50 : 64);
+    return { half, scored, teamNotes, total };
+  }
+
+  const verdict = (t: number) => t >= 80 ? ['good', 'Готова к 9★ в зале'] : t >= 62 ? ['mid', 'Пройдёт, но впритык'] : ['bad', 'Скорее не хватит'];
+  const noteLi = (n: Note) => `<li class="${n.ok === true ? 'ok' : n.ok === false ? 'no' : 'tip'}">${esc(n.text)}</li>`;
+
+  $('check').addEventListener('click', () => {
+    const res = [1, 2].map(checkHalf);
+    if (res.every((r) => !r)) { $('result').innerHTML = '<p class="notice">Соберите хотя бы одну команду: выберите персонажей в слотах половин или нажмите «Подобрать из моих персонажей».</p>'; return; }
+    $('result').innerHTML = `<h2 class="h-sec">Результат</h2><div class="results">${res.map((r, i) => {
+      if (!r) return `<div class="panel res empty"><h3>${i + 1}-я половина</h3><p class="muted">Команда не собрана.</p></div>`;
+      const [cls, label] = verdict(r.total);
+      return `<article class="panel res">
+        <header><div><h3>${i + 1}-я половина</h3><span class="muted small">${esc(r.half?.label ?? '')}</span></div>
+          <div class="score ${cls}"><b>${r.total}</b><span>${label}</span></div></header>
+        <ul class="notes">${r.teamNotes.map(noteLi).join('')}</ul>
+        <div class="members">${r.scored.map((x) => `<details><summary><img src="${x.c.i}" alt="" width="36" height="36"><b>${esc(x.c.n)}</b><span class="mscore ${verdict(x.score)[0]}">${x.score}</span></summary>
+          <ul class="notes">${x.notes.map(noteLi).join('') || '<li class="ok">Билд совпадает с рекомендованным</li>'}</ul>
+          <a class="small" href="${BASE}/characters/${x.c.s}#build">Рекомендованный билд</a></details>`).join('')}</div>
+      </article>`;
+    }).join('')}</div>
+    <p class="muted small">Оценка складывается из уровня, оружия, сета, основных и итоговых статов (до 100 баллов на персонажа) и того, закрывает ли команда требования половины. Реальный урон зависит ещё от ротации и созвездий.</p>`;
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  renderRoster(); renderTeams();
+</script>
+
+<style>
+  .tc { display: grid; gap: 14px; }
+  label { display: grid; gap: .3rem; font-size: .82rem; color: var(--muted); }
+  .add { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .grow { flex: 1 1 240px; }
+  .uidrow { display: flex; gap: 6px; }
+  .uidrow .input { width: 150px; }
+  .hint { margin: .5rem 0 0; }
+  .status { min-height: 1.2em; margin: .4rem 0; }
+  .status.bad { color: var(--bad); }
+  .roster { display: flex; flex-wrap: wrap; gap: 8px; margin-top: .6rem; }
+  .roster :global(.rchip) {
+    display: flex; align-items: center; gap: .5rem; padding: .3rem .7rem .3rem .3rem; border-radius: var(--radius);
+    background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--el); cursor: pointer; text-align: left;
+  }
+  .roster :global(.rchip[aria-pressed="true"]) { border-color: var(--accent); background: var(--accent-soft); }
+  .roster :global(.rchip img) { border-radius: 8px; }
+  .roster :global(.rchip span) { display: grid; line-height: 1.2; }
+  .roster :global(.rchip small) { color: var(--muted); font-size: .74rem; }
+
+  .editor-panel :global(.ed-head) { display: flex; gap: .8rem; align-items: center; margin-bottom: 1rem; }
+  .editor-panel :global(.ed-head h2) { margin: 0; }
+  .editor-panel :global(.ed-head .btn) { margin-left: auto; }
+  .editor-panel :global(.ed-head img) { border-radius: 12px; }
+  .editor-panel :global(.ed-grid) { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .editor-panel :global(fieldset) { border: 1px solid var(--border); border-radius: var(--radius); padding: .6rem .8rem .8rem; display: grid; gap: .6rem; margin: 0; align-content: start; }
+  .editor-panel :global(fieldset.stats) { grid-template-columns: 1fr 1fr; grid-column: 1 / -1; }
+  .editor-panel :global(fieldset.stats legend) { grid-column: 1 / -1; }
+  .editor-panel :global(legend) { font-weight: 600; font-size: .9rem; padding: 0 .3rem; }
+  .editor-panel :global(.tri) { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .editor-panel :global(.input) { padding: .4rem .55rem; font-size: .9rem; color: var(--text); }
+  .editor-panel :global(.danger) { margin-top: 1rem; color: var(--bad); }
+  @media (min-width: 900px) { .editor-panel :global(fieldset.stats) { grid-template-columns: repeat(4, 1fr); } }
+
+  .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .team .need { margin: -.4rem 0 .8rem; }
+  .slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .slots :global(.slot) { display: flex; align-items: center; gap: .5rem; background: var(--surface-2); border-radius: var(--radius); padding: .4rem; border-bottom: 3px solid var(--el, transparent); }
+  .slots :global(.slot img) { border-radius: 8px; flex: none; }
+  .slots :global(.ph) { width: 48px; height: 48px; border-radius: 8px; border: 1px dashed var(--border); display: grid; place-items: center; color: var(--muted); flex: none; }
+  .slots :global(select) { padding: .35rem .4rem; font-size: .88rem; color: var(--text); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .big { padding: .75rem 1.3rem; font-size: 1rem; }
+
+  #result :global(.results) { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  #result :global(.res header) { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; margin-bottom: .6rem; }
+  #result :global(.res h3) { margin: 0; font-size: 1.05rem; }
+  #result :global(.score) { display: grid; justify-items: end; }
+  #result :global(.score b) { font: 700 2.2rem/1 var(--font-display); }
+  #result :global(.score span) { font-size: .85rem; font-weight: 600; }
+  #result :global(.good) { color: var(--good); }
+  #result :global(.mid) { color: var(--accent); }
+  #result :global(.bad) { color: var(--bad); }
+  #result :global(.notes) { list-style: none; padding: 0; margin: .4rem 0; display: grid; gap: .35rem; font-size: .9rem; }
+  #result :global(.notes li) { padding-left: 1.4rem; position: relative; }
+  #result :global(.notes li::before) { position: absolute; left: 0; font-weight: 700; }
+  #result :global(.notes .ok::before) { content: "✓"; color: var(--good); }
+  #result :global(.notes .no::before) { content: "!"; color: var(--bad); left: .3rem; }
+  #result :global(.notes .tip::before) { content: "›"; color: var(--accent); left: .2rem; }
+  #result :global(.members) { display: grid; gap: 6px; margin-top: .8rem; }
+  #result :global(.members details) { background: var(--surface-2); border-radius: var(--radius); padding: .4rem .6rem; }
+  #result :global(.members summary) { display: flex; align-items: center; gap: .6rem; }
+  #result :global(.members summary img) { border-radius: 8px; }
+  #result :global(.mscore) { margin-left: auto; font: 600 1rem var(--font-display); }
+  @media (max-width: 860px) { .teams, #result :global(.results) { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,394 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCharacter } from '../../lib/data';
+
+// Стандартный пул 5★: выпадение такого персонажа на баннере события — проигранные 50/50
+const STANDARD = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari', 'yumemizuki-mizuki'].map((s) => {
+  const c = getCharacter(s);
+  return [c.name, c.nameEn];
+}).flat();
+const script = await import('../../../public/wish-url.ps1?raw').then((m) => m.default as string);
+---
+<Layout title="Трекер круток" description="Счётчик гаранта, история молитв и статистика 50/50 в Genshin Impact. Данные хранятся только в вашем браузере.">
+  <h1>Трекер круток</h1>
+  <p class="lead">
+    Считает, сколько молитв осталось до гаранта, выиграны ли 50/50 и сколько примогемов ушло на каждого 5★.
+    История хранится только в вашем браузере — на сервер она не отправляется.
+  </p>
+
+  <div class="wt" data-standard={JSON.stringify(STANDARD)}>
+    <section class="panel import">
+      <div class="itabs" role="tablist" aria-label="Способ импорта">
+        <button type="button" role="tab" aria-selected="true" data-itab="link">По ссылке из игры</button>
+        <button type="button" role="tab" aria-selected="false" data-itab="file">Из файла</button>
+        <button type="button" role="tab" aria-selected="false" data-itab="manual">Вручную</button>
+      </div>
+
+      <div data-ipanel="link">
+        <ol class="steps">
+          <li>Откройте игру на ПК и зайдите в «Молитва» → «История».</li>
+          <li>Откройте PowerShell (Win + X → «Терминал») и выполните команду — она найдёт ссылку в кэше игры и скопирует её:
+            <div class="cmd"><code id="ps-cmd">iex (irm "https://…/wish-url.ps1")</code><button class="btn" type="button" id="copy-cmd">Скопировать</button></div>
+            <details><summary class="small">Что делает скрипт</summary><pre class="script">{script}</pre></details>
+          </li>
+          <li>Вставьте ссылку сюда. Она действует сутки и даёт доступ только к истории молитв.</li>
+        </ol>
+        <div class="row">
+          <input class="input grow" id="wish-url" placeholder="https://gs.hoyoverse.com/genshin/event/e20190909gacha-v3/index.html?authkey=…" autocomplete="off" />
+          <button class="btn primary" type="button" id="import-link">Загрузить историю</button>
+        </div>
+      </div>
+
+      <div data-ipanel="file" hidden>
+        <p>Файл в формате <b>UIGF</b> (версии 3 и 4) — его выгружают paimon.moe, Starward, SnapHutao и другие трекеры. Новые записи добавятся к уже загруженным без дублей.</p>
+        <input type="file" id="uigf-file" accept=".json,application/json" />
+      </div>
+
+      <div data-ipanel="manual" hidden>
+        <p class="muted small">Пригодится для консоли и телефона, где ссылку не достать. Добавляйте молитвы в том порядке, в каком они выпадали.</p>
+        <div class="manual">
+          <label>Баннер<select class="input" id="m-banner">
+            <option value="301">Событие персонажа</option><option value="302">Оружие</option><option value="200">Стандартный</option><option value="500">Хроники</option>
+          </select></label>
+          <label>Сколько молитв без 4★ и 5★<input class="input" id="m-count" type="number" min="1" max="90" value="10" /></label>
+          <button class="btn" type="button" id="m-add-filler">Добавить</button>
+          <label class="grow">4★ или 5★ предмет<input class="input" id="m-item" list="m-items" placeholder="Имя персонажа или оружия" /></label>
+          <button class="btn" type="button" id="m-add-item">Добавить</button>
+          <datalist id="m-items"></datalist>
+        </div>
+      </div>
+
+      <p class="status small" id="status" aria-live="polite"></p>
+    </section>
+
+    <section class="toolbar">
+      <label class="uid">Аккаунт <select class="input" id="uid-select"></select></label>
+      <button class="btn" type="button" id="export">Скачать UIGF</button>
+      <button class="btn" type="button" id="wipe">Удалить историю аккаунта</button>
+    </section>
+
+    <div class="empty panel" id="empty">
+      <h2>Пока пусто</h2>
+      <p class="muted">Загрузите историю по ссылке из игры или файлом — счётчики гаранта появятся здесь.</p>
+    </div>
+
+    <div class="banners" id="banners"></div>
+
+    <section id="history-wrap" hidden>
+      <h2 class="h-sec">История <small><label><input type="checkbox" id="only-rare" checked /> только 4★ и 5★</label></small></h2>
+      <div class="panel table-wrap"><table><thead><tr><th>Время</th><th>Предмет</th><th>Баннер</th><th>Гарант</th></tr></thead><tbody id="history"></tbody></table></div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { store } from '../../scripts/common';
+  import { BASE } from '../../scripts/search';
+
+  type Wish = { id: string; uid: string; gacha_type: string; time: string; name: string; item_type: string; rank_type: string; item_id?: string };
+  type Idx = { characters: { id: number | null; s: string; n: string; i: string | null; r: number }[]; weapons: { id: number; s: string; n: string; i: string | null; r: number }[] };
+
+  const root = document.querySelector<HTMLElement>('.wt')!;
+  const STANDARD = new Set<string>(JSON.parse(root.dataset.standard!));
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const status = (t: string, bad = false) => { const s = $('status'); s.textContent = t; s.classList.toggle('bad', bad); };
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  // Баннеры: 400 — второй баннер события, у него общий гарант с 301
+  const GROUPS = [
+    { key: 'char', title: 'Событие персонажа', types: ['301', '400'], pity: 90, soft: 74, fiftyFifty: true },
+    { key: 'weapon', title: 'Оружие', types: ['302'], pity: 80, soft: 63, fiftyFifty: false },
+    { key: 'standard', title: 'Стандартный', types: ['200'], pity: 90, soft: 74, fiftyFifty: false },
+    { key: 'chronicled', title: 'Хроники', types: ['500'], pity: 90, soft: 74, fiftyFifty: false },
+  ];
+  const TYPE_NAME: Record<string, string> = { '301': 'Событие', '400': 'Событие 2', '302': 'Оружие', '200': 'Стандарт', '500': 'Хроники', '100': 'Новичка' };
+
+  const idx: Idx = await fetch(`${BASE}/data/checker.json`).then((r) => r.json());
+  const byName = new Map<string, { i: string | null; kind: 'c' | 'w'; s: string; r?: number }>();
+  const byId = new Map<string, { n: string; kind: 'c' | 'w'; r?: number }>();
+  for (const c of idx.characters) { byName.set(c.n.toLowerCase(), { i: c.i, kind: 'c', s: c.s, r: c.r }); if (c.id) byId.set(String(c.id), { n: c.n, kind: 'c', r: c.r }); }
+  for (const w of idx.weapons) { byName.set(w.n.toLowerCase(), { i: w.i, kind: 'w', s: w.s, r: w.r }); byId.set(String(w.id), { n: w.n, kind: 'w', r: w.r }); }
+  $('m-items').innerHTML = [...idx.characters.map((c) => c.n), ...idx.weapons.filter((w) => w.r >= 4).map((w) => w.n)].map((n) => `<option value="${esc(n)}">`).join('');
+
+  // Хранилище: по аккаунту, записи отсортированы по id (в игре id растут со временем)
+  const load = (uid: string) => store.get<Wish[]>(`gf:wishes:${uid}`, []);
+  const save = (uid: string, list: Wish[]) => {
+    store.set(`gf:wishes:${uid}`, list);
+    store.set('gf:wish-uids', [...new Set([...store.get<string[]>('gf:wish-uids', []), uid])]);
+  };
+  const cmpId = (a: Wish, b: Wish) => (a.id.length - b.id.length) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+  function merge(uid: string, incoming: Wish[]) {
+    const map = new Map(load(uid).map((w) => [w.id, w]));
+    let added = 0;
+    for (const w of incoming) if (!map.has(w.id)) { map.set(w.id, { ...w, uid }); added++; }
+    save(uid, [...map.values()].sort(cmpId));
+    return added;
+  }
+  let uid = store.get<string>('gf:wish-uid', '') || store.get<string[]>('gf:wish-uids', [])[0] || '';
+
+  // ---------- Импорт по ссылке ----------
+  $('ps-cmd').textContent = `iex (irm "${location.origin}${BASE}/wish-url.ps1")`;
+  $('copy-cmd').addEventListener('click', () => navigator.clipboard?.writeText($('ps-cmd').textContent!).then(() => status('Команда скопирована.')));
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  $('import-link').addEventListener('click', async () => {
+    const raw = $<HTMLInputElement>('wish-url').value.trim();
+    let params: URLSearchParams;
+    try { params = new URL(raw).searchParams; } catch { return status('Это не похоже на ссылку. Скопируйте её скриптом ещё раз.', true); }
+    if (!params.get('authkey')) return status('В ссылке нет authkey. Откройте историю молитв в игре и запустите скрипт снова.', true);
+    const btn = $<HTMLButtonElement>('import-link');
+    btn.disabled = true;
+    try {
+      let total = 0;
+      let foundUid = '';
+      for (const type of ['301', '302', '200', '500', '100']) {
+        let endId = '0';
+        const known = new Set(foundUid ? load(foundUid).map((w) => w.id) : []);
+        const got: Wish[] = [];
+        for (let page = 1; ; page++) {
+          status(`Загружаю «${TYPE_NAME[type]}», страница ${page}…`);
+          const q = new URLSearchParams({ authkey: params.get('authkey')!, authkey_ver: params.get('authkey_ver') ?? '1', sign_type: params.get('sign_type') ?? '2',
+            lang: 'ru', gacha_type: type, page: String(page), end_id: endId, game_biz: params.get('game_biz') ?? 'hk4e_global', region: params.get('region') ?? '' });
+          const res = await fetch(`${BASE}/api/gacha?${q}`);
+          const body = await res.json().catch(() => null);
+          if (!body) throw new Error('Сервер не ответил. Попробуйте ещё раз через минуту.');
+          if (body.retcode === -110) { await sleep(1500); page--; continue; }
+          if (body.retcode === -101) throw new Error('Ссылка устарела (живёт сутки). Откройте историю в игре и получите новую.');
+          if (body.retcode !== 0) throw new Error(body.error ?? body.message ?? 'Не удалось загрузить историю.');
+          const list: Wish[] = body.data?.list ?? [];
+          if (!list.length) break;
+          foundUid ||= list[0].uid;
+          const fresh = list.filter((w) => !known.has(w.id));
+          got.push(...fresh);
+          if (fresh.length < list.length) break; // дошли до уже сохранённых
+          endId = list.at(-1)!.id;
+          await sleep(350);
+        }
+        if (foundUid && got.length) total += merge(foundUid, got);
+      }
+      if (!foundUid) return status('История пуста: на этом аккаунте ещё не было молитв за последние 6 месяцев.');
+      uid = foundUid; store.set('gf:wish-uid', uid);
+      status(`Готово: добавлено ${total} новых молитв.`);
+      render();
+    } catch (e) {
+      status((e as Error).message, true);
+    } finally { btn.disabled = false; }
+  });
+
+  // ---------- UIGF ----------
+  $<HTMLInputElement>('uigf-file').addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      const accounts: { uid: string; list: Partial<Wish>[] }[] = data.hk4e
+        ? data.hk4e.map((a: { uid: string | number; list: Partial<Wish>[] }) => ({ uid: String(a.uid), list: a.list }))
+        : [{ uid: String(data.info?.uid ?? ''), list: data.list ?? [] }];
+      let total = 0;
+      for (const a of accounts) {
+        if (!a.uid || !Array.isArray(a.list)) continue;
+        const list = a.list.map((w) => {
+          const known = w.item_id ? byId.get(String(w.item_id)) : undefined;
+          return {
+            id: String(w.id), uid: a.uid, gacha_type: String(w.gacha_type), time: String(w.time ?? ''),
+            name: w.name ?? known?.n ?? '?', item_type: w.item_type ?? (known?.kind === 'c' ? 'Персонаж' : 'Оружие'),
+            rank_type: String(w.rank_type ?? known?.r ?? 3), item_id: w.item_id ? String(w.item_id) : undefined,
+          } as Wish;
+        }).filter((w) => w.id !== 'undefined');
+        total += merge(a.uid, list);
+        uid = a.uid;
+      }
+      store.set('gf:wish-uid', uid);
+      status(`Файл загружен: добавлено ${total} новых молитв.`);
+      render();
+    } catch {
+      status('Не получилось прочитать файл. Нужен JSON в формате UIGF.', true);
+    }
+  });
+  $('export').addEventListener('click', () => {
+    if (!uid) return;
+    const list = load(uid);
+    const out = {
+      info: { export_timestamp: Math.floor(Date.now() / 1000), export_app: 'GenshinFlex', export_app_version: '1.0', version: 'v4.0' },
+      hk4e: [{ uid, timezone: 8, lang: 'ru-ru', list: list.map((w) => ({ ...w, uigf_gacha_type: w.gacha_type === '400' ? '301' : w.gacha_type, count: '1' })) }],
+    };
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' }));
+    a.download = `genshinflex-wishes-${uid}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // Удаление — в два нажатия, без системных диалогов
+  let wipeArmed = false;
+  $('wipe').addEventListener('click', () => {
+    if (!uid) return;
+    if (!wipeArmed) { wipeArmed = true; $('wipe').textContent = 'Точно удалить? Нажмите ещё раз'; setTimeout(() => { wipeArmed = false; $('wipe').textContent = 'Удалить историю аккаунта'; }, 4000); return; }
+    store.set(`gf:wishes:${uid}`, []);
+    store.set('gf:wish-uids', store.get<string[]>('gf:wish-uids', []).filter((u) => u !== uid));
+    uid = store.get<string[]>('gf:wish-uids', [])[0] ?? '';
+    wipeArmed = false; $('wipe').textContent = 'Удалить историю аккаунта';
+    status('История аккаунта удалена из браузера.');
+    render();
+  });
+
+  // ---------- Ручной ввод ----------
+  const manualUid = () => { if (!uid) { uid = 'manual'; store.set('gf:wish-uid', uid); } return uid; };
+  let seq = 0;
+  const mk = (type: string, name: string, item_type: string, rank: string): Wish => ({
+    id: `9${Date.now()}${String(seq++).padStart(4, '0')}`, uid: manualUid(), gacha_type: type,
+    time: new Date().toISOString().slice(0, 19).replace('T', ' '), name, item_type, rank_type: rank,
+  });
+  $('m-add-filler').addEventListener('click', () => {
+    const n = Math.max(1, Math.min(90, Number($<HTMLInputElement>('m-count').value) || 0));
+    const type = $<HTMLSelectElement>('m-banner').value;
+    merge(manualUid(), Array.from({ length: n }, () => mk(type, 'Оружие 3★', 'Оружие', '3')));
+    status(`Добавлено молитв: ${n}.`); render();
+  });
+  $('m-add-item').addEventListener('click', () => {
+    const name = $<HTMLInputElement>('m-item').value.trim();
+    const hit = byName.get(name.toLowerCase());
+    if (!hit) return status('Не нашёл такой предмет — выберите из подсказок.', true);
+    const rank = String(hit.r ?? 4);
+    merge(manualUid(), [mk($<HTMLSelectElement>('m-banner').value, name, hit.kind === 'c' ? 'Персонаж' : 'Оружие', rank)]);
+    $<HTMLInputElement>('m-item').value = '';
+    status(`Добавлено: ${name}.`); render();
+  });
+
+  // ---------- Подсчёт ----------
+  type Five = { name: string; pity: number; outcome: 'win' | 'lose' | 'guar' | null; time: string };
+  function analyse(list: Wish[], g: typeof GROUPS[number]) {
+    const ws = list.filter((w) => g.types.includes(w.gacha_type));
+    let p5 = 0, p4 = 0, guaranteed = false;
+    const fives: Five[] = [];
+    const outcomes = new Map<string, Five['outcome']>();
+    for (const w of ws) {
+      p5++; p4++;
+      if (w.rank_type === '5') {
+        let outcome: Five['outcome'] = null;
+        if (g.fiftyFifty) {
+          const lost = w.item_type === 'Персонаж' && STANDARD.has(w.name);
+          outcome = lost ? 'lose' : guaranteed ? 'guar' : 'win';
+          guaranteed = lost;
+        }
+        fives.push({ name: w.name, pity: p5, outcome, time: w.time });
+        outcomes.set(w.id, outcome);
+        p5 = 0; p4 = 0;
+      } else if (w.rank_type === '4') p4 = 0;
+    }
+    const wins = fives.filter((f) => f.outcome === 'win').length, losses = fives.filter((f) => f.outcome === 'lose').length;
+    return {
+      total: ws.length, p5, p4, guaranteed, fives, outcomes,
+      avg: fives.length ? Math.round(fives.reduce((s, f) => s + f.pity, 0) / fives.length) : null,
+      rate: wins + losses ? Math.round((wins / (wins + losses)) * 100) : null,
+    };
+  }
+
+  const icon = (name: string) => byName.get(name.toLowerCase())?.i;
+  const hrefOf = (name: string) => { const h = byName.get(name.toLowerCase()); return h ? `${BASE}/${h.kind === 'c' ? 'characters' : 'weapons'}/${h.s}` : null; };
+  const OUT: Record<string, string> = { win: 'выиграл 50/50', lose: 'проиграл 50/50', guar: 'по гаранту' };
+
+  function render() {
+    const uids = store.get<string[]>('gf:wish-uids', []);
+    const sel = $<HTMLSelectElement>('uid-select');
+    sel.innerHTML = uids.map((u) => `<option value="${u}" ${u === uid ? 'selected' : ''}>${u === 'manual' ? 'Ручной ввод' : `UID ${u}`}</option>`).join('');
+    const list = uid ? load(uid) : [];
+    $('empty').hidden = list.length > 0;
+    document.querySelector<HTMLElement>('.toolbar')!.hidden = !uids.length;
+    $('history-wrap').hidden = !list.length;
+    if (!list.length) { $('banners').innerHTML = ''; return; }
+
+    const all = new Map<string, Five['outcome']>();
+    $('banners').innerHTML = GROUPS.map((g) => {
+      const a = analyse(list, g);
+      a.outcomes.forEach((v, k) => all.set(k, v));
+      if (!a.total) return '';
+      const pct = Math.min(100, (a.p5 / g.pity) * 100);
+      return `<article class="bcard panel">
+        <header><h3>${g.title}</h3>${g.fiftyFifty ? `<span class="chip ${a.guaranteed ? 'gold' : ''}">${a.guaranteed ? 'Следующий 5★ — гарант' : 'Следующий 5★ — 50/50'}</span>` : ''}</header>
+        <div class="pity">
+          <div class="pnum"><b>${a.p5}</b><span class="muted">/ ${g.pity}</span></div>
+          <div><span class="small muted">до гаранта 5★: ${g.pity - a.p5}</span>
+            <div class="bar" role="img" aria-label="Гарант ${a.p5} из ${g.pity}"><i style="width:${pct}%"></i><em style="left:${(g.soft / g.pity) * 100}%" title="Мягкий гарант с ${g.soft}-й молитвы"></em></div>
+            <span class="small muted">4★: ${a.p4} / 10${a.p5 >= g.soft ? ' · <b class="soft">шанс 5★ уже повышен</b>' : ''}</span></div>
+        </div>
+        <dl class="kv">
+          <div><dt>Молитв</dt><dd>${a.total}</dd></div>
+          <div><dt>Примогемов</dt><dd>${(a.total * 160).toLocaleString('ru-RU')}</dd></div>
+          <div><dt>Средний 5★</dt><dd>${a.avg ?? '—'}</dd></div>
+          ${g.fiftyFifty ? `<div><dt>Выиграно 50/50</dt><dd>${a.rate === null ? '—' : a.rate + '%'}</dd></div>` : ''}
+        </dl>
+        ${a.fives.length ? `<ul class="fives">${a.fives.slice().reverse().map((f) => {
+          const i = icon(f.name), h = hrefOf(f.name);
+          const tag = h ? 'a' : 'span';
+          return `<li class="${f.outcome ?? ''}" title="${esc(f.name)}: ${f.pity} молитв${f.outcome ? ', ' + OUT[f.outcome] : ''}"><${tag} ${h ? `href="${h}"` : ''}>${i ? `<img src="${i}" alt="" width="44" height="44" loading="lazy">` : ''}<b>${f.pity}</b></${tag}><span class="sr-only">${esc(f.name)}, ${f.pity}${f.outcome ? ', ' + OUT[f.outcome] : ''}</span></li>`;
+        }).join('')}</ul>` : '<p class="muted small">5★ на этом баннере ещё не было.</p>'}
+      </article>`;
+    }).join('');
+
+    const onlyRare = $<HTMLInputElement>('only-rare').checked;
+    $('history').innerHTML = list.slice().reverse().filter((w) => !onlyRare || w.rank_type !== '3').slice(0, 200).map((w) => {
+      const i = icon(w.name);
+      const o = all.get(w.id);
+      return `<tr class="r${w.rank_type}"><td class="muted">${esc(w.time)}</td><td><span class="it">${i ? `<img src="${i}" alt="" width="28" height="28" loading="lazy">` : ''}${esc(w.name)}</span></td>
+        <td class="muted">${TYPE_NAME[w.gacha_type] ?? w.gacha_type}</td><td class="muted">${o ? OUT[o] : ''}</td></tr>`;
+    }).join('');
+  }
+
+  // Вкладки импорта
+  const itabs = [...document.querySelectorAll<HTMLButtonElement>('[data-itab]')];
+  itabs.forEach((t) => t.addEventListener('click', () => {
+    itabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+    document.querySelectorAll<HTMLElement>('[data-ipanel]').forEach((p) => (p.hidden = p.dataset.ipanel !== t.dataset.itab));
+  }));
+  $<HTMLSelectElement>('uid-select').addEventListener('change', (e) => { uid = (e.target as HTMLSelectElement).value; store.set('gf:wish-uid', uid); render(); });
+  $('only-rare').addEventListener('change', render);
+  render();
+</script>
+
+<style>
+  .wt { display: grid; gap: 14px; }
+  .itabs { display: flex; gap: 4px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .itabs button { border: 1px solid var(--border); background: var(--surface-2); border-radius: var(--radius-sm); padding: .45rem .8rem; cursor: pointer; color: var(--muted); }
+  .itabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .steps { padding-left: 1.2rem; display: grid; gap: .6rem; margin: 0 0 1rem; max-width: 80ch; }
+  .cmd { display: flex; gap: 8px; align-items: center; margin: .5rem 0; flex-wrap: wrap; }
+  .cmd code { flex: 1 1 280px; padding: .55rem .7rem; background: var(--bg-deep); border-radius: var(--radius-sm); overflow-x: auto; white-space: nowrap; }
+  .script { max-height: 260px; overflow: auto; background: var(--bg-deep); padding: .8rem; border-radius: var(--radius-sm); font-size: .78rem; white-space: pre; }
+  .grow { flex: 1 1 260px; }
+  .manual { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .manual label { display: grid; gap: .3rem; font-size: .82rem; color: var(--muted); }
+  .status { margin: .8rem 0 0; min-height: 1.2em; }
+  .status.bad { color: var(--bad); }
+  .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .uid { display: flex; align-items: center; gap: .5rem; font-size: .9rem; color: var(--muted); }
+  .uid select { width: auto; }
+  .empty { text-align: center; padding: 2.4rem 1rem; }
+  .empty h2 { margin: 0 0 .4rem; }
+
+  .banners { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 12px; }
+  .banners :global(.bcard header) { display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .8rem; }
+  .banners :global(.bcard h3) { margin: 0; }
+  .banners :global(.pity) { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center; }
+  .banners :global(.pnum b) { font: 700 2.4rem/1 var(--font-display); color: var(--accent); }
+  .banners :global(.bar) { position: relative; height: 10px; border-radius: 5px; background: var(--surface-3); margin: .35rem 0; }
+  .banners :global(.bar i) { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); }
+  .banners :global(.bar em) { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); opacity: .5; }
+  .banners :global(.soft) { color: var(--accent); }
+  .banners :global(.kv) { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 1rem 0; }
+  .banners :global(.kv div) { background: var(--surface-2); border-radius: var(--radius-sm); padding: .4rem .5rem; }
+  .banners :global(.kv dt) { font-size: .72rem; color: var(--muted); }
+  .banners :global(.kv dd) { margin: 0; font-weight: 600; }
+  .banners :global(.fives) { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .banners :global(.fives li > a), .banners :global(.fives li > span:not(.sr-only)) { position: relative; display: block; text-decoration: none; }
+  .banners :global(.fives img) { border-radius: 10px; background: linear-gradient(170deg, #6b4520, #d1953f); display: block; border: 2px solid transparent; }
+  .banners :global(.fives .lose img) { border-color: var(--bad); }
+  .banners :global(.fives .win img) { border-color: var(--good); }
+  .banners :global(.fives b) { position: absolute; right: -4px; bottom: -4px; font-size: .72rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0 .3rem; }
+  .table-wrap { overflow-x: auto; padding: .4rem .6rem; }
+  #history :global(.it) { display: inline-flex; align-items: center; gap: .5rem; }
+  #history :global(img) { border-radius: 6px; }
+  #history :global(tr.r5 td:nth-child(2)) { color: var(--accent); font-weight: 600; }
+  #history :global(tr.r4 td:nth-child(2)) { color: #b595ec; }
+  @media (max-width: 480px) { .banners :global(.kv) { grid-template-columns: repeat(2, 1fr); } }
+</style>

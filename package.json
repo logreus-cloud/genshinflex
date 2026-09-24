@@ -10,7 +10,9 @@
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "dev:full": "npm run build && wrangler pages dev dist",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name genshinflex"
   },
   "dependencies": {
     "astro": "^7.3.4"
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "genshin-db": "^5.2.14",
-    "pagefind": "^1.5.2"
+    "pagefind": "^1.5.2",
+    "wrangler": "^4.137.0"
   }
 }

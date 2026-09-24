@@ -15,6 +15,8 @@ export async function GET() {
       ['Баннеры: текущие и следующие', '/banners'],
       ['Рейтинг ELO', '/rating'],
       ['Руководства', '/guides'],
+      ['Проверка команды для Бездны', '/tools/team-check'],
+      ['Трекер круток: гарант и 50/50', '/tools/wishes'],
       ['Конструктор ротаций', '/tools/rotation-builder'],
     ],
   };

@@ -81,13 +81,20 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   </section>
 
   <section class="tiles">
-    <a class="tile" href={`${base}/rating`}>
+    <a class="tile" href={`${base}/tools/team-check`}>
       <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
-        {[6, 10, 15, 22, 30, 36, 33, 26, 18, 12, 8, 5].map((h, i) => <rect x={i * 10} y={40 - h} width="7" height={h} rx="1.5" />)}
+        {[0, 1, 2, 3].map((i) => <rect x={i * 30} y="6" width="26" height="28" rx="6" />)}
+        <path class="tick" d="M92 20l6 6 12-12" />
       </svg>
-      <h3>Рейтинг ELO</h3>
-      <p class="muted small">Вместо тир-листа: голоса сообщества и реальные забеги</p>
-      <span class="chip gold">скоро</span>
+      <h3>Проверка команды</h3>
+      <p class="muted small">Добавьте своих персонажей и узнайте, хватит ли их на текущую Бездну</p>
+    </a>
+    <a class="tile" href={`${base}/tools/wishes`}>
+      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
+        <rect x="0" y="16" width="120" height="8" rx="4" class="track" /><rect x="0" y="16" width="78" height="8" rx="4" />
+      </svg>
+      <h3>Трекер круток</h3>
+      <p class="muted small">Сколько до гаранта, выиграны ли 50/50 и сколько ушло примогемов</p>
     </a>
     <a class="tile" href={`${base}/tools/rotation-builder`}>
       <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
@@ -96,19 +103,17 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
       <h3>Конструктор ротаций</h3>
       <p class="muted small">Соберите команду и порядок действий, поделитесь ссылкой</p>
     </a>
-    <a class="tile" href={`${base}/guides`}>
-      <b class="big">{builds.length}</b>
-      <h3>Руководства</h3>
-      <p class="muted small">Билды и команды, обновлённые под патч {newest[0].version}</p>
-    </a>
-    <a class="tile" href={`${base}/characters`}>
-      <b class="big">{characters.length}</b>
-      <h3>База</h3>
-      <p class="muted small">{weapons.length} видов оружия и {artifacts.length} сетов артефактов</p>
+    <a class="tile" href={`${base}/rating`}>
+      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
+        {[6, 10, 15, 22, 30, 36, 33, 26, 18, 12, 8, 5].map((h, i) => <rect x={i * 10} y={40 - h} width="7" height={h} rx="1.5" />)}
+      </svg>
+      <h3>Рейтинг ELO</h3>
+      <p class="muted small">Вместо тир-листа: голоса сообщества и реальные забеги</p>
+      <span class="chip gold">скоро</span>
     </a>
   </section>
 
-  <h2 class="h-sec">Новые персонажи <small><a href={`${base}/characters`}>Все персонажи</a></small></h2>
+  <h2 class="h-sec">Новые персонажи <small><a href={`${base}/characters`}>Все {characters.length}</a> · <a href={`${base}/guides`}>Руководства ({builds.length})</a></small></h2>
   <div class="cards">{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? 'новый' : buildSet.has(c.slug) ? 'билд' : undefined} />)}</div>
 
   {newWeapons.length > 0 && (
@@ -238,7 +243,8 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   .tile p { margin: 0 0 .3rem; }
   .tile .chip { justify-self: start; }
   .viz { width: 120px; height: 40px; fill: var(--accent); stroke: var(--accent); stroke-width: 2; }
-  .viz circle { fill: var(--surface-3); }
+  .viz circle, .viz .track { fill: var(--surface-3); }
+  .viz .tick { fill: none; stroke: var(--accent-ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
   .big { font: 700 2rem/40px var(--font-display); color: var(--accent); }
 
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }

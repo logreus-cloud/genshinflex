@@ -56,7 +56,7 @@ const users = (await getCollection('builds'))
       {users.length ? (
         <div class="cards">{users.map((u) => <CharacterCard slug={u.slug} badge={`#${u.place + 1}`} />)}</div>
       ) : (
-        <p class="muted">Пока ни в одном нашем билде. Если знаете, кому оно подходит, — предложите билд через pull request.</p>
+        <p class="muted">Пока не входит ни в один наш билд.</p>
       )}
     </section>
 

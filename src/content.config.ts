@@ -36,6 +36,13 @@ const rotations = defineCollection({
     tags: z.array(z.string()).default([]),
     buffs: z.array(z.string()).default([]),
     cast: z.array(z.object({ title: z.string(), members: z.array(z.string()) })).default([]),
+    // Для проверки команды: какие стихии нужны в каждой половине (все группы должны быть закрыты, внутри группы — любая стихия)
+    halves: z.array(z.object({
+      half: z.number().int(),
+      label: z.string(),
+      need: z.array(z.array(z.enum(['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo']))),
+      tip: z.string(),
+    })).default([]),
     stages: z.array(z.object({
       name: z.string(),
       halves: z.array(z.object({ enemies: z.array(z.string()), note: z.string().optional() })),
