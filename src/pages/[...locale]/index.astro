@@ -179,9 +179,11 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
     position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px;
     padding: 2.4rem 0 2rem; isolation: isolate;
   }
+  /* Отступ арта и затемнение снизу — в пикселях, а не в процентах от высоты блока:
+     иначе при смене вкладки поиска (другая высота блока) арт и затемнение скачут */
   .art { position: absolute; inset: -1.8rem -24px 0; z-index: -1; overflow: hidden; pointer-events: none; }
-  .art img { position: absolute; right: -6%; top: -10%; width: 80%; opacity: .32; filter: saturate(1.1); mask-image: radial-gradient(closest-side, #000 40%, transparent); }
-  .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 25%, transparent 70%), linear-gradient(0deg, var(--bg), transparent 40%); }
+  .art img { position: absolute; right: -6%; top: -64px; width: 80%; opacity: .32; filter: saturate(1.1); mask-image: radial-gradient(closest-side, #000 40%, transparent); }
+  .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 25%, transparent 70%), linear-gradient(0deg, var(--bg), transparent 180px); }
 
   .brand { display: flex; align-items: center; gap: 1rem; color: var(--accent); margin-bottom: 1.6rem; }
   .brand h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 700; margin: 0; color: var(--text); letter-spacing: -.02em; }
