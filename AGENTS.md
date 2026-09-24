@@ -1,5 +1,7 @@
 ## Development
 
+After making changes, always include a suggested commit message in Russian in the final response. The user commits and pushes to GitHub themselves.
+
 When starting the dev server, use background mode:
 
 ```

@@ -4,7 +4,7 @@ import Layout from '../../../layouts/Layout.astro';
 import { useData, LANGS } from '../../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { fmtDate, t } = useData(Astro.currentLocale);
+const { fmtDate, t, base } = useData(Astro.currentLocale);
 
 const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'abyss')?.data;
 ---
@@ -15,15 +15,23 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     {abyss && t('Текущий цикл — до {date}.', { date: fmtDate(abyss.end) })}
     {t('Оценка сравнивает ваш билд с рекомендованным и проверяет требования этажа; это ориентир, а не симуляция урона.')}
   </p>
+  <p class="abyss-context">{t('Требования и рекомендации — для 12-го этажа текущей Бездны.')} <a href={`${base}/abyss/`}>{t('Враги и команды всех этажей')}</a></p>
 
   <div class="tc">
     <section class="panel roster-panel">
-      <h2 class="h-sec">{t('Мои персонажи')} <small id="roster-count"></small></h2>
+      <div class="panel-head"><h2 class="h-sec">{t('Мои персонажи')} <small id="roster-count"></small></h2><button class="btn small danger" type="button" id="clear-roster" hidden>{t('Очистить список')}</button></div>
       <div class="add">
         <label class="grow">{t('Добавить вручную')}<input class="input" id="add-char" list="char-list" placeholder={t('Имя персонажа')} /></label>
         <label>{t('Или по UID')}<span class="uidrow"><input class="input" id="uid" inputmode="numeric" placeholder="700000000" maxlength="10" /><button class="btn" type="button" id="load-uid">{t('Загрузить')}</button></span></label>
       </div>
       <p class="muted small hint">{t('Для загрузки по UID в игре нужно выставить персонажей на витрину профиля и включить «Показывать подробности».')}</p>
+      <button class="btn" type="button" id="open-picker" aria-expanded="false" aria-controls="picker">{t('Выбрать из всех персонажей')}</button>
+      <div class="picker" id="picker" hidden>
+        <input class="input" id="picker-search" type="search" placeholder={t('Поиск по имени')} aria-label={t('Поиск по имени')} />
+        <div class="picker-filters" id="picker-filters"></div>
+        <p class="muted small" id="picker-count"></p>
+        <div class="picker-grid" id="picker-grid"></div>
+      </div>
       <p class="status small" id="status" aria-live="polite"></p>
       <div class="roster" id="roster"></div>
       <datalist id="char-list"></datalist>
@@ -34,9 +42,10 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     <section class="teams">
       {[1, 2].map((h) => (
         <div class="panel team" data-half={h}>
-          <h2 class="h-sec">{t('{n}-я половина', { n: h })}</h2>
+          <div class="panel-head"><h2 class="h-sec">{t('{n}-я половина', { n: h })}</h2><button class="btn small" type="button" data-clear-half={h} hidden>{t('Очистить')}</button></div>
           <p class="muted small need" data-need={h}></p>
           <div class="slots" data-slots={h}></div>
+          <div class="recommend" data-recommend={h}></div>
         </div>
       ))}
     </section>
@@ -44,6 +53,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     <div class="actions">
       <button class="btn primary big" type="button" id="check">{t('Проверить команды')}</button>
       <button class="btn" type="button" id="autofill">{t('Подобрать из моих персонажей')}</button>
+      <button class="btn" type="button" id="reset-teams">{t('Сбросить составы')}</button>
     </div>
 
     <section id="result" aria-live="polite"></section>
@@ -93,7 +103,8 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   let roster: Entry[] = store.get<Entry[]>('gf:roster', []).filter((e) => chars.has(e.s));
   let teams: Record<number, string[]> = store.get('gf:abyss-teams', { 1: [], 2: [] });
   let editing: string | null = null;
-  const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); };
+  let checked = false;
+  const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); if (checked) renderResult(false); };
 
   // Новый персонаж получает рекомендованный билд как отправную точку
   function fromBuild(s: string): Entry {
@@ -138,6 +149,9 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         const c = charById.get(a.avatarId);
         if (!c) { skipped.push(a.avatarId === 10000005 || a.avatarId === 10000007 ? t('Путешественник') : String(a.avatarId)); continue; }
         const e = fromBuild(c.s);
+        // Обновление витрины сохраняет выбранные составы и открытый редактор.
+        const existing = roster.find((x) => x.s === c.s);
+        if (existing) e.key = existing.key;
         e.level = Number(a.propMap?.['4001']?.val ?? 90);
         e.cons = (a.talentIdList ?? []).length;
         const f = a.fightPropMap ?? {};
@@ -169,7 +183,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         roster = [e, ...roster.filter((x) => x.s !== c.s)];
         added++;
       }
-      persist(); renderRoster(); renderTeams();
+      persist(); openEditor(editing); renderTeams();
       status(t('Загружено персонажей: {n}.', { n: added }) + (skipped.length ? ' ' + t('Пропущены: {list} — добавьте вручную.', { list: skipped.join(', ') }) : ''));
     } catch {
       status(t('Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз.'), true);
@@ -189,15 +203,66 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   });
 
   // ---------- Ростер и редактор ----------
+  const normalizeName = (name: string) => name.toLocaleLowerCase().replace(/ё/g, 'е');
+  let pickerElement = '';
+  const renderPicker = () => {
+    const query = normalizeName($<HTMLInputElement>('picker-search').value.trim());
+    $('picker-count').textContent = t('Выбрано: {n}', { n: roster.length });
+    $('picker-filters').innerHTML = Object.entries(EL).map(([el, name]) =>
+      `<button class="btn small" type="button" data-filter-el="${esc(el)}" data-el="${esc(el)}" aria-pressed="${pickerElement === el}"><span class="el-dot"></span>${esc(name)}</button>`
+    ).join('');
+    $('picker-grid').innerHTML = [...data.characters]
+      .filter((c) => (!pickerElement || c.el === pickerElement) && normalizeName(c.n).includes(query))
+      .sort((a, b) => b.r - a.r || a.n.localeCompare(b.n, LANG))
+      .map((c) => `<button type="button" class="pick" data-pick="${esc(c.s)}" data-el="${esc(c.el)}" aria-pressed="${roster.some((e) => e.s === c.s)}">
+        <img src="${esc(c.i)}" alt="" width="56" height="56" loading="lazy"><span title="${esc(c.n)}">${esc(c.n)}</span></button>`).join('');
+  };
   function renderRoster() {
     $('roster-count').textContent = roster.length ? String(roster.length) : '';
+    $('clear-roster').hidden = !roster.length;
     $('roster').innerHTML = roster.length ? roster.map((e) => {
       const c = chars.get(e.s)!;
       const filled = Object.values(e.stats).some((v) => v);
-      return `<button type="button" class="rchip" data-edit="${e.key}" data-el="${c.el}" aria-pressed="${editing === e.key}">
-        <img src="${c.i}" alt="" width="40" height="40" loading="lazy"><span><b>${esc(c.n)}</b><small>${t('ур.')} ${e.level} · C${e.cons}${filled ? '' : ' · ' + t('без статов')}</small></span></button>`;
+      return `<div class="rchip" data-el="${esc(c.el)}">
+        <button type="button" class="rchip-edit" data-edit="${esc(e.key)}" aria-pressed="${editing === e.key}" title="${esc(t('Редактировать'))}">
+          <img src="${esc(c.i)}" alt="" width="40" height="40" loading="lazy"><span><b>${esc(c.n)}</b><small>${esc(t('ур.'))} ${e.level} · C${e.cons}${filled ? '' : ' · ' + esc(t('без статов'))}</small></span></button>
+        <span class="rchip-halves">
+          ${[1, 2].map((h) => `<button type="button" class="btn small" data-to-half="${h}" data-key="${esc(e.key)}" aria-pressed="${teams[h]?.includes(e.key) ?? false}" title="${esc(t(h === 1 ? 'В 1-ю половину' : 'Во 2-ю половину'))}">${h}</button>`).join('')}
+        </span></div>`;
     }).join('') : `<p class="muted small">${t('Пока никого. Добавьте персонажа по имени или загрузите витрину по UID.')}</p>`;
+    renderPicker();
   }
+
+  $('open-picker').addEventListener('click', () => {
+    const picker = $('picker');
+    picker.hidden = !picker.hidden;
+    $('open-picker').textContent = picker.hidden ? t('Выбрать из всех персонажей') : t('Скрыть список');
+    $('open-picker').setAttribute('aria-expanded', String(!picker.hidden));
+  });
+  $<HTMLInputElement>('picker-search').addEventListener('input', renderPicker);
+  let clearArmed = false;
+  let clearTimer: ReturnType<typeof setTimeout> | undefined;
+  $('clear-roster').addEventListener('click', () => {
+    if (!roster.length) return;
+    if (!clearArmed) {
+      clearArmed = true;
+      $('clear-roster').textContent = t('Точно очистить? Нажмите ещё раз');
+      clearTimer = setTimeout(() => {
+        clearArmed = false;
+        $('clear-roster').textContent = t('Очистить список');
+      }, 4000);
+      return;
+    }
+    clearTimeout(clearTimer);
+    clearArmed = false;
+    $('clear-roster').textContent = t('Очистить список');
+    roster = []; teams = { 1: [], 2: [] };
+    checked = false;
+    $('result').innerHTML = '';
+    openEditor(null);
+    persist(); renderTeams();
+    status(t('Список персонажей очищен.'));
+  });
 
   const opt = (list: [string, string][], v: string) => list.map(([k, l]) => `<option value="${k}" ${k === v ? 'selected' : ''}>${esc(l)}</option>`).join('');
   function openEditor(key: string | null) {
@@ -217,7 +282,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         <fieldset><legend>${t('Персонаж')}</legend>
           <label>${t('Уровень')}<input class="input" type="number" min="1" max="100" data-f="level" value="${e.level}"></label>
           <label>${t('Созвездие')}<select class="input" data-f="cons">${opt([0, 1, 2, 3, 4, 5, 6].map((k) => [String(k), `C${k}`]), String(e.cons))}</select></label>
-          <label>${t('Таланты (атака / навык / взрыв)')}<span class="tri">${e.talents.map((t, i) => `<input class="input" type="number" min="1" max="15" data-t="${i}" value="${t}" aria-label="${t('Уровень таланта {n}', { n: i + 1 })}">`).join('')}</span></label>
+          <label>${t('Таланты (атака / навык / взрыв)')}<span class="tri">${e.talents.map((level, i) => `<input class="input" type="number" min="1" max="15" data-t="${i}" value="${level}" aria-label="${t('Уровень таланта {n}', { n: i + 1 })}">`).join('')}</span></label>
         </fieldset>
         <fieldset><legend>${t('Оружие')}</legend>
           <label>${t('Оружие')}<select class="input" data-f="weapon"><option value="">—</option>${opt(ws, e.weapon)}</select></label>
@@ -255,7 +320,49 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   document.addEventListener('click', (ev) => {
     const b = (ev.target as HTMLElement).closest('button');
     if (!b) return;
-    if (b.dataset.edit) openEditor(editing === b.dataset.edit ? null : b.dataset.edit);
+    if (b.dataset.filterEl) {
+      pickerElement = pickerElement === b.dataset.filterEl ? '' : b.dataset.filterEl;
+      renderPicker();
+    } else if (b.dataset.pick) {
+      const c = chars.get(b.dataset.pick);
+      if (!c) return;
+      const existing = roster.find((e) => e.s === c.s);
+      if (existing) {
+        roster = roster.filter((e) => e.key !== existing.key);
+        for (const h of [1, 2]) teams[h] = (teams[h] ?? []).filter((k) => k !== existing.key);
+        if (editing === existing.key) openEditor(null);
+        status(t('{name} убран', { name: c.n }));
+      } else {
+        roster = [fromBuild(c.s), ...roster];
+        status(t('{name} добавлен', { name: c.n }));
+      }
+      persist(); renderRoster(); renderTeams();
+    } else if (b.dataset.toHalf) {
+      const h = Number(b.dataset.toHalf), other = h === 1 ? 2 : 1, key = b.dataset.key!;
+      if (teams[h]?.includes(key)) teams[h] = teams[h].filter((k) => k !== key);
+      else {
+        if ((teams[h] ?? []).length >= 4) return status(t('В {n}-й половине уже 4 персонажа', { n: h }), true);
+        teams[other] = (teams[other] ?? []).filter((k) => k !== key);
+        teams[h] = [...(teams[h] ?? []), key];
+      }
+      persist(); renderTeams();
+    } else if (b.dataset.clearHalf) {
+      teams[Number(b.dataset.clearHalf)] = [];
+      persist(); renderTeams();
+    } else if (b.dataset.takeHalf && b.dataset.takeTeam) {
+      const h = Number(b.dataset.takeHalf);
+      const half = halves.find((x) => x.half === h);
+      const team = half?.teams[Number(b.dataset.takeTeam)];
+      if (!team) return;
+      const used = new Set(teams[h === 1 ? 2 : 1] ?? []);
+      const available = team.members.map((s) => roster.find((e) => e.s === s && !used.has(e.key)));
+      teams[h] = available.filter((e): e is Entry => Boolean(e)).map((e) => e.key);
+      const missing = team.members.filter((_, i) => !available[i]).map((s) => chars.get(s)?.n ?? s);
+      persist(); renderTeams();
+      status(missing.length
+        ? t('Поставлено {n} из 4. Нет: {list}', { n: teams[h].length, list: missing.join(', ') })
+        : t('Команда «{name}» поставлена', { name: t(team.name ?? '') }));
+    } else if (b.dataset.edit) openEditor(editing === b.dataset.edit ? null : b.dataset.edit);
     else if (b.hasAttribute('data-close')) openEditor(null);
     else if (b.hasAttribute('data-remove') && editing) {
       roster = roster.filter((x) => x.key !== editing);
@@ -268,6 +375,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   function renderTeams() {
     for (const h of [1, 2]) {
       const half = halves.find((x) => x.half === h);
+      const clear = document.querySelector<HTMLButtonElement>(`[data-clear-half="${h}"]`)!;
       const need = document.querySelector<HTMLElement>(`[data-need="${h}"]`)!;
       need.textContent = half ? `${t(half.label)}. ${t('Нужно')}: ${half.need.map((g) => g.map((e) => EL[e]).join(` ${t('или')} `)).join(' + ')}.` : '';
       teams[h] = (teams[h] ?? []).filter((k) => roster.some((e) => e.key === k));
@@ -281,7 +389,18 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
           <select class="input" data-half="${h}" data-i="${i}" aria-label="${t('Персонаж {i}, {h}-я половина', { i: i + 1, h })}"><option value="">${t('Пусто')}</option>
           ${options.filter((o) => o.key === cur || !teams[h].includes(o.key)).map((o) => `<option value="${o.key}" ${o.key === cur ? 'selected' : ''}>${esc(chars.get(o.s)!.n)}</option>`).join('')}</select></label>`;
       }).join('');
+      clear.hidden = !teams[h].length;
+      document.querySelector<HTMLElement>(`[data-recommend="${h}"]`)!.innerHTML = half?.teams.length
+        ? `<h3>${esc(t('Рекомендуем'))}</h3>${half.teams.map((tm, i) => `<div class="recommended-team">
+            <span class="recommended-name">${esc(t(tm.name ?? ''))}</span>
+            <span class="recommended-icons">${tm.members.map((s) => {
+              const c = chars.get(s);
+              return c ? `<img class="${roster.some((e) => e.s === s) ? '' : 'missing'}" src="${esc(c.i)}" alt="${esc(c.n)}" title="${esc(roster.some((e) => e.s === s) ? c.n : t('Нет в ваших персонажах'))}" width="32" height="32" loading="lazy">` : '';
+            }).join('')}</span>
+            <button class="btn small" type="button" data-take-half="${h}" data-take-team="${i}">${esc(t('Взять'))}</button>
+          </div>`).join('')}` : '';
     }
+    renderRoster();
   }
   document.addEventListener('change', (ev) => {
     const t = ev.target as HTMLSelectElement;
@@ -290,6 +409,13 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     const arr = [...(teams[h] ?? [])];
     arr[i] = t.value;
     teams[h] = arr.filter(Boolean);
+    persist(); renderTeams();
+  });
+
+  $('reset-teams').addEventListener('click', () => {
+    teams = { 1: [], 2: [] };
+    checked = false;
+    $('result').innerHTML = '';
     persist(); renderTeams();
   });
 
@@ -450,7 +576,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   const verdict = (v: number) => v >= 80 ? ['good', t('Готова к 9★ в зале')] : v >= 62 ? ['mid', t('Пройдёт, но впритык')] : ['bad', t('Скорее не хватит')];
   const noteLi = (n: Note) => `<li class="${n.ok === true ? 'ok' : n.ok === false ? 'no' : 'tip'}">${esc(n.text)}</li>`;
 
-  $('check').addEventListener('click', () => {
+  const renderResult = (scroll: boolean) => {
     const res = [1, 2].map(checkHalf);
     if (res.every((r) => !r)) { $('result').innerHTML = `<p class="notice">${t('Соберите хотя бы одну команду: выберите персонажей в слотах половин или нажмите «Подобрать из моих персонажей».')}</p>`; return; }
     $('result').innerHTML = `<h2 class="h-sec">${t('Результат')}</h2><div class="results">${res.map((r, i) => {
@@ -466,8 +592,9 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       </article>`;
     }).join('')}</div>
     <p class="muted small">${t('Оценка складывается из уровня, оружия, сета, основных и итоговых статов (до 100 баллов на персонажа) и того, закрывает ли команда требования половины. Реальный урон зависит ещё от ротации и созвездий.')}</p>`;
-    $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+    if (scroll) $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  $('check').addEventListener('click', () => { checked = true; renderResult(true); });
 
   renderRoster(); renderTeams();
 </script>
@@ -475,6 +602,29 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 <style>
   .tc { display: grid; gap: 14px; }
   label { display: grid; gap: .3rem; font-size: .82rem; color: var(--muted); }
+  .abyss-context { margin: 0 0 1rem; padding: .65rem .85rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+  .panel-head .h-sec { margin: 0; }
+  #clear-roster[hidden], .team .btn[hidden], .picker[hidden] { display: none; }
+  #open-picker { margin-top: .7rem; }
+  .picker { display: grid; gap: .7rem; margin-top: .7rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius); }
+  .picker-filters { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .picker-filters :global(.btn) { color: var(--el); }
+  .picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: .5rem; }
+  .picker-grid :global(.pick) {
+    min-width: 0; display: grid; justify-items: center; gap: .3rem; padding: .45rem .25rem;
+    border: 2px solid var(--el); border-radius: var(--radius); background: var(--surface-2); cursor: pointer;
+  }
+  .picker-grid :global(.pick[aria-pressed="true"]) { background: var(--accent-soft); }
+  .picker-grid :global(.pick img) { border-radius: 8px; }
+  .picker-grid :global(.pick span) { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; }
+  .recommend { margin-top: .8rem; }
+  .recommend :global(h3) { margin: 0 0 .5rem; font-size: .9rem; }
+  .recommend :global(.recommended-team) { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: .35rem 0; border-top: 1px solid var(--border); }
+  .recommend :global(.recommended-name) { flex: 1 1 130px; min-width: 0; font-size: .85rem; }
+  .recommend :global(.recommended-icons) { display: flex; gap: .2rem; }
+  .recommend :global(.recommended-icons img) { border-radius: 6px; }
+  .recommend :global(.recommended-icons .missing) { opacity: .4; }
   .add { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
   .grow { flex: 1 1 240px; }
   .uidrow { display: flex; gap: 6px; }
@@ -484,12 +634,16 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   .status.bad { color: var(--bad); }
   .roster { display: flex; flex-wrap: wrap; gap: 8px; margin-top: .6rem; }
   .roster :global(.rchip) {
-    display: flex; align-items: center; gap: .5rem; padding: .3rem .7rem .3rem .3rem; border-radius: var(--radius);
-    background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--el); cursor: pointer; text-align: left;
+    display: flex; align-items: center; gap: .25rem; min-width: 0; max-width: 100%; padding: .3rem;
+    border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--el);
   }
-  .roster :global(.rchip[aria-pressed="true"]) { border-color: var(--accent); background: var(--accent-soft); }
+  .roster :global(.rchip-edit) { display: flex; align-items: center; gap: .5rem; min-width: 0; border: 0; background: none; color: inherit; cursor: pointer; text-align: left; }
+  .roster :global(.rchip-edit[aria-pressed="true"]) { color: var(--accent); }
+  .roster :global(.rchip-edit span) { min-width: 0; overflow-wrap: anywhere; }
+  .roster :global(.rchip-halves) { display: flex; gap: .2rem; margin-left: auto; }
+  .roster :global(.rchip-halves .btn) { padding: .2rem .4rem; }
   .roster :global(.rchip img) { border-radius: 8px; }
-  .roster :global(.rchip span) { display: grid; line-height: 1.2; }
+  .roster :global(.rchip-edit span) { display: grid; line-height: 1.2; }
   .roster :global(.rchip small) { color: var(--muted); font-size: .74rem; }
 
   .editor-panel :global(.ed-head) { display: flex; gap: .8rem; align-items: center; margin-bottom: 1rem; }
@@ -537,4 +691,5 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   #result :global(.members summary img) { border-radius: 8px; }
   #result :global(.mscore) { margin-left: auto; font: 600 1rem var(--font-display); }
   @media (max-width: 860px) { .teams, #result :global(.results) { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .picker-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>

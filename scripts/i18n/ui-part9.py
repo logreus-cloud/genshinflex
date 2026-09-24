@@ -1,0 +1,23 @@
+# Перевод интерфейса, часть 9: доработка проверки команды
+T = [
+("Требования и рекомендации — для 12-го этажа текущей Бездны.", "Requirements and recommendations are for Floor 12 of the current Abyss.", "Los requisitos y recomendaciones son para el piso 12 del Abismo actual."),
+("Враги и команды всех этажей", "Enemies and teams for all floors", "Enemigos y equipos de todos los pisos"),
+("Очистить список", "Clear roster", "Vaciar lista"),
+("Выбрать из всех персонажей", "Choose from all characters", "Elegir entre todos los personajes"),
+("Скрыть список", "Hide list", "Ocultar lista"),
+("Поиск по имени", "Search by name", "Buscar por nombre"),
+("Выбрано: {n}", "Selected: {n}", "Seleccionados: {n}"),
+("Точно очистить? Нажмите ещё раз", "Clear for sure? Click again", "¿Seguro que quieres vaciarla? Haz clic otra vez"),
+("Список персонажей очищен.", "Character roster cleared.", "Se ha vaciado la lista de personajes."),
+("Сбросить составы", "Reset teams", "Restablecer equipos"),
+("{name} добавлен", "{name} added", "Se añadió a {name}"),
+("{name} убран", "{name} removed", "Se quitó a {name}"),
+("В 1-ю половину", "To the 1st half", "A la 1.ª mitad"),
+("Во 2-ю половину", "To the 2nd half", "A la 2.ª mitad"),
+("В {n}-й половине уже 4 персонажа", "The {n} half already has 4 characters", "La mitad {n} ya tiene 4 personajes"),
+("Рекомендуем", "Recommended", "Recomendamos"),
+("Нет в ваших персонажах", "Not in your roster", "No está en tu lista de personajes"),
+("Взять", "Use", "Usar"),
+("Команда «{name}» поставлена", "Team “{name}” selected", "Se ha elegido el equipo «{name}»"),
+("Поставлено {n} из 4. Нет: {list}", "Added {n} of 4. Missing: {list}", "Se añadieron {n} de 4. Faltan: {list}"),
+]
