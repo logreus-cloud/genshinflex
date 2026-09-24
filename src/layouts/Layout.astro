@@ -4,10 +4,10 @@ import QuickSearch from '../components/QuickSearch.astro';
 import { useData, LANGS, prefixOf } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
 
-interface Props { title?: string; description?: string; wide?: boolean; image?: string | null; type?: 'website' | 'article'; jsonLd?: object; }
+interface Props { title?: string; description?: string; wide?: boolean; noindex?: boolean; image?: string | null; type?: 'website' | 'article'; jsonLd?: object; }
 const {
   title, description = t('Справочник по Genshin Impact на русском: билды, команды, проверка команды для Бездны и трекер круток.'),
-  wide = false, image, type = 'website', jsonLd,
+  wide = false, image, type = 'website', jsonLd, noindex = false,
 } = Astro.props;
 const fullTitle = title ? `${title} — GenshinFlex` : `GenshinFlex — ${t('билды и команды Genshin Impact под текущую Бездну')}`;
 // Cloudflare отдаёт страницы с «/» на конце — canonical должен совпадать с реальным адресом
@@ -58,6 +58,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <meta property="og:site_name" content="GenshinFlex" />
     <meta property="og:locale" content={OG_LOCALE[lang]} />

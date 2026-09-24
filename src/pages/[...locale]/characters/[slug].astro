@@ -1,11 +1,12 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import Team from '../../../components/Team.astro';
 import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
 import { useData, LANGS, type Character } from '../../../lib/data';
-const { characters, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
+import { makeLookup, renderGuide } from '../../../lib/guide-markup';
+const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
 
 export function getStaticPaths() {
   return LANGS.flatMap((l) => useData(l).characters.map((c) => ({ params: { locale: l === 'ru' ? undefined : l, slug: c.slug }, props: { c } })));
@@ -17,7 +18,9 @@ const build = allBuilds.find((b) => b.data.character === c.slug);
 // На английском и испанском — переведённый текст разбора; сгенерированные разборы собираем из переведённого шаблона
 const i18nEntry = lang !== 'ru' ? (await getCollection('buildsI18n')).find((e) => e.id === `${lang}/${c.slug}`) : undefined;
 const templated = lang !== 'ru' && !i18nEntry && build?.body?.startsWith('Краткий билд по данным сообщества');
-const Content = build && !templated ? (await render(i18nEntry ?? build)).Content : null;
+// Текст разбора — Markdown с баблами и выносками, тот же рендер, что и в превью редактора гайдов
+const bodySrc = build && !templated ? (i18nEntry ?? build).body?.trim() : '';
+const bodyHtml = bodySrc ? renderGuide(bodySrc, makeLookup({ characters, weapons, artifacts, elements: ELEMENTS }, base), { tip: t('Совет'), warn: t('Важно'), info: t('На заметку') }) : '';
 const b = build?.data;
 
 // Где ещё встречается персонаж: команды других билдов и рекомендации текущего эндгейма
@@ -94,6 +97,10 @@ const jsonLd = b && {
           <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m10 3.5 1.9 4 4.3.5-3.2 3 .9 4.3L10 13.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5Z" /></svg>
           <span>{t('В избранное')}</span>
         </button>
+        <a class="btn edit" href={`${base}/guides/editor/?c=${c.slug}`} data-pagefind-ignore>
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4 16h3l8.5-8.5-3-3L4 13Zm7-10 3 3" /></svg>
+          <span>{b ? t('Дополнить гайд') : t('Написать гайд')}</span>
+        </a>
       </div>
     </header>
 
@@ -162,10 +169,11 @@ const jsonLd = b && {
             <div><span class="muted small">{t('Доп. статы')}</span><b>{b.substats.map(stat).join('  >  ')}</b></div>
             {b.talents.length > 0 && <div><span class="muted small">{t('Прокачка талантов')}</span><b>{b.talents.map((t) => TALENTS[t]).join('  >  ')}</b></div>}
           </div>
-          {Content && <div class="panel prose"><Content /></div>}
+          {bodyHtml && <div class="panel prose" set:html={bodyHtml} />}
+          {b.authors.length > 0 && <p class="muted small">{t('Авторы гайда')}: {b.authors.join(', ')}</p>}
           {templated && <div class="panel prose"><p>{t('Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.', { role: t(b.role).toLowerCase() })}</p></div>}
           {b.sources.length > 0 && (
-            <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`}>{t('Нашли ошибку в билде?')}</a></p>
+            <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`}>{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Дополнить гайд')}</a></p>
           )}
         </section>
 
@@ -192,6 +200,7 @@ const jsonLd = b && {
     ) : (
       <p class="notice" data-pagefind-ignore>
         {t('Билда для этого персонажа пока нет — он появится в одном из ближайших обновлений.')}
+        {' '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Напишите свой')}</a> {t('— после проверки он появится здесь.')}
       </p>
     )}
 
@@ -311,6 +320,8 @@ const jsonLd = b && {
   .meta dd { margin: 0; }
   .fav svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
   .fav[aria-pressed="true"] svg { fill: currentColor; }
+  .edit { margin-left: .4rem; }
+  .edit svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 
   .tabs {
     position: sticky; top: var(--top-h); z-index: 5; display: flex; gap: 2px; overflow-x: auto; margin-top: 12px;

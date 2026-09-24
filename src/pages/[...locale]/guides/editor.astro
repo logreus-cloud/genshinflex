@@ -1,0 +1,747 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { useData, LANGS } from '../../../lib/data';
+// Редактор гайдов: каждая страница существует в трёх языках, гайд отправляется на языке страницы
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t, base, TALENTS } = useData(Astro.currentLocale);
+const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие')], ['set', t('Сет')], ['el', t('Стихия')], ['text', t('Текст')], ['gold', t('Золотой')]];
+---
+<Layout title={t('Редактор гайдов')} description={t('Напишите свой гайд на персонажа Genshin Impact или дополните существующий: билд, команды, текст с превью.')} wide noindex>
+  <div class="ge">
+    <nav class="crumbs small muted"><a href={`${base}/guides/`}>{t('Руководства')}</a> / {t('Редактор')}</nav>
+    <h1>{t('Редактор гайдов')}</h1>
+    <p class="muted lead">{t('Напишите новый гайд или дополните существующий. Слева — редактор, справа — как гайд будет выглядеть на сайте. Всё сохраняется в черновик в этом браузере. После отправки гайд проверяет модератор и только потом публикует.')}</p>
+
+    <div class="panel who">
+      <label class="who-pick">
+        <span class="muted small">{t('Персонаж')}</span>
+        <span class="pick big"><img alt="" width="40" height="40" hidden /><input class="input" id="char" list="dl-char" data-kind="char" placeholder={t('Начните вводить имя — например, Фурина')} autocomplete="off" /></span>
+      </label>
+      <span class="chip" id="mode" hidden></span>
+      <p class="small muted" id="notice" aria-live="polite"></p>
+    </div>
+
+    <div class="view-switch" role="tablist" aria-label={t('Что показать')}>
+      <button type="button" role="tab" aria-selected="true" data-view="edit">{t('Редактор')}</button>
+      <button type="button" role="tab" aria-selected="false" data-view="preview">{t('Превью')}</button>
+    </div>
+
+    <div class="split" data-view="edit">
+      <form class="editor" id="ed" novalidate autocomplete="off">
+        <details class="panel sec" open>
+          <summary>{t('Основное')}</summary>
+          <div class="cols">
+            <label><span class="muted small">{t('Роль')}</span><input class="input" name="role" list="dl-role" maxlength="60" placeholder={t('ДД, Саппорт, Хилер…')} /></label>
+            <label><span class="muted small">{t('Патч')}</span><input class="input" name="patch" maxlength="10" placeholder="7.1" /></label>
+          </div>
+        </details>
+
+        <details class="panel sec" open>
+          <summary>{t('Оружие')} <small class="muted">{t('от лучшего к запасному')}</small></summary>
+          <div class="rows" data-list="weapons"></div>
+          <button class="btn add" type="button" data-add="weapons">+ {t('Оружие')}</button>
+        </details>
+
+        <details class="panel sec" open>
+          <summary>{t('Артефакты')} <small class="muted">{t('второй сет — для вариантов 2 + 2')}</small></summary>
+          <div class="rows" data-list="artifacts"></div>
+          <button class="btn add" type="button" data-add="artifacts">+ {t('Вариант сетов')}</button>
+        </details>
+
+        <details class="panel sec" open>
+          <summary>{t('Статы и таланты')}</summary>
+          <div class="cols three">
+            <label><span class="muted small">{t('Часы')}</span><input class="input" name="sands" list="dl-sands" maxlength="80" /></label>
+            <label><span class="muted small">{t('Кубок')}</span><input class="input" name="goblet" list="dl-goblet" maxlength="80" /></label>
+            <label><span class="muted small">{t('Корона')}</span><input class="input" name="circlet" list="dl-circlet" maxlength="80" /></label>
+          </div>
+          <label><span class="muted small">{t('Доп. статы — по приоритету, через «>»')}</span>
+            <input class="input" name="substats" maxlength="300" placeholder={t('Шанс / Крит. урон > Восст. энергии > Сила атаки %')} /></label>
+          <div class="cols three">
+            {[1, 2, 3].map((n) => (
+              <label><span class="muted small">{t('Таланты: {n}-й', { n })}</span>
+                <select class="input" name={`t${n}`}>
+                  <option value="">—</option>
+                  {(['normal', 'skill', 'burst'] as const).map((k) => <option value={k}>{TALENTS[k]}</option>)}
+                </select></label>
+            ))}
+          </div>
+        </details>
+
+        <details class="panel sec" open>
+          <summary>{t('Команды')}</summary>
+          <div class="rows" data-list="teams"></div>
+          <button class="btn add" type="button" data-add="teams">+ {t('Команда')}</button>
+        </details>
+
+        <details class="panel sec" open>
+          <summary>{t('Текст гайда')}</summary>
+          <div class="tb" role="toolbar" aria-label={t('Форматирование текста')}>
+            <button type="button" data-md="h2" title={t('Заголовок')}>{t('Заголовок')}</button>
+            <button type="button" data-md="bold" title={t('Жирный (Ctrl+B)')}><b>{t('Ж')}</b></button>
+            <button type="button" data-md="italic" title={t('Курсив (Ctrl+I)')}><i>{t('К')}</i></button>
+            <button type="button" data-md="mark" title={t('Выделение цветом')}><mark>{t('Выд')}</mark></button>
+            <button type="button" data-md="ul" title={t('Список')}>• {t('Список')}</button>
+            <button type="button" data-md="ol" title={t('Нумерованный список')}>1. {t('Список')}</button>
+            <button type="button" data-md="quote" title={t('Цитата')}>❝ {t('Цитата')}</button>
+            <span class="sep" aria-hidden="true"></span>
+            <button type="button" data-pop="link" title={t('Ссылка (Ctrl+K)')}>{t('Ссылка')}</button>
+            <button type="button" data-pop="bubble" title={t('Бабл: персонаж, оружие, сет, стихия или свой текст')}>{t('Бабл')}</button>
+            <button type="button" data-pop="callout" title={t('Блок-выноска')}>{t('Выноска')}</button>
+          </div>
+
+          <div class="pop panel" id="pop-link" hidden>
+            <label><span class="muted small">{t('Текст ссылки')}</span><input class="input" data-f="text" placeholder={t('Например, разбор ротации')} /></label>
+            <label><span class="muted small">{t('Адрес')}</span><input class="input" data-f="url" placeholder={t('https://… или /characters/furina/')} /></label>
+            <div class="row"><button type="button" class="btn primary" data-insert="link">{t('Вставить')}</button><button type="button" class="btn" data-close>{t('Отмена')}</button>
+              <small class="muted" data-f="err"></small></div>
+          </div>
+
+          <div class="pop panel" id="pop-bubble" hidden>
+            <div class="seg" role="radiogroup" aria-label={t('Тип бабла')}>
+              {bubbleKinds.map(([k, v], i) => (
+                <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-kind={k}>{v}</button>
+              ))}
+            </div>
+            <input class="input" data-f="value" list="dl-char" placeholder={t('Имя персонажа')} />
+            <div class="row"><span class="muted small">{t('Будет так:')}</span><span class="prose bubble-demo" data-f="demo"></span></div>
+            <div class="row"><button type="button" class="btn primary" data-insert="bubble">{t('Вставить')}</button><button type="button" class="btn" data-close>{t('Отмена')}</button></div>
+          </div>
+
+          <div class="pop panel" id="pop-callout" hidden>
+            <div class="row">
+              <button type="button" class="btn" data-callout="tip">{t('Совет')}</button>
+              <button type="button" class="btn" data-callout="warn">{t('Важно')}</button>
+              <button type="button" class="btn" data-callout="info">{t('На заметку')}</button>
+              <button type="button" class="btn" data-close>{t('Отмена')}</button>
+            </div>
+          </div>
+
+          <textarea class="input body" name="body" rows="16" maxlength="20000" spellcheck="true"
+            placeholder={t('Расскажите, как играть персонажем: суть, ротация, на что обратить внимание. Пустая строка — новый абзац.')}></textarea>
+          <div class="row between"><small class="muted" id="count">0 / 20 000</small></div>
+          <details class="cheat">
+            <summary class="small">{t('Шпаргалка по разметке')}</summary>
+            <table class="small">
+              <tbody>
+                <tr><td><code>## {t('Заголовок')}</code></td><td>{t('заголовок раздела')} (<code>###</code> — {t('поменьше')})</td></tr>
+                <tr><td><code>**{t('жирный')}**</code>, <code>*{t('курсив')}*</code>, <code>=={t('выделение')}==</code></td><td>{t('оформление текста')}</td></tr>
+                <tr><td><code>[{t('текст')}](https://…)</code></td><td>{t('ссылка')}</td></tr>
+                <tr><td><code>- {t('пункт')}</code>, <code>1. {t('пункт')}</code></td><td>{t('списки')}</td></tr>
+                <tr><td><code>&gt; {t('цитата')}</code></td><td>{t('цитата')}</td></tr>
+                <tr><td><code>{'{{char:furina}}'}</code>, <code>{'{{weapon:…}}'}</code>, <code>{'{{set:…}}'}</code>, <code>{'{{el:hydro}}'}</code></td><td>{t('бабл с иконкой и ссылкой — удобнее через кнопку «Бабл»')}</td></tr>
+                <tr><td><code>{`{{${t('любой текст')}}}`}</code>, <code>{`{{gold:${t('текст')}}}`}</code></td><td>{t('простой и золотой бабл')}</td></tr>
+                <tr><td><code>:::tip</code> … <code>:::</code></td><td>{t('выноска: tip — совет, warn — важно, info — на заметку')}</td></tr>
+              </tbody>
+            </table>
+          </details>
+        </details>
+
+        <div class="panel sec send">
+          <h2 class="h-sec">{t('Отправка на проверку')}</h2>
+          <ul class="checks small" id="checks"></ul>
+          <div class="cols">
+            <label><span class="muted small">{t('Имя или ник — подпишем гайд')}</span><input class="input" name="author" maxlength="60" required /></label>
+            <label><span class="muted small">{t('Как с вами связаться')} <span>{t('(необязательно)')}</span></span><input class="input" name="contact" maxlength="120" placeholder={t('Telegram, Discord или почта')} /></label>
+          </div>
+          <label><span class="muted small">{t('Комментарий для модератора')} <span>{t('(необязательно)')}</span></span>
+            <textarea class="input" name="comment" rows="2" maxlength="1000" placeholder={t('Что изменили и почему, откуда данные')}></textarea></label>
+          <label class="trap" aria-hidden="true">{t('Сайт')}<input name="website" tabindex="-1" autocomplete="off" /></label>
+          <div class="row">
+            <button class="btn primary" type="submit">{t('Отправить гайд')}</button>
+            <button class="btn" type="button" id="reset">{t('Сбросить черновик')}</button>
+            <p class="status small" id="status" aria-live="polite"></p>
+          </div>
+          <p class="muted small">{t('Гайд публикуется после проверки модератором, иногда с правками. Сохраняем только сам гайд, подпись и контакт, если вы его указали.')}</p>
+        </div>
+      </form>
+
+      <aside class="preview" aria-label={t('Превью гайда')}>
+        <div class="pv-bar small muted"><span>{t('Превью')}</span><span>{t('так гайд будет выглядеть на странице персонажа')}</span></div>
+        <div class="pv" id="pv"><p class="muted">{t('Выберите персонажа — здесь появится превью.')}</p></div>
+      </aside>
+    </div>
+    <div id="lists" hidden></div>
+  </div>
+</Layout>
+
+<script>
+  import { makeLookup, renderGuide, esc } from '../../../lib/guide-markup';
+  import { store } from '../../../scripts/common';
+  import { BASE, LANG, t } from '../../../scripts/search';
+
+  type Item = { slug: string; name: string; icon: string | null; element?: string; weapon?: string; rarity?: number; splash?: string | null; title?: string };
+  type Guide = {
+    character: string; role: string; patch: string;
+    weapons: { slug: string; note?: string }[]; artifacts: { sets: string[]; note?: string }[];
+    mainStats: { sands: string; goblet: string; circlet: string }; substats: string[]; talents: string[];
+    teams: { name?: string; members: string[]; note?: string }[]; body: string;
+  };
+  type Data = {
+    characters: Item[]; weapons: Item[]; artifacts: Item[]; elements: Record<string, string>; weaponTypes: Record<string, string>;
+    talents: Record<string, string>; options: Record<'role' | 'sands' | 'goblet' | 'circlet', string[]>;
+    builds: Record<string, Guide & { updated: string }>;
+  };
+  type Drafts = Record<string, { guide: Guide; ts: number }>;
+  type PickKind = 'char' | 'weapon' | 'set';
+
+  // Черновики — отдельно для каждого языка: гайд пишется на языке страницы
+  const DRAFTS = LANG === 'ru' ? 'gf:guide-drafts' : `gf:guide-drafts:${LANG}`;
+  const ME = 'gf:guide-author';
+  const LOCALE = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG];
+  const CALLOUTS = { tip: t('Совет'), warn: t('Важно'), info: t('На заметку') };
+  const form = document.querySelector<HTMLFormElement>('#ed')!;
+  const pv = document.querySelector<HTMLElement>('#pv')!;
+  const ta = form.elements.namedItem('body') as HTMLTextAreaElement;
+  const charInput = document.querySelector<HTMLInputElement>('#char')!;
+  const notice = document.querySelector<HTMLElement>('#notice')!;
+  const modeChip = document.querySelector<HTMLElement>('#mode')!;
+  const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
+  const norm = (s: string) => s.trim().toLowerCase().replace(/ё/g, 'е');
+  const debounce = (fn: () => void, ms: number) => { let id = 0; return () => { clearTimeout(id); id = window.setTimeout(fn, ms); }; };
+  const date = (d: Date | number | string) => new Date(d).toLocaleDateString(LOCALE);
+
+  init();
+
+  async function init() {
+    const data: Data = await fetch(`${BASE}/data/editor.json`).then((r) => r.json());
+    const lookup = makeLookup(data, BASE);
+    const render = (src: string) => renderGuide(src, lookup, CALLOUTS);
+    const index = (list: Item[]) => {
+      const bySlug = new Map(list.map((i) => [i.slug, i]));
+      const byName = new Map(list.map((i) => [norm(i.name), i]));
+      return { bySlug, find: (v: string) => byName.get(norm(v)) ?? bySlug.get(v.trim()) };
+    };
+    const idx = { char: index(data.characters), weapon: index(data.weapons), set: index(data.artifacts) };
+    const latestPatch = Object.values(data.builds).map((b) => b.patch).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0] ?? '';
+    let cur: Item | undefined;
+
+    // Подсказки для полей ввода
+    const options = (list: string[]) => list.map((s) => `<option value="${esc(s)}">`).join('');
+    const lists: Record<string, string> = {
+      'dl-char': options(data.characters.map((c) => c.name)),
+      'dl-weapon': '',
+      'dl-weapon-all': data.weapons.map((w) => `<option value="${esc(w.name)}">${'★'.repeat(w.rarity ?? 0)}</option>`).join(''),
+      'dl-set': options(data.artifacts.map((a) => a.name)),
+      'dl-el': options(Object.values(data.elements)),
+      'dl-role': options(data.options.role),
+      'dl-sands': options(data.options.sands),
+      'dl-goblet': options(data.options.goblet),
+      'dl-circlet': options(data.options.circlet),
+    };
+    document.querySelector('#lists')!.innerHTML = Object.entries(lists).map(([id, html]) => `<datalist id="${id}">${html}</datalist>`).join('');
+    const weaponList = document.querySelector<HTMLDataListElement>('#dl-weapon')!;
+
+    // ---------- Поля выбора с иконкой: имя вводится текстом, слаг находится по списку ----------
+    const picker = (kind: PickKind, slug = '', placeholder = '') => {
+      const it = slug ? idx[kind].bySlug.get(slug) : undefined;
+      return `<span class="pick"><img alt="" width="28" height="28" ${it?.icon ? `src="${esc(it.icon)}"` : 'hidden'} />`
+        + `<input class="input" list="dl-${kind}" data-kind="${kind}" placeholder="${esc(placeholder)}" value="${esc(it?.name ?? '')}" /></span>`;
+    };
+    const resolve = (input: HTMLInputElement) => idx[input.dataset.kind as PickKind].find(input.value);
+    const paintPick = (input: HTMLInputElement) => {
+      const it = resolve(input);
+      const img = input.previousElementSibling as HTMLImageElement;
+      if (it?.icon) { img.src = it.icon; img.hidden = false; } else img.hidden = true;
+      input.toggleAttribute('aria-invalid', Boolean(input.value.trim() && !it));
+    };
+    const controls = `<span class="ctl"><button type="button" data-act="up" title="${t('Выше')}" aria-label="${t('Выше')}">↑</button><button type="button" data-act="down" title="${t('Ниже')}" aria-label="${t('Ниже')}">↓</button><button type="button" data-act="del" title="${t('Удалить')}" aria-label="${t('Удалить')}">✕</button></span>`;
+    const note = (v = '', ph = t('Заметка (необязательно)')) => `<input class="input note" maxlength="200" placeholder="${esc(ph)}" value="${esc(v)}" />`;
+    const ROWS = {
+      weapons: (w?: Guide['weapons'][number]) => `${picker('weapon', w?.slug, t('Оружие'))}${note(w?.note, t('Заметка: пробуждение, условия…'))}${controls}`,
+      artifacts: (a?: Guide['artifacts'][number]) => `${picker('set', a?.sets[0], t('Сет'))}${picker('set', a?.sets[1], t('Второй сет (для 2 + 2)'))}${note(a?.note, t('Заметка: «4 предмета» или «2 + 2»'))}${controls}`,
+      teams: (tm?: Guide['teams'][number]) => `<input class="input tname" maxlength="80" placeholder="${esc(t('Название команды'))}" value="${esc(tm?.name ?? '')}" />${controls}`
+        + `<div class="members">${[0, 1, 2, 3].map((i) => picker('char', tm?.members[i], t('Участник {n}', { n: i + 1 }))).join('')}</div>${note(tm?.note, t('Заметка к команде'))}`,
+    };
+    type ListName = keyof typeof ROWS;
+    const addRow = (name: ListName, value?: never) => {
+      const el = document.createElement('div');
+      el.className = `item ${name}`;
+      el.innerHTML = ROWS[name](value);
+      form.querySelector(`[data-list="${name}"]`)!.append(el);
+      return el;
+    };
+
+    // ---------- Форма ⇄ объект гайда ----------
+    const rowsOf = (name: ListName) => [...form.querySelectorAll<HTMLElement>(`[data-list="${name}"] > .item`)];
+    const slugsIn = (row: Element) => [...row.querySelectorAll<HTMLInputElement>('.pick input')].map((i) => resolve(i)?.slug ?? '').filter(Boolean);
+    const noteIn = (row: Element) => row.querySelector<HTMLInputElement>('.note')!.value.trim();
+    const collect = (): Guide => ({
+      character: cur?.slug ?? '',
+      role: field('role').value.trim(),
+      patch: field('patch').value.trim(),
+      weapons: rowsOf('weapons').map((r) => ({ slug: slugsIn(r)[0] ?? '', note: noteIn(r) })).filter((w) => w.slug),
+      artifacts: rowsOf('artifacts').map((r) => ({ sets: slugsIn(r), note: noteIn(r) })).filter((a) => a.sets.length),
+      mainStats: { sands: field('sands').value.trim(), goblet: field('goblet').value.trim(), circlet: field('circlet').value.trim() },
+      substats: field('substats').value.split('>').map((s) => s.trim()).filter(Boolean),
+      talents: [...new Set(['t1', 't2', 't3'].map((n) => field(n).value).filter(Boolean))],
+      teams: rowsOf('teams').map((r) => ({ name: r.querySelector<HTMLInputElement>('.tname')!.value.trim(), members: slugsIn(r), note: noteIn(r) })).filter((tm) => tm.members.length || tm.name),
+      body: ta.value,
+    });
+    const fill = (g: Partial<Guide>) => {
+      field('role').value = g.role ?? '';
+      field('patch').value = g.patch ?? latestPatch;
+      for (const k of ['sands', 'goblet', 'circlet'] as const) field(k).value = g.mainStats?.[k] ?? '';
+      field('substats').value = (g.substats ?? []).join(' > ');
+      ['t1', 't2', 't3'].forEach((n, i) => { field(n).value = g.talents?.[i] ?? ''; });
+      ta.value = g.body ?? '';
+      for (const name of Object.keys(ROWS) as ListName[]) {
+        form.querySelector(`[data-list="${name}"]`)!.innerHTML = '';
+        const items = (g[name] ?? []) as never[];
+        (items.length ? items : [undefined as never]).forEach((v) => addRow(name, v));
+      }
+      form.querySelectorAll<HTMLInputElement>('.pick input').forEach(paintPick);
+      refresh();
+    };
+
+    // ---------- Выбор персонажа и черновики ----------
+    const drafts = () => store.get<Drafts>(DRAFTS, {});
+    const saveDraft = debounce(() => {
+      if (!cur) return;
+      const all = drafts();
+      all[cur.slug] = { guide: collect(), ts: Date.now() };
+      // Храним черновики пяти последних персонажей
+      store.set(DRAFTS, Object.fromEntries(Object.entries(all).sort((a, b) => b[1].ts - a[1].ts).slice(0, 5)));
+    }, 400);
+    const dropDraft = (slug: string) => { const all = drafts(); delete all[slug]; store.set(DRAFTS, all); };
+    const when = (ts: number) => new Date(ts).toLocaleString(LOCALE, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+
+    const setCharacter = (slug: string) => {
+      cur = idx.char.bySlug.get(slug);
+      if (!cur) return;
+      charInput.value = cur.name;
+      paintPick(charInput);
+      history.replaceState(null, '', `?c=${cur.slug}`);
+      weaponList.innerHTML = data.weapons.filter((w) => w.weapon === cur!.weapon).map((w) => `<option value="${esc(w.name)}">${'★'.repeat(w.rarity ?? 0)}</option>`).join('');
+      const build = data.builds[cur.slug];
+      modeChip.hidden = false;
+      modeChip.textContent = build ? t('Правка существующего гайда') : t('Новый гайд');
+      modeChip.classList.toggle('gold', !build);
+      const draft = drafts()[cur.slug];
+      if (draft) {
+        fill(draft.guide);
+        notice.innerHTML = `${esc(t('Восстановлен черновик от {date}.', { date: when(draft.ts) }))} <button type="button" class="link" data-restart>${esc(build ? t('Начать с текущего гайда') : t('Начать с чистого листа'))}</button>`;
+      } else if (build) {
+        fill(build);
+        notice.textContent = t('Загружен текущий гайд (патч {v}, обновлён {date}) — правьте и дополняйте что нужно.', { v: build.patch, date: date(build.updated) });
+      } else {
+        fill({});
+        notice.textContent = t('Гайда на этого персонажа ещё нет — вы можете написать первый.');
+      }
+    };
+    const restart = () => {
+      if (!cur) return;
+      dropDraft(cur.slug);
+      setCharacter(cur.slug);
+    };
+
+    charInput.addEventListener('change', () => {
+      const it = resolve(charInput);
+      paintPick(charInput);
+      if (it && it.slug !== cur?.slug) setCharacter(it.slug);
+    });
+    charInput.addEventListener('input', () => { const it = resolve(charInput); if (it && it.slug !== cur?.slug) setCharacter(it.slug); });
+    notice.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('[data-restart]')) restart(); });
+    document.querySelector('#reset')!.addEventListener('click', restart);
+
+    // ---------- Проверки перед отправкой ----------
+    const checksEl = document.querySelector<HTMLElement>('#checks')!;
+    const problems = (g: Guide) => {
+      const out: string[] = [];
+      if (!cur) out.push(t('Выберите персонажа.'));
+      const bad = [...form.querySelectorAll<HTMLInputElement>('.pick input[aria-invalid]')].map((i) => `«${i.value.trim()}»`);
+      if (bad.length) out.push(t('Не нашли в списке: {list} — выберите вариант из подсказок.', { list: bad.join(', ') }));
+      g.teams.forEach((tm, i) => {
+        if (tm.members.length !== 4) out.push(t('В команде {name}: {n} из 4 участников.', { name: tm.name ? `«${tm.name}»` : `№${i + 1}`, n: tm.members.length }));
+      });
+      if (!g.weapons.length && !g.artifacts.length && !g.teams.length && g.body.trim().length < 50) out.push(t('Гайд пока пустой: добавьте оружие, артефакты, команды или текст.'));
+      if (!field('author').value.trim()) out.push(t('Укажите имя или ник для подписи.'));
+      return out;
+    };
+
+    // ---------- Превью ----------
+    const slotName = { sands: t('Часы'), goblet: t('Кубок'), circlet: t('Корона') } as const;
+    const empty = (text: string) => `<p class="muted small empty">${esc(text)}</p>`;
+    const preview = (g: Guide) => {
+      if (!cur) { pv.innerHTML = `<p class="muted">${esc(t('Выберите персонажа — здесь появится превью.'))}</p>`; return; }
+      const c = cur;
+      const weapon = (s: string) => idx.weapon.bySlug.get(s)!;
+      const set = (s: string) => idx.set.bySlug.get(s)!;
+      const member = (s: string) => { const m = idx.char.bySlug.get(s)!; return `<span class="mem" data-el="${m.element}"><img src="${esc(m.icon ?? '')}" alt="" /><small>${esc(m.name)}</small></span>`; };
+      pv.innerHTML = `
+        <header class="pv-head" data-el="${c.element}">
+          ${c.splash ? `<img class="pv-splash" src="${esc(c.splash)}" alt="" />` : ''}
+          <div><p class="muted small">${esc(c.title ?? '')}</p><h2>${esc(c.name)}</h2>
+            <div class="row"><span class="chip gold">${'★'.repeat(c.rarity ?? 0)}</span><span class="chip" data-el="${c.element}">${esc(data.elements[c.element!] ?? '')}</span><span class="chip">${esc(data.weaponTypes[c.weapon!] ?? '')}</span></div></div>
+        </header>
+        <h3 class="h-sec">${esc(t('Билд'))} <small>${esc(t('патч {v}, обновлено {date}', { v: g.patch || '—', date: date(Date.now()) }))}</small></h3>
+        ${g.role ? `<p class="muted">${esc(g.role)}</p>` : ''}
+        <div class="pv-build">
+          <div class="panel"><h4>${esc(t('Оружие'))}</h4>${g.weapons.length ? `<ol class="rank">${g.weapons.map((w, i) => { const it = weapon(w.slug); return `<li><span class="n">${i + 1}</span><img class="r${it.rarity}" src="${esc(it.icon ?? '')}" alt="" /><span><b>${esc(it.name)}</b> <span class="muted small">${'★'.repeat(it.rarity ?? 0)}</span>${w.note ? `<small class="muted note">${esc(w.note)}</small>` : ''}</span></li>`; }).join('')}</ol>` : empty(t('Оружие не добавлено'))}</div>
+          <div class="panel"><h4>${esc(t('Артефакты'))}</h4>${g.artifacts.length ? `<ol class="rank">${g.artifacts.map((a, i) => `<li><span class="n">${i + 1}</span><span class="sets">${a.sets.map((s) => `<img src="${esc(set(s).icon ?? '')}" alt="" />`).join('')}</span><span><b>${esc(a.sets.map((s) => set(s).name).join(' + '))}</b>${a.note ? `<small class="muted note">${esc(a.note)}</small>` : ''}</span></li>`).join('')}</ol>` : empty(t('Сеты не добавлены'))}</div>
+        </div>
+        <div class="pv-stats">${(['sands', 'goblet', 'circlet'] as const).map((k) => `<div class="panel"><span class="muted small">${esc(slotName[k])}</span><b>${esc(g.mainStats[k] || '—')}</b></div>`).join('')}</div>
+        <div class="panel pv-prio">
+          <div><span class="muted small">${esc(t('Доп. статы'))}</span><b>${g.substats.length ? esc(g.substats.join('  >  ')) : '—'}</b></div>
+          ${g.talents.length ? `<div><span class="muted small">${esc(t('Прокачка талантов'))}</span><b>${g.talents.map((k) => esc(data.talents[k])).join('  >  ')}</b></div>` : ''}
+        </div>
+        ${g.body.trim() ? `<div class="panel prose">${render(g.body)}</div>` : ''}
+        <h3 class="h-sec">${esc(t('Команды'))}</h3>
+        ${g.teams.length ? `<div class="pv-teams">${g.teams.map((tm) => `<div class="panel team"><h4>${esc(tm.name || t('Без названия'))}</h4><div class="mems">${tm.members.map(member).join('')}${'<span class="mem ghost"></span>'.repeat(Math.max(0, 4 - tm.members.length))}</div>${tm.note ? `<p class="muted small">${esc(tm.note)}</p>` : ''}</div>`).join('')}</div>` : empty(t('Команды не добавлены'))}`;
+    };
+
+    const count = document.querySelector<HTMLElement>('#count')!;
+    const refresh = () => {
+      const g = collect();
+      preview(g);
+      const list = problems(g);
+      checksEl.innerHTML = list.length ? list.map((p) => `<li>${esc(p)}</li>`).join('') : `<li class="ok">${esc(t('Всё готово к отправке.'))}</li>`;
+      count.textContent = `${ta.value.length.toLocaleString(LOCALE)} / ${(20000).toLocaleString(LOCALE)}`;
+    };
+    const refreshSoon = debounce(refresh, 120);
+
+    form.addEventListener('input', (e) => {
+      const el = e.target as HTMLInputElement;
+      if (el.matches('.pick input')) paintPick(el);
+      if (el.name === 'author' || el.name === 'contact') store.set(ME, { author: field('author').value, contact: field('contact').value });
+      refreshSoon();
+      saveDraft();
+    });
+    form.addEventListener('change', () => { refreshSoon(); saveDraft(); });
+    form.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!btn) return;
+      if (btn.dataset.add) { const row = addRow(btn.dataset.add as ListName); row.querySelector<HTMLInputElement>('input')!.focus(); }
+      const row = btn.closest<HTMLElement>('.item');
+      if (btn.dataset.act && row) {
+        if (btn.dataset.act === 'up') row.previousElementSibling?.before(row);
+        if (btn.dataset.act === 'down') row.nextElementSibling?.after(row);
+        if (btn.dataset.act === 'del') row.remove();
+      }
+      if (btn.dataset.add || btn.dataset.act) { refresh(); saveDraft(); }
+    });
+
+    // ---------- Панель форматирования ----------
+    const replace = (s: number, e: number, text: string, selS?: number, selE?: number) => {
+      ta.focus();
+      ta.setSelectionRange(s, e);
+      // insertText сохраняет Ctrl+Z; если браузер не умеет — меняем текст напрямую
+      if (!document.execCommand('insertText', false, text)) ta.setRangeText(text, s, e, 'end');
+      ta.setSelectionRange(selS ?? s + text.length, selE ?? s + text.length);
+      refresh(); saveDraft();
+    };
+    const wrap = (before: string, after: string, placeholder: string) => {
+      const { selectionStart: s, selectionEnd: e, value } = ta;
+      const sel = value.slice(s, e) || placeholder;
+      replace(s, e, before + sel + after, s + before.length, s + before.length + sel.length);
+    };
+    const prefixLines = (prefix: (i: number) => string) => {
+      const v = ta.value;
+      const s = v.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+      let e = v.indexOf('\n', ta.selectionEnd); if (e < 0) e = v.length;
+      const lines = v.slice(s, e).split('\n');
+      const on = lines.every((l, i) => l.startsWith(prefix(i)));
+      const text = lines.map((l, i) => (on ? l.slice(prefix(i).length) : prefix(i) + l.replace(/^(#{1,3}|[-*•]|\d+[.)]|>)\s+/, ''))).join('\n');
+      replace(s, e, text, s, s + text.length);
+    };
+    // Блочный элемент — на отдельных строках с пустой строкой вокруг
+    const block = (text: string, selFrom: number, selLen: number) => {
+      const { selectionStart: s, selectionEnd: e, value } = ta;
+      const pre = s === 0 ? '' : value.slice(0, s).endsWith('\n\n') ? '' : value.slice(0, s).endsWith('\n') ? '\n' : '\n\n';
+      const post = value.slice(e).startsWith('\n') ? '\n' : '\n\n';
+      replace(s, e, pre + text + post, s + pre.length + selFrom, s + pre.length + selFrom + selLen);
+    };
+    const MD: Record<string, () => void> = {
+      h2: () => prefixLines(() => '## '),
+      bold: () => wrap('**', '**', t('жирный текст')),
+      italic: () => wrap('*', '*', t('курсив')),
+      mark: () => wrap('==', '==', t('важное')),
+      ul: () => prefixLines(() => '- '),
+      ol: () => prefixLines((i) => `${i + 1}. `),
+      quote: () => prefixLines(() => '> '),
+    };
+
+    // Всплывающие окна: ссылка, бабл, выноска
+    const pops = { link: '#pop-link', bubble: '#pop-bubble', callout: '#pop-callout' } as const;
+    let saved = { s: 0, e: 0 };
+    const closePops = () => Object.values(pops).forEach((sel) => { document.querySelector<HTMLElement>(sel)!.hidden = true; });
+    const openPop = (name: keyof typeof pops) => {
+      const pop = document.querySelector<HTMLElement>(pops[name])!;
+      const wasOpen = !pop.hidden;
+      closePops();
+      if (wasOpen) return;
+      saved = { s: ta.selectionStart, e: ta.selectionEnd };
+      pop.hidden = false;
+      if (name === 'link') {
+        pop.querySelector<HTMLInputElement>('[data-f="text"]')!.value = ta.value.slice(saved.s, saved.e);
+        pop.querySelector<HTMLInputElement>('[data-f="url"]')!.value = '';
+        pop.querySelector<HTMLElement>('[data-f="err"]')!.textContent = '';
+        pop.querySelector<HTMLInputElement>(ta.value.slice(saved.s, saved.e) ? '[data-f="url"]' : '[data-f="text"]')!.focus();
+      }
+      if (name === 'bubble') { bubbleValue.value = ''; paintBubble(); bubbleValue.focus(); }
+    };
+    const insertAt = (text: string) => { ta.focus(); ta.setSelectionRange(saved.s, saved.e); replace(saved.s, saved.e, text); closePops(); };
+
+    const linkPop = document.querySelector<HTMLElement>('#pop-link')!;
+    const insertLink = () => {
+      const text = linkPop.querySelector<HTMLInputElement>('[data-f="text"]')!.value.trim();
+      let url = linkPop.querySelector<HTMLInputElement>('[data-f="url"]')!.value.trim();
+      if (/^[\w-]+(\.[\w-]+)+/.test(url)) url = `https://${url}`;
+      const err = linkPop.querySelector<HTMLElement>('[data-f="err"]')!;
+      if (!/^(https?:\/\/\S+|\/\S*)$/i.test(url)) { err.textContent = t('Нужен адрес вида https://… или /путь на сайте'); return; }
+      insertAt(`[${text || url}](${url})`);
+    };
+
+    const bubblePop = document.querySelector<HTMLElement>('#pop-bubble')!;
+    const bubbleValue = bubblePop.querySelector<HTMLInputElement>('[data-f="value"]')!;
+    const bubbleDemo = bubblePop.querySelector<HTMLElement>('[data-f="demo"]')!;
+    const BUBBLE = {
+      char: { list: 'dl-char', ph: t('Имя персонажа') }, weapon: { list: 'dl-weapon-all', ph: t('Название оружия') },
+      set: { list: 'dl-set', ph: t('Название сета') }, el: { list: 'dl-el', ph: t('Стихия') },
+      text: { list: '', ph: t('Любой текст: «C2», «сигнатурное»') }, gold: { list: '', ph: t('Текст золотого бабла') },
+    };
+    let bubbleKind: keyof typeof BUBBLE = 'char';
+    const bubbleCode = () => {
+      const v = bubbleValue.value.trim();
+      if (!v) return '';
+      if (bubbleKind === 'text') return `{{${v}}}`;
+      if (bubbleKind === 'gold') return `{{gold:${v}}}`;
+      if (bubbleKind === 'el') { const k = Object.entries(data.elements).find(([, n]) => norm(n) === norm(v))?.[0]; return k ? `{{el:${k}}}` : ''; }
+      const it = idx[bubbleKind].find(v);
+      return it ? `{{${bubbleKind}:${it.slug}}}` : '';
+    };
+    const paintBubble = () => {
+      const code = bubbleCode();
+      bubbleDemo.innerHTML = code ? render(code).replace(/^<p>|<\/p>$/g, '') : `<span class="muted small">${esc(t('выберите из подсказок'))}</span>`;
+    };
+    bubblePop.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-kind]');
+      if (!b) return;
+      bubbleKind = b.dataset.kind as keyof typeof BUBBLE;
+      bubblePop.querySelectorAll('[data-kind]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+      const cfg = BUBBLE[bubbleKind];
+      if (cfg.list) bubbleValue.setAttribute('list', cfg.list); else bubbleValue.removeAttribute('list');
+      bubbleValue.placeholder = cfg.ph;
+      bubbleValue.value = '';
+      paintBubble();
+      bubbleValue.focus();
+    });
+    bubbleValue.addEventListener('input', paintBubble);
+    const insertBubble = () => { const code = bubbleCode(); if (code) insertAt(code); };
+
+    const tb = document.querySelector<HTMLElement>('.tb')!;
+    tb.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!b) return;
+      if (b.dataset.md) { closePops(); MD[b.dataset.md](); }
+      if (b.dataset.pop) openPop(b.dataset.pop as keyof typeof pops);
+    });
+    form.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!b) return;
+      if (b.dataset.close !== undefined) { closePops(); ta.focus(); }
+      if (b.dataset.insert === 'link') insertLink();
+      if (b.dataset.insert === 'bubble') insertBubble();
+      if (b.dataset.callout) {
+        ta.setSelectionRange(saved.s, saved.e);
+        closePops();
+        const inner = ta.value.slice(saved.s, saved.e) || t('Текст выноски');
+        block(`:::${b.dataset.callout}\n${inner}\n:::`, b.dataset.callout.length + 4, inner.length);
+      }
+    });
+    // Enter во всплывающем окне — вставить, Esc — закрыть
+    for (const [pop, fn] of [[linkPop, insertLink], [bubblePop, insertBubble]] as const) {
+      pop.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); fn(); }
+        if (e.key === 'Escape') { closePops(); ta.focus(); }
+      });
+    }
+    ta.addEventListener('keydown', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const k = e.code;
+      if (k === 'KeyB') { e.preventDefault(); MD.bold(); }
+      if (k === 'KeyI') { e.preventDefault(); MD.italic(); }
+      if (k === 'KeyK') { e.preventDefault(); openPop('link'); }
+    });
+
+    // ---------- Отправка ----------
+    const status = document.querySelector<HTMLElement>('#status')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const g = collect();
+      const list = problems(g);
+      if (list.length) { status.className = 'status small err'; status.textContent = list[0]; checksEl.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+      const btn = form.querySelector<HTMLButtonElement>('[type="submit"]')!;
+      btn.disabled = true;
+      status.className = 'status small';
+      status.textContent = t('Отправляем…');
+      try {
+        const res = await fetch('/api/guides', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guide: g, lang: LANG, mode: data.builds[g.character] ? 'edit' : 'new',
+            author: field('author').value, contact: field('contact').value, comment: field('comment').value, website: field('website').value,
+          }),
+        });
+        const out = await res.json().catch(() => ({}));
+        // Сервер отвечает по-русски — переводим сообщение здесь
+        if (!res.ok) throw new Error(t(out.error ?? 'Не удалось отправить — попробуйте позже'));
+        dropDraft(g.character);
+        status.className = 'status small ok';
+        status.textContent = t('Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации гайд появится на странице персонажа.');
+        (form.elements.namedItem('comment') as HTMLTextAreaElement).value = '';
+      } catch (err) {
+        status.className = 'status small err';
+        status.textContent = err instanceof Error && err.message !== 'Failed to fetch' ? err.message : t('Нет связи с сервером — черновик сохранён, попробуйте позже');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---------- Переключатель «Редактор / Превью» на узком экране ----------
+    const split = document.querySelector<HTMLElement>('.split')!;
+    document.querySelector('.view-switch')!.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-view]');
+      if (!b) return;
+      split.dataset.view = b.dataset.view;
+      document.querySelectorAll('.view-switch [data-view]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    });
+
+    // ---------- Старт: персонаж из ссылки, иначе последний черновик ----------
+    const me = store.get<{ author?: string; contact?: string }>(ME, {});
+    field('author').value = me.author ?? '';
+    field('contact').value = me.contact ?? '';
+    const fromUrl = new URLSearchParams(location.search).get('c');
+    const lastDraft = Object.entries(drafts()).sort((a, b) => b[1].ts - a[1].ts)[0]?.[0];
+    const start = [fromUrl, lastDraft].find((s) => s && idx.char.bySlug.has(s));
+    if (start) setCharacter(start);
+    else { fill({}); charInput.focus(); }
+  }
+</script>
+
+<style is:global>
+  .ge .crumbs { margin-bottom: .8rem; }
+  .ge .crumbs a { color: var(--muted); }
+  .ge .lead { max-width: 80ch; }
+  .ge .who { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; margin: 1rem 0; }
+  .ge .who-pick { display: grid; gap: .25rem; flex: 1 1 320px; max-width: 460px; }
+  .ge #notice { flex: 1 1 100%; margin: 0; }
+  .ge #notice:empty { display: none; }
+  .ge button.link { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+  .ge .pick { position: relative; display: flex; align-items: center; min-width: 0; }
+  .ge .pick img { position: absolute; left: .35rem; border-radius: 6px; background: var(--surface-3); pointer-events: none; }
+  .ge .pick img:not([hidden]) + input { padding-left: 2.6rem; }
+  .ge .pick.big img { width: 32px; height: 32px; border-radius: 50%; }
+  .ge .pick.big img:not([hidden]) + input { padding-left: 2.9rem; }
+  .ge .input[aria-invalid] { border-color: var(--pyro); }
+
+  .ge .view-switch { display: none; }
+  .ge .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .ge .editor { display: grid; gap: 12px; min-width: 0; }
+  .ge .sec > summary { cursor: pointer; font: 600 1rem var(--font-display); }
+  .ge .sec > summary small { font: 400 .8rem var(--font-body, inherit); margin-left: .4rem; }
+  .ge .sec[open] > summary { margin-bottom: .8rem; }
+  .ge .sec label { display: grid; gap: .25rem; margin-bottom: .6rem; }
+  .ge .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 .7rem; }
+  .ge .cols.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ge .rows { display: grid; gap: .5rem; margin-bottom: .6rem; }
+  .ge .item { display: grid; gap: .4rem; align-items: center; padding: .5rem; border-radius: var(--radius); background: var(--surface-2); }
+  .ge .item.weapons { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; }
+  .ge .item.artifacts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+  .ge .item.artifacts .note { grid-column: 1 / 3; }
+  .ge .item.teams { grid-template-columns: minmax(0, 1fr) auto; }
+  .ge .item.teams .members { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem; }
+  .ge .item.teams > .note { grid-column: 1 / -1; }
+  .ge .item .input { background: var(--surface); padding-top: .4rem; padding-bottom: .4rem; }
+  .ge .ctl { display: inline-flex; gap: 2px; }
+  .ge .ctl button { width: 1.9rem; height: 1.9rem; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; color: var(--muted); }
+  .ge .ctl button:hover { color: var(--text); border-color: var(--accent); }
+  .ge .item:first-child [data-act="up"], .ge .item:last-child [data-act="down"] { visibility: hidden; }
+  .ge .add { font-size: .85rem; padding: .4rem .8rem; }
+
+  .ge .tb { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--border); border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0; background: var(--surface-2); }
+  .ge .tb button { border: 1px solid transparent; background: none; border-radius: var(--radius-sm); padding: .3rem .55rem; cursor: pointer; font-size: .85rem; color: var(--text); }
+  .ge .tb button:hover { background: var(--surface); border-color: var(--border); }
+  .ge .tb mark { background: var(--accent-soft); color: var(--accent); border-radius: 3px; padding: 0 .15em; }
+  .ge .tb .sep { width: 1px; background: var(--border); margin: 2px 4px; }
+  .ge .body { border-radius: 0 0 var(--radius) var(--radius); resize: vertical; min-height: 280px; line-height: 1.55; font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: .88rem; }
+  .ge .pop { display: grid; gap: .5rem; margin-bottom: .5rem; padding: .8rem; background: var(--surface-2); }
+  .ge .pop[hidden] { display: none; }
+  .ge .pop label { margin: 0; }
+  .ge .pop .input { background: var(--surface); }
+  .ge .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+  .ge .seg button { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: .25rem .7rem; cursor: pointer; font-size: .82rem; color: var(--muted); }
+  .ge .seg [aria-checked="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .ge .bubble-demo { margin: 0; }
+  .ge .between { justify-content: space-between; margin-top: .3rem; }
+  .ge .cheat { margin-top: .5rem; }
+  .ge .cheat summary { cursor: pointer; color: var(--accent); }
+  .ge .cheat table { margin-top: .5rem; }
+  .ge .cheat td { padding: .3rem .5rem; vertical-align: top; }
+  .ge .cheat code { white-space: nowrap; }
+
+  .ge .send .h-sec { margin-top: 0; }
+  .ge .checks { margin: 0 0 .8rem; padding-left: 1.2rem; color: var(--muted); }
+  .ge .checks li::marker { color: var(--pyro); }
+  .ge .checks li.ok { list-style: none; margin-left: -1.2rem; color: var(--dendro); }
+  .ge .trap { position: absolute; left: -9999px; }
+  .ge .status { margin: 0; }
+  .ge .status.ok { color: var(--dendro); }
+  .ge .status.err { color: var(--pyro); }
+
+  /* Превью: повторяет вид страницы персонажа */
+  .ge .preview { position: sticky; top: calc(var(--top-h) + 12px); max-height: calc(100vh - var(--top-h) - 24px); overflow: auto; border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--bg); overscroll-behavior: contain; }
+  .ge .pv-bar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 1rem; padding: .5rem .9rem; background: var(--bg-deep); border-bottom: 1px solid var(--border); }
+  .ge .pv-bar span:first-child { color: var(--accent); font-weight: 600; }
+  .ge .pv { padding: 12px; container-type: inline-size; }
+  .ge .pv .h-sec { margin: 1.3rem 0 .6rem; }
+  .ge .pv-head { position: relative; overflow: hidden; isolation: isolate; min-height: 170px; display: flex; align-items: center; border-radius: var(--radius-lg); border: 1px solid var(--border);
+    background: linear-gradient(110deg, var(--surface) 35%, color-mix(in srgb, var(--el) 30%, var(--surface))); }
+  .ge .pv-head > div { padding: 1rem 1.2rem; }
+  .ge .pv-head p { margin: 0; }
+  .ge .pv-head h2 { margin: .1rem 0 .5rem; font-size: 1.8rem; }
+  .ge .pv-splash { position: absolute; right: -6%; top: -10%; height: 135%; z-index: -1; mask-image: linear-gradient(90deg, transparent 15%, #000 55%); }
+  .ge .pv-build { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .ge .pv h4 { margin: 0; }
+  .ge .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }
+  .ge .rank li { display: flex; gap: .7rem; align-items: center; }
+  .ge .rank .n { width: 1.4rem; text-align: center; color: var(--muted); font: 600 .85rem var(--font-display); flex: none; }
+  .ge .rank li:first-child .n { color: var(--accent); }
+  .ge .rank img { width: 40px; height: 40px; border-radius: 8px; background: var(--surface-3); flex: none; }
+  .ge .rank img.r5 { background: linear-gradient(160deg, #7a5226, #d1953f); }
+  .ge .rank img.r4 { background: linear-gradient(160deg, #5b4b82, #9679c4); }
+  .ge .sets { display: flex; flex: none; }
+  .ge .sets img + img { margin-left: -14px; }
+  .ge .note { display: block; }
+  .ge .pv-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+  .ge .pv-stats > div, .ge .pv-prio > div { display: grid; }
+  .ge .pv-prio { display: grid; gap: .6rem; margin-top: 10px; }
+  .ge .pv .prose { margin-top: 10px; }
+  .ge .pv .prose p { margin: .4rem 0; }
+  .ge .pv-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .ge .team h4 { margin-bottom: .6rem; }
+  .ge .team p { margin: .5rem 0 0; }
+  .ge .mems { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .3rem; }
+  .ge .mem { display: grid; justify-items: center; gap: .2rem; text-align: center; min-width: 0; }
+  .ge .mem img { width: 100%; max-width: 52px; aspect-ratio: 1; border-radius: 50%; background: color-mix(in srgb, var(--el) 35%, var(--surface-3)); }
+  .ge .mem small { font-size: .7rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  .ge .mem.ghost { aspect-ratio: 1; max-width: 52px; width: 100%; border-radius: 50%; border: 1px dashed var(--border); }
+  .ge .empty { margin: .6rem 0 0; }
+  @container (max-width: 480px) { .ge .pv-stats { grid-template-columns: 1fr; } }
+
+  @media (max-width: 1100px) {
+    .ge .view-switch { display: flex; gap: 4px; position: sticky; top: var(--top-h); z-index: 4; padding: 6px 0; background: var(--bg); margin-bottom: 8px; }
+    .ge .view-switch button { flex: 1; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: .5rem; cursor: pointer; color: var(--muted); }
+    .ge .view-switch [aria-selected="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+    .ge .split { grid-template-columns: minmax(0, 1fr); }
+    .ge .split[data-view="edit"] .preview, .ge .split[data-view="preview"] .editor { display: none; }
+    .ge .preview { position: static; max-height: none; }
+  }
+  @media (max-width: 640px) {
+    .ge .cols, .ge .cols.three { grid-template-columns: 1fr; }
+    .ge .item.weapons, .ge .item.artifacts { grid-template-columns: minmax(0, 1fr) auto; }
+    .ge .item.weapons .note, .ge .item.artifacts .pick + .pick, .ge .item.artifacts .note { grid-column: 1 / -1; }
+    .ge .item.artifacts .ctl { grid-row: 1; grid-column: 2; }
+  }
+</style>

@@ -111,3 +111,26 @@ th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(-
 th { color: var(--muted); font-weight: 500; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Разметка гайдов (src/lib/guide-markup.ts): одинаково на странице персонажа и в превью редактора */
+.prose h3 { margin: 1.1rem 0 .4rem; }
+.prose h4 { margin: .9rem 0 .3rem; font-size: 1rem; }
+.prose ul, .prose ol { margin: .4rem 0; padding-left: 1.3rem; max-width: 80ch; }
+.prose li { margin: .15rem 0; }
+.prose blockquote { margin: .6rem 0; padding: .1rem 0 .1rem .9rem; border-left: 3px solid var(--border); color: var(--muted); }
+.prose mark { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 .2em; }
+.prose .chip { font-size: .85em; vertical-align: .05em; }
+.gm-item { padding-left: .2em; color: var(--text); background: var(--surface-3); }
+.gm-item img { width: 1.5em; height: 1.5em; margin: -.2em 0; border-radius: 50%; object-fit: cover; }
+.gm-item[data-el] { background: color-mix(in srgb, var(--el) 30%, var(--surface-3)); }
+.gm-item[data-el]::before { content: none; }
+a.gm-item:hover { outline: 1px solid var(--accent); }
+.callout { margin: .7rem 0; padding: .6rem .9rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface-2); max-width: 80ch; }
+.callout > b:first-child { display: block; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; margin-bottom: .2rem; }
+.callout > :is(p, ul, ol):last-child { margin-bottom: 0; }
+.callout.tip { border-color: color-mix(in srgb, var(--dendro) 55%, transparent); }
+.callout.tip > b:first-child { color: var(--dendro); }
+.callout.warn { border-color: color-mix(in srgb, var(--pyro) 55%, transparent); }
+.callout.warn > b:first-child { color: var(--pyro); }
+.callout.info { border-color: color-mix(in srgb, var(--hydro) 55%, transparent); }
+.callout.info > b:first-child { color: var(--hydro); }

@@ -13,7 +13,9 @@
     "astro": "astro",
     "dev:full": "npm run build && wrangler pages dev dist",
     "deploy": "npm run build && wrangler pages deploy dist --project-name genshinflex",
-    "feedback": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, kind, page, contact, substr(message,1,300) AS message FROM feedback ORDER BY id DESC LIMIT 30\""
+    "feedback": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, kind, page, contact, substr(message,1,300) AS message FROM feedback ORDER BY id DESC LIMIT 30\"",
+    "guides": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, character, mode, author, contact, status, length(payload) AS size FROM guide_submissions ORDER BY id DESC LIMIT 30\"",
+    "guide:md": "node scripts/guide-to-md.mjs"
   },
   "dependencies": {
     "astro": "^7.3.4"

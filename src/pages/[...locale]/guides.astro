@@ -9,7 +9,10 @@ const { getCharacter, base, t } = useData(Astro.currentLocale);
 const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - +a.data.updated);
 ---
 <Layout title={t('Руководства')}>
-  <h1>{t('Руководства')}</h1>
+  <div class="top">
+    <h1>{t('Руководства')}</h1>
+    <a class="btn primary" href={`${base}/guides/editor/`}>+ {t('Предложить гайд')}</a>
+  </div>
   <p class="muted">{t('Билды и команды для всех персонажей: оружие, артефакты, статы и составы. Разборы постепенно дополняются.')}</p>
   <div class="grid">
     {builds.map(({ data }) => {
@@ -29,6 +32,8 @@ const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - 
 </Layout>
 
 <style>
+  .top { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; }
+  .top h1 { margin-bottom: 0; }
   .guide { display: flex; gap: .8rem; align-items: flex-start; text-decoration: none; }
   .guide:hover { border-color: var(--accent); }
   .guide img { border-radius: 12px; background: color-mix(in srgb, var(--el) 35%, transparent); flex: none; }
