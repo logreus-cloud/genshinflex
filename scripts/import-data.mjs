@@ -92,7 +92,8 @@ const characters = [
       version: c.version,
       icon: img(c.images?.filename_icon),
       card: img(c.images?.filename_iconCard),
-      splash: img(c.images?.filename_gachaSplash),
+      // У Люмин в genshin-db нет сплэша — берём игровой арт баннера напрямую
+      splash: img(c.images?.filename_gachaSplash ?? (element ? 'UI_Gacha_AvatarImg_PlayerGirl' : null)),
       // У Путешественника одна внешность на все стихии — различаем по иконке элементального навыка
       emblem: element ? img(ti.filename_combat2) : null,
       stats: CHAR_LEVELS.map((l) => {

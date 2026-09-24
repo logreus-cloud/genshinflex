@@ -20,7 +20,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .frame { position: relative; width: min(var(--s), 100%); aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: linear-gradient(160deg, #6c5a8f, #9a7ec9); }
   .frame.r5 { background: linear-gradient(160deg, #8a5a2b, #d3953e); }
   .frame.emblem { background: linear-gradient(160deg, color-mix(in srgb, var(--el) 55%, #1c2033), color-mix(in srgb, var(--el) 85%, #fff)); }
-  .frame .skill { position: absolute; right: 2px; bottom: 2px; width: 44%; height: auto; border-radius: 50%; padding: 2px; background: rgb(15 18 32 / .8); box-shadow: 0 0 0 1.5px var(--el); }
+  .frame .skill { position: absolute; right: 2px; bottom: 2px; width: 32%; height: auto; border-radius: 50%; padding: 2px; background: rgb(15 18 32 / .8); box-shadow: 0 0 0 1.5px var(--el); }
   .frame img:not(.skill) { width: 100%; height: 100%; object-fit: cover; display: block; }
   .dot { position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--el); box-shadow: 0 0 0 2px rgb(0 0 0 / .35); }
   /* Длинные имена («Путешественник (Крио)») переносятся по слогам внутри своей колонки, не налезая на соседей */
