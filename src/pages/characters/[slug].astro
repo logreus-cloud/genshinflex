@@ -1,0 +1,127 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Team from '../../components/Team.astro';
+import { characters, getWeapon, getArtifact, TALENTS, type Character } from '../../lib/data';
+
+export function getStaticPaths() {
+  return characters.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+
+const { c } = Astro.props as { c: Character };
+const build = (await getCollection('builds')).find((b) => b.data.character === c.slug);
+const Content = build ? (await render(build)).Content : null;
+const b = build?.data;
+---
+<Layout title={c.name} description={`${c.name}: билд, команды, таланты и созвездия.`}>
+  <article data-pagefind-body>
+    <header class="head" data-el={c.element}>
+      {c.icon && <img class="portrait" src={c.icon} alt="" width="120" height="120" />}
+      <div>
+        <p class="muted title">{c.title}</p>
+        <h1>{c.name}</h1>
+        <div class="chips" data-pagefind-ignore>
+          <span class="chip" data-el={c.element}>{c.elementText}</span>
+          <span class="chip">{'★'.repeat(c.rarity)}</span>
+          <span class="chip">{c.weaponText}</span>
+          {c.region && <span class="chip">{c.region}</span>}
+          <span class="chip">Версия {c.version}</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="ratings" data-pagefind-ignore>
+      <div class="card"><h3>ELO сообщества</h3><p class="muted">Скоро: попарные голосования по текущему циклу</p></div>
+      <div class="card"><h3>ELO по забегам</h3><p class="muted">Скоро: рейтинг по отправленным прохождениям</p></div>
+    </section>
+
+    {b ? (
+      <section>
+        <h2>Билд <span class="chip">патч {b.patch}</span></h2>
+        <p class="muted">{b.role}</p>
+        <div class="build">
+          <div class="card">
+            <h3>Оружие</h3>
+            <ol>{b.weapons.map((w) => {
+              const it = getWeapon(w.slug);
+              return <li><img src={it.icon} alt="" width="36" height="36" loading="lazy" /><span><b>{it.name}</b> {'★'.repeat(it.rarity)}{w.note && <small class="muted"> — {w.note}</small>}</span></li>;
+            })}</ol>
+          </div>
+          <div class="card">
+            <h3>Артефакты</h3>
+            <ol>{b.artifacts.map((a) => (
+              <li>
+                {a.sets.map((s) => <img src={getArtifact(s).icon} alt="" width="36" height="36" loading="lazy" />)}
+                <span><b>{a.sets.map((s) => getArtifact(s).name).join(' + ')}</b>{a.note && <small class="muted"> — {a.note}</small>}</span>
+              </li>
+            ))}</ol>
+          </div>
+          <div class="card">
+            <h3>Статы</h3>
+            <dl>
+              <dt>Часы</dt><dd>{b.mainStats.sands}</dd>
+              <dt>Кубок</dt><dd>{b.mainStats.goblet}</dd>
+              <dt>Корона</dt><dd>{b.mainStats.circlet}</dd>
+              <dt>Доп. статы</dt><dd>{b.substats.join(' > ')}</dd>
+              <dt>Таланты</dt><dd>{b.talents.map((t) => TALENTS[t]).join(' > ')}</dd>
+            </dl>
+          </div>
+        </div>
+
+        <h2>Команды</h2>
+        <div class="grid">{b.teams.map((t) => <Team {...t} />)}</div>
+
+        {Content && <div class="card prose"><Content /></div>}
+
+        {b.sources.length > 0 && (
+          <p class="muted small">Источники: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}</p>
+        )}
+        <p class="muted small">Обновлено {b.updated.toLocaleDateString('ru-RU')}</p>
+      </section>
+    ) : (
+      <p class="notice">Билда для этого персонажа пока нет — его можно добавить через PR, см. CONTRIBUTING.md.</p>
+    )}
+
+    <h2>Таланты</h2>
+    <div class="stack">
+      {(['normal', 'skill', 'burst'] as const).map((k) => c.talents[k] && (
+        <details class="card"><summary>{TALENTS[k]}: {c.talents[k].name}</summary><div>{c.talents[k].description}</div></details>
+      ))}
+      {c.talents.passives.map((p) => p && (
+        <details class="card"><summary>Пассивный: {p.name}</summary><div>{p.description}</div></details>
+      ))}
+    </div>
+
+    <h2>Созвездия</h2>
+    <div class="stack">
+      {c.constellations.map((k, i) => k && (
+        <details class="card"><summary>C{i + 1}: {k.name}</summary><div>{k.description}</div></details>
+      ))}
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .head {
+    display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; padding: 1.2rem;
+    border-radius: var(--radius); border: 1px solid var(--border);
+    background: linear-gradient(120deg, color-mix(in srgb, var(--el) 22%, var(--surface)), var(--surface));
+  }
+  .portrait { border-radius: 16px; background: color-mix(in srgb, var(--el) 35%, transparent); }
+  .title { margin: 0; }
+  .head h1 { margin: .1rem 0 .6rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .ratings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 14px; }
+  .ratings p { margin: 0; font-size: .9rem; }
+  .build { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  ol { margin: 0; padding: 0; list-style: none; display: grid; gap: .5rem; }
+  li { display: flex; gap: .5rem; align-items: center; }
+  li img { border-radius: 8px; background: var(--surface-2); flex: none; }
+  dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; }
+  dt { color: var(--muted); }
+  dd { margin: 0; }
+  .prose { margin-top: 14px; }
+  .prose :global(p) { margin: .4rem 0; }
+  .stack { display: grid; gap: .6rem; }
+  .small { font-size: .85rem; }
+</style>

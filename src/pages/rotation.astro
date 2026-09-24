@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Team from '../components/Team.astro';
+import { MODES, fmtDate } from '../lib/data';
+
+const order = Object.keys(MODES);
+const rotations = (await getCollection('rotations'))
+  .sort((a, b) => order.indexOf(a.data.mode) - order.indexOf(b.data.mode));
+---
+<Layout title="Ротация">
+  <h1>Текущая ротация</h1>
+  <p class="muted">Враги, баффы и рекомендованные команды под текущие циклы. Данные лежат в <code>src/content/rotations</code>.</p>
+
+  {rotations.map(({ data: r }) => (
+    <section id={r.mode} class="mode">
+      <h2>{MODES[r.mode].title} <span class="chip">{fmtDate(r.start)} — {fmtDate(r.end)}</span></h2>
+      {r.draft ? (
+        <p class="notice">Цикл «{r.cycle}» ещё не заполнен: нужны враги по комнатам, баффы и команды.</p>
+      ) : (
+        <>
+          <p class="muted">{r.cycle}</p>
+          {r.buffs.length > 0 && <ul>{r.buffs.map((b) => <li>{b}</li>)}</ul>}
+          <div class="grid">
+            {r.stages.map((s) => (
+              <div class="card">
+                <h3>{s.name}</h3>
+                {s.halves.map((h, i) => (
+                  <p>
+                    {s.halves.length > 1 && <b>{i + 1}-я половина: </b>}
+                    {h.enemies.join(', ')}
+                    {h.note && <small class="muted"> — {h.note}</small>}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+          {r.teams.length > 0 && (
+            <>
+              <h3>Команды</h3>
+              <div class="grid">{r.teams.map((t) => <Team {...t} />)}</div>
+            </>
+          )}
+        </>
+      )}
+    </section>
+  ))}
+</Layout>
+
+<style>
+  .mode { scroll-margin-top: 80px; }
+  .card p { margin: .3rem 0; font-size: .92rem; }
+</style>

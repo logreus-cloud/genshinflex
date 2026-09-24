@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Search from '../components/Search.astro';
+import CharacterIcon from '../components/CharacterIcon.astro';
+import { characters, MODES, fmtDate } from '../lib/data';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - +a.data.updated);
+const order = Object.keys(MODES);
+const rotations = (await getCollection('rotations')).sort((a, b) => order.indexOf(a.data.mode) - order.indexOf(b.data.mode));
+const newest = [...characters].sort((a, b) => parseFloat(b.version) - parseFloat(a.version)).slice(0, 8);
+
+const tiles = [
+  { href: '/rating', title: 'Рейтинг', text: 'Два ELO: по мнению сообщества и по реальным забегам' },
+  { href: '/characters', title: 'Персонажи', text: `${characters.length} персонажей: таланты, созвездия, билды` },
+  { href: '/guides', title: 'Руководства', text: `${builds.length} билдов и команд` },
+  { href: '/rotation', title: 'Ротация', text: 'Текущие Бездна, Театр и Натиск' },
+];
+---
+<Layout>
+  <section class="hero">
+    <h1>Всё по текущей ротации на одной странице</h1>
+    <p class="muted">Билды, команды и рейтинг персонажей под актуальные Бездну, Театр и Натиск. Открыто и без рекламы.</p>
+    <Search />
+  </section>
+
+  <section class="tiles">
+    {tiles.map((t) => (
+      <a class="card tile" href={`${base}${t.href}`}>
+        <h2>{t.title}</h2>
+        <p class="muted">{t.text}</p>
+      </a>
+    ))}
+  </section>
+
+  <h2>Сейчас в игре</h2>
+  <div class="grid">
+    {rotations.map(({ data }) => (
+      <a class="card rot" href={`${base}/rotation#${data.mode}`}>
+        <h3>{MODES[data.mode].title}</h3>
+        <p class="muted">{data.draft ? 'Данные цикла ещё не заполнены' : data.cycle}</p>
+        <span class="chip">{fmtDate(data.start)} — {fmtDate(data.end)}</span>
+      </a>
+    ))}
+  </div>
+
+  <h2>Новые персонажи</h2>
+  <div class="row">{newest.map((c) => <CharacterIcon slug={c.slug} size={72} />)}</div>
+</Layout>
+
+<style>
+  .hero { padding: 2rem 0 1.5rem; max-width: 720px; }
+  .hero p { font-size: 1.1rem; margin: 0 0 1.4rem; }
+  .tiles { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .tile { text-decoration: none; transition: border-color .15s, transform .15s; }
+  .tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .tile h2 { margin: 0 0 .3rem; color: var(--accent); }
+  .tile p { margin: 0; font-size: .92rem; }
+  .rot { text-decoration: none; }
+  .rot p { margin: 0 0 .6rem; }
+  .row { display: flex; flex-wrap: wrap; gap: .6rem; }
+</style>

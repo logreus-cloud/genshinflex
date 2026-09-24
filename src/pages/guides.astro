@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import { getCharacter } from '../lib/data';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const builds = (await getCollection('builds')).sort((a, b) => +b.data.updated - +a.data.updated);
+---
+<Layout title="Руководства">
+  <h1>Руководства</h1>
+  <p class="muted">Билды и команды. Каждый гайд — Markdown-файл в <code>src/content/builds</code>, их можно дополнять через PR.</p>
+  <div class="grid">
+    {builds.map(({ data }) => {
+      const c = getCharacter(data.character);
+      return (
+        <a class="card guide" href={`${base}/characters/${c.slug}`} data-el={c.element}>
+          {c.icon && <img src={c.icon} alt="" width="56" height="56" loading="lazy" />}
+          <div>
+            <h3>{c.name}</h3>
+            <p class="muted">{data.role}</p>
+            <span class="chip">патч {data.patch}</span>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</Layout>
+
+<style>
+  .guide { display: flex; gap: .8rem; align-items: flex-start; text-decoration: none; }
+  .guide:hover { border-color: var(--accent); }
+  .guide img { border-radius: 12px; background: color-mix(in srgb, var(--el) 35%, transparent); flex: none; }
+  .guide p { margin: 0 0 .4rem; font-size: .9rem; }
+</style>

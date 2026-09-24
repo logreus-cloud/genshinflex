@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+
+interface Props { title?: string; description?: string; }
+const { title, description = 'Открытый справочник по Genshin Impact: билды, команды и рейтинг под текущую ротацию.' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const nav = [
+  ['Персонажи', '/characters'],
+  ['Руководства', '/guides'],
+  ['Ротация', '/rotation'],
+  ['Рейтинг', '/rating'],
+];
+const path = Astro.url.pathname.replace(base, '');
+---
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet" />
+    <title>{title ? `${title} — GenshinFlex` : 'GenshinFlex'}</title>
+    <script is:inline>
+      try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="logo" href={`${base}/`}>Genshin<span>Flex</span></a>
+        <nav>
+          {nav.map(([label, href]) => (
+            <a href={`${base}${href}`} aria-current={path.startsWith(href) ? 'page' : undefined}>{label}</a>
+          ))}
+        </nav>
+        <button class="theme" type="button" aria-label="Сменить тему" title="Сменить тему">◐</button>
+      </div>
+    </header>
+    <main class="wrap"><slot /></main>
+    <footer class="wrap footer muted">
+      <p>
+        GenshinFlex — открытый проект без рекламы. Код под MIT.
+        Genshin Impact, игровые изображения и данные © HoYoverse; проект не связан с HoYoverse.
+      </p>
+    </footer>
+    <script>
+      document.querySelector('.theme')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const dark = root.dataset.theme
+          ? root.dataset.theme === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        root.dataset.theme = dark ? 'light' : 'dark';
+        try { localStorage.setItem('theme', root.dataset.theme); } catch {}
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header { border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; }
+  .bar { display: flex; align-items: center; gap: 1.2rem; min-height: 58px; flex-wrap: wrap; }
+  .logo { font: 700 1.15rem "Unbounded", sans-serif; text-decoration: none; }
+  .logo span { color: var(--accent); }
+  nav { display: flex; gap: .2rem; flex: 1; overflow-x: auto; }
+  nav a { text-decoration: none; padding: .4rem .7rem; border-radius: 8px; color: var(--muted); white-space: nowrap; }
+  nav a:hover, nav a[aria-current] { color: var(--text); background: var(--surface-2); }
+  .theme { border: 1px solid var(--border); background: none; color: var(--text); border-radius: 8px; width: 36px; height: 36px; cursor: pointer; }
+  main { padding-top: 2rem; padding-bottom: 3rem; min-height: 70vh; }
+  .footer { border-top: 1px solid var(--border); font-size: .85rem; padding-top: 1rem; padding-bottom: 2rem; }
+  @media (max-width: 640px) { .bar { gap: .5rem; padding-block: .5rem; } nav { order: 3; flex-basis: 100%; } .theme { margin-left: auto; } }
+</style>
