@@ -21,8 +21,8 @@
   "dps": 60112
  },
  "_meta": {
-  "gcsim": "8c57786",
-  "date": "2026-09-24",
+  "gcsim": "3d48bd5",
+  "date": "2026-09-25",
   "iterations": 500
  },
  "albedo": {
@@ -2422,6 +2422,263 @@
   ],
   "weapon": -2.6,
   "dps": 43721,
+  "optimized": true
+ },
+ "yun-jin": {
+  "team": [
+   "yoimiya",
+   "yelan",
+   "yunjin",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/k7DGtzLkRQWP",
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   -0.3,
+   3.2,
+   7.6,
+   9.1,
+   9.5,
+   10.8
+  ],
+  "weapon": -1.3,
+  "dps": 47489,
+  "optimized": true
+ },
+ "traveler-anemo": {
+  "team": [
+   "kamisatoayaka",
+   "sangonomiyakokomi",
+   "lumineanemo",
+   "shenhe"
+  ],
+  "source": "https://gcsim.app/db/KzdnthkJJhFH",
+  "four": "sacrificial-sword",
+  "refine": 5,
+  "five": "freedom-sworn",
+  "cons": [
+   0,
+   0,
+   0.5,
+   0.6,
+   1,
+   8.6
+  ],
+  "weapon": 5.3,
+  "dps": 62584,
+  "optimized": true
+ },
+ "traveler-geo": {
+  "team": [
+   "aratakiitto",
+   "aethergeo",
+   "gorou",
+   "zhongli"
+  ],
+  "source": "https://gcsim.app/db/c6dQCFMtJKCh",
+  "four": "the-black-sword",
+  "refine": 5,
+  "five": "primordial-jade-cutter",
+  "cons": [
+   4.9,
+   5.4,
+   6,
+   6.3,
+   6.5,
+   8.3
+  ],
+  "weapon": 0.8,
+  "dps": 59303,
+  "optimized": true
+ },
+ "traveler-electro": {
+  "team": [
+   "aetherelectro",
+   "chevreuse",
+   "fischl",
+   "bennett"
+  ],
+  "source": "https://gcsim.app/db/zBQjFFBWCMHC",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": "freedom-sworn",
+  "cons": [
+   0.1,
+   2.4,
+   2.7,
+   2.8,
+   3.6,
+   4.1
+  ],
+  "weapon": 7.5,
+  "dps": 53967,
+  "optimized": true
+ },
+ "traveler-dendro": {
+  "team": [
+   "sangonomiyakokomi",
+   "nilou",
+   "nahida",
+   "luminedendro"
+  ],
+  "source": "https://gcsim.app/db/hc7MQmfk9kNc",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0.1,
+   4.7,
+   4.7,
+   5.1,
+   5.4,
+   6.1
+  ],
+  "weapon": null,
+  "dps": 101369,
+  "optimized": true
+ },
+ "traveler-hydro": {
+  "team": [
+   "columbina",
+   "ineffa",
+   "lauma",
+   "aetherhydro"
+  ],
+  "source": "https://gcsim.app/db/JfmwWJ9wGQrP",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   -0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0
+  ],
+  "weapon": null,
+  "dps": 120099,
+  "optimized": true
+ },
+ "traveler-pyro": {
+  "team": [
+   "mualani",
+   "sucrose",
+   "aetherpyro",
+   "mona"
+  ],
+  "source": "https://gcsim.app/db/KhBLfkWFDPd7",
+  "four": "favonius-sword",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   3.3,
+   36.4,
+   36.7,
+   36.7,
+   37.3,
+   125.5
+  ],
+  "weapon": null,
+  "dps": 110300,
+  "optimized": true
+ },
+ "varka": {
+  "team": [
+   "varka",
+   "durin",
+   "venti",
+   "bennett"
+  ],
+  "source": "https://keqingmains.com/q/varka-quickguide/",
+  "own": true,
+  "four": "serpent-spine",
+  "refine": 5,
+  "five": "gest-of-the-mighty-wolf",
+  "cons": [
+   9.9,
+   22.4,
+   38,
+   50.5,
+   50.5,
+   91.5
+  ],
+  "weapon": 9.4,
+  "dps": 76822,
+  "optimized": true
+ },
+ "iansan": {
+  "team": [
+   "iansan",
+   "varesa",
+   "furina",
+   "xianyun"
+  ],
+  "source": "https://keqingmains.com/q/iansan-quickguide/",
+  "own": true,
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   0.3,
+   5,
+   5.2,
+   7.1,
+   7.6,
+   8.3
+  ],
+  "weapon": null,
+  "dps": 60282,
+  "optimized": true
+ },
+ "odette": {
+  "team": [
+   "odette",
+   "yaemiko",
+   "wriothesley",
+   "beidou"
+  ],
+  "source": "https://keqingmains.com/q/odette-quickguide/",
+  "own": true,
+  "four": "finale-of-the-deep",
+  "refine": 5,
+  "five": null,
+  "cons": [
+   13.8,
+   46.6,
+   54.4,
+   62.2,
+   62,
+   119.6
+  ],
+  "weapon": null,
+  "dps": 49327,
+  "optimized": true
+ },
+ "traveler-cryo": {
+  "team": [
+   "aethercryo",
+   "varka",
+   "prune",
+   "odette"
+  ],
+  "source": "https://keqingmains.com/q/varka-quickguide/",
+  "own": true,
+  "four": "emberwell",
+  "refine": 5,
+  "five": "exaiphanes-blade",
+  "cons": [
+   24.7,
+   27.4,
+   28.6,
+   29.7,
+   29.9,
+   35.1
+  ],
+  "weapon": 29.1,
+  "dps": 71388,
   "optimized": true
  }
 }

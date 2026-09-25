@@ -27,6 +27,8 @@ const weapons = JSON.parse(readFileSync('src/data/generated/weapons.en.json', 'u
 const weaponBy = new Map(weapons.map((w) => [w.slug, w]));
 // Ключи gcsim — английское название без пробелов и знаков: «Kaedehara Kazuha» → kaedeharakazuha
 const key = (name) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
+// Путешественник в gcsim — aether<стихия> или lumine<стихия>, остальные — по английскому имени
+const keysOf = (c) => (c.slug.startsWith('traveler-') ? ['aether', 'lumine'].map((p) => p + c.slug.slice(9)) : [key(c.nameEn)]);
 
 // Оружие из гайда: первое 4★ — «доступная база», первое 5★ — «лучшее 5★»
 function guideWeapons(slug) {
@@ -38,19 +40,36 @@ function guideWeapons(slug) {
 // Команды из гайда — в ключах gcsim
 function guideTeams(slug) {
   const md = readFileSync(`src/content/builds/${slug}.md`, 'utf8');
-  return [...md.matchAll(/members: \[([^\]]+)\]/g)].map((m) => m[1].split(',').map((x) => chars.find((c) => c.slug === x.trim())).filter(Boolean).map((c) => key(c.nameEn)));
+  return [...md.matchAll(/members: \[([^\]]+)\]/g)].map((m) => m[1].split(',').map((x) => chars.find((c) => c.slug === x.trim())).filter(Boolean).flatMap(keysOf));
 }
 
-async function pickTeam(ck, teams) {
-  const q = { query: { 'summary.char_names': ck, is_db_valid: true }, limit: 100, skip: 0 };
-  const res = await fetch(`https://simpact.app/api/db?q=${encodeURIComponent(JSON.stringify(q))}`, { signal: AbortSignal.timeout(30_000) }).then((r) => r.json()).catch(() => ({}));
+// Свои команды — scripts/sim-teams/<слаг>.txt: полный конфиг gcsim с ротацией из открытого гайда (ссылка — в первой строке).
+// Если такой файл есть, он важнее базы: это осознанный выбор команды, а не поиск ближайшей.
+function ownTeam(slug, cks) {
+  const file = `scripts/sim-teams/${slug}.txt`;
+  if (!existsSync(file)) return null;
+  const config = readFileSync(file, 'utf8');
+  const names = [...config.matchAll(/^\s*(\w+)\s+char\b/gm)].map((m) => m[1]);
+  const team = names.map((name) => {
+    const w = config.match(new RegExp(`^${name}\\s+add\\s+weapon="([^"]+)"\\s+refine=(\\d+)`, 'm'));
+    return { name, weapon: w ? { name: w[1], refine: Number(w[2]) } : null };
+  });
+  const source = config.split('\n')[0].match(/https?:\/\/\S+/)?.[0] ?? null;
+  return { entry: { config, summary: { char_names: names, team }, own: true, source }, ck: cks.find((k) => names.includes(k)) ?? names[0] };
+}
+
+// ck — список возможных ключей персонажа; в найденной записи он подменяется на тот, что в ней встретился
+async function pickTeam(cks, teams) {
+  const q = { query: { 'summary.char_names': { $in: cks }, is_db_valid: true }, limit: 100, skip: 0 };
+  const res = await fetch(`https://simpact.app/api/db?q=${encodeURIComponent(JSON.stringify(q))}`, { signal: AbortSignal.timeout(30_000) }).then((r) => r.json());
   const list = (res.data ?? []).filter((e) => e.summary?.target_count === 1);
-  const cons = (e) => e.summary.team.find((m) => m.name === ck)?.cons ?? 0;
+  const own = (e) => cks.find((k) => e.summary.char_names.includes(k));
+  const cons = (e) => e.summary.team.find((m) => m.name === own(e))?.cons ?? 0;
   const overlap = (e) => Math.max(0, ...teams.map((t) => t.filter((k) => e.summary.char_names.includes(k)).length));
-  const burst = (e) => (usesBurst(e.config, ck) ? 1 : 0);
+  const burst = (e) => (usesBurst(e.config, own(e)) ? 1 : 0);
   // Сначала — ротации, где персонаж использует взрыв стихии: иначе созвездия на взрыв ничего не покажут
   list.sort((a, b) => burst(b) - burst(a) || overlap(b) - overlap(a) || cons(a) - cons(b) || b.summary.mean_dps_per_target - a.summary.mean_dps_per_target);
-  return list[0];
+  return list[0] && { entry: list[0], ck: own(list[0]) };
 }
 
 // Использует ли персонаж взрыв стихии в ротации. В строках ротации имя часто сокращено (mav вместо mavuika),
@@ -109,10 +128,12 @@ for (const slug of slugs) {
   const c = chars.find((x) => x.slug === slug);
   // Уже посчитанных пропускаем, чтобы прерванный прогон продолжался с места остановки (--force — пересчитать)
   if (!c || (result[slug] && !only.length && !args.includes('--force'))) continue;
-  const ck = key(c.nameEn);
   const { four, five } = guideWeapons(slug);
-  const entry = await pickTeam(ck, guideTeams(slug));
-  if (!entry) { console.log(`— ${slug}: нет команды в базе gcsim`); continue; }
+  // Ошибку сети не выдаём за «нет команды» — иначе персонаж молча выпадает из расчёта
+  let picked = ownTeam(slug, keysOf(c));
+  if (!picked) try { picked = await pickTeam(keysOf(c), guideTeams(slug)); } catch (e) { console.log(`✗ ${slug}: база gcsim недоступна (${e.message})`); continue; }
+  if (!picked) { console.log(`— ${slug}: нет команды в базе gcsim`); continue; }
+  const { entry, ck } = picked;
   // В конфиге персонаж может быть записан сокращённо (raiden, yae, ayaka) — берём имя из строк «<имя> char»
   const aliases = [...entry.config.matchAll(/^\s*(\w+)\s+char\b/gm)].map((m) => m[1]);
   const alias = aliases.find((a) => a === ck) ?? aliases.find((a) => ck.includes(a) || a.includes(ck))
@@ -152,7 +173,8 @@ for (const slug of slugs) {
     const pct = (v) => (v == null ? null : Math.round((v / dps.c0 - 1) * 1000) / 10);
     result[slug] = {
       team: entry.summary.char_names,
-      source: `https://gcsim.app/db/${entry._id}`,
+      source: entry.own ? entry.source : `https://gcsim.app/db/${entry._id}`,
+      ...(entry.own ? { own: true } : {}),
       four: baseWeapon?.slug ?? null, refine: base.refine, five: dps.sig ? sig.slug : null,
       cons: [1, 2, 3, 4, 5, 6].map((n) => pct(dps[`c${n}`])),
       weapon: pct(dps.sig),

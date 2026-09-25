@@ -5,7 +5,7 @@ import { useData } from '../lib/data';
 import data from '../data/investments.json';
 
 // four — оружие, с которым считали созвездия (refine — его пробуждение); five и weapon — сравнение с лучшим 5★, если оно есть в гайде
-interface Row { team: string[]; source: string; four: string | null; refine?: number; five: string | null; cons: (number | null)[]; weapon: number | null; dps: number; optimized?: boolean }
+interface Row { team: string[]; source: string; four: string | null; refine?: number; five: string | null; cons: (number | null)[]; weapon: number | null; dps: number; optimized?: boolean; own?: boolean }
 interface Props { slug: string }
 const { slug } = Astro.props;
 const { t, getWeapon, characters, base, fmtNumber } = useData(Astro.currentLocale);
@@ -20,7 +20,10 @@ const verdict = (g: number) =>
   : { cls: 'big', text: t('заметный прирост') };
 
 const key = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
-const bySimKey = new Map(characters.map((c) => [key(c.nameEn), c.slug]));
+// Путешественник в gcsim — aether<стихия> или lumine<стихия>
+const bySimKey = new Map(characters.flatMap((c) => c.slug.startsWith('traveler-')
+  ? ['aether', 'lumine'].map((p) => [p + c.slug.slice(9), c.slug] as const)
+  : [[key(c.nameEn), c.slug] as const]));
 
 // Шаг — прирост к предыдущему посчитанному созвездию; null — gcsim не смог прогнать это созвездие
 const steps = (row?.cons ?? []).map((total, i, all) => {
@@ -81,14 +84,16 @@ const signed = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v)}%`;
 
       <details class="how small">
         <summary>{t('Как считали')}</summary>
-        {tuned ? (
+        {row.own ? (
+          <p>{t('Команду и ротацию мы собрали сами по открытому гайду: в базе симуляций gcsim подходящей команды нет. Билды напарников — из наших гайдов, доп. статы всей команды подобраны по стандарту KQM под каждое оружие отдельно. C0 с {four}: {dps} урона в секунду.', { four: four.name, dps: fmtNumber(row.dps) })}</p>
+        ) : tuned ? (
           <p>{t('Команда из открытой базы симуляций gcsim — самая близкая к командам из гайда. Меняли только этого персонажа: созвездие и оружие. Напарники, сеты артефактов и ротация — как в исходной симуляции, доп. статы всей команды подобраны по стандарту KQM под каждое оружие отдельно. C0 с {four}: {dps} урона в секунду.', { four: four.name, dps: fmtNumber(row.dps) })}</p>
         ) : (
           <p>{t('Команда из открытой базы симуляций gcsim — самая близкая к командам из гайда. Меняли только созвездие этого персонажа; напарники, артефакты, статы и ротация — как в исходной симуляции. C0 с {four}: {dps} урона в секунду.', { four: four.name, dps: fmtNumber(row.dps) })}</p>
         )}
         <div class="team">{row.team.map((k) => bySimKey.get(k)).filter(Boolean).map((s) => <CharacterIcon slug={s!} size={40} />)}</div>
         <p class="muted">{t('Прирост зависит от команды и вложений: это ориентир, а не точное число для вашего аккаунта.')}
-          {' '}<a href={row.source} rel="noopener">{t('Исходная симуляция')}</a>{meta && <> · gcsim {meta.gcsim}, {meta.date}</>}</p>
+          {' '}{row.source && <a href={row.source} rel="noopener">{row.own ? t('Источник ротации') : t('Исходная симуляция')}</a>}{meta && <> · gcsim {meta.gcsim}, {meta.date}</>}</p>
       </details>
     </div>
   </section>
