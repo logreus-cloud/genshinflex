@@ -1,0 +1,21 @@
+# Перевод интерфейса, часть 15: персонажи из утечек (BETA)
+T = [
+("Утечка из бета-версии", "Beta leak", "Filtración de la beta"),
+("Персонаж из утечек бета-версии. Имя, стихия, характеристики и материалы могут измениться к релизу.",
+ "A character from beta leaks. The name, element, stats and materials may change before release.",
+ "Personaje de filtraciones de la beta. El nombre, el elemento, las estadísticas y los materiales pueden cambiar antes del lanzamiento."),
+("Персонаж из утечек бета-версии: имя, стихия, характеристики и материалы предварительные и могут измениться к релизу.",
+ "This character comes from beta leaks: the name, element, stats and materials are preliminary and may change before release.",
+ "Este personaje procede de filtraciones de la beta: el nombre, el elemento, las estadísticas y los materiales son provisionales y pueden cambiar antes del lanzamiento."),
+("{name} (BETA): утечки — Genshin Impact", "{name} (BETA): leaks — Genshin Impact", "{name} (BETA): filtraciones — Genshin Impact"),
+("Материалы", "Materials", "Materiales"),
+("на возвышение и все таланты до 10 уровня", "for ascension and all talents to level 10", "para la ascensión y todos los talentos a nivel 10"),
+("Опыт героя", "Hero's Wit", "Experiencia de héroe"),
+("Материал с еженедельного босса", "Weekly boss material", "Material de jefe semanal"),
+("Корона прозрения", "Crown of Insight", "Corona de la Sabiduría"),
+("Местный диковинный материал (новый)", "Local specialty (new)", "Especialidad local (nueva)"),
+("Материал с босса", "Boss material", "Material de jefe"),
+("Самоцветы: осколок / фрагмент / кусок / камень", "Gems: sliver / fragment / chunk / gemstone", "Gemas: astilla / fragmento / trozo / piedra"),
+("Книги талантов: учение / руководство / философия", "Talent books: Teachings / Guide / Philosophies", "Libros de talento: Enseñanzas / Guía / Filosofía"),
+("Материалы с монстров: 1★ / 2★ / 3★", "Common materials: 1★ / 2★ / 3★", "Materiales comunes: 1★ / 2★ / 3★"),
+]

@@ -11,6 +11,7 @@ const c = getCharacter(slug);
     {c.icon && <img src={c.icon} alt="" width={size} height={size} loading="lazy" />}
     {c.emblem && <img class="skill" src={c.emblem} alt="" width={size / 2} height={size / 2} loading="lazy" />}
     <i class="dot" aria-hidden="true"></i>
+    {c.beta && <b class="beta">BETA</b>}
   </span>
   {label && <span class="name">{c.name}</span>}
 </a>
@@ -23,6 +24,7 @@ const c = getCharacter(slug);
   .frame .skill { position: absolute; right: 2px; bottom: 2px; width: 32%; height: auto; border-radius: 50%; padding: 2px; background: rgb(15 18 32 / .8); box-shadow: 0 0 0 1.5px var(--el); }
   .frame img:not(.skill) { width: 100%; height: 100%; object-fit: cover; display: block; }
   .dot { position: absolute; top: 2px; right: 2px; width: 34%; aspect-ratio: 1; border-radius: 50%; background: var(--el-icon) center / 84% no-repeat, rgb(12 14 24 / .6); }
+  .beta { position: absolute; left: 0; right: 0; bottom: 0; background: #e0457b; color: #fff; font-size: max(.5rem, calc(var(--s) * .14)); line-height: 1.3; text-align: center; letter-spacing: .04em; }
   /* Длинные имена («Путешественник (Крио)») переносятся по слогам внутри своей колонки, не налезая на соседей */
   .name {
     width: 100%; font-size: .74rem; text-align: center; line-height: 1.15;

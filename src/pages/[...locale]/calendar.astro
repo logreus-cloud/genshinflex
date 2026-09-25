@@ -119,10 +119,18 @@ const items = await calendarItems(lang);
   let timelineStart = 0, timelineEnd = 0, timelinePx = 0;
   const save = () => { try { localStorage.setItem('gf:cal', JSON.stringify({ zoom, view, filters: [...filters] })); } catch { /* Приватный режим. */ } };
   const visible = () => items.map((item, index) => ({ item, index })).filter(({ item }) => filters.has(itemLane(item)));
-  const scrollToday = () => {
-    if (board.querySelector('.cal-now')) {
-      timeline.scrollLeft = Math.max(0, labelWidth + (Date.now() - timelineStart) / dayMs * timelinePx - timeline.clientWidth / 3);
-    }
+  const scrollToday = (smooth = false) => {
+    const line = board.querySelector<HTMLElement>('.cal-now');
+    if (!line) return;
+    const left = Math.max(0, labelWidth + (Date.now() - timelineStart) / dayMs * timelinePx - timeline.clientWidth / 3);
+    timeline.scrollLeft = left;
+    if (!smooth) return;
+    // Подсветка линии «Сейчас», чтобы нажатие было заметно, даже если шкала уже на месте.
+    // Плавной здесь только прокрутка страницы: две плавные прокрутки сразу Chrome обрывает.
+    timeline.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    line.classList.remove('is-flash');
+    void line.offsetWidth;
+    line.classList.add('is-flash');
   };
 
   const renderTimeline = (resetScroll = false) => {
@@ -186,7 +194,7 @@ const items = await calendarItems(lang);
       </div></div>${laneHtml || `<p class="cal-empty">${esc(t('Нет записей для выбранных категорий.'))}</p>`}
       <div class="cal-now" style="left:${labelWidth + x(now)}px"><span>${esc(t('Сейчас'))}</span></div>
     </div>`;
-    if (resetScroll) requestAnimationFrame(scrollToday);
+    if (resetScroll) scrollToday();
   };
 
   const card = ({ item, index }: { item: CalItem; index: number }, now: number) => {
@@ -341,7 +349,13 @@ const items = await calendarItems(lang);
     save(); render();
   }));
   document.getElementById('cal-today')!.addEventListener('click', () => {
-    if (view !== 'timeline') { view = 'timeline'; save(); render(true); } else if (Date.now() >= timelineEnd) render(true); else scrollToday();
+    if (view === 'list') {
+      const first = list.querySelector<HTMLElement>('[data-group]:not([hidden])');
+      (first ?? list).scrollIntoView({ block: 'start', behavior: 'smooth' });
+      return;
+    }
+    if (Date.now() >= timelineEnd) render();
+    scrollToday(true);
   });
   const openItem = (event: Event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-item]');
@@ -413,6 +427,9 @@ const items = await calendarItems(lang);
   :global(.cal-icon) { width: 28px; height: 28px; flex: 0 0 28px; object-fit: cover; border-radius: 50%; background: var(--el); }
   :global(.cal-art) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   :global(.cal-now) { position: absolute; top: 0; bottom: 0; z-index: 3; width: 2px; background: var(--accent); pointer-events: none; }
+  :global(.cal-now.is-flash) { animation: cal-flash .9s ease-out 2; }
+  @keyframes cal-flash { 0% { box-shadow: 0 0 0 0 var(--accent); } 50% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  @media (prefers-reduced-motion: reduce) { :global(.cal-now.is-flash) { animation: none; } }
   :global(.cal-now span) { position: sticky; top: 63px; display: inline-block; margin-left: 3px; padding: .15rem .3rem; border-radius: var(--radius); background: var(--accent); color: var(--surface); font-size: .7rem; }
   :global(.cal-empty) { padding: 1rem; }
   .cal-list { display: grid; gap: 1rem; }

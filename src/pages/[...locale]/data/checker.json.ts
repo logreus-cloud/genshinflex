@@ -21,7 +21,8 @@ export async function GET({ params }: { params: { locale?: string } }) {
   const builds = new Map((await getCollection('builds')).map((b) => [b.data.character, b.data]));
   const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'abyss')?.data;
   const body = {
-    characters: characters.map((c) => {
+    // Утечки в проверке команды не участвуют: нет ни билдов, ни статов по уровням
+    characters: characters.filter((c) => !c.beta).map((c) => {
       const b = builds.get(c.slug);
       return {
         id: c.slug.startsWith('traveler-') ? null : c.id,

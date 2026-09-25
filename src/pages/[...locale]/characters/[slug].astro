@@ -6,7 +6,7 @@ import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
 import Investments from '../../../components/Investments.astro';
 import investments from '../../../data/investments.json';
-import { useData, LANGS, type Character } from '../../../lib/data';
+import { useData, LANGS, BETA_SOURCE, type Character } from '../../../lib/data';
 import { makeLookup, renderGuide } from '../../../lib/guide-markup';
 const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
 
@@ -48,7 +48,14 @@ for (const t of [
 const related = [...merged.values()];
 
 const talentKeys = ['normal', 'skill', 'burst'] as const;
-const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ['talents', t('Таланты')], ['constellations', t('Созвездия')]];
+const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ...(c.beta ? [['materials', t('Материалы')]] : [['talents', t('Таланты')], ['constellations', t('Созвездия')]])];
+// Подписи материалов утечки: ключи из beta-characters.json
+const betaLabels: Record<string, string> = {
+  mora: t('Мора'), wit: t('Опыт героя'), weekly: t('Материал с еженедельного босса'), crown: t('Корона прозрения'),
+  specialty: t('Местный диковинный материал (новый)'), boss: t('Материал с босса'),
+  gems: t('Самоцветы: осколок / фрагмент / кусок / камень'), books: t('Книги талантов: учение / руководство / философия'),
+  drops: t('Материалы с монстров: 1★ / 2★ / 3★'),
+};
 const meta = [
   [t('Созвездие'), c.constellationName], [t('Регион'), c.region], [t('День рождения'), c.birthday], [t('В игре с версии'), c.version],
 ].filter(([, v]) => v);
@@ -60,7 +67,7 @@ const slotIcons = {
 const slotNames = { sands: t('Часы'), goblet: t('Кубок'), circlet: t('Корона') } as const;
 
 // SEO: заголовок и описание под запросы вида «гайд на Водяницу», «билд Весна»
-const seoTitle = b ? t('{name}: гайд и билд — Genshin Impact {patch}', { name: c.name, patch: b.patch }) : t('{name}: таланты и созвездия — Genshin Impact', { name: c.name });
+const seoTitle = c.beta ? t('{name} (BETA): утечки — Genshin Impact', { name: c.name }) : b ? t('{name}: гайд и билд — Genshin Impact {patch}', { name: c.name, patch: b.patch }) : t('{name}: таланты и созвездия — Genshin Impact', { name: c.name });
 const seoDescription = b
   ? t('{name} ({el}, {r}★) — гайд и билд: лучшее оружие — {weapon}, артефакты — {sets}, статы, команды и таланты. Актуально для патча {patch}.', { name: c.name, el: c.elementText, r: c.rarity, weapon: getWeapon(b.weapons[0].slug).name, sets: b.artifacts[0].sets.map((s) => getArtifact(s).name).join(' + '), patch: b.patch })
   : t('{name} в Genshin Impact: {el}, {weapon}, таланты с множителями, созвездия и статы на любом уровне.', { name: c.name, el: c.elementText, weapon: c.weaponText.toLowerCase() });
@@ -79,7 +86,7 @@ const jsonLd = b && {
   about: { '@type': 'VideoGame', name: 'Genshin Impact' },
 };
 ---
-<Layout title={seoTitle} description={seoDescription} image={c.splash ?? c.icon} type={b ? 'article' : 'website'} jsonLd={jsonLd} wide>
+<Layout title={seoTitle} description={seoDescription} image={c.splash ?? c.icon} type={b ? 'article' : 'website'} jsonLd={jsonLd} noindex={c.beta} wide>
   <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/characters/${c.slug}`, name: c.name, icon: c.icon, kind: t('Персонаж') })}>
     <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/characters`}>{t('Персонажи')}</a> / {c.name}</nav>
 
@@ -89,6 +96,7 @@ const jsonLd = b && {
         <p class="muted" data-pagefind-ignore>{c.title}</p>
         <h1>{c.name}</h1>
         <div class="row" data-pagefind-ignore>
+          {c.beta && <span class="chip beta">BETA</span>}
           <span class="chip gold">{stars(c.rarity)}</span>
           <span class="chip" data-el={c.element}>{c.elementText}</span>
           <span class="chip">{c.weaponText}</span>
@@ -106,6 +114,13 @@ const jsonLd = b && {
         </a>
       </div>
     </header>
+
+    {c.beta && (
+      <p class="notice" data-pagefind-ignore>
+        {t('Персонаж из утечек бета-версии: имя, стихия, характеристики и материалы предварительные и могут измениться к релизу.')}
+        {' '}{t('Источник')}: <a href={BETA_SOURCE.url} rel="noopener noreferrer" target="_blank">{BETA_SOURCE.title}</a>.
+      </p>
+    )}
 
     <nav class="tabs" aria-label={t('Разделы страницы')} data-pagefind-ignore>
       {tabs.map(([id, label]) => <a href={`#${id}`}>{label}</a>)}
@@ -217,13 +232,21 @@ const jsonLd = b && {
           </section>
         )}
       </>
-    ) : (
+    ) : !c.beta && (
       <p class="notice" data-pagefind-ignore>
         {t('Билда для этого персонажа пока нет — он появится в одном из ближайших обновлений.')}
         {' '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Напишите свой')}</a> {t('— после проверки он появится здесь.')}
       </p>
     )}
 
+    {c.beta ? (
+      <section id="materials">
+        <h2 class="h-sec">{t('Материалы')} <small>{t('на возвышение и все таланты до 10 уровня')}</small></h2>
+        <dl class="panel mats">
+          {(c.betaMaterials ?? []).map(([k, v]) => <div><dt>{betaLabels[k] ?? k}</dt><dd>{v}</dd></div>)}
+        </dl>
+      </section>
+    ) : (<>
     <section id="talents">
       <h2 class="h-sec">{t('Таланты')}
         <small data-pagefind-ignore>
@@ -279,6 +302,7 @@ const jsonLd = b && {
         ))}
       </div>
     </section>
+    </>)}
 
     <section class="browse" data-pagefind-ignore>
       <h2 class="h-sec">{t('Другие персонажи')}</h2>
@@ -385,6 +409,11 @@ const jsonLd = b && {
   .lvl { display: inline-flex; align-items: center; gap: .5rem; }
   .lvl output { color: var(--accent); font-weight: 600; min-width: 1.4em; }
   .lvl input { accent-color: var(--accent); width: 140px; }
+  .chip.beta { background: #e0457b; border-color: #e0457b; color: #fff; font-weight: 600; letter-spacing: .04em; }
+  .mats { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: .6rem 1.2rem; margin: 0; }
+  .mats div { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: .4rem; }
+  .mats dt { color: var(--muted); }
+  .mats dd { margin: 0; font-weight: 600; white-space: nowrap; }
   .talents { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
   .small-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
   .t-head { display: flex; gap: .7rem; align-items: center; margin-bottom: .6rem; }

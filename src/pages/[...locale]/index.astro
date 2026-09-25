@@ -21,7 +21,8 @@ const banner = banners.find((b) => new Date(b.end) > now) ?? banners.at(-1)!;
 const heroes = banner.featured.map((f) => getCharacter(f.slug));
 const buildSet = new Set(builds.map((b) => b.data.character));
 
-const newest = [...characters].sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 8);
+const leaks = characters.filter((c) => c.beta);
+const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 8 - leaks.length);
 const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(0, 6);
 ---
 <Layout>
@@ -131,8 +132,8 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
 
   <CalendarWidget />
 
-  <h2 class="h-sec">{t('Новые персонажи')} <small><a href={`${base}/characters`}>{t('Все {n}', { n: characters.length })}</a> · <a href={`${base}/guides`}>{t('Руководства')} ({builds.length})</a></small></h2>
-  <div class="cards">{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>
+  <h2 class="h-sec">{t('Новые персонажи')} <small><a href={`${base}/characters`}>{t('Все {n}', { n: characters.length - leaks.length })}</a> · <a href={`${base}/guides`}>{t('Руководства')} ({builds.length})</a></small></h2>
+  <div class="cards">{leaks.map((c) => <CharacterCard slug={c.slug} />)}{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>
 
   {newWeapons.length > 0 && (
     <>

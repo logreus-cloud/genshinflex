@@ -9,18 +9,21 @@ export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 
 const { characters, t } = useData(Astro.currentLocale);
 
 const withBuild = new Set((await getCollection('builds')).map((b) => b.data.character));
-const latest = Math.max(...characters.map((c) => parseFloat(c.version)));
+const released = characters.filter((c) => !c.beta);
+const latest = Math.max(...released.map((c) => parseFloat(c.version)));
+// Утечки — в начале списка, чтобы их было видно сразу
+const ordered = [...characters.filter((c) => c.beta), ...released];
 ---
 <Layout title={t('Персонажи')} wide>
   <h1>{t('Персонажи')}</h1>
-  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.', { n: characters.length })}</p>
+  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.', { n: released.length })}</p>
 
   <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} extra={{ key: 'build', label: t('Только с билдом') }} />
 
   <div class="cards" id="chars">
-    {characters.map((c) => (
+    {ordered.map((c) => (
       <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-element={c.element} data-weapon={c.weapon}
-        data-rarity={String(c.rarity)} data-build={withBuild.has(c.slug) ? '1' : ''}>
+        data-rarity={String(c.rarity)} data-beta={c.beta ? '1' : undefined} data-build={withBuild.has(c.slug) ? '1' : ''}>
         <CharacterCard slug={c.slug} badge={parseFloat(c.version) === latest ? t('новый') : withBuild.has(c.slug) ? t('билд') : undefined} />
       </div>
     ))}

@@ -1,0 +1,39 @@
+{
+  "source": { "title": "Hiragara Leaks", "url": "https://t.me/hiragara_leaks" },
+  "characters": [
+    {
+      "slug": "mitya",
+      "rarity": 5,
+      "element": "anemo",
+      "weapon": "catalyst",
+      "stats": { "hp": 11634, "atk": 263, "def": 792, "sub": 88.4 },
+      "substatPercent": true,
+      "i18n": {
+        "ru": { "name": "Митя", "nameEn": "Mitya", "substat": "Крит. урон" },
+        "en": { "name": "Mitya", "nameEn": "Mitya", "substat": "CRIT DMG" },
+        "es": { "name": "Mitya", "nameEn": "Mitya", "substat": "Daño CRIT" }
+      },
+      "materials": [
+        ["mora", "7 100 000"], ["wit", "419"], ["weekly", "18"], ["crown", "3"], ["specialty", "168"], ["boss", "46"],
+        ["gems", "1 / 9 / 9 / 6"], ["books", "9 / 63 / 114"], ["drops", "36 / 96 / 129"]
+      ]
+    },
+    {
+      "slug": "valery",
+      "rarity": 4,
+      "element": "anemo",
+      "weapon": "sword",
+      "stats": { "hp": 10005, "atk": 255, "def": 703, "sub": 24 },
+      "substatPercent": true,
+      "i18n": {
+        "ru": { "name": "Валери", "nameEn": "Valery", "substat": "Сила атаки %" },
+        "en": { "name": "Valery", "nameEn": "Valery", "substat": "ATK%" },
+        "es": { "name": "Valery", "nameEn": "Valery", "substat": "ATQ %" }
+      },
+      "materials": [
+        ["mora", "7 100 000"], ["wit", "419"], ["weekly", "18"], ["crown", "3"], ["specialty", "168"], ["boss", "46"],
+        ["gems", "1 / 9 / 9 / 6"], ["books", "9 / 63 / 114"], ["drops", "36 / 96 / 129"]
+      ]
+    }
+  ]
+}

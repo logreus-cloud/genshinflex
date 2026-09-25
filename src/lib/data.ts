@@ -9,16 +9,15 @@ import weaponsEs from '../data/generated/weapons.es.json';
 import artifactsEs from '../data/generated/artifacts.es.json';
 import { translate, type Lang } from '../i18n';
 
+import beta from '../data/beta-characters.json';
+
 export type { Lang };
-export type Character = (typeof characters)[number];
+// beta — персонаж из утечек: данных мало, в инструментах (проверка команды, конструктор ротаций) не участвует
+export type Character = (typeof characters)[number] & { beta?: boolean; betaMaterials?: string[][] };
 export type Weapon = (typeof weapons)[number];
 export type Artifact = (typeof artifacts)[number];
+export const BETA_SOURCE = beta.source;
 
-const SOURCES = {
-  ru: { characters, weapons, artifacts },
-  en: { characters: charactersEn as Character[], weapons: weaponsEn as Weapon[], artifacts: artifactsEn as Artifact[] },
-  es: { characters: charactersEs as Character[], weapons: weaponsEs as Weapon[], artifacts: artifactsEs as Artifact[] },
-};
 
 const index = <T extends { slug: string }>(list: T[]) => new Map(list.map((x) => [x.slug, x]));
 // Ссылка на несуществующий слаг — ошибка контента, роняем сборку, чтобы её заметили
@@ -77,6 +76,30 @@ export const LANGS: Lang[] = ['ru', 'en', 'es'];
 // Префикс ссылок: русский — в корне, остальные — /en, /es
 export const prefixOf = (lang: Lang) => (lang === 'ru' ? '' : `/${lang}`);
 export const toLang = (v: string | undefined): Lang => (v === 'en' || v === 'es' ? v : 'ru');
+
+// Утечки дописываем в конец списка в том же формате, что и сгенерированные персонажи
+const betaCharacters = (lang: Lang): Character[] => beta.characters.map((b) => {
+  const t = translate(lang);
+  const text = b.i18n[lang];
+  return {
+    id: 0, slug: b.slug, nameEn: text.nameEn, name: text.name,
+    title: t('Утечка из бета-версии'),
+    description: t('Персонаж из утечек бета-версии. Имя, стихия, характеристики и материалы могут измениться к релизу.'),
+    rarity: b.rarity, element: b.element, elementText: ELEMENTS[lang][b.element], weapon: b.weapon, weaponText: WEAPON_TYPES[lang][b.weapon],
+    region: '', constellationName: '', birthday: '', substat: text.substat, version: '',
+    icon: '/img/beta-character.svg', card: '/img/beta-character.svg', splash: null as unknown as string, emblem: null,
+    stats: [{ level: '90', ...b.stats }], substatPercent: b.substatPercent,
+    talents: { normal: null, skill: null, burst: null, passives: [] } as unknown as Character['talents'],
+    constellations: [],
+    beta: true, betaMaterials: b.materials,
+  } as Character;
+});
+
+const SOURCES = {
+  ru: { characters: [...characters, ...betaCharacters('ru')] as Character[], weapons, artifacts },
+  en: { characters: [...(charactersEn as Character[]), ...betaCharacters('en')], weapons: weaponsEn as Weapon[], artifacts: artifactsEn as Artifact[] },
+  es: { characters: [...(charactersEs as Character[]), ...betaCharacters('es')], weapons: weaponsEs as Weapon[], artifacts: artifactsEs as Artifact[] },
+};
 
 // Всё языкозависимое для страницы: данные, подписи, форматирование, префикс ссылок и перевод интерфейса
 export function useData(locale: string | undefined) {

@@ -71,8 +71,10 @@ const presets = [
   const root = document.querySelector<HTMLElement>('.builder')!;
   const presets: { name: string; members: string[] }[] = JSON.parse(root.dataset.presets!);
   const idx = await loadIndex();
-  const chars = new Map(idx.characters.map((c) => [c.s, c]));
-  const byName = new Map(idx.characters.flatMap((c) => [[c.n.toLowerCase(), c.s], [c.e.toLowerCase(), c.s]]));
+  // Персонажи из утечек (BETA) в конструкторе не участвуют
+  const roster = idx.characters.filter((c) => !(c as { beta?: number }).beta);
+  const chars = new Map(roster.map((c) => [c.s, c]));
+  const byName = new Map(roster.flatMap((c) => [[c.n.toLowerCase(), c.s], [c.e.toLowerCase(), c.s]]));
   const weapons = new Map(idx.weapons.map((w) => [w.s, w]));
   const arts = new Map(idx.artifacts.map((a) => [a.s, a]));
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -90,7 +92,7 @@ const presets = [
 
   const teamInput = root.querySelector<HTMLInputElement>('[name="team"]')!;
   const presetSel = root.querySelector<HTMLSelectElement>('[name="preset"]')!;
-  document.getElementById('char-list')!.innerHTML = idx.characters.map((c) => `<option value="${esc(c.n)}">`).join('');
+  document.getElementById('char-list')!.innerHTML = roster.map((c) => `<option value="${esc(c.n)}">`).join('');
 
   function save() {
     const h = encode(state);
