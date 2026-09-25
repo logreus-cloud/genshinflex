@@ -26,7 +26,7 @@
       "stats": { "hp": 10005, "atk": 255, "def": 703, "sub": 24 },
       "substatPercent": true,
       "i18n": {
-        "ru": { "name": "Валери", "nameEn": "Valery", "substat": "Сила атаки %" },
+        "ru": { "name": "Валерий", "nameEn": "Valery", "substat": "Сила атаки %" },
         "en": { "name": "Valery", "nameEn": "Valery", "substat": "ATK%" },
         "es": { "name": "Valery", "nameEn": "Valery", "substat": "ATQ %" }
       },
