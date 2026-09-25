@@ -45,7 +45,7 @@ const items = await calendarItems(lang);
   <div class="cal-timeline" id="cal-timeline" tabindex="0" aria-label={t('Шкала календаря')}>
     <div id="cal-board"></div>
   </div>
-  <div class="cal-list" id="cal-list" hidden></div>
+  <div class="cal-list" id="cal-list" tabindex="-1" hidden></div>
   <section class="cal-detail panel" id="cal-detail" aria-live="polite" hidden></section>
 </Layout>
 
@@ -116,11 +116,13 @@ const items = await calendarItems(lang);
   let view: View = saved.view === 'timeline' || saved.view === 'list' ? saved.view : matchMedia('(max-width: 640px)').matches ? 'list' : 'timeline';
   let filters = new Set<Lane>(Array.isArray(saved.filters) ? saved.filters.filter((x): x is Lane => allLanes.includes(x)) : allLanes);
   let selected: number | null = null;
+  let timelineStart = 0, timelineEnd = 0, timelinePx = 0;
   const save = () => { try { localStorage.setItem('gf:cal', JSON.stringify({ zoom, view, filters: [...filters] })); } catch { /* Приватный режим. */ } };
   const visible = () => items.map((item, index) => ({ item, index })).filter(({ item }) => filters.has(itemLane(item)));
   const scrollToday = () => {
-    const line = board.querySelector<HTMLElement>('.cal-now');
-    if (line) timeline.scrollLeft = Math.max(0, line.offsetLeft - timeline.clientWidth / 3);
+    if (board.querySelector('.cal-now')) {
+      timeline.scrollLeft = Math.max(0, labelWidth + (Date.now() - timelineStart) / dayMs * timelinePx - timeline.clientWidth / 3);
+    }
   };
 
   const renderTimeline = (resetScroll = false) => {
@@ -138,6 +140,7 @@ const items = await calendarItems(lang);
     const days = Math.max(1, Math.ceil((to - from) / dayMs));
     const startMoment = serverMoment(`${new Date(from).toISOString().slice(0, 10)}T00:00`, region.get());
     const width = days * px;
+    timelineStart = startMoment; timelineEnd = startMoment + days * dayMs; timelinePx = px;
     const x = (ms: number) => (ms - startMoment) / dayMs * px;
     const months: string[] = [];
     const dates: string[] = [];
@@ -212,6 +215,7 @@ const items = await calendarItems(lang);
     const groups: { entry: HTMLElement; item: CalItem }[][] = [[], [], []];
     const active = document.activeElement as HTMLElement | null;
     let restoreFocus = false;
+    let removedFocus: HTMLElement | null = null;
     const present = new Map<number, HTMLElement>([...list.querySelectorAll<HTMLElement>('[data-item]')].map((entry) => [Number(entry.dataset.item), entry]));
     for (const { item, index } of visible()) {
       const status = state(item, now);
@@ -233,7 +237,19 @@ const items = await calendarItems(lang);
       groups[group].push({ entry, item });
       present.delete(index);
     }
-    for (const entry of present.values()) entry.remove();
+    for (const entry of present.values()) {
+      if (active && entry.contains(active)) {
+        const section = entry.closest<HTMLElement>('[data-group]');
+        const groupIndex = Number(section?.dataset.group);
+        const kept = new Set(groups[groupIndex]?.map(({ entry }) => entry));
+        const siblings = [...entry.parentElement!.querySelectorAll<HTMLElement>('[data-item]')];
+        const index = siblings.indexOf(entry);
+        removedFocus = siblings.slice(index + 1).find((node) => kept.has(node))
+          ?? siblings.slice(0, index).reverse().find((node) => kept.has(node))
+          ?? groups[groupIndex]?.[0]?.entry ?? list;
+      }
+      entry.remove();
+    }
     groups[0].sort((a, b) => moment(a.item.end!) - moment(b.item.end!));
     groups[1].sort((a, b) => moment(a.item.start) - moment(b.item.start));
     groups[2].sort((a, b) => moment(b.item.end ?? b.item.start) - moment(a.item.end ?? a.item.start));
@@ -251,7 +267,8 @@ const items = await calendarItems(lang);
       section.hidden = !group.length;
     });
     list.querySelector<HTMLElement>('p.muted')!.hidden = groups.some((group) => group.length);
-    if (restoreFocus && active?.isConnected) active.focus();
+    if (removedFocus) removedFocus.focus({ preventScroll: true });
+    else if (restoreFocus && active?.isConnected) active.focus();
   };
   const renderDetail = () => {
     if (selected === null || !items[selected] || !filters.has(itemLane(items[selected]))) { detail.hidden = true; return; }
@@ -279,6 +296,7 @@ const items = await calendarItems(lang);
   const render = (resetScroll = false) => {
     const active = document.activeElement as HTMLElement | null;
     const focusedId = active?.closest<HTMLElement>('[data-id]')?.dataset.id;
+    const focusedTimeline = active && timeline.contains(active);
     const focusedHref = active && detail.contains(active) ? active.closest('a')?.getAttribute('href') : null;
     paintControls();
     timeline.hidden = view !== 'timeline';
@@ -288,13 +306,22 @@ const items = await calendarItems(lang);
     renderDetail();
     if (focusedId) {
       const container = view === 'timeline' ? board : list;
-      [...container.querySelectorAll<HTMLElement>('[data-id]')].find((entry) => entry.dataset.id === focusedId)?.focus();
+      const entry = [...container.querySelectorAll<HTMLElement>('[data-id]')].find((entry) => entry.dataset.id === focusedId);
+      if (entry) entry.focus();
+      else if (focusedTimeline && view === 'timeline') timeline.focus({ preventScroll: true });
     } else if (focusedHref) {
       [...detail.querySelectorAll<HTMLAnchorElement>('a')].find((link) => link.getAttribute('href') === focusedHref)?.focus();
     }
   };
   const refresh = () => {
     const now = Date.now();
+    if (view === 'timeline') {
+      if (now >= timelineEnd) render();
+      else {
+        const line = board.querySelector<HTMLElement>('.cal-now');
+        if (line) line.style.left = `${labelWidth + (now - timelineStart) / dayMs * timelinePx}px`;
+      }
+    }
     board.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
       const item = items[Number(entry.dataset.item)];
       entry.classList.toggle('is-past', state(item, now) === 'past');
@@ -314,7 +341,7 @@ const items = await calendarItems(lang);
     save(); render();
   }));
   document.getElementById('cal-today')!.addEventListener('click', () => {
-    if (view !== 'timeline') { view = 'timeline'; save(); render(true); } else scrollToday();
+    if (view !== 'timeline') { view = 'timeline'; save(); render(true); } else if (Date.now() >= timelineEnd) render(true); else scrollToday();
   });
   const openItem = (event: Event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-item]');

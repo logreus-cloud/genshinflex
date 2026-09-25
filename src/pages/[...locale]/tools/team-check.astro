@@ -154,6 +154,11 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   let editing: string | null = null;
   let checked = false;
   let importGen = 0;
+  let rosterRev = 0;
+  const editedRev = new Map<string, number>();
+  const removedRev = new Map<string, number>();
+  const markEdited = (e: Entry) => { editedRev.set(e.key, ++rosterRev); };
+  const markRemoved = (e: Entry) => { removedRev.set(e.s, ++rosterRev); editedRev.delete(e.key); };
   const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); if (checked) renderResult(false); };
 
   // Новый персонаж получает рекомендованный билд как отправную точку
@@ -188,6 +193,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     const gen = ++importGen;
     const uid = $<HTMLInputElement>('uid').value.trim();
     if (!/^\d{9,10}$/.test(uid)) return status(t('UID — это 9 или 10 цифр из правого нижнего угла экрана в игре.'), true);
+    const startRev = rosterRev;
     status(t('Загружаю витрину…'));
     try {
       const res = await fetch(`/api/enka/${uid}`);
@@ -198,12 +204,16 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       const list: any[] = body.avatarInfoList ?? [];
       if (!list.length) return status(t('На витрине нет персонажей или скрыты подробности. Включите «Показывать подробности» в профиле игры.'), true);
       let added = 0, skipped: string[] = [];
+      const updated = new Set<string>();
       for (const a of list) {
         const c = charById.get(a.avatarId);
         if (!c) { skipped.push(a.avatarId === 10000005 || a.avatarId === 10000007 ? t('Путешественник') : String(a.avatarId)); continue; }
+        const existing = roster.find((x) => x.s === c.s);
+        if ((removedRev.get(c.s) ?? 0) > startRev || existing && (editedRev.get(existing.key) ?? 0) > startRev) {
+          skipped.push(c.n); continue;
+        }
         const e = fromBuild(c.s);
         // Обновление витрины сохраняет выбранные составы и открытый редактор.
-        const existing = roster.find((x) => x.s === c.s);
         if (existing) e.key = existing.key;
         e.level = Number(a.propMap?.['4001']?.val ?? 90);
         e.cons = (a.talentIdList ?? []).length;
@@ -239,9 +249,31 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         const sl = a.skillLevelMap ? Object.values(a.skillLevelMap).map(Number) : [];
         if (sl.length >= 3) e.talents = [sl[0], sl[1], sl.at(-1)!] as [number, number, number];
         roster = [e, ...roster.filter((x) => x.s !== c.s)];
+        updated.add(e.key);
         added++;
       }
-      persist(); openEditor(editing); renderTeams();
+      persist();
+      if (editing && updated.has(editing)) {
+        const active = document.activeElement as HTMLInputElement | HTMLSelectElement | null;
+        const field = active?.closest('#editor') ? (['f', 't', 's'] as const).find((name) => active.dataset[name] !== undefined) : undefined;
+        const value = field ? active!.dataset[field] : undefined;
+        let selection: [number, number] | null = null;
+        if (field) try {
+          const input = active as HTMLInputElement;
+          if (typeof input.selectionStart === 'number' && typeof input.selectionEnd === 'number') selection = [input.selectionStart, input.selectionEnd];
+        } catch { /* Поле не поддерживает выделение. */ }
+        openEditor(editing);
+        if (field) {
+          const fields = [...$('editor').querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-f], [data-t], [data-s]')];
+          const visible = (node: HTMLElement) => !node.closest('[hidden]') && node.offsetParent !== null;
+          let next = fields.find((node) => node.dataset[field] === value);
+          if (next && !visible(next)) next = value === 'set2' ? fields.find((node) => node.dataset.f === 'set1pc' && visible(node)) : undefined;
+          next ??= fields.find(visible);
+          if (next) try { next.focus(); } catch { /* Не удалось восстановить фокус. */ }
+          if (selection && next) try { (next as HTMLInputElement).setSelectionRange(...selection); } catch { /* Поле не поддерживает выделение. */ }
+        }
+      }
+      renderTeams();
       status(t('Загружено персонажей: {n}.', { n: added }) + (skipped.length ? ' ' + t('Пропущены: {list} — добавьте вручную.', { list: skipped.join(', ') }) : ''));
     } catch {
       if (gen !== importGen) return;
@@ -261,6 +293,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     }
     const e = fromBuild(s);
     roster = [e, ...roster];
+    markEdited(e);
     input.value = '';
     persist(); renderRoster(); openEditor(e.key); renderTeams();
     status(t('{name} добавлен с рекомендованным билдом — поправьте его под свой.', { name: chars.get(s)!.n }));
@@ -345,6 +378,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     clearArmed = false;
     $('clear-roster').textContent = t('Очистить список');
     ++importGen;
+    roster.forEach(markRemoved);
     roster = []; teams = { 1: [], 2: [] };
     checked = false;
     $('result').innerHTML = '';
@@ -408,6 +442,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       if (f === 'set1pc') $('editor').querySelector<HTMLElement>('[data-set2]')!.hidden = e.set1pc === 4;
     } else if (t.dataset.t) e.talents[Number(t.dataset.t)] = validInt(Number(t.value), 1, 15, e.talents[Number(t.dataset.t)]);
     else if (t.dataset.s) e.stats[t.dataset.s as keyof Stats] = t.value === '' ? undefined : validStat(Number(t.value), t.dataset.s as keyof Stats);
+    markEdited(e);
     persist(); renderRoster();
   });
   document.addEventListener('click', (ev) => {
@@ -421,12 +456,15 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       if (!c) return;
       const existing = roster.find((e) => e.s === c.s);
       if (existing) {
+        markRemoved(existing);
         roster = roster.filter((e) => e.key !== existing.key);
         for (const h of [1, 2]) teams[h] = (teams[h] ?? []).filter((k) => k !== existing.key);
         if (editing === existing.key) openEditor(null);
         status(t('{name} убран', { name: c.n }));
       } else {
-        roster = [fromBuild(c.s), ...roster];
+        const e = fromBuild(c.s);
+        roster = [e, ...roster];
+        markEdited(e);
         status(t('{name} добавлен', { name: c.n }));
       }
       persist(); renderRoster(); renderTeams();
@@ -458,6 +496,8 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     } else if (b.dataset.edit) openEditor(editing === b.dataset.edit ? null : b.dataset.edit);
     else if (b.hasAttribute('data-close')) openEditor(null);
     else if (b.hasAttribute('data-remove') && editing) {
+      const removed = roster.find((x) => x.key === editing);
+      if (removed) markRemoved(removed);
       roster = roster.filter((x) => x.key !== editing);
       for (const h of [1, 2]) teams[h] = teams[h].filter((k) => k !== editing);
       persist(); openEditor(null); renderTeams();
@@ -590,21 +630,29 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     // Итоговые статы — 40
     const st = e.stats;
     const filled = Object.values(st).some((v) => v !== undefined);
-    const incomplete = () => {
-      score += 16;
+    const incomplete = (empty = true) => {
+      if (empty) score += 16;
       notes.push({ ok: null, text: t('Статы не указаны — оценка неполная. Впишите их с экрана персонажа или загрузите по UID') });
     };
     if (!filled) incomplete(); else {
       const parts: number[] = [];
+      let missing = false;
+      const addMissing = () => { parts.push(0.4); missing = true; };
       const cls = b?.cls ?? 'sub';
       const usesCrit = !b || b.main.circlet.some((k) => ['crit', 'cr', 'cd'].includes(k));
-      if (usesCrit && st.cr !== undefined && st.cd !== undefined) {
-        const cv = Math.min(st.cr, 100) * 2 + st.cd;
-        const [lo, hi] = cls === 'support' ? [120, 190] : [130, 250];
-        parts.push(clamp((cv - lo) / (hi - lo)));
-        if (cv < (lo + hi) / 2) notes.push({ ok: false, text: t('Крит {cr}% / {cd}%: для {role} маловато, ориентир — {target}', { cr: st.cr, cd: st.cd, role: cls === 'dps' ? t('основного ДД') : t('этой роли'), target: cls === 'support' ? '50% / 100%' : '65% / 130%' }) });
-        else notes.push({ ok: true, text: t('Крит {cr}% / {cd}% — хорошо', { cr: st.cr, cd: st.cd }) });
-        if (st.cr > 85) notes.push({ ok: null, text: t('Шанс крита выше 85% — часть статов уходит впустую, можно перекинуть в крит. урон') });
+      if (usesCrit) {
+        if (st.cr === undefined && st.cd === undefined) addMissing();
+        else {
+          const cv = Math.min(st.cr ?? 5, 100) * 2 + (st.cd ?? 50);
+          const [lo, hi] = cls === 'support' ? [120, 190] : [130, 250];
+          parts.push(clamp((cv - lo) / (hi - lo)));
+          if (st.cr === undefined || st.cd === undefined) missing = true;
+          else {
+            if (cv < (lo + hi) / 2) notes.push({ ok: false, text: t('Крит {cr}% / {cd}%: для {role} маловато, ориентир — {target}', { cr: st.cr, cd: st.cd, role: cls === 'dps' ? t('основного ДД') : t('этой роли'), target: cls === 'support' ? '50% / 100%' : '65% / 130%' }) });
+            else notes.push({ ok: true, text: t('Крит {cr}% / {cd}% — хорошо', { cr: st.cr, cd: st.cd }) });
+            if (st.cr > 85) notes.push({ ok: null, text: t('Шанс крита выше 85% — часть статов уходит впустую, можно перекинуть в крит. урон') });
+          }
+        }
       }
       // Масштабирующий стат: по основному стату часов из билда
       const scale = b?.main.sands.find((k) => ['atk%', 'hp%', 'def%', 'em'].includes(k)) ?? 'atk%';
@@ -624,16 +672,18 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       } else if (scale === 'em' && st.em !== undefined) {
         parts.push(clamp((st.em - 300) / (750 - 300)));
         if (st.em < 500) notes.push({ ok: false, text: t('Мастерство стихий {v}: для реакционного персонажа ориентир — от 600', { v: st.em }) });
-      }
+      } else addMissing();
       // Энергия: если ВЭ в приоритете у билда — нужен запас
       if (st.er !== undefined) {
         const erFirst = b && (b.subs[0] === 'er' || b.main.sands[0] === 'er');
         const target = erFirst ? (cls === 'support' ? 180 : 160) : 120;
         parts.push(clamp((st.er - 100) / (target - 100)));
         if (st.er < target - 10) notes.push({ ok: false, text: t('Восст. энергии {v}%: для этого персонажа лучше {target}%+, иначе взрыв стихии не будет готов к ротации', { v: st.er, target }) });
-      }
-      if (parts.length) score += 40 * parts.reduce((s, p) => s + p, 0) / parts.length;
-      else incomplete();
+      } else addMissing();
+      if (parts.length) {
+        score += 40 * parts.reduce((s, p) => s + p, 0) / parts.length;
+        if (missing) incomplete(false);
+      } else incomplete();
     }
 
     // Созвездия и таланты — небольшой бонус сверху, если что-то сильно отстаёт — предупреждение
@@ -646,7 +696,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     const members = (teams[h] ?? []).map((k) => roster.find((e) => e.key === k)!).filter(Boolean);
     if (!members.length) return null;
     const scored = members.map((e) => ({ e, c: chars.get(e.s)!, ...scoreChar(e) }));
-    const avg = scored.reduce((s, x) => s + x.score, 0) / scored.length;
+    const avg = scored.reduce((s, x) => s + x.score, 0) / 4;
     const teamNotes: Note[] = [];
     let fit = 1;
     let missingCount = 0;
@@ -667,6 +717,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     let total = Math.round(avg * 0.7 + Math.max(0, fit) * 30);
     // Без нужной стихии бафф этажа не работает, а щиты снимаются медленно — «готова» быть не может
     if (missingCount > 0) total = Math.min(total, missingCount > 1 ? 50 : 64);
+    if (members.length < 4) total = Math.min(total, members.length === 3 ? 64 : 50);
     return { half, scored, teamNotes, total };
   }
 
