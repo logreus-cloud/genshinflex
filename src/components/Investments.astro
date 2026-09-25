@@ -105,7 +105,7 @@ const signed = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v)}%`;
   .pick { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .6rem; align-items: center; }
   .opt { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); min-width: 0; }
   .opt.best { border-color: var(--accent); background: var(--accent-soft); }
-  .opt img { border-radius: 8px; background: linear-gradient(160deg, #7a5226, #d1953f); flex: none; }
+  .opt img { border-radius: 8px; background: linear-gradient(160deg, #7a5226, #d1953f); flex: none; padding: 3px; box-sizing: border-box; }
   .opt div { display: grid; min-width: 0; flex: 1; }
   .opt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .opt strong { font: 700 1.2rem var(--font-display); color: var(--accent); white-space: nowrap; }

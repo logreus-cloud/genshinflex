@@ -281,7 +281,7 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   .wcard { display: flex; align-items: center; gap: .6rem; padding: .5rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; font-size: .86rem; }
   /* Длинные названия оружия переносятся внутри карточки, а не вылезают за неё */
   .wcard span { min-width: 0; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
-  .wcard img { border-radius: 8px; background: linear-gradient(160deg, #5b4b82, #9679c4); flex: none; }
+  .wcard img { border-radius: 8px; background: linear-gradient(160deg, #5b4b82, #9679c4); flex: none; padding: 4px; box-sizing: border-box; }
   .wcard.r5 img { background: linear-gradient(160deg, #7a5226, #d1953f); }
   .wcard:hover { border-color: var(--accent); }
 

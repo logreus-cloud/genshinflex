@@ -384,7 +384,8 @@ const jsonLd = b && {
   .rank li { display: flex; gap: .7rem; align-items: center; }
   .rank .n { width: 1.4rem; text-align: center; color: var(--muted); font: 600 .85rem var(--font-display); flex: none; }
   .rank li:first-child .n { color: var(--accent); }
-  .rank img { border-radius: 8px; background: var(--surface-3); flex: none; }
+  /* Отступ внутри рамки: иконки оружия нарисованы до краёв, и скругление срезало бы кончики */
+  .rank img { border-radius: 8px; background: var(--surface-3); flex: none; padding: 3px; box-sizing: border-box; }
   .rank img.r5 { background: linear-gradient(160deg, #7a5226, #d1953f); }
   .rank img.r4 { background: linear-gradient(160deg, #5b4b82, #9679c4); }
   .rank a { text-decoration: none; }
@@ -432,6 +433,11 @@ const jsonLd = b && {
   @media (max-width: 900px) {
     .two { grid-template-columns: 1fr; }
     .stats-row { grid-template-columns: 1fr; }
+  }
+  /* На телефоне вкладки переносятся на вторую строку, а не уезжают за край экрана */
+  @media (max-width: 640px) {
+    .tabs { flex-wrap: wrap; overflow-x: visible; }
+    .tabs a { padding: .5rem .65rem; font-size: .85rem; }
   }
   @media (max-width: 640px) {
     .head { min-height: 0; flex-direction: column; align-items: stretch; }
