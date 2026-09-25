@@ -202,9 +202,47 @@ const items = await calendarItems(lang);
       { title: t('Скоро'), entries: shown.filter(({ item }) => state(item, now) === 'future').sort((a, b) => moment(a.item.start) - moment(b.item.start)) },
       { title: t('Недавно закончилось'), entries: shown.filter(({ item }) => state(item, now) === 'past' && moment(item.end ?? item.start) >= now - 14 * dayMs).sort((a, b) => moment(b.item.end ?? b.item.start) - moment(a.item.end ?? a.item.start)) },
     ];
-    list.innerHTML = groups.filter((group) => group.entries.length).map((group) =>
-      `<section><h2 class="h-sec">${esc(group.title)}</h2><div class="cal-cards">${group.entries.map((entry) => card(entry, now)).join('')}</div></section>`).join('') ||
-      `<p class="muted">${esc(t('Нет записей для выбранных категорий.'))}</p>`;
+    list.innerHTML = groups.map((group, index) =>
+      `<section data-group="${index}"${group.entries.length ? '' : ' hidden'}><h2 class="h-sec">${esc(group.title)}</h2><div class="cal-cards">${group.entries.map((entry) => card(entry, now)).join('')}</div></section>`).join('') +
+      `<p class="muted"${groups.some((group) => group.entries.length) ? ' hidden' : ''}>${esc(t('Нет записей для выбранных категорий.'))}</p>`;
+  };
+  const refreshList = (now: number, regionChanged = false) => {
+    const sections = [...list.querySelectorAll<HTMLElement>('[data-group]')];
+    if (!sections.length) return;
+    const groups: { entry: HTMLElement; item: CalItem }[][] = [[], [], []];
+    const active = document.activeElement as HTMLElement | null;
+    let restoreFocus = false;
+    list.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
+      const item = items[Number(entry.dataset.item)];
+      const status = state(item, now);
+      const group = status === 'current' ? 0 : status === 'future' ? 1 : 2;
+      if (group === 2 && moment(item.end ?? item.start) < now - 14 * dayMs) { entry.remove(); return; }
+      entry.classList.toggle('is-past', status === 'past');
+      entry.classList.toggle('is-current', status === 'current');
+      if (regionChanged) {
+        entry.setAttribute('aria-label', `${item.title}, ${laneNames[itemLane(item)]}, ${rangeText(item)}`);
+        entry.querySelector<HTMLElement>('.cal-card-dates')!.textContent = rangeText(item);
+      }
+      groups[group].push({ entry, item });
+    });
+    groups[0].sort((a, b) => moment(a.item.end!) - moment(b.item.end!));
+    groups[1].sort((a, b) => moment(a.item.start) - moment(b.item.start));
+    groups[2].sort((a, b) => moment(b.item.end ?? b.item.start) - moment(a.item.end ?? a.item.start));
+    groups.forEach((group, index) => {
+      const section = sections[index];
+      const cards = section.querySelector<HTMLElement>('.cal-cards')!;
+      let next: HTMLElement | null = null;
+      for (const { entry } of group.reverse()) {
+        if (entry.parentElement !== cards || entry.nextElementSibling !== next) {
+          if (active && entry.contains(active)) restoreFocus = true;
+          cards.insertBefore(entry, next);
+        }
+        next = entry;
+      }
+      section.hidden = !group.length;
+    });
+    list.querySelector<HTMLElement>('p.muted')!.hidden = groups.some((group) => group.length);
+    if (restoreFocus && active?.isConnected) active.focus();
   };
   const renderDetail = () => {
     if (selected === null || !items[selected] || !filters.has(itemLane(items[selected]))) { detail.hidden = true; return; }
@@ -253,11 +291,7 @@ const items = await calendarItems(lang);
       entry.classList.toggle('is-past', state(item, now) === 'past');
       entry.classList.toggle('is-current', state(item, now) === 'current');
     });
-    list.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
-      const item = items[Number(entry.dataset.item)];
-      entry.classList.toggle('is-past', state(item, now) === 'past');
-      entry.classList.toggle('is-current', state(item, now) === 'current');
-    });
+    refreshList(now);
     document.querySelectorAll<HTMLElement>('[data-left]').forEach((entry) => {
       entry.textContent = countdown(items[Number(entry.dataset.left)], now);
     });
@@ -288,9 +322,21 @@ const items = await calendarItems(lang);
     if (event.deltaY < 0 && timeline.scrollLeft <= 0) return;
     if (event.deltaY > 0 && timeline.scrollLeft >= timeline.scrollWidth - timeline.clientWidth - 1) return;
     event.preventDefault();
-    timeline.scrollLeft += event.deltaY;
+    timeline.scrollLeft += event.deltaY * (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? timeline.clientWidth : 1);
   }, { passive: false });
-  document.addEventListener('gf:region', () => render(true));
+  document.addEventListener('gf:region', () => {
+    if (view === 'timeline') { render(true); return; }
+    const active = document.activeElement as HTMLElement | null;
+    const focusedHref = active && detail.contains(active) ? active.closest('a')?.getAttribute('href') : null;
+    paintControls();
+    const now = Date.now();
+    refreshList(now, true);
+    document.querySelectorAll<HTMLElement>('[data-left]').forEach((entry) => {
+      entry.textContent = countdown(items[Number(entry.dataset.left)], now);
+    });
+    renderDetail();
+    if (focusedHref) [...detail.querySelectorAll<HTMLAnchorElement>('a')].find((link) => link.getAttribute('href') === focusedHref)?.focus();
+  });
   setInterval(refresh, 30_000);
   render(true);
 </script>

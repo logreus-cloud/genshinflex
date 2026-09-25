@@ -109,7 +109,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   const validStat = (v: unknown, key: keyof Stats) => typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.min(['cr', 'cd', 'er', 'dmg'].includes(key) ? 1000 : Infinity, v)) : undefined;
   const validKey = (v: unknown) => typeof v === 'string' && /^[a-z0-9-]{1,80}$/.test(v);
   const validSlug = (v: unknown, known: Map<string, unknown>) => typeof v === 'string' && known.has(v) ? v : '';
-  const validSlot = (v: unknown, slot: 'sands' | 'goblet' | 'circlet') => typeof v === 'string' && STAT_OPTS[slot].some(([key]) => key === v) ? v : STAT_OPTS[slot][0][0];
+  const validSlot = (v: unknown, slot: 'sands' | 'goblet' | 'circlet') => v === '' || typeof v === 'string' && STAT_OPTS[slot].some(([key]) => key === v) ? v : STAT_OPTS[slot][0][0];
   const keyMap = new Map<string, string>();
   const seenChars = new Set<string>();
   const seenKeys = new Set<string>();
@@ -214,6 +214,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
           dmg: +(100 * (f[ELEM_BONUS[c.el]] ?? 0)).toFixed(1),
         };
         e.weapon = '';
+        e.sands = e.goblet = e.circlet = '';
         e.refine = 1;
         const sets = new Map<string, number>();
         for (const item of a.equipList ?? []) {
@@ -380,9 +381,9 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
           <label>${t('Сет')}<select class="input" data-f="set1">${opt(sets, e.set1)}</select></label>
           <label>${t('Предметов')}<select class="input" data-f="set1pc">${opt([['4', t('4 предмета')], ['2', t('2 предмета')]], String(e.set1pc))}</select></label>
           <label ${e.set1pc === 4 ? 'hidden' : ''} data-set2>${t('Второй сет (2 предмета)')}<select class="input" data-f="set2">${opt(sets, e.set2)}</select></label>
-          <label>${t('Часы')}<select class="input" data-f="sands">${opt(STAT_OPTS.sands, e.sands)}</select></label>
-          <label>${t('Кубок')}<select class="input" data-f="goblet">${opt(STAT_OPTS.goblet, e.goblet)}</select></label>
-          <label>${t('Корона')}<select class="input" data-f="circlet">${opt(STAT_OPTS.circlet, e.circlet)}</select></label>
+          <label>${t('Часы')}<select class="input" data-f="sands">${opt([['', '—'], ...STAT_OPTS.sands], e.sands)}</select></label>
+          <label>${t('Кубок')}<select class="input" data-f="goblet">${opt([['', '—'], ...STAT_OPTS.goblet], e.goblet)}</select></label>
+          <label>${t('Корона')}<select class="input" data-f="circlet">${opt([['', '—'], ...STAT_OPTS.circlet], e.circlet)}</select></label>
         </fieldset>
         <fieldset class="stats"><legend>${t('Итоговые статы')} <span class="muted small">— ${t('как в игре на экране персонажа')}</span></legend>
           ${STAT_FIELDS.map(([k, l, u]) => `<label>${l}${u ? ', %' : ''}<input class="input" type="number" step="0.1" min="0" data-s="${k}" value="${e.stats[k] ?? ''}" placeholder="—"></label>`).join('')}
@@ -579,14 +580,16 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       const names: Record<string, string> = Object.fromEntries([...STAT_OPTS.sands, ...STAT_OPTS.goblet, ...STAT_OPTS.circlet]);
       for (const slot of ['sands', 'goblet', 'circlet'] as const) {
         const want = b.main[slot].flatMap((k) => (k === 'crit' ? ['cr', 'cd'] : [k]));
-        if (!want.length || want.includes(e[slot])) score += 5;
-        else notes.push({ ok: false, text: t('{slot}: {have}, а нужно {want}', { slot: t({ sands: 'Часы', goblet: 'Кубок', circlet: 'Корона' }[slot]), have: names[e[slot]], want: [...new Set(want)].map((k) => names[k] ?? k).join(` ${t('или')} `) }) });
+        const slotName = t({ sands: 'Часы', goblet: 'Кубок', circlet: 'Корона' }[slot]);
+        if (!e[slot]) notes.push({ ok: false, text: t('{slot}: не указан', { slot: slotName }) });
+        else if (!want.length || want.includes(e[slot])) score += 5;
+        else notes.push({ ok: false, text: t('{slot}: {have}, а нужно {want}', { slot: slotName, have: names[e[slot]], want: [...new Set(want)].map((k) => names[k] ?? k).join(` ${t('или')} `) }) });
       }
     } else score += 12;
 
     // Итоговые статы — 40
     const st = e.stats;
-    const filled = Object.values(st).some((v) => v);
+    const filled = Object.values(st).some((v) => v !== undefined);
     if (!filled) {
       score += 16;
       notes.push({ ok: null, text: t('Статы не указаны — оценка неполная. Впишите их с экрана персонажа или загрузите по UID') });
@@ -605,15 +608,15 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       // Масштабирующий стат: по основному стату часов из билда
       const scale = b?.main.sands.find((k) => ['atk%', 'hp%', 'def%', 'em'].includes(k)) ?? 'atk%';
       const base = c.base[lvlKey(e.level)] ?? c.base['90'];
-      if (scale === 'atk%' && st.atk) {
+      if (scale === 'atk%' && st.atk !== undefined) {
         const ratio = st.atk / (base[1] + (w?.atk ?? 500));
         parts.push(clamp((ratio - 1.3) / (2.0 - 1.3)));
         if (ratio < 1.6) notes.push({ ok: false, text: t('Атака {v}: мало относительно базовой — нужно больше Силы атаки % в статах', { v: st.atk }) });
-      } else if (scale === 'hp%' && st.hp) {
+      } else if (scale === 'hp%' && st.hp !== undefined) {
         const ratio = st.hp / base[0];
         parts.push(clamp((ratio - 1.6) / (2.6 - 1.6)));
         if (ratio < 2) notes.push({ ok: false, text: t('HP {v}: для персонажа от HP нужно больше — ориентир от {target}', { v: st.hp, target: Math.round(base[0] * 2.3).toLocaleString() }) });
-      } else if (scale === 'def%' && st.def) {
+      } else if (scale === 'def%' && st.def !== undefined) {
         const ratio = st.def / base[2];
         parts.push(clamp((ratio - 1.8) / (2.8 - 1.8)));
         if (ratio < 2.2) notes.push({ ok: false, text: t('Защита {v}: для персонажа от защиты маловато, ориентир — от {target}', { v: st.def, target: Math.round(base[2] * 2.5) }) });

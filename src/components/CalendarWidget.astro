@@ -5,14 +5,10 @@ import { useData } from '../lib/data';
 const { lang, base, t, fmtServerDate } = useData(Astro.currentLocale);
 const now = Date.now();
 const moment = (value: string) => Date.parse(`${value.replace(' ', 'T').slice(0, 16)}+01:00`);
-const items = (await calendarItems(lang)).filter((item) => item.kind !== 'abyss' && item.kind !== 'theater' && item.kind !== 'onslaught' && item.kind !== 'version');
-const ongoing = items.filter((item) => item.end && moment(item.start) <= now && moment(item.end) > now)
-  .sort((a, b) => moment(a.end!) - moment(b.end!));
-const recent = items.filter((item) => moment(item.end ?? item.start) <= now && moment(item.end ?? item.start) > now - 13 * 3_600_000)
-  .sort((a, b) => moment(b.end ?? b.start) - moment(a.end ?? a.start));
-const future = items.filter((item) => moment(item.start) > now)
-  .sort((a, b) => moment(a.start) - moment(b.start));
-const shown = [...ongoing, ...recent, ...future].slice(0, 30);
+const shown = (await calendarItems(lang)).filter((item) =>
+  item.kind !== 'abyss' && item.kind !== 'theater' && item.kind !== 'onslaught' && item.kind !== 'version' &&
+  moment(item.end ?? item.start) + 6 * 3_600_000 > now - 86_400_000 &&
+  moment(item.start) - 7 * 3_600_000 <= now + 60 * 86_400_000);
 ---
 {shown.length > 0 && (
   <section class="calendar-widget" data-ended={t('Закончилось')} data-ongoing={t('Идёт сейчас')}>
@@ -22,7 +18,7 @@ const shown = [...ongoing, ...recent, ...future].slice(0, 30);
         const active = moment(item.start) <= now;
         const until = active && item.end ? item.end : item.start;
         return (
-          <a class="calendar-card" href={`${base}/calendar/`} data-start={item.start} data-end={item.end ?? ''}
+          <a class="calendar-card" href={`${base}/calendar/`} data-id={item.id} data-start={item.start} data-end={item.end ?? ''}
             data-start-label={t('с {date}', { date: fmtServerDate(item.start) })}
             data-end-label={t('до {date}', { date: fmtServerDate(item.end ?? item.start) })}>
             {item.image ? (
@@ -71,9 +67,16 @@ const shown = [...ongoing, ...recent, ...future].slice(0, 30);
         }
         return { card, active, future, until };
       }).sort((a, b) => Number(b.active) - Number(a.active) || a.until - b.until);
-      cards.append(...ordered.map(({ card }) => card));
-      let visible = 0;
-      ordered.forEach(({ card, active, future }) => { card.hidden = !(active || future) || visible++ >= 5; });
+      const visible = ordered.filter(({ active, future }) => active || future).slice(0, 5);
+      const currentIds = [...cards.querySelectorAll<HTMLAnchorElement>('.calendar-card:not([hidden])')].map((card) => card.dataset.id);
+      const nextIds = visible.map(({ card }) => card.dataset.id);
+      const changed = currentIds.length !== nextIds.length || currentIds.some((id, index) => id !== nextIds[index]);
+      const focused = changed && widget.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+      ordered.forEach(({ card }) => { card.hidden = !visible.some((entry) => entry.card === card); });
+      if (changed) {
+        cards.prepend(...visible.map(({ card }) => card));
+        if (focused && focused.closest<HTMLAnchorElement>('.calendar-card')?.hidden === false) focused.focus();
+      }
     });
   };
   refresh();

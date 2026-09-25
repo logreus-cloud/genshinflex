@@ -62,6 +62,7 @@
  "{n}-й повтор": "rerun #{n}",
  "{n}-я половина": "Half {n}",
  "{slot}: {have}, а нужно {want}": "{slot}: {have}, but it should be {want}",
+ "{slot}: не указан": "{slot}: not set",
  "«Раскольников»": "\"Raskolnikov\"",
  "Автор (необязательно)": "Author (optional)",
  "Авторы гайда": "Guide authors",

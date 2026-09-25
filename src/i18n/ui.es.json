@@ -62,6 +62,7 @@
  "{n}-й повтор": "reposición n.º {n}",
  "{n}-я половина": "Mitad {n}",
  "{slot}: {have}, а нужно {want}": "{slot}: {have}, pero debería ser {want}",
+ "{slot}: не указан": "{slot}: sin indicar",
  "«Раскольников»": "«Raskólnikov»",
  "Автор (необязательно)": "Autor (opcional)",
  "Авторы гайда": "Autores de la guía",
