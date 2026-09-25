@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import QuickSearch from '../components/QuickSearch.astro';
+import Splash from '../components/Splash.astro';
+import { ogPath } from '../lib/og';
 import { useData, LANGS, prefixOf } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
 
@@ -99,6 +101,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     <aside class="side" id="side" aria-label={t('Навигация')}>
       <a class="logo" href={`${base}/`}>
         <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+    <Splash />
         <span>Genshin<b>Flex</b></span>
       </a>
       <nav>

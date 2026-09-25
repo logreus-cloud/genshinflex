@@ -1,0 +1,60 @@
+---
+// Заставка при первом заходе: луна меняет фазы, пока грузится страница.
+// Только первый показ за сессию вкладки, только с JS; скрывается по load, но не позже чем через 2,5 с.
+---
+<div id="gf-splash" hidden aria-hidden="true">
+  <div class="moon"></div>
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="30" height="30"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+    <span>Genshin<b>Flex</b></span>
+  </div>
+</div>
+<script is:inline>
+  (function () {
+    var el = document.getElementById('gf-splash');
+    try {
+      if (sessionStorage.getItem('gf:splash')) { el.remove(); return; }
+      sessionStorage.setItem('gf:splash', '1');
+    } catch (e) { el.remove(); return; }
+    el.hidden = false;
+    var start = Date.now(), done = false;
+    function hide() {
+      if (done) return;
+      done = true;
+      // Не меньше 0,7 с, иначе на быстрой сети заставка просто мигнёт
+      setTimeout(function () {
+        el.classList.add('out');
+        setTimeout(function () { el.remove(); }, 450);
+      }, Math.max(0, 700 - (Date.now() - start)));
+    }
+    if (document.readyState === 'complete') hide();
+    else { addEventListener('load', hide, { once: true }); setTimeout(hide, 2500); }
+  })();
+</script>
+
+<style>
+  #gf-splash {
+    position: fixed; inset: 0; z-index: 1000; display: grid; place-content: center; justify-items: center; gap: 1.4rem;
+    background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--accent) 12%, var(--bg)) 0, var(--bg-deep) 60%);
+    color: var(--text); transition: opacity .45s ease, visibility .45s;
+  }
+  #gf-splash[hidden] { display: none; }
+  #gf-splash.out { opacity: 0; visibility: hidden; }
+  /* Луна: светлый диск, по которому проходит тень — получается смена фаз */
+  .moon {
+    position: relative; width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+    background: var(--accent); box-shadow: 0 0 48px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .moon::after {
+    content: ""; position: absolute; inset: -2px; border-radius: 50%; background: var(--bg-deep);
+    animation: gf-phase 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes gf-phase { from { transform: translateX(-104%); } to { transform: translateX(104%); } }
+  .brand { display: flex; align-items: center; gap: .55rem; font: 600 1.15rem var(--font-display); letter-spacing: .01em; }
+  .brand svg { color: var(--accent); }
+  .brand b { color: var(--accent); font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) {
+    .moon::after { animation: none; transform: translateX(45%); }
+    #gf-splash { transition: none; }
+  }
+</style>
