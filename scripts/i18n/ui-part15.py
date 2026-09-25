@@ -17,5 +17,6 @@ T = [
 ("Материал с босса", "Boss material", "Material de jefe"),
 ("Самоцветы: осколок / фрагмент / кусок / камень", "Gems: sliver / fragment / chunk / gemstone", "Gemas: astilla / fragmento / trozo / piedra"),
 ("Книги талантов: учение / руководство / философия", "Talent books: Teachings / Guide / Philosophies", "Libros de talento: Enseñanzas / Guía / Filosofía"),
+("В разработке", "In development", "En desarrollo"),
 ("Материалы с монстров: 1★ / 2★ / 3★", "Common materials: 1★ / 2★ / 3★", "Materiales comunes: 1★ / 2★ / 3★"),
 ]

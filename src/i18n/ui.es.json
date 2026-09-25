@@ -119,6 +119,7 @@
  "В команде {name}: {n} из 4 участников.": "Equipo {name}: {n} de 4 miembros.",
  "В команде {n} из 4 — пустые слоты сильно снижают урон и выживаемость": "Solo {n} de 4 en el equipo: los huecos vacíos reducen mucho el daño y la supervivencia",
  "В команде нет саппорта или хилера — на 12-м этаже будет сложно выживать": "No hay apoyo ni sanador en el equipo: sobrevivir en el piso 12 será difícil",
+ "В разработке": "En desarrollo",
  "В ссылке нет authkey — скопируйте ссылку заново": "El enlace no tiene authkey: vuelve a copiarlo",
  "В ссылке нет authkey. Откройте историю молитв в игре и запустите скрипт снова.": "El enlace no tiene authkey. Abre el historial de deseos en el juego y vuelve a ejecutar el script.",
  "В тексте гайдов": "En el texto de las guías",

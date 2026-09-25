@@ -23,11 +23,13 @@ const MAP_LANG = { ru: 'ru-ru', en: 'en-us', es: 'es-es' } as const;
 const nav = [
   { group: null, items: [['Главная', '/', 'home']] },
   { group: 'База', items: [['Персонажи', '/characters', 'user'], ['Оружие', '/weapons', 'sword'], ['Артефакты', '/artifacts', 'flower']] },
-  { group: 'Эндгейм', items: [['Все режимы', '/rotation', 'moon'], ['Витая бездна', '/abyss', 'spiral'], ['Театр воображариума', '/theater', 'mask'], ['Натиск', '/onslaught', 'flame'], ['Рейтинг', '/rating', 'chart']] },
+  { group: 'Эндгейм', items: [['Все режимы', '/rotation', 'moon'], ['Витая бездна', '/abyss', 'spiral'], ['Театр воображариума', '/theater', 'mask'], ['Натиск', '/onslaught', 'flame']] },
   { group: 'Таймлайн', items: [['Календарь', '/calendar', 'calendar'], ['Баннеры', '/banners', 'moon']] },
   { group: 'Гайды', items: [['Руководства', '/guides', 'book']] },
   { group: 'Сайт', items: [['Новости сайта', '/news', 'book']] },
   { group: 'Инструменты', items: [['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
+  // Разделы, которые выйдут не скоро: отдельно и приглушённо, чтобы не путать с готовыми
+  { group: 'В разработке', soon: true, items: [['Рейтинг', '/rating', 'chart']] },
 ] as const;
 
 // Простые контурные иконки навигации, 20×20
@@ -100,13 +102,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <span>Genshin<b>Flex</b></span>
       </a>
       <nav>
-        {nav.map(({ group, items }) => (
-          <div class="group">
+        {nav.map(({ group, items, ...rest }) => (
+          <div class:list={['group', { soon: 'soon' in rest }]}>
             {group && <p class="gtitle">{t(group)}</p>}
             {items.map(([label, href, icon]) => (
               <a href={`${base}${href}`} aria-current={active(href) ? 'page' : undefined}>
                 <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d={icons[icon]} /></svg>
                 {t(label)}
+                {'soon' in rest && <small class="soon-tag">{t('скоро')}</small>}
               </a>
             ))}
           </div>
@@ -216,6 +219,8 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   nav a:hover { color: var(--text); background: var(--surface); }
   nav a[aria-current] { color: var(--text); background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
   nav a[aria-current] svg { stroke: var(--accent); }
+  .group.soon a:not([aria-current]) { opacity: .7; }
+  .soon-tag { margin-left: auto; padding: .05rem .4rem; border: 1px solid var(--border); border-radius: 999px; font-size: .68rem; color: var(--muted); }
   /* Кнопка карты: рамка как у окон в игре — двойная золотая линия и ромбы по углам */
   .map-card {
     position: relative; display: flex; align-items: center; gap: .6rem; margin: 0 .8rem 1rem; padding: .7rem .7rem;
