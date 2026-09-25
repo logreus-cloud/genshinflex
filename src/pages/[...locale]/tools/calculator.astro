@@ -14,7 +14,7 @@ const { t, TALENTS } = useData(Astro.currentLocale);
     <form class="setup" id="calc" autocomplete="off">
       <section class="panel">
         <h2>{t('Персонаж')}</h2>
-        <label class="pick"><img alt="" width="44" height="44" hidden /><input class="input" name="char" list="dl-char" placeholder={t('Начните вводить имя')} /></label>
+        <label class="pick"><img alt="" width="44" height="44" hidden /><input class="input" name="char" placeholder={t('Начните вводить имя')} /></label>
         <div class="range">
           <label><span class="muted small">{t('Уровень сейчас')}</span><select class="input" name="cFrom"></select></label>
           <span class="arrow" aria-hidden="true">→</span>
@@ -39,15 +39,13 @@ const { t, TALENTS } = useData(Astro.currentLocale);
 
       <section class="panel">
         <h2>{t('Оружие')} <small class="muted">{t('необязательно')}</small></h2>
-        <label class="pick"><img alt="" width="44" height="44" hidden /><input class="input" name="weapon" list="dl-weapon" placeholder={t('Название оружия')} /></label>
+        <label class="pick"><img alt="" width="44" height="44" hidden /><input class="input" name="weapon" placeholder={t('Название оружия')} /></label>
         <div class="range">
           <label><span class="muted small">{t('Уровень сейчас')}</span><select class="input" name="wFrom"></select></label>
           <span class="arrow" aria-hidden="true">→</span>
           <label><span class="muted small">{t('Цель')}</span><select class="input" name="wTo"></select></label>
         </div>
       </section>
-      <datalist id="dl-char"></datalist>
-      <datalist id="dl-weapon"></datalist>
     </form>
 
     <section class="panel result" aria-live="polite">
@@ -65,6 +63,7 @@ const { t, TALENTS } = useData(Astro.currentLocale);
 <script>
   import { store } from '../../../scripts/common';
   import { BASE, LANG, t } from '../../../scripts/search';
+  import { combobox } from '../../../scripts/combobox';
 
   type Cost = [number, number][];
   type Data = {
@@ -73,7 +72,7 @@ const { t, TALENTS } = useData(Astro.currentLocale);
     weapons: Record<string, { rarity: number; asc: Cost[] }>;
     materials: Record<string, { rarity: number; sort: number; icon: string | null; ru: string; en: string; es: string }>;
   };
-  type Named = { s: string; n: string; i: string; r: number; el?: string };
+  type Named = { s: string; n: string; e: string; i: string; r: number; el?: string };
 
   const MORA = 202, WIT = 104003, MYSTIC = 104013;
   // Ступени прокачки: [уровень, число возвышений]; «80★» — возвышенный 80-й, лимит поднят до 90
@@ -94,8 +93,20 @@ const { t, TALENTS } = useData(Astro.currentLocale);
     ]);
     const chars = index.characters.filter((c) => data.characters[c.s]);
     const weapons = index.weapons.filter((w) => data.weapons[w.s]);
-    document.querySelector('#dl-char')!.innerHTML = chars.map((c) => `<option value="${c.n}">`).join('');
-    document.querySelector('#dl-weapon')!.innerHTML = weapons.map((w) => `<option value="${w.n}">${'★'.repeat(w.r)}</option>`).join('');
+    typeof combobox === 'function' && combobox(el('char'), () => chars.map((c) => ({
+      value: c.n, label: c.n, icon: c.i, el: c.el, hint: '★'.repeat(c.r), search: c.e,
+    })), (item) => {
+      const input = el('char');
+      input.value = item.label;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    typeof combobox === 'function' && combobox(el('weapon'), () => weapons.map((w) => ({
+      value: w.n, label: w.n, icon: w.i, rarity: w.r, hint: '★'.repeat(w.r), search: w.e,
+    })), (item) => {
+      const input = el('weapon');
+      input.value = item.label;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
     const find = (list: Named[], v: string) => list.find((x) => norm(x.n) === norm(v) || x.s === v.trim());
 
     // Оружию 1–2★ доступно только 70 уровней и 4 возвышения

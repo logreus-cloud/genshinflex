@@ -1,0 +1,349 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { LANGS, useData } from '../../lib/data';
+import { calendarItems } from '../../lib/calendar';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { lang, t } = useData(Astro.currentLocale);
+const items = await calendarItems(lang);
+---
+<Layout title={t('Календарь Genshin Impact: баннеры, ивенты и обновления')} description={t('Даты баннеров, ивентов, версий и сбросов эндгейма Genshin Impact по времени выбранного сервера.')}>
+  <h1>{t('Календарь')}</h1>
+  <p class="lead">{t('Баннеры, ивенты, обновления и сбросы эндгейма на одной шкале. Время — по серверу выбранного региона.')}</p>
+
+  <div class="cal-region panel">
+    <span>{t('Сервер')}</span>
+    <div class="cal-buttons" role="group" aria-label={t('Регион сервера')}>
+      <button class="btn" type="button" data-region="eu" aria-pressed="false">{t('Европа')}</button>
+      <button class="btn" type="button" data-region="na" aria-pressed="false">{t('Америка')}</button>
+      <button class="btn" type="button" data-region="asia" aria-pressed="false">{t('Азия')}</button>
+    </div>
+  </div>
+  <p class="muted small cal-source">{t('Данные ивентов — из официальных объявлений игры; даты будущих версий — ожидаемые.')}</p>
+
+  <div class="cal-controls panel">
+    <button class="btn" type="button" id="cal-today">{t('Сегодня')}</button>
+    <div class="cal-buttons" role="group" aria-label={t('Масштаб')}>
+      <button class="btn" type="button" data-zoom="week" aria-pressed="false">{t('Неделя')}</button>
+      <button class="btn" type="button" data-zoom="month" aria-pressed="false">{t('Месяц')}</button>
+      <button class="btn" type="button" data-zoom="quarter" aria-pressed="false">{t('Квартал')}</button>
+    </div>
+    <div class="cal-buttons" role="group" aria-label={t('Вид календаря')}>
+      <button class="btn" type="button" data-view="timeline" aria-pressed="false">{t('Шкала')}</button>
+      <button class="btn" type="button" data-view="list" aria-pressed="false">{t('Список')}</button>
+    </div>
+    <div class="cal-filters" role="group" aria-label={t('Категории календаря')}>
+      <button type="button" data-filter="version" aria-pressed="true">{t('Версии')}</button>
+      <button type="button" data-filter="char-banner" aria-pressed="true">{t('Молитвы персонажей')}</button>
+      <button type="button" data-filter="weapon-banner" aria-pressed="true">{t('Молитвы оружия')}</button>
+      <button type="button" data-filter="event" aria-pressed="true">{t('Ивенты')}</button>
+      <button type="button" data-filter="endgame" aria-pressed="true">{t('Эндгейм')}</button>
+      <button type="button" data-filter="livestream" aria-pressed="true">{t('Стримы')}</button>
+    </div>
+  </div>
+
+  <div class="cal-timeline" id="cal-timeline" tabindex="0" aria-label={t('Шкала календаря')}>
+    <div id="cal-board"></div>
+  </div>
+  <div class="cal-list" id="cal-list" hidden></div>
+  <section class="cal-detail panel" id="cal-detail" aria-live="polite" hidden></section>
+</Layout>
+
+<script type="application/json" id="cal-data" set:html={JSON.stringify(items).replace(/</g, '\\u003c')} />
+
+<script>
+  import type { CalItem } from '../../lib/calendar';
+  import { pageLang, translate } from '../../i18n/client';
+  import { region, serverMoment, humanLeft, REGIONS, type Region } from '../../scripts/common';
+
+  type Lane = 'version' | 'char-banner' | 'weapon-banner' | 'event' | 'endgame' | 'livestream';
+  type Zoom = 'week' | 'month' | 'quarter';
+  type View = 'timeline' | 'list';
+  type Saved = { zoom?: Zoom; view?: View; filters?: Lane[] };
+  const lang = pageLang();
+  const t = translate(lang);
+  const base = lang === 'ru' ? '' : `/${lang}`;
+  const locale = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang];
+  const items = JSON.parse(document.getElementById('cal-data')!.textContent || '[]') as CalItem[];
+  const timeline = document.getElementById('cal-timeline')!;
+  const board = document.getElementById('cal-board')!;
+  const list = document.getElementById('cal-list')!;
+  const detail = document.getElementById('cal-detail')!;
+  const allLanes: Lane[] = ['version', 'char-banner', 'weapon-banner', 'event', 'endgame', 'livestream'];
+  const laneNames: Record<Lane, string> = {
+    version: t('Версии'), 'char-banner': t('Молитвы персонажей'), 'weapon-banner': t('Молитвы оружия'),
+    event: t('Ивенты'), endgame: t('Эндгейм'), livestream: t('Стримы'),
+  };
+  const dayMs = 86_400_000;
+  const labelWidth = 170;
+  const esc = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+  const imageUrl = (value?: string | null) => value && /^https?:\/\//i.test(value) ? value : '';
+  const sourceUrl = (value?: string) => value && /^https?:\/\//i.test(value) ? value : '';
+  const itemLane = (item: CalItem): Lane => ['abyss', 'theater', 'onslaught'].includes(item.kind) ? 'endgame' : item.kind as Lane;
+  const moment = (value: string) => serverMoment(value, region.get());
+  const stamp = (ms: number) => new Date(ms + REGIONS[region.get()].offset * 3_600_000);
+  const dateText = (ms: number, full = false) => stamp(ms).toLocaleString(locale, {
+    timeZone: 'UTC', day: 'numeric', month: 'short', ...(full ? { year: 'numeric' } : {}),
+    hour: '2-digit', minute: '2-digit',
+  });
+  const rangeText = (item: CalItem) => `${dateText(moment(item.start))}${item.end ? ` — ${dateText(moment(item.end))}` : ''}`;
+  const state = (item: CalItem, now: number) => {
+    const start = moment(item.start);
+    const end = item.end ? moment(item.end) : null;
+    if (end === null) return start <= now ? 'past' : 'future';
+    return end <= now ? 'past' : start <= now ? 'current' : 'future';
+  };
+  const countdown = (item: CalItem, now = Date.now()) => {
+    const start = moment(item.start);
+    const end = item.end ? moment(item.end) : null;
+    if (state(item, now) === 'past') return t('Закончилось');
+    if (start > now) return t('Начнётся через {time}', { time: humanLeft(start - now) ?? '0' });
+    return t('Осталось {time}', { time: humanLeft(end! - now) ?? '0' });
+  };
+  const icons = (item: CalItem) => (item.icons ?? []).slice(0, 4).map((icon) =>
+    `<img class="cal-icon" src="${esc(imageUrl(icon.src))}" alt="${esc(icon.name)}" title="${esc(icon.name)}" style="--el:var(--${esc(/^(pyro|hydro|anemo|electro|dendro|cryo|geo)$/.test(icon.el ?? '') ? icon.el : 'accent')})" loading="lazy">`).join('');
+  const art = (item: CalItem) => imageUrl(item.image) ? `<img class="cal-art" src="${esc(item.image)}" alt="" loading="lazy">` : '';
+  const statusClass = (item: CalItem, now: number) =>
+    `${state(item, now) === 'past' ? ' is-past' : ''}${state(item, now) === 'current' ? ' is-current' : ''}${item.estimated ? ' is-estimated' : ''}`;
+  const laneColors: Record<Lane, string> = {
+    version: 'var(--accent)', 'char-banner': 'var(--pyro)', 'weapon-banner': 'var(--geo)',
+    event: 'var(--hydro)', endgame: 'var(--electro)', livestream: 'var(--dendro)',
+  };
+
+  let saved: Saved = {};
+  try { saved = JSON.parse(localStorage.getItem('gf:cal') || '{}') ?? {}; } catch { /* Хранилище недоступно. */ }
+  let zoom: Zoom = ['week', 'month', 'quarter'].includes(saved.zoom ?? '') ? saved.zoom! : 'month';
+  let view: View = saved.view === 'timeline' || saved.view === 'list' ? saved.view : matchMedia('(max-width: 640px)').matches ? 'list' : 'timeline';
+  let filters = new Set<Lane>(Array.isArray(saved.filters) ? saved.filters.filter((x): x is Lane => allLanes.includes(x)) : allLanes);
+  let selected: number | null = null;
+  const save = () => { try { localStorage.setItem('gf:cal', JSON.stringify({ zoom, view, filters: [...filters] })); } catch { /* Приватный режим. */ } };
+  const visible = () => items.map((item, index) => ({ item, index })).filter(({ item }) => filters.has(itemLane(item)));
+  const scrollToday = () => {
+    const line = board.querySelector<HTMLElement>('.cal-now');
+    if (line) timeline.scrollLeft = Math.max(0, line.offsetLeft - timeline.clientWidth / 3);
+  };
+
+  const renderTimeline = (resetScroll = false) => {
+    const now = Date.now();
+    const px = { week: 40, month: 18, quarter: 7 }[zoom];
+    const today = stamp(now);
+    const midnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+    const lower = midnight - 180 * dayMs;
+    const upper = midnight + 180 * dayMs;
+    const shown = visible();
+    const earliest = Math.min(midnight - 45 * dayMs, ...shown.map(({ item }) => moment(item.start)));
+    const latest = Math.max(midnight + 75 * dayMs, ...shown.map(({ item }) => moment(item.end ?? item.start)));
+    const from = Math.max(lower, Math.floor((earliest + REGIONS[region.get()].offset * 3_600_000) / dayMs) * dayMs);
+    const to = Math.min(upper, Math.ceil((latest + REGIONS[region.get()].offset * 3_600_000) / dayMs) * dayMs + dayMs);
+    const days = Math.max(1, Math.ceil((to - from) / dayMs));
+    const startMoment = serverMoment(`${new Date(from).toISOString().slice(0, 10)}T00:00`, region.get());
+    const width = days * px;
+    const x = (ms: number) => (ms - startMoment) / dayMs * px;
+    const months: string[] = [];
+    const dates: string[] = [];
+    const weekends: string[] = [];
+    for (let i = 0; i < days; i++) {
+      const d = new Date(from + i * dayMs);
+      const day = d.getUTCDate();
+      if (day === 1 || i === 0) {
+        let count = 1;
+        while (i + count < days && new Date(from + (i + count) * dayMs).getUTCMonth() === d.getUTCMonth()) count++;
+        months.push(`<span style="left:${i * px}px;width:${count * px}px">${esc(d.toLocaleDateString(locale, { timeZone: 'UTC', month: 'long', year: 'numeric' }))}</span>`);
+      }
+      if (d.getUTCDay() === 0 || d.getUTCDay() === 6) weekends.push(`<span style="left:${i * px}px;width:${px}px"></span>`);
+      if (zoom !== 'quarter' || [1, 8, 15, 22].includes(day)) dates.push(`<span style="left:${i * px}px;width:${px}px">${day}</span>`);
+    }
+    const weekMarkup = weekends.join('');
+    const lanes = allLanes.filter((lane) => filters.has(lane) && shown.some(({ item }) => itemLane(item) === lane));
+    const laneHtml = lanes.map((lane) => {
+      const entries = shown.filter(({ item }) => itemLane(item) === lane);
+      const rowEnds: number[] = [];
+      const bars = entries.map(({ item, index }) => {
+        const start = moment(item.start);
+        const end = item.end ? moment(item.end) : start;
+        if (end < startMoment || start > startMoment + days * dayMs) return '';
+        const left = Math.max(0, Math.min(width - 6, x(start)));
+        const right = Math.min(width, x(end));
+        const barWidth = Math.min(width - left, Math.max(6, right - left));
+        let row = rowEnds.findIndex((last) => last + 4 <= left);
+        if (row < 0) row = rowEnds.length;
+        rowEnds[row] = left + barWidth;
+        return `<button type="button" class="cal-bar${statusClass(item, now)}" data-item="${index}" data-id="${esc(item.id)}" style="left:${left}px;top:${row * 50 + 8}px;width:${barWidth}px" aria-label="${esc(`${item.title}, ${laneNames[lane]}, ${rangeText(item)}`)}">
+          ${art(item)}<span class="cal-bar-content">${icons(item)}<span class="cal-bar-text"><b>${esc(item.title)}</b><small>${esc(rangeText(item))}${item.estimated ? ` · ${esc(t('ожидается'))}` : ''}</small></span></span>
+        </button>`;
+      }).join('');
+      return `<div class="cal-lane" style="--lane-color:${laneColors[lane]};height:${Math.max(60, rowEnds.length * 50 + 12)}px">
+        <div class="cal-side">${esc(laneNames[lane])}</div>
+        <div class="cal-track" style="width:${width}px"><div class="cal-weekends">${weekMarkup}</div>${bars}</div>
+      </div>`;
+    }).join('');
+    board.innerHTML = `<div class="cal-board" style="width:${labelWidth + width}px">
+      <div class="cal-head"><div class="cal-side"></div><div class="cal-ruler" style="width:${width}px">
+        <div class="cal-months">${months.join('')}</div><div class="cal-days">${dates.join('')}</div>
+      </div></div>${laneHtml || `<p class="cal-empty">${esc(t('Нет записей для выбранных категорий.'))}</p>`}
+      <div class="cal-now" style="left:${labelWidth + x(now)}px"><span>${esc(t('Сейчас'))}</span></div>
+    </div>`;
+    if (resetScroll) requestAnimationFrame(scrollToday);
+  };
+
+  const card = ({ item, index }: { item: CalItem; index: number }, now: number) => {
+    const lane = itemLane(item);
+    return `<button type="button" class="cal-card${statusClass(item, now)}" data-item="${index}" data-id="${esc(item.id)}" style="--lane-color:${laneColors[lane]}" aria-label="${esc(`${item.title}, ${laneNames[lane]}, ${rangeText(item)}`)}">
+      ${art(item)}<span class="cal-card-body"><span class="cal-card-category">${esc(laneNames[lane])}${item.estimated ? ` · ${esc(t('ожидается'))}` : ''}</span>
+      <span class="cal-card-title">${icons(item)}<b>${esc(item.title)}</b></span>
+      <span class="cal-card-dates">${esc(rangeText(item))}</span><span class="cal-countdown" data-left="${index}">${esc(countdown(item, now))}</span></span>
+    </button>`;
+  };
+  const renderList = () => {
+    const now = Date.now();
+    const shown = visible();
+    const groups = [
+      { title: t('Идёт сейчас'), entries: shown.filter(({ item }) => state(item, now) === 'current').sort((a, b) => moment(a.item.end!) - moment(b.item.end!)) },
+      { title: t('Скоро'), entries: shown.filter(({ item }) => state(item, now) === 'future').sort((a, b) => moment(a.item.start) - moment(b.item.start)) },
+      { title: t('Недавно закончилось'), entries: shown.filter(({ item }) => state(item, now) === 'past' && moment(item.end ?? item.start) >= now - 14 * dayMs).sort((a, b) => moment(b.item.end ?? b.item.start) - moment(a.item.end ?? a.item.start)) },
+    ];
+    list.innerHTML = groups.filter((group) => group.entries.length).map((group) =>
+      `<section><h2 class="h-sec">${esc(group.title)}</h2><div class="cal-cards">${group.entries.map((entry) => card(entry, now)).join('')}</div></section>`).join('') ||
+      `<p class="muted">${esc(t('Нет записей для выбранных категорий.'))}</p>`;
+  };
+  const renderDetail = () => {
+    if (selected === null || !items[selected] || !filters.has(itemLane(items[selected]))) { detail.hidden = true; return; }
+    const item = items[selected];
+    const lane = itemLane(item);
+    const href = item.href?.startsWith('/') && !item.href.startsWith('//') ? `${base}${item.href}` : '';
+    const source = sourceUrl(item.source?.url);
+    detail.hidden = false;
+    detail.innerHTML = `${art(item)}<div class="cal-detail-body">
+      <span class="muted small">${esc(laneNames[lane])}${item.estimated ? ` · ${esc(t('ожидается'))}` : ''}</span>
+      <h2>${esc(item.title)}</h2><div class="cal-detail-icons">${icons(item)}</div>
+      <p>${esc(t('Начало'))}: ${esc(dateText(moment(item.start), true))}</p>
+      ${item.end ? `<p>${esc(t('Конец'))}: ${esc(dateText(moment(item.end), true))}</p>` : ''}
+      <p class="cal-countdown" data-left="${selected}">${esc(countdown(item))}</p>${item.note ? `<p>${esc(item.note)}</p>` : ''}
+      ${href ? `<a href="${esc(href)}">${esc(t('Подробнее'))} →</a>` : ''}
+      ${source ? `<p class="muted small">${esc(t('Источник'))}: <a href="${esc(source)}" rel="noopener noreferrer" target="_blank">${esc(item.source!.title)}</a></p>` : ''}
+    </div>`;
+  };
+  const paintControls = () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-region]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.region === region.get())));
+    document.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.zoom === zoom)));
+    document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.view === view)));
+    document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((button) => button.setAttribute('aria-pressed', String(filters.has(button.dataset.filter as Lane))));
+  };
+  const render = (resetScroll = false) => {
+    const active = document.activeElement as HTMLElement | null;
+    const focusedId = active?.closest<HTMLElement>('[data-id]')?.dataset.id;
+    const focusedHref = active && detail.contains(active) ? active.closest('a')?.getAttribute('href') : null;
+    paintControls();
+    timeline.hidden = view !== 'timeline';
+    list.hidden = view !== 'list';
+    if (view === 'timeline') renderTimeline(resetScroll);
+    else renderList();
+    renderDetail();
+    if (focusedId) {
+      const container = view === 'timeline' ? board : list;
+      [...container.querySelectorAll<HTMLElement>('[data-id]')].find((entry) => entry.dataset.id === focusedId)?.focus();
+    } else if (focusedHref) {
+      [...detail.querySelectorAll<HTMLAnchorElement>('a')].find((link) => link.getAttribute('href') === focusedHref)?.focus();
+    }
+  };
+  const refresh = () => {
+    const now = Date.now();
+    board.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
+      const item = items[Number(entry.dataset.item)];
+      entry.classList.toggle('is-past', state(item, now) === 'past');
+      entry.classList.toggle('is-current', state(item, now) === 'current');
+    });
+    list.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
+      const item = items[Number(entry.dataset.item)];
+      entry.classList.toggle('is-past', state(item, now) === 'past');
+      entry.classList.toggle('is-current', state(item, now) === 'current');
+    });
+    document.querySelectorAll<HTMLElement>('[data-left]').forEach((entry) => {
+      entry.textContent = countdown(items[Number(entry.dataset.left)], now);
+    });
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-region]').forEach((button) => button.addEventListener('click', () => region.set(button.dataset.region as Region)));
+  document.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((button) => button.addEventListener('click', () => { zoom = button.dataset.zoom as Zoom; save(); render(true); }));
+  document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((button) => button.addEventListener('click', () => { view = button.dataset.view as View; save(); render(true); }));
+  document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((button) => button.addEventListener('click', () => {
+    const lane = button.dataset.filter as Lane;
+    if (filters.has(lane)) filters.delete(lane); else filters.add(lane);
+    save(); render();
+  }));
+  document.getElementById('cal-today')!.addEventListener('click', () => {
+    if (view !== 'timeline') { view = 'timeline'; save(); render(true); } else scrollToday();
+  });
+  const openItem = (event: Event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-item]');
+    if (!button) return;
+    selected = Number(button.dataset.item);
+    renderDetail();
+    detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+  timeline.addEventListener('click', openItem);
+  list.addEventListener('click', openItem);
+  timeline.addEventListener('wheel', (event) => {
+    if (event.shiftKey || !(event.deltaMode !== 0 || (Math.abs(event.deltaY) >= 50 && event.deltaX === 0))) return;
+    if (timeline.scrollWidth <= timeline.clientWidth) return;
+    if (event.deltaY < 0 && timeline.scrollLeft <= 0) return;
+    if (event.deltaY > 0 && timeline.scrollLeft >= timeline.scrollWidth - timeline.clientWidth - 1) return;
+    event.preventDefault();
+    timeline.scrollLeft += event.deltaY;
+  }, { passive: false });
+  document.addEventListener('gf:region', () => render(true));
+  setInterval(refresh, 30_000);
+  render(true);
+</script>
+
+<style>
+  .cal-region, .cal-controls, .cal-buttons, .cal-filters { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .cal-region { gap: 1rem; }
+  .cal-source { margin: .5rem 0 1rem; }
+  .cal-controls { margin: 1rem 0; }
+  .cal-controls .btn, .cal-region .btn { padding: .4rem .7rem; }
+  .cal-filters { flex-basis: 100%; }
+  .cal-filters button { border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); color: var(--muted); padding: .35rem .7rem; cursor: pointer; }
+  .cal-filters button[aria-pressed="true"], .cal-buttons button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .cal-timeline { overflow: auto; max-height: 70vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .cal-timeline[hidden], .cal-list[hidden], .cal-detail[hidden] { display: none; }
+  :global(.cal-board) { position: relative; }
+  :global(.cal-head), :global(.cal-lane) { display: flex; }
+  :global(.cal-head) { position: sticky; top: 0; z-index: 5; height: 62px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  :global(.cal-side) { position: sticky; left: 0; z-index: 4; flex: 0 0 170px; display: flex; align-items: center; padding: .5rem; background: var(--surface-2); border-right: 1px solid var(--border); font-size: .82rem; font-weight: 600; }
+  :global(.cal-head .cal-side) { z-index: 6; }
+  :global(.cal-ruler), :global(.cal-track), :global(.cal-months), :global(.cal-days) { position: relative; }
+  :global(.cal-months), :global(.cal-days) { height: 30px; }
+  :global(.cal-months span), :global(.cal-days span) { position: absolute; top: 0; height: 30px; overflow: hidden; white-space: nowrap; padding: .3rem; border-left: 1px solid var(--border); font-size: .72rem; }
+  :global(.cal-days span) { text-align: center; padding: .3rem 0; color: var(--muted); }
+  :global(.cal-lane) { border-bottom: 1px solid var(--border); }
+  :global(.cal-weekends) { position: absolute; inset: 0; pointer-events: none; }
+  :global(.cal-weekends span) { position: absolute; top: 0; bottom: 0; background: var(--accent-soft); opacity: .35; }
+  :global(.cal-bar) { position: absolute; height: 44px; overflow: hidden; padding: 0; border: 1px solid var(--lane-color); border-radius: var(--radius); background: var(--lane-color); color: #fff; text-align: left; cursor: pointer; }
+  :global(.cal-bar:hover), :global(.cal-card:hover) { filter: brightness(1.1); }
+  :global(.cal-bar.is-past), :global(.cal-card.is-past) { opacity: .55; }
+  :global(.is-current) { outline: 2px solid var(--lane-color); outline-offset: 1px; }
+  :global(.is-estimated) { border: 2px dashed var(--lane-color); }
+  :global(.cal-bar-content) { position: relative; display: flex; align-items: center; gap: .3rem; height: 100%; padding: .25rem .4rem; background: linear-gradient(90deg, rgb(10 12 20 / .7), rgb(10 12 20 / .2)); }
+  :global(.cal-bar-text) { min-width: 0; display: grid; }
+  :global(.cal-bar-text b), :global(.cal-bar-text small) { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  :global(.cal-bar-text small) { font-size: .68rem; }
+  :global(.cal-icon) { width: 28px; height: 28px; flex: 0 0 28px; object-fit: cover; border-radius: 50%; background: var(--el); }
+  :global(.cal-art) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  :global(.cal-now) { position: absolute; top: 0; bottom: 0; z-index: 3; width: 2px; background: var(--accent); pointer-events: none; }
+  :global(.cal-now span) { position: sticky; top: 63px; display: inline-block; margin-left: 3px; padding: .15rem .3rem; border-radius: var(--radius); background: var(--accent); color: var(--surface); font-size: .7rem; }
+  :global(.cal-empty) { padding: 1rem; }
+  .cal-list { display: grid; gap: 1rem; }
+  .cal-list :global(.h-sec) { margin: 1rem 0 .5rem; }
+  :global(.cal-cards) { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap: .7rem; }
+  :global(.cal-card) { position: relative; min-height: 120px; overflow: hidden; border: 1px solid var(--lane-color); border-radius: var(--radius); background: var(--surface-2); color: inherit; text-align: left; cursor: pointer; }
+  :global(.cal-card-body) { position: relative; display: grid; gap: .35rem; height: 100%; padding: .8rem; background: linear-gradient(90deg, var(--surface-2) 25%, color-mix(in srgb, var(--surface-2) 75%, transparent)); }
+  :global(.cal-card-category), :global(.cal-card-dates) { color: var(--muted); font-size: .78rem; }
+  :global(.cal-card-title) { display: flex; align-items: center; gap: .35rem; }
+  :global(.cal-countdown) { color: var(--accent); font-size: .85rem; font-weight: 600; }
+  .cal-detail { position: relative; overflow: hidden; margin-top: 1rem; }
+  .cal-detail :global(.cal-detail-body) { position: relative; }
+  .cal-detail :global(h2) { margin: .3rem 0 .7rem; }
+  .cal-detail :global(p) { margin: .4rem 0; }
+  .cal-detail :global(.cal-detail-icons) { display: flex; gap: .3rem; }
+  @media (max-width: 640px) { .cal-controls { align-items: flex-start; } }
+</style>

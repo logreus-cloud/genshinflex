@@ -21,7 +21,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     <section class="panel roster-panel">
       <div class="panel-head"><h2 class="h-sec">{t('Мои персонажи')} <small id="roster-count"></small></h2><button class="btn small danger" type="button" id="clear-roster" hidden>{t('Очистить список')}</button></div>
       <div class="add">
-        <label class="grow">{t('Добавить вручную')}<input class="input" id="add-char" list="char-list" placeholder={t('Имя персонажа')} /></label>
+        <label class="grow">{t('Добавить вручную')}<input class="input" id="add-char" placeholder={t('Имя персонажа')} /></label>
         <label>{t('Или по UID')}<span class="uidrow"><input class="input" id="uid" inputmode="numeric" placeholder="700000000" maxlength="10" /><button class="btn" type="button" id="load-uid">{t('Загрузить')}</button></span></label>
       </div>
       <p class="muted small hint">{t('Для загрузки по UID в игре нужно выставить персонажей на витрину профиля и включить «Показывать подробности».')}</p>
@@ -34,7 +34,6 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       </div>
       <p class="status small" id="status" aria-live="polite"></p>
       <div class="roster" id="roster"></div>
-      <datalist id="char-list"></datalist>
     </section>
 
     <section class="panel editor-panel" id="editor" hidden></section>
@@ -63,6 +62,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 <script>
   import { store } from '../../../scripts/common';
   import { BASE, t, LANG } from '../../../scripts/search';
+  import { combobox, norm } from '../../../scripts/combobox';
 
   // ---------- Данные ----------
   type Build = { role: string; healer: boolean; cls: 'dps' | 'sub' | 'support'; weapons: string[]; sets: string[][]; main: Record<'sands' | 'goblet' | 'circlet', string[]>; subs: string[] };
@@ -80,7 +80,8 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 
   const data: Data = await fetch(`${BASE}/data/checker.json`).then((r) => r.json());
   const chars = new Map(data.characters.map((c) => [c.s, c]));
-  const byName = new Map(data.characters.flatMap((c) => [[c.n.toLowerCase(), c.s]]));
+  const normName = (s: string) => typeof norm === 'function' ? norm(s) : s.toLowerCase().replace(/ё/g, 'е').trim();
+  const byName = new Map(data.characters.map((c) => [normName(c.n), c.s]));
   const weapons = new Map(data.weapons.map((w) => [w.s, w]));
   const arts = new Map(data.artifacts.map((a) => [a.s, a]));
   const halves = data.abyss?.halves ?? [];
@@ -100,10 +101,59 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   const status = (t: string, bad = false) => { const s = $('status'); s.textContent = t; s.classList.toggle('bad', bad); };
 
   // ---------- Состояние: ростер и составы живут в браузере ----------
-  let roster: Entry[] = store.get<Entry[]>('gf:roster', []).filter((e) => chars.has(e.s));
-  let teams: Record<number, string[]> = store.get('gf:abyss-teams', { 1: [], 2: [] });
+  // Сохранённые данные могут быть старыми или повреждёнными.
+  const rawRoster: unknown = store.get('gf:roster', []);
+  const rawTeams: unknown = store.get('gf:abyss-teams', { 1: [], 2: [] });
+  const validInt = (v: unknown, min: number, max: number, fallback: number) => typeof v === 'number' && Number.isFinite(v) ? Math.max(min, Math.min(max, Math.trunc(v))) : fallback;
+  const validSetCount = (v: unknown): 4 | 2 => v === 2 ? 2 : 4;
+  const validStat = (v: unknown, key: keyof Stats) => typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.min(['cr', 'cd', 'er', 'dmg'].includes(key) ? 1000 : Infinity, v)) : undefined;
+  const validKey = (v: unknown) => typeof v === 'string' && /^[a-z0-9-]{1,80}$/.test(v);
+  const validSlug = (v: unknown, known: Map<string, unknown>) => typeof v === 'string' && known.has(v) ? v : '';
+  const validSlot = (v: unknown, slot: 'sands' | 'goblet' | 'circlet') => typeof v === 'string' && STAT_OPTS[slot].some(([key]) => key === v) ? v : STAT_OPTS[slot][0][0];
+  const keyMap = new Map<string, string>();
+  const seenChars = new Set<string>();
+  const seenKeys = new Set<string>();
+  let roster: Entry[] = [];
+  for (const value of Array.isArray(rawRoster) ? rawRoster : []) {
+    if (!value || typeof value !== 'object' || typeof value.s !== 'string' || !chars.has(value.s)) continue;
+    if (seenChars.has(value.s)) {
+      if (validKey(value.key) && !keyMap.has(value.key)) keyMap.set(value.key, roster.find((e) => e.s === value.s)!.key);
+      continue;
+    }
+    seenChars.add(value.s);
+    let key = validKey(value.key) && !seenKeys.has(value.key) ? value.key : fromBuild(value.s).key;
+    for (let i = 1; seenKeys.has(key); i++) key = `${value.s}-${Date.now().toString(36)}-${i.toString(36)}`;
+    seenKeys.add(key);
+    if (validKey(value.key) && !keyMap.has(value.key)) keyMap.set(value.key, key);
+    const stats: Partial<Stats> = {};
+    if (value.stats && typeof value.stats === 'object') for (const [name, number] of Object.entries(value.stats)) {
+      const stat = validStat(number, name as keyof Stats);
+      if (STAT_FIELDS.some(([field]) => field === name) && stat !== undefined) stats[name as keyof Stats] = stat;
+    }
+    roster.push({
+      key, s: value.s, level: validInt(value.level, 1, 100, 90), cons: validInt(value.cons, 0, 6, 0),
+      talents: [0, 1, 2].map((i) => validInt(value.talents?.[i], 1, 15, 9)) as [number, number, number],
+      weapon: weapons.get(value.weapon)?.w === chars.get(value.s)!.w ? value.weapon : '', refine: validInt(value.refine, 1, 5, 1),
+      set1: validSlug(value.set1, arts), set1pc: validSetCount(value.set1pc), set2: validSlug(value.set2, arts),
+      sands: validSlot(value.sands, 'sands'), goblet: validSlot(value.goblet, 'goblet'), circlet: validSlot(value.circlet, 'circlet'), stats,
+    });
+  }
+  const sourceTeams = rawTeams && typeof rawTeams === 'object' ? rawTeams as Record<number, unknown> : {};
+  const usedKeys = new Set<string>();
+  let teams: Record<number, string[]> = { 1: [], 2: [] };
+  for (const half of [1, 2]) {
+    const source = sourceTeams[half];
+    for (const oldKey of Array.isArray(source) ? source : []) {
+      if (!validKey(oldKey)) continue;
+      const key = keyMap.get(oldKey) ?? oldKey;
+      if (!seenKeys.has(key) || usedKeys.has(key)) continue;
+      teams[half].push(key); usedKeys.add(key);
+      if (teams[half].length === 4) break;
+    }
+  }
   let editing: string | null = null;
   let checked = false;
+  let importGen = 0;
   const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); if (checked) renderResult(false); };
 
   // Новый персонаж получает рекомендованный билд как отправную точку
@@ -135,12 +185,15 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   const setById = new Map(data.artifacts.map((a) => [a.id, a]));
 
   $('load-uid').addEventListener('click', async () => {
+    const gen = ++importGen;
     const uid = $<HTMLInputElement>('uid').value.trim();
     if (!/^\d{9,10}$/.test(uid)) return status(t('UID — это 9 или 10 цифр из правого нижнего угла экрана в игре.'), true);
     status(t('Загружаю витрину…'));
     try {
       const res = await fetch(`/api/enka/${uid}`);
+      if (gen !== importGen) return;
       const body = await res.json();
+      if (gen !== importGen) return;
       if (!res.ok) return status(t(body.error ?? 'Не удалось загрузить профиль.'), true);
       const list: any[] = body.avatarInfoList ?? [];
       if (!list.length) return status(t('На витрине нет персонажей или скрыты подробности. Включите «Показывать подробности» в профиле игры.'), true);
@@ -160,12 +213,16 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
           cr: +(100 * (f['20'] ?? 0)).toFixed(1), cd: +(100 * (f['22'] ?? 0)).toFixed(1), er: +(100 * (f['23'] ?? 0)).toFixed(1),
           dmg: +(100 * (f[ELEM_BONUS[c.el]] ?? 0)).toFixed(1),
         };
+        e.weapon = '';
+        e.refine = 1;
         const sets = new Map<string, number>();
         for (const item of a.equipList ?? []) {
           if (item.weapon) {
             const w = weaponById.get(item.itemId);
-            if (w) e.weapon = w.s;
-            e.refine = 1 + Number(Object.values(item.weapon.affixMap ?? { x: 0 })[0] ?? 0);
+            if (w) {
+              e.weapon = w.s;
+              e.refine = 1 + Number(Object.values(item.weapon.affixMap ?? { x: 0 })[0] ?? 0);
+            }
           } else if (item.reliquary) {
             const setId = Number(String(item.flat?.icon ?? '').match(/UI_RelicIcon_(\d+)_/)?.[1]);
             const set = setById.get(setId);
@@ -176,7 +233,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
           }
         }
         const counted = [...sets.entries()].sort((x, y) => y[1] - x[1]);
-        e.set1 = counted[0]?.[0] ?? ''; e.set1pc = (counted[0]?.[1] ?? 0) >= 4 ? 4 : 2;
+        e.set1 = (counted[0]?.[1] ?? 0) >= 2 ? counted[0][0] : ''; e.set1pc = (counted[0]?.[1] ?? 0) >= 4 ? 4 : 2;
         e.set2 = e.set1pc === 2 && (counted[1]?.[1] ?? 0) >= 2 ? counted[1][0] : '';
         const sl = a.skillLevelMap ? Object.values(a.skillLevelMap).map(Number) : [];
         if (sl.length >= 3) e.talents = [sl[0], sl[1], sl.at(-1)!] as [number, number, number];
@@ -186,27 +243,47 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       persist(); openEditor(editing); renderTeams();
       status(t('Загружено персонажей: {n}.', { n: added }) + (skipped.length ? ' ' + t('Пропущены: {list} — добавьте вручную.', { list: skipped.join(', ') }) : ''));
     } catch {
+      if (gen !== importGen) return;
       status(t('Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз.'), true);
     }
   });
 
-  $('char-list').innerHTML = data.characters.map((c) => `<option value="${esc(c.n)}">`).join('');
-  $<HTMLInputElement>('add-char').addEventListener('change', (ev) => {
-    const input = ev.target as HTMLInputElement;
-    const s = byName.get(input.value.trim().toLowerCase());
-    if (!s) return;
+  const addChar = (s: string) => {
+    const input = $<HTMLInputElement>('add-char');
+    const existing = roster.find((entry) => entry.s === s);
+    if (existing) {
+      input.value = '';
+      openEditor(existing.key);
+      const message = '{name} уже в списке — открыл его билд';
+      status(t(message, { name: chars.get(s)!.n }));
+      return;
+    }
     const e = fromBuild(s);
     roster = [e, ...roster];
     input.value = '';
     persist(); renderRoster(); openEditor(e.key); renderTeams();
     status(t('{name} добавлен с рекомендованным билдом — поправьте его под свой.', { name: chars.get(s)!.n }));
+  };
+  typeof combobox === 'function' && combobox($<HTMLInputElement>('add-char'), () => data.characters.map((c) => ({
+    value: c.s, label: c.n, icon: c.i, el: c.el, hint: '★'.repeat(c.r) + ' · ' + EL[c.el],
+  })), (item) => addChar(item.value));
+  $<HTMLInputElement>('add-char').addEventListener('change', (ev) => {
+    const s = byName.get(normName((ev.target as HTMLInputElement).value));
+    if (s) addChar(s);
   });
 
   // ---------- Ростер и редактор ----------
   const normalizeName = (name: string) => name.toLocaleLowerCase().replace(/ё/g, 'е');
   let pickerElement = '';
   const renderPicker = () => {
-    const query = normalizeName($<HTMLInputElement>('picker-search').value.trim());
+    const search = $<HTMLInputElement>('picker-search');
+    const focused = document.activeElement as HTMLElement | null;
+    const pick = focused?.closest<HTMLElement>('[data-pick]')?.dataset.pick;
+    const filter = focused?.closest<HTMLElement>('[data-filter-el]')?.dataset.filterEl;
+    const searchFocused = focused === search;
+    const selection = searchFocused && typeof search.selectionStart === 'number' ? [search.selectionStart, search.selectionEnd ?? search.selectionStart] : null;
+    const value = search.value;
+    const query = normalizeName(value.trim());
     $('picker-count').textContent = t('Выбрано: {n}', { n: roster.length });
     $('picker-filters').innerHTML = Object.entries(EL).map(([el, name]) =>
       `<button class="btn small" type="button" data-filter-el="${esc(el)}" data-el="${esc(el)}" aria-pressed="${pickerElement === el}"><span class="el-dot"></span>${esc(name)}</button>`
@@ -216,6 +293,16 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       .sort((a, b) => b.r - a.r || a.n.localeCompare(b.n, LANG))
       .map((c) => `<button type="button" class="pick" data-pick="${esc(c.s)}" data-el="${esc(c.el)}" aria-pressed="${roster.some((e) => e.s === c.s)}">
         <img src="${esc(c.i)}" alt="" width="56" height="56" loading="lazy"><span title="${esc(c.n)}">${esc(c.n)}</span></button>`).join('');
+    search.value = value;
+    const grid = $('picker-grid');
+    const filters = $('picker-filters');
+    const next = pick && typeof grid.querySelectorAll === 'function' ? [...grid.querySelectorAll<HTMLElement>('[data-pick]')].find((node) => node.dataset.pick === pick)
+      : filter && typeof filters.querySelectorAll === 'function' ? [...filters.querySelectorAll<HTMLElement>('[data-filter-el]')].find((node) => node.dataset.filterEl === filter) : null;
+    if (next && typeof next.focus === 'function') next.focus();
+    else if (searchFocused) {
+      if (typeof search.focus === 'function') search.focus();
+      if (selection && typeof search.setSelectionRange === 'function') search.setSelectionRange(selection[0], selection[1]);
+    }
   };
   function renderRoster() {
     $('roster-count').textContent = roster.length ? String(roster.length) : '';
@@ -256,6 +343,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     clearTimeout(clearTimer);
     clearArmed = false;
     $('clear-roster').textContent = t('Очистить список');
+    ++importGen;
     roster = []; teams = { 1: [], 2: [] };
     checked = false;
     $('result').innerHTML = '';
@@ -311,10 +399,14 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     if (!e) return;
     if (t.dataset.f) {
       const f = t.dataset.f as keyof Entry;
-      (e as any)[f] = ['level', 'cons', 'refine', 'set1pc'].includes(f) ? Number(t.value) : t.value;
+      if (f === 'level') e.level = validInt(Number(t.value), 1, 100, e.level);
+      else if (f === 'cons') e.cons = validInt(Number(t.value), 0, 6, e.cons);
+      else if (f === 'refine') e.refine = validInt(Number(t.value), 1, 5, e.refine);
+      else if (f === 'set1pc') e.set1pc = validSetCount(Number(t.value));
+      else (e as any)[f] = t.value;
       if (f === 'set1pc') $('editor').querySelector<HTMLElement>('[data-set2]')!.hidden = e.set1pc === 4;
-    } else if (t.dataset.t) e.talents[Number(t.dataset.t)] = Number(t.value);
-    else if (t.dataset.s) e.stats[t.dataset.s as keyof Stats] = t.value === '' ? undefined : Number(t.value);
+    } else if (t.dataset.t) e.talents[Number(t.dataset.t)] = validInt(Number(t.value), 1, 15, e.talents[Number(t.dataset.t)]);
+    else if (t.dataset.s) e.stats[t.dataset.s as keyof Stats] = t.value === '' ? undefined : validStat(Number(t.value), t.dataset.s as keyof Stats);
     persist(); renderRoster();
   });
   document.addEventListener('click', (ev) => {
@@ -387,7 +479,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         const c = e && chars.get(e.s);
         return `<label class="slot" ${c ? `data-el="${c.el}"` : ''}>${c ? `<img src="${c.i}" alt="" width="48" height="48">` : '<span class="ph">+</span>'}
           <select class="input" data-half="${h}" data-i="${i}" aria-label="${t('Персонаж {i}, {h}-я половина', { i: i + 1, h })}"><option value="">${t('Пусто')}</option>
-          ${options.filter((o) => o.key === cur || !teams[h].includes(o.key)).map((o) => `<option value="${o.key}" ${o.key === cur ? 'selected' : ''}>${esc(chars.get(o.s)!.n)}</option>`).join('')}</select></label>`;
+          ${options.filter((o) => o.key === cur || !teams[h].includes(o.key)).map((o) => `<option value="${esc(o.key)}" ${o.key === cur ? 'selected' : ''}>${esc(chars.get(o.s)!.n)}</option>`).join('')}</select></label>`;
       }).join('');
       clear.hidden = !teams[h].length;
       document.querySelector<HTMLElement>(`[data-recommend="${h}"]`)!.innerHTML = half?.teams.length
@@ -469,17 +561,17 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     } else score += w.r >= 5 ? 12 : 8;
 
     // Артефакты — 15
-    const have = e.set1pc === 4 ? [e.set1] : [e.set1, e.set2].filter(Boolean);
+    const have = e.set1pc === 4 ? [e.set1] : [e.set1, e.set2];
     if (!e.set1) notes.push({ ok: false, text: t('Не выбран сет артефактов') });
     else if (b) {
-      const same = (opt: string[]) => opt.length === have.length && opt.every((s) => have.includes(s));
+      const same = (opt: string[]) => opt.length === have.length && [...opt].sort().every((s, i) => s === [...have].sort()[i]);
       const idx = b.sets.findIndex(same);
       const partial = b.sets.some((opt) => opt.some((s) => have.includes(s)));
       score += idx === 0 ? 15 : idx > 0 ? 12 : partial ? 7 : 3;
       const setName = (s: string) => arts.get(s)?.n ?? s;
       notes.push(idx >= 0
-        ? { ok: true, text: t('Сет {sets} — {rank}', { sets: have.map(setName).join(' + '), rank: idx === 0 ? t('лучший вариант') : t('вариант №{n}', { n: idx + 1 }) }) }
-        : { ok: null, text: t('Сет {sets} не из рекомендованных. Лучше: {best}', { sets: have.map(setName).join(' + '), best: b.sets[0].map(setName).join(' + ') }) });
+        ? { ok: true, text: t('Сет {sets} — {rank}', { sets: have.filter(Boolean).map(setName).join(' + '), rank: idx === 0 ? t('лучший вариант') : t('вариант №{n}', { n: idx + 1 }) }) }
+        : { ok: null, text: t('Сет {sets} не из рекомендованных. Лучше: {best}', { sets: have.filter(Boolean).map(setName).join(' + '), best: b.sets[0].map(setName).join(' + ') }) });
     } else score += 10;
 
     // Основные статы — 15 (по 5 за слот)

@@ -1,0 +1,103 @@
+---
+import { calendarItems } from '../lib/calendar';
+import { useData } from '../lib/data';
+
+const { lang, base, t, fmtServerDate } = useData(Astro.currentLocale);
+const now = Date.now();
+const moment = (value: string) => Date.parse(`${value.replace(' ', 'T').slice(0, 16)}+01:00`);
+const items = (await calendarItems(lang)).filter((item) => item.kind !== 'abyss' && item.kind !== 'theater' && item.kind !== 'onslaught' && item.kind !== 'version');
+const ongoing = items.filter((item) => item.end && moment(item.start) <= now && moment(item.end) > now)
+  .sort((a, b) => moment(a.end!) - moment(b.end!));
+const recent = items.filter((item) => moment(item.end ?? item.start) <= now && moment(item.end ?? item.start) > now - 13 * 3_600_000)
+  .sort((a, b) => moment(b.end ?? b.start) - moment(a.end ?? a.start));
+const future = items.filter((item) => moment(item.start) > now)
+  .sort((a, b) => moment(a.start) - moment(b.start));
+const shown = [...ongoing, ...recent, ...future].slice(0, 30);
+---
+{shown.length > 0 && (
+  <section class="calendar-widget" data-ended={t('Закончилось')} data-ongoing={t('Идёт сейчас')}>
+    <h2 class="h-sec">{t('Календарь')} <small><a href={`${base}/calendar/`}>{t('Весь календарь →')}</a></small></h2>
+    <div class="calendar-cards">
+      {shown.map((item) => {
+        const active = moment(item.start) <= now;
+        const until = active && item.end ? item.end : item.start;
+        return (
+          <a class="calendar-card" href={`${base}/calendar/`} data-start={item.start} data-end={item.end ?? ''}
+            data-start-label={t('с {date}', { date: fmtServerDate(item.start) })}
+            data-end-label={t('до {date}', { date: fmtServerDate(item.end ?? item.start) })}>
+            {item.image ? (
+              <img class="art" src={item.image} alt="" loading="lazy" />
+            ) : item.icons?.length ? (
+              <span class="icons">
+                {item.icons.slice(0, 3).map((icon) => <img src={icon.src} alt="" title={icon.name} loading="lazy" />)}
+              </span>
+            ) : (
+              <span class="symbol" aria-hidden="true">✦</span>
+            )}
+            <span class="copy">
+              <strong>{item.title}</strong>
+              <small>{active && item.end ? t('до {date}', { date: fmtServerDate(until) }) : t('с {date}', { date: fmtServerDate(until) })}</small>
+              <b data-until={until} data-done={active && item.end ? t('Закончилось') : t('Идёт сейчас')}>…</b>
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+)}
+<script>
+  import { humanLeft, region, serverMoment } from '../scripts/common';
+
+  const refresh = () => {
+    document.querySelectorAll<HTMLElement>('.calendar-widget').forEach((widget) => {
+      const cards = widget.querySelector<HTMLElement>('.calendar-cards')!;
+      const now = Date.now();
+      const ordered = [...cards.querySelectorAll<HTMLAnchorElement>('.calendar-card')].map((card) => {
+        const start = serverMoment(card.dataset.start!, region.get());
+        const end = card.dataset.end ? serverMoment(card.dataset.end, region.get()) : null;
+        const active = end !== null && start <= now && end > now;
+        const future = start > now;
+        const until = active ? end! : start;
+        const label = card.querySelector<HTMLElement>('.copy small')!;
+        const timer = card.querySelector<HTMLElement>('.copy b')!;
+        label.textContent = active ? card.dataset.endLabel! : card.dataset.startLabel!;
+        if (active || future) {
+          timer.dataset.until = active ? card.dataset.end! : card.dataset.start!;
+          timer.dataset.done = active ? widget.dataset.ended! : widget.dataset.ongoing!;
+          timer.textContent = humanLeft(until - now) ?? timer.dataset.done;
+        } else {
+          timer.removeAttribute('data-until');
+          timer.textContent = widget.dataset.ended!;
+        }
+        return { card, active, future, until };
+      }).sort((a, b) => Number(b.active) - Number(a.active) || a.until - b.until);
+      cards.append(...ordered.map(({ card }) => card));
+      let visible = 0;
+      ordered.forEach(({ card, active, future }) => { card.hidden = !(active || future) || visible++ >= 5; });
+    });
+  };
+  refresh();
+  setInterval(refresh, 30_000);
+  document.addEventListener('gf:region', refresh);
+</script>
+
+<style>
+  .calendar-widget { margin-top: 1.8rem; }
+  .calendar-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .calendar-card { display: grid; align-content: start; gap: .6rem; min-width: 0; padding: .75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); text-decoration: none; }
+  .calendar-card[hidden] { display: none; }
+  .calendar-card:hover { border-color: var(--accent); }
+  .art { width: 100%; height: 76px; object-fit: cover; border-radius: var(--radius-sm); }
+  .icons { display: flex; align-items: center; height: 76px; }
+  .icons img { width: 52px; height: 52px; object-fit: cover; border-radius: 50%; background: var(--surface-2); }
+  .icons img + img { margin-left: -12px; }
+  .symbol { display: grid; place-items: center; height: 76px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent); font-size: 2rem; }
+  .copy { display: grid; gap: .25rem; min-width: 0; }
+  .copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .86rem; }
+  .copy small { color: var(--muted); }
+  .copy b { color: var(--accent); font-size: .82rem; }
+  @media (max-width: 900px) {
+    .calendar-cards { display: flex; overflow-x: auto; padding-bottom: .5rem; scroll-snap-type: x proximity; }
+    .calendar-card { flex: 0 0 180px; scroll-snap-align: start; }
+  }
+</style>

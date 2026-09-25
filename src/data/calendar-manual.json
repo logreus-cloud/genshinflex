@@ -1,0 +1,18 @@
+[
+  {
+    "id": "version-7.2",
+    "kind": "version",
+    "start": "2026-11-04T07:00",
+    "estimated": true,
+    "title": {
+      "ru": "Версия 7.2",
+      "en": "Version 7.2",
+      "es": "Versión 7.2"
+    },
+    "note": {
+      "ru": "Ожидается сразу после окончания 7.1",
+      "en": "Expected right after 7.1 ends",
+      "es": "Se espera justo al terminar la 7.1"
+    }
+  }
+]

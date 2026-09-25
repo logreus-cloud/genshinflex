@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "import": "node scripts/import-data.mjs && node scripts/import-wiki-enemies.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/import-weapon-sources.mjs",
+    "import": "node scripts/import-data.mjs && node scripts/import-wiki-enemies.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/import-weapon-sources.mjs && node scripts/import-calendar.mjs",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
@@ -17,7 +17,8 @@
     "guides": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, character, mode, author, contact, status, length(payload) AS size FROM guide_submissions ORDER BY id DESC LIMIT 30\"",
     "guide:md": "node scripts/guide-to-md.mjs",
     "sim": "node scripts/sim-investments.mjs",
-    "import:sources": "node scripts/import-weapon-sources.mjs"
+    "import:sources": "node scripts/import-weapon-sources.mjs",
+    "import:calendar": "node scripts/import-calendar.mjs"
   },
   "dependencies": {
     "astro": "^7.3.4"

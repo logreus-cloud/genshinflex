@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import CharacterCard from '../../components/CharacterCard.astro';
+import CalendarWidget from '../../components/CalendarWidget.astro';
 import { siteNews, newsDate } from '../../lib/news';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
@@ -127,6 +128,8 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
       <span class="chip gold">{t('скоро')}</span>
     </a>
   </section>
+
+  <CalendarWidget />
 
   <h2 class="h-sec">{t('Новые персонажи')} <small><a href={`${base}/characters`}>{t('Все {n}', { n: characters.length })}</a> · <a href={`${base}/guides`}>{t('Руководства')} ({builds.length})</a></small></h2>
   <div class="cards">{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>

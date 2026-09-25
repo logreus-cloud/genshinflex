@@ -36,7 +36,12 @@ export const favorites = {
 export const REGIONS = { asia: { offset: 8 }, eu: { offset: 1 }, na: { offset: -5 } } as const;
 export type Region = keyof typeof REGIONS;
 export const region = {
-  get: (): Region => store.get<Region>('gf:region', 'eu'),
+  get: (): Region => {
+    const saved = store.get<unknown>('gf:region', 'eu');
+    // Хранилище может содержать старое или повреждённое значение.
+    // Оно не должно останавливать таймеры и остальные скрипты страницы.
+    return saved === 'asia' || saved === 'na' || saved === 'eu' ? saved : 'eu';
+  },
   set: (r: Region) => { store.set('gf:region', r); document.dispatchEvent(new CustomEvent('gf:region', { detail: r })); },
 };
 

@@ -19,6 +19,7 @@ export async function GET({ params }: { params: { locale?: string } }) {
       ['Театр воображариума', '/theater'],
       ['Натиск', '/onslaught'],
       ['Баннеры: текущие и следующие', '/banners'],
+      ['Календарь: баннеры, ивенты и обновления', '/calendar'],
       ['Рейтинг ELO', '/rating'],
       ['Руководства', '/guides'],
       ['Проверка команды для Бездны', '/tools/team-check'],
