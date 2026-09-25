@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <g fill="#fff" fill-opacity=".28">
-    <circle cx="128" cy="92" r="46"/>
-    <path d="M40 256c4-60 42-96 88-96s84 36 88 96Z"/>
-  </g>
-  <text x="128" y="112" text-anchor="middle" font-family="system-ui, sans-serif" font-size="64" font-weight="700" fill="#fff" fill-opacity=".85">?</text>
-</svg>

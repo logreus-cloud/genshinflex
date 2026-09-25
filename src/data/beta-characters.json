@@ -4,7 +4,7 @@
     {
       "slug": "mitya",
       "rarity": 5,
-      "element": "anemo",
+      "element": "electro",
       "weapon": "catalyst",
       "stats": { "hp": 11634, "atk": 263, "def": 792, "sub": 88.4 },
       "substatPercent": true,
@@ -21,7 +21,7 @@
     {
       "slug": "valery",
       "rarity": 4,
-      "element": "anemo",
+      "element": "electro",
       "weapon": "sword",
       "stats": { "hp": 10005, "atk": 255, "def": 703, "sub": 24 },
       "substatPercent": true,
