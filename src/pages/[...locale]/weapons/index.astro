@@ -3,10 +3,14 @@ import Layout from '../../../layouts/Layout.astro';
 import FilterBar from '../../../components/FilterBar.astro';
 import { useData, LANGS } from '../../../lib/data';
 import { weaponSource } from '../../../lib/weapon-source';
+import weaponArt from '../../../data/generated/weapon-art.json';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { weapons, fmtStat, stars, base, t, lang } = useData(Astro.currentLocale);
 
+// Полный арт с баннера (scripts/import-weapon-art.py): игровая иконка обрезает длинное оружие
+const withArt = new Set<string>(weaponArt);
+const pic = (w: { slug: string; icon: string }) => (withArt.has(w.slug) ? `/img/weapons/${w.slug}.webp` : w.icon);
 const groups = [5, 4, 3].map((r) => ({ r, list: weapons.filter((w) => w.rarity === r) }));
 const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
 ---
@@ -27,7 +31,7 @@ const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
             <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
               <a class:list={['wc', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
                 <span class="pic">
-                  <img src={w.icon} alt="" width="96" height="96" loading="lazy" />
+                  <img src={pic(w)} alt="" width="96" height="96" loading="lazy" />
                   {parseFloat(w.version) === latest && <span class="badge">{t('новое')}</span>}
                 </span>
                 <span class="nm">{w.name}</span>
@@ -56,7 +60,7 @@ const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
   .pic { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: var(--radius); background: linear-gradient(170deg, #36436a, #4b7aa6); }
   .r4 .pic { background: linear-gradient(170deg, #4a3d6d, #9679c4); }
   .r5 .pic { background: linear-gradient(170deg, #6b4520, #d1953f); }
-  .pic img { width: 78%; height: auto; }
+  .pic img { width: 86%; height: 86%; object-fit: contain; }
   .badge { position: absolute; top: 5px; right: 5px; background: var(--accent); color: var(--accent-ink); font-size: .66rem; font-weight: 600; padding: 0 .35rem; border-radius: 4px; }
   .nm { font-size: .8rem; text-align: center; line-height: 1.2; }
   .wc:hover .pic, .wc:focus-visible .pic { outline: 2px solid var(--accent); outline-offset: 2px; }
