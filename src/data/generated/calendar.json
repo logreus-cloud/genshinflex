@@ -1,4 +1,150 @@
 {
-  "updated": "",
-  "items": []
+  "updated": "2026-09-25",
+  "items": [
+    {
+      "id": "ann-21946",
+      "kind": "version",
+      "start": "2026-09-23T07:00",
+      "end": "2026-11-04T06:00",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/22/f5b06cb01edc9b576cb6fd25bf8c23d5_79390737427291834_transformed.jpg",
+      "title": {
+        "en": "Version 7.1 Update Details",
+        "ru": "Подробности обновления 7.1",
+        "es": "Detalles de la versión 7.1"
+      },
+      "version": "7.1"
+    },
+    {
+      "id": "ann-21886",
+      "kind": "event",
+      "start": "2026-09-22T12:00",
+      "end": "2026-10-12T03:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/22f2f523e19349f439b81b1c8e7a18f4_8177819633981078287_transformed.jpg",
+      "title": {
+        "en": "Silverwing in Pursuit of the Moon",
+        "ru": "Среброкрылая птица на пути к луне",
+        "es": "Evento «Alargéntea en pos de la luna»"
+      }
+    },
+    {
+      "id": "ann-21879",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-04T07:00",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/13731601c5ec188f8221e2179960f25d_8966757839271822351_transformed.jpg",
+      "title": {
+        "en": "Rainbow's End: Resplendent Starlight",
+        "ru": "Золото радуги: Сияние звёзд",
+        "es": "Evento «Fin del arcoíris: Resplandor estelar»"
+      }
+    },
+    {
+      "id": "ann-21924",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-03T14:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/14/def098880dbaaff9a37a118be5e2aa7c_6270530679197833402_transformed.jpg",
+      "title": {
+        "en": "Tabletop Troupe: A Gathering on Adventure's Eve",
+        "ru": "Настольная труппа: Канун приключений",
+        "es": "Evento «Juego de rol: La víspera de la aventura»"
+      }
+    },
+    {
+      "id": "ann-21885",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-03T14:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/d353f2681a2b4a56d9db56c863201430_5948218306514774688_transformed.jpg",
+      "title": {
+        "en": "Across the Frozen Wilds, Honing One's Edge",
+        "ru": "В снегах закаляется сталь",
+        "es": "Evento «Forjando el filo en tierras heladas»"
+      }
+    },
+    {
+      "id": "ann-21880",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-03T14:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/b434c127f3396db3759a37da24b4d4c8_3067875660919907928_transformed.jpg",
+      "title": {
+        "en": "A Rekviem for the Underworld",
+        "ru": "Реквием загробного мира",
+        "es": "Misión de Arconte «Un réquiem para el inframundo»"
+      }
+    },
+    {
+      "id": "ann-21881",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-04T07:00",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/ef63a98d969e6393c062b09a371debd4_7968206810973486747_transformed.jpg",
+      "title": {
+        "en": "Swords and Secrets",
+        "ru": "Мечи и секреты",
+        "es": "Misión de mundo «Espadas y secretos»"
+      }
+    },
+    {
+      "id": "ann-21882",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-04T07:00",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/ebd7c34e4e6e82a5f6b907fd8a65a85b_739333715900579401_transformed.jpg",
+      "title": {
+        "en": "Upstream Variations",
+        "ru": "Вариация встречного течения",
+        "es": "Misión de mundo «Variaciones contra corriente»"
+      }
+    },
+    {
+      "id": "ann-21883",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-10-07T23:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/112dc770760c748f77fcbcbb929882d8_2577404397453496509_transformed.jpg",
+      "title": {
+        "en": "Adventurer's Booster Bundles",
+        "ru": "Наборы помощи приключенцам",
+        "es": "Paquetes de apoyo al aventurero"
+      }
+    },
+    {
+      "id": "ann-21884",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-02T03:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/09/11/7907d83c5432d75d68d61e8ace6ef758_7423804670023482212_transformed.jpg",
+      "title": {
+        "en": "Moontrace",
+        "ru": "БП Восходящая луна",
+        "es": "PB «En pos de la luna»"
+      }
+    },
+    {
+      "id": "ann-20508",
+      "kind": "event",
+      "start": "2026-09-21T12:00",
+      "end": "2026-11-04T07:00",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2024/05/22/2aced11db7ef3877d6f0a882c1f5f408_3497207719847849432.png",
+      "title": {
+        "en": "Genius Invokation TCG - The Forge Realm's Temper",
+        "ru": "Священный призыв семерых: В пламени горна",
+        "es": "Invocación de los Sabios - Al rojo vivo"
+      }
+    },
+    {
+      "id": "ann-3802",
+      "kind": "event",
+      "start": "2026-09-12T22:00",
+      "end": "2026-11-04T07:00",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/08/21/d062e1eb109c1fbf3e19a66ad5794fe0_6308541727246277529_transformed.jpg",
+      "title": {
+        "en": "Initial Top-Up Bonus Reset",
+        "ru": "Сброс бонуса первого пополнения",
+        "es": "Restablecimiento de la primera recarga"
+      }
+    }
+  ]
 }
