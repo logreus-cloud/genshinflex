@@ -28,7 +28,7 @@ beta.characters.forEach((c, n) => {
   const names = [c.i18n.ru.name, c.i18n.en.name, c.i18n.es.name];
   const mat = (id, rarity, key, label) => {
     data.materials[id] = {
-      rarity, sort: SORT[key], icon: `/img/beta/${c.slug}-${key}.webp`,
+      rarity, sort: SORT[key], icon: `/img/beta/${c.slug}-${key}.webp?v=2`,
       ru: `${label[0]} (${names[0]}, BETA)`, en: `${label[1]} (${names[1]}, BETA)`, es: `${label[2]} (${names[2]}, BETA)`,
     };
     return id;

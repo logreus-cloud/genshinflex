@@ -87,7 +87,7 @@ const betaCharacters = (lang: Lang): Character[] => beta.characters.map((b) => {
     description: t('Персонаж из утечек бета-версии. Имя, стихия, характеристики и материалы могут измениться к релизу.'),
     rarity: b.rarity, element: b.element, elementText: ELEMENTS[lang][b.element], weapon: b.weapon, weaponText: WEAPON_TYPES[lang][b.weapon],
     region: '', constellationName: '', birthday: '', substat: text.substat, version: '',
-    icon: `/img/beta/${b.slug}-icon.webp`, card: `/img/beta/${b.slug}-icon.webp`, splash: `/img/beta/${b.slug}-splash.webp`, emblem: null,
+    icon: `/img/beta/${b.slug}-icon.webp?v=2`, card: `/img/beta/${b.slug}-icon.webp?v=2`, splash: `/img/beta/${b.slug}-splash.webp?v=2`, emblem: null,
     stats: [{ level: '90', ...b.stats }], substatPercent: b.substatPercent,
     talents: { normal: null, skill: null, burst: null, passives: [] } as unknown as Character['talents'],
     constellations: [],
