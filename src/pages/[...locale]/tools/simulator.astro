@@ -1,0 +1,289 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { useData, LANGS } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Симулятор команды')} description={t('Симуляция урона вашей команды в Genshin Impact по данным витрины: ваши созвездия, оружие и артефакты против эталонного билда. Считается прямо в браузере движком gcsim.')} wide>
+  <h1>{t('Симулятор команды')}</h1>
+  <p class="muted lead">{t('Введите UID — возьмём персонажей с витрины профиля и посчитаем урон их команды с вашими билдами. Симуляция идёт у вас в браузере, данные никуда не отправляются.')}</p>
+  <div class="sim">
+    <section class="panel">
+      <h2 class="h-sec">{t('Загрузка витрины')}</h2>
+      <form id="uid-form" class="uid-row">
+        <label for="uid">UID</label>
+        <input class="input" id="uid" inputmode="numeric" maxlength="10" placeholder="700000000" />
+        <button class="btn" id="load-uid" type="submit">{t('Загрузить витрину')}</button>
+      </form>
+      <p class="small" id="status" role="status" aria-live="polite"></p>
+    </section>
+    <section class="panel" id="showcase-panel" hidden>
+      <h2 class="h-sec">{t('Персонажи витрины')}</h2>
+      <div class="showcase" id="showcase"></div>
+      <p class="muted small" id="skipped"></p>
+    </section>
+    <section class="panel" id="team-panel" hidden>
+      <h2 class="h-sec">{t('Эталонная команда')}</h2>
+      <div class="members" id="members"></div>
+      <p class="small" id="source"></p>
+      <ul class="muted small warnings" id="warnings"></ul>
+      <div class="actions">
+        <label>{t('Точность')}
+          <select class="input" id="iterations">
+            <option value="100">{t('Быстро (100)')}</option>
+            <option value="300" selected>{t('Обычно (300)')}</option>
+            <option value="1000">{t('Точно (1000)')}</option>
+          </select>
+        </label>
+        <button class="btn primary" id="simulate" type="button">{t('Симулировать')}</button>
+        <button class="btn" id="stop" type="button" hidden>{t('Остановить')}</button>
+      </div>
+      <div class="progress" id="progress-box" hidden>
+        <progress id="progress" max="300" value="0"></progress>
+        <span class="small" id="progress-text"></span>
+      </div>
+    </section>
+    <section class="panel" id="result" hidden>
+      <h2 class="h-sec">{t('Результат')}</h2>
+      <div id="summary"></div>
+      <h3>{t('Вклад персонажей')}</h3>
+      <div class="contributions" id="contributions"></div>
+      <p class="muted small">{t('Ротация — эталонная для этой команды. Если восстановления энергии не хватает, gcsim ждёт энергию на взрыв стихии — как пришлось бы и в игре. Эталон: C0, 4★ оружие, доп. статы по стандарту KQM.')}</p>
+    </section>
+    <noscript><p class="panel">{t('Симулятору нужен JavaScript.')}</p></noscript>
+    <p class="muted small" id="credit"></p>
+  </div>
+</Layout>
+
+<script>
+  import { runSim, validateSim, warmUp, type SimResult } from '../../../scripts/gcsim';
+  import { enkaToBuilds, applyBuilds, type SimBuild, type SimIds } from '../../../lib/enka-gcsim';
+  import { BASE, LANG, t } from '../../../scripts/search';
+
+  type Preset = { config: string; members: { slug: string; alias: string }[]; dps: number; source: string; own?: boolean };
+  type Presets = { gcsim: string; presets: Record<string, Preset>; ids: SimIds };
+  type Named = { s: string; n: string; e: string; i: string };
+  type Index = { characters: Named[]; weapons: Named[] };
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const fmt = (n: number) => Math.round(n).toLocaleString({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG]);
+  const key = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const uid = $<HTMLInputElement>('uid'), showcase = $('showcase'), members = $('members');
+  const simulate = $<HTMLButtonElement>('simulate'), stop = $<HTMLButtonElement>('stop');
+  const progress = $<HTMLProgressElement>('progress'), progressBox = $('progress-box');
+  let data: { presets: Presets; index: Index } | null = null;
+  let loading: Promise<{ presets: Presets; index: Index }> | null = null;
+  let builds = new Map<string, SimBuild>();
+  let skipped: number[] = [];
+  let selected = '';
+  let controller: AbortController | null = null;
+  let generation = 0, importGeneration = 0;
+  let importing = false;
+  const status = (message: string, bad = false) => {
+    const node = $('status');
+    node.textContent = message;
+    node.classList.toggle('bad', bad);
+  };
+  const character = (slug: string) => data?.index.characters.find((c) => c.s === slug);
+  const name = (slug: string) => character(slug)?.n ?? slug;
+  function cancel(message = '') {
+    generation++;
+    controller?.abort();
+    controller = null;
+    simulate.disabled = importing || !selected;
+    stop.hidden = true;
+    progressBox.hidden = true;
+    if (message) status(message);
+  }
+  function warning(message: string) {
+    const [slug, reason] = message.split(': ');
+    const label = name(slug);
+    if (reason === 'не найдена строка персонажа или оружия') return t('Не удалось применить билд {name}: в конфиге нет персонажа или оружия.', { name: label });
+    if (reason === 'неизвестное оружие, оставлено эталонное') return t('Оружие {name} не распознано — оставлено эталонное.', { name: label });
+    if (reason === 'нет статов артефактов') return t('У {name} нет статов артефактов.', { name: label });
+    return t('Не удалось применить билд {name}.', { name: label });
+  }
+  function renderShowcase() {
+    const presets = data!.presets.presets;
+    showcase.innerHTML = [...builds.values()].map((build) => {
+      const c = character(build.slug);
+      const available = Boolean(presets[build.slug]);
+      const label = available ? '' : t('нет эталонной команды');
+      return `<button class="showcase-char" type="button" data-slug="${esc(build.slug)}" aria-pressed="${selected === build.slug}" ${available && !importing ? '' : 'disabled'} title="${esc(label || name(build.slug))}">
+        ${c?.i ? `<img src="${esc(c.i)}" alt="" width="56" height="56" loading="lazy">` : ''}
+        <span>${esc(name(build.slug))}</span>${label ? `<small>${esc(label)}</small>` : ''}</button>`;
+    }).join('');
+    $('showcase-panel').hidden = false;
+    $('skipped').textContent = skipped.length
+      ? `${t('Пропущены: {list}', { list: skipped.map((id) => id === 10000005 || id === 10000007 ? t('Путешественник') : String(id)).join(', ') })} ${t('Путешественник пока не поддерживается.')}`
+      : '';
+  }
+  function renderTeam() {
+    const preset = data!.presets.presets[selected];
+    $('team-panel').hidden = !preset;
+    $('result').hidden = true;
+    if (!preset) return;
+    const applied = applyBuilds(preset, builds);
+    members.innerHTML = preset.members.map(({ slug }) => {
+      const build = builds.get(slug), c = character(slug);
+      const weapon = build?.weapon && data!.index.weapons.find((w) => key(w.e) === build.weapon!.key);
+      const details = build ? `C${build.cons} · ${esc(t('ур.'))} ${build.level} · ${esc(weapon?.n ?? build.weapon?.key ?? '—')} R${build.weapon?.refine ?? 1}` : '';
+      return `<div class="member">${c?.i ? `<img src="${esc(c.i)}" alt="" width="56" height="56" loading="lazy">` : ''}
+        <div><b>${esc(name(slug))}</b><span class="chip">${esc(t(build ? 'ваш билд' : 'эталон'))}</span>${details ? `<small class="muted">${details}</small>` : ''}</div></div>`;
+    }).join('');
+    const source = $('source');
+    source.innerHTML = preset.source ? `<a href="${esc(preset.source)}" target="_blank" rel="noopener">${esc(t(preset.own ? 'Источник ротации' : 'Исходная симуляция'))}</a>` : '';
+    $('warnings').innerHTML = applied.warnings.map((message) => `<li>${esc(warning(message))}</li>`).join('');
+    simulate.disabled = importing;
+  }
+  function renderResult(ours: SimResult, preset: Preset) {
+    const reference = preset.dps;
+    const difference = reference > 0 ? (ours.dps / reference - 1) * 100 : 0;
+    const sign = difference >= 0 ? '+' : '−';
+    $('summary').innerHTML = `<strong>${esc(t('Ваша команда: {dps} урона в секунду', { dps: fmt(ours.dps) }))}</strong>
+      <span>${esc(t('Эталон: {dps}', { dps: fmt(reference) }))}</span>
+      ${reference > 0 ? `<b class="${difference >= 0 ? 'good' : 'bad'}">${sign}${Math.abs(difference).toLocaleString({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG], { maximumFractionDigits: 1 })}%</b>` : ''}`;
+    $('contributions').innerHTML = preset.members.map(({ slug }, i) => {
+      const c = character(slug), dps = ours.chars[i]?.dps ?? 0;
+      const share = ours.dps > 0 ? Math.max(0, Math.min(100, dps / ours.dps * 100)) : 0;
+      return `<div class="contribution">${c?.i ? `<img src="${esc(c.i)}" alt="" width="36" height="36">` : ''}
+        <span>${esc(name(slug))}</span><b>${fmt(dps)}</b><div class="bar"><span style="width:${share}%"></span></div></div>`;
+    }).join('');
+    $('result').hidden = false;
+  }
+  async function getData() {
+    if (!loading) loading = Promise.all([
+      fetch('/data/sim-presets.json').then((r) => { if (!r.ok) throw new Error(); return r.json() as Promise<Presets>; }),
+      fetch(`${BASE}/data/index.json`).then((r) => { if (!r.ok) throw new Error(); return r.json() as Promise<Index>; }),
+    ]).then(([presets, index]) => ({ presets, index })).catch((error) => { loading = null; throw error; });
+    return loading;
+  }
+  $('uid-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const value = uid.value.trim();
+    if (!/^\d{9,10}$/.test(value)) return status(t('UID — это 9 или 10 цифр из правого нижнего угла экрана в игре.'), true);
+    const gen = ++importGeneration;
+    importing = true;
+    cancel();
+    if (!$('showcase-panel').hidden) renderShowcase();
+    $<HTMLButtonElement>('load-uid').disabled = true;
+    status(t('Загружаю витрину…'));
+    try {
+      const response = await fetch(`/api/enka/${value}`);
+      const body = await response.json();
+      if (gen !== importGeneration) return;
+      if (!response.ok) return status(t(body.error ?? 'Не удалось загрузить профиль.'), true);
+      if (!body.avatarInfoList?.length) return status(t('На витрине нет персонажей или скрыты подробности. Включите «Показывать подробности» в профиле игры.'), true);
+      data = await getData();
+      if (gen !== importGeneration) return;
+      const imported = enkaToBuilds(body, data.presets.ids);
+      builds = new Map(imported.builds.map((build) => [build.slug, build]));
+      skipped = imported.skipped;
+      selected = imported.builds.find((build) => data!.presets.presets[build.slug])?.slug ?? '';
+      try { localStorage.setItem('gf:sim-uid', value); } catch {}
+      renderShowcase();
+      renderTeam();
+      $('credit').innerHTML = `${esc(t('Симуляции — gcsim v{version} (AGPL-3.0), исходный код:', { version: data.presets.gcsim }))} <a href="https://github.com/genshinsim/gcsim" target="_blank" rel="noopener">github.com/genshinsim/gcsim</a>`;
+      status(selected ? '' : t('Для персонажей витрины пока нет эталонных команд.'));
+    } catch {
+      if (gen === importGeneration) status(t('Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз.'), true);
+    } finally {
+      if (gen === importGeneration) {
+        importing = false;
+        $<HTMLButtonElement>('load-uid').disabled = false;
+        if (!$('showcase-panel').hidden) renderShowcase();
+        simulate.disabled = !selected;
+      }
+    }
+  });
+  showcase.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-slug]');
+    if (importing || !button || button.disabled || button.dataset.slug === selected) return;
+    cancel();
+    selected = button.dataset.slug!;
+    status('');
+    renderShowcase();
+    renderTeam();
+  });
+  simulate.addEventListener('pointerenter', warmUp);
+  simulate.addEventListener('focus', warmUp);
+  stop.addEventListener('click', () => cancel(t('Симуляция остановлена.')));
+  simulate.addEventListener('click', async () => {
+    if (importing) return;
+    const preset = data?.presets.presets[selected];
+    if (!preset) return;
+    const gen = ++generation, signal = new AbortController();
+    controller = signal;
+    simulate.disabled = true;
+    stop.hidden = false;
+    progressBox.hidden = false;
+    $('result').hidden = true;
+    const total = Number($<HTMLSelectElement>('iterations').value);
+    progress.max = total; progress.value = 0;
+    $('progress-text').textContent = t('Прогон {done} из {total}', { done: 0, total });
+    const config = applyBuilds(preset, builds).config;
+    status(t('Загружаю движок gcsim (≈10 МБ, один раз)…'));
+    try {
+      const issue = await validateSim(config);
+      if (gen !== generation) return;
+      if (issue) return status(t('gcsim не принял конфиг: {message}', { message: issue }), true);
+      const ours = await runSim(config, {
+        iterations: total, signal: signal.signal,
+        onProgress(done, count) {
+          if (gen !== generation) return;
+          progress.value = done;
+          $('progress-text').textContent = t('Прогон {done} из {total}', { done, total: count });
+        },
+      });
+      if (gen !== generation) return;
+      renderResult(ours, preset);
+      status(t('Симуляция завершена.'));
+    } catch (error) {
+      if (gen === generation) status(t('Ошибка симуляции: {message}', { message: error instanceof Error ? error.message : String(error) }), true);
+    } finally {
+      if (gen === generation) {
+        controller = null;
+        simulate.disabled = false;
+        stop.hidden = true;
+        progressBox.hidden = true;
+      }
+    }
+  });
+  try { uid.value = localStorage.getItem('gf:sim-uid') ?? ''; } catch {}
+</script>
+
+<style>
+  .lead { max-width: 85ch; }
+  .sim { display: grid; gap: 14px; margin-top: 1rem; }
+  .h-sec { margin: 0 0 .8rem; }
+  .uid-row, .actions { display: flex; align-items: end; gap: .6rem; flex-wrap: wrap; }
+  .uid-row label { width: 100%; font-size: .82rem; }
+  .uid-row .input { width: min(100%, 190px); }
+  #status { min-height: 1.2em; margin: .6rem 0 0; }
+  #status.bad, #summary :global(.bad) { color: var(--bad); }
+  .showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: .5rem; }
+  .showcase :global(.showcase-char) { min-width: 0; display: grid; justify-items: center; gap: .25rem; padding: .5rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); color: var(--text); cursor: pointer; }
+  .showcase :global(.showcase-char[aria-pressed="true"]) { border-color: var(--accent); background: var(--accent-soft); }
+  .showcase :global(.showcase-char:disabled) { opacity: .5; cursor: default; }
+  .showcase :global(img), .members :global(img), .contributions :global(img) { border-radius: 8px; }
+  .showcase :global(span), .showcase :global(small) { max-width: 100%; overflow-wrap: anywhere; text-align: center; }
+  .showcase :global(small) { font-size: .7rem; }
+  .members { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+  .members :global(.member) { min-width: 0; display: flex; gap: .5rem; padding: .5rem; background: var(--surface-2); border-radius: var(--radius); }
+  .members :global(.member div) { min-width: 0; display: grid; align-content: center; gap: .2rem; overflow-wrap: anywhere; }
+  .members :global(.member img) { flex: none; }
+  .members :global(.member small) { font-size: .74rem; }
+  .warnings { padding-left: 1.2rem; }
+  .actions label { display: grid; gap: .3rem; font-size: .82rem; }
+  .progress { display: grid; gap: .3rem; margin-top: .8rem; }
+  .progress[hidden] { display: none; }
+  .progress progress { width: 100%; }
+  #summary :global(strong) { display: block; font: 700 1.5rem var(--font-display); }
+  #summary :global(span), #summary :global(b) { display: inline-block; margin: .4rem .7rem .4rem 0; }
+  #summary :global(.good) { color: var(--good); }
+  .contributions { display: grid; gap: .6rem; }
+  .contributions :global(.contribution) { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: .3rem .6rem; }
+  .contributions :global(.bar) { grid-column: 2 / -1; height: 8px; overflow: hidden; border-radius: 9px; background: var(--surface-2); }
+  .contributions :global(.bar span) { display: block; height: 100%; background: var(--accent); }
+  @media (max-width: 800px) { .members { grid-template-columns: 1fr; } .uid-row .input, .uid-row .btn { width: 100%; } }
+</style>

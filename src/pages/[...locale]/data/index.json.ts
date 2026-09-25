@@ -22,6 +22,7 @@ export async function GET({ params }: { params: { locale?: string } }) {
       ['Календарь: баннеры, ивенты и обновления', '/calendar'],
       ['Рейтинг ELO', '/rating'],
       ['Руководства', '/guides'],
+      ['Симулятор команды: урон по данным аккаунта', '/tools/simulator'],
       ['Проверка команды для Бездны', '/tools/team-check'],
       ['Трекер круток: гарант и 50/50', '/tools/wishes'],
       ['Конструктор ротаций', '/tools/rotation-builder'],

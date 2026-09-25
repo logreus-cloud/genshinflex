@@ -29,7 +29,7 @@ const nav = [
   { group: 'Таймлайн', items: [['Календарь', '/calendar', 'calendar'], ['Баннеры', '/banners', 'moon']] },
   { group: 'Гайды', items: [['Руководства', '/guides', 'book']] },
   { group: 'Сайт', items: [['Новости сайта', '/news', 'book']] },
-  { group: 'Инструменты', items: [['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
+  { group: 'Инструменты', items: [['Симулятор команды', '/tools/simulator', 'chart'], ['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
   // Разделы, которые выйдут не скоро: отдельно и приглушённо, чтобы не путать с готовыми
   { group: 'В разработке', soon: true, items: [['Рейтинг', '/rating', 'chart']] },
 ] as const;
@@ -56,7 +56,7 @@ const icons: Record<string, string> = {
 const footerCols: [string, [string, string][]][] = [
   ['База', [['Персонажи', '/characters/'], ['Оружие', '/weapons/'], ['Артефакты', '/artifacts/'], ['Руководства', '/guides/']]],
   ['Эндгейм', [['Календарь', '/calendar/'], ['Витая бездна', '/abyss/'], ['Театр воображариума', '/theater/'], ['Натиск', '/onslaught/'], ['Баннеры', '/banners/'], ['История баннеров', '/banners/#history'], ['Рейтинг', '/rating/']]],
-  ['Инструменты', [['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'], ['Калькулятор прокачки', '/tools/calculator/'],
+  ['Инструменты', [['Симулятор команды', '/tools/simulator/'], ['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'], ['Калькулятор прокачки', '/tools/calculator/'],
     ['Карта Тейвата', `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`]]],
   ['Сайт', [['Новости сайта', '/news/'], ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Sitemap', '/sitemap.xml']]],
 ];

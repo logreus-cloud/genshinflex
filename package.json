@@ -18,6 +18,8 @@
     "guides": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, character, mode, author, contact, status, length(payload) AS size FROM guide_submissions ORDER BY id DESC LIMIT 30\"",
     "guide:md": "node scripts/guide-to-md.mjs",
     "sim": "node scripts/sim-investments.mjs",
+    "sim:presets": "node scripts/export-sim-presets.mjs",
+    "test:sim": "node --experimental-strip-types scripts/test-enka-gcsim.mjs",
     "import:sources": "node scripts/import-weapon-sources.mjs",
     "import:calendar": "node scripts/import-calendar.mjs"
   },
