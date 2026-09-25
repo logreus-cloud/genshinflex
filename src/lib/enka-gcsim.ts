@@ -3,6 +3,7 @@ export type SimBuild = {
   slug: string; level: number; maxLevel: number; cons: number; talents: [number, number, number];
   weapon: { key: string; refine: number; level: number; maxLevel: number } | null;
   sets: Record<string, number>;
+  unknownSets?: number;                   // вещи из сетов, которых нет в gcsim: их бонус теряется
   stats: Record<string, number>;
 };
 
@@ -49,6 +50,7 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
     const talents: [number, number, number] = skills.length >= 3 && skills[0] !== null && skills[1] !== null && skills.at(-1) !== null
       ? [skills[0]!, skills[1]!, skills.at(-1)!] : [1, 1, 1];
     const sets: Record<string, number> = {}, sums: Record<string, number> = {};
+    let unknownSets = 0;
     let weapon: SimBuild['weapon'] = null;
     for (const value of Array.isArray(avatar.equipList) ? avatar.equipList : []) {
       const item = record(value), equipped = record(item.weapon), flat = record(item.flat);
@@ -66,6 +68,7 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
       if (!item.reliquary) continue;
       const set = Object.hasOwn(ids.sets, String(flat.setId)) ? ids.sets[String(flat.setId)] : undefined;
       if (set) sets[set] = (sets[set] ?? 0) + 1;
+      else if (flat.setId) unknownSets++;
       const stats = [flat.reliquaryMainstat, ...(Array.isArray(flat.reliquarySubstats) ? flat.reliquarySubstats : [])];
       for (const value of stats) {
         const stat = record(value), id = String(stat.mainPropId ?? stat.appendPropId);
@@ -78,7 +81,7 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
     const stats = Object.fromEntries(Object.entries(sums).map(([name, value]) => [name, +value.toFixed(4)]));
     builds.push({
       slug, level, maxLevel: maxLevels[promote], cons: Math.min(6, Array.isArray(avatar.talentIdList) ? avatar.talentIdList.length : 0),
-      talents, weapon, sets, stats,
+      talents, weapon, sets, stats, unknownSets,
     });
   }
   return { builds, skipped };
@@ -130,6 +133,7 @@ export function applyBuilds(
     const stats = Object.entries(build.stats).filter(([, value]) => Number.isFinite(value));
     if (stats.length) additions.push(`${alias} add stats ${stats.map(([key, value]) => `${key}=${value}`).join(' ')};`);
     else warnings.push(`${slug}: нет статов артефактов`);
+    if ((build.unknownSets ?? 0) >= 2) warnings.push(`${slug}: сет артефактов неизвестен gcsim, его бонус не учтён`);
     lines.splice(insert + 1, 0, ...additions);
     applied.push(slug);
   }

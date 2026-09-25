@@ -99,7 +99,8 @@ const { t } = useData(Astro.currentLocale);
     const [slug, reason] = message.split(': ');
     const label = name(slug);
     if (reason === 'не найдена строка персонажа или оружия') return t('Не удалось применить билд {name}: в конфиге нет персонажа или оружия.', { name: label });
-    if (reason === 'неизвестное оружие, оставлено эталонное') return t('Оружие {name} не распознано — оставлено эталонное.', { name: label });
+    if (reason === 'неизвестное оружие, оставлено эталонное') return t('Оружие {name} пока не поддерживается в gcsim — в симуляции эталонное.', { name: label });
+    if (reason === 'сет артефактов неизвестен gcsim, его бонус не учтён') return t('Сет артефактов {name} пока не поддерживается в gcsim — учтены только статы, без бонуса сета.', { name: label });
     if (reason === 'нет статов артефактов') return t('У {name} нет статов артефактов.', { name: label });
     return t('Не удалось применить билд {name}.', { name: label });
   }

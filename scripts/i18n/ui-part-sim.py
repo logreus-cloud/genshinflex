@@ -1,5 +1,7 @@
 # Симулятор команды
 T = [
+("Оружие {name} пока не поддерживается в gcsim — в симуляции эталонное.", "{name}'s weapon isn't supported by gcsim yet, so the simulation uses the reference one.", "El arma de {name} aún no es compatible con gcsim, así que la simulación usa la de referencia."),
+("Сет артефактов {name} пока не поддерживается в gcsim — учтены только статы, без бонуса сета.", "{name}'s artifact set isn't supported by gcsim yet: only the stats count, without the set bonus.", "El set de artefactos de {name} aún no es compatible con gcsim: solo cuentan las estadísticas, sin el bono del set."),
 ("Симулятор команды", "Team Simulator", "Simulador de equipos"),
 ("Симулятор команды: урон по данным аккаунта", "Team Simulator: damage based on your account", "Simulador de equipos: daño según tu cuenta"),
 ("Симуляция урона вашей команды в Genshin Impact по данным витрины: ваши созвездия, оружие и артефакты против эталонного билда. Считается прямо в браузере движком gcsim.",
@@ -18,7 +20,6 @@ T = [
 ("ваш билд", "your build", "tu build"),
 ("эталон", "reference", "referencia"),
 ("Не удалось применить билд {name}: в конфиге нет персонажа или оружия.", "Could not apply {name}'s build: the config has no character or weapon entry.", "No se pudo aplicar la build de {name}: falta el personaje o el arma en la configuración."),
-("Оружие {name} не распознано — оставлено эталонное.", "{name}'s weapon was not recognized; the reference weapon was kept.", "No se reconoció el arma de {name}; se mantuvo el arma de referencia."),
 ("У {name} нет статов артефактов.", "{name} has no artifact stats.", "{name} no tiene estadísticas de artefactos."),
 ("Не удалось применить билд {name}.", "Could not apply {name}'s build.", "No se pudo aplicar la build de {name}."),
 ("Точность", "Accuracy", "Precisión"),
