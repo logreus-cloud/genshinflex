@@ -35,6 +35,8 @@
  "HP {v}: для персонажа от HP нужно больше — ориентир от {target}": "Vida {v}: un personaje que escala con Vida necesita más — apunta a {target}+",
  "Telegram, Discord или почта": "Telegram, Discord o correo",
  "Telegram, Discord или почта — если хотите ответ": "Telegram, Discord o correo, si quieres respuesta",
+ "Telegram-канал": "Canal de Telegram",
+ "Telegram-канал проекта": "Canal de Telegram del proyecto",
  "UID в файле UIGF должен состоять из 9 или 10 цифр.": "El UID del archivo UIGF debe tener 9 o 10 dígitos.",
  "UID — это 9 или 10 цифр": "El UID tiene 9 o 10 dígitos",
  "UID — это 9 или 10 цифр из правого нижнего угла экрана в игре.": "El UID es el número de 9 o 10 dígitos de la esquina inferior derecha de la pantalla del juego.",
