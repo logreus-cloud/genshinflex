@@ -310,7 +310,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     $('clear-roster').hidden = !roster.length;
     $('roster').innerHTML = roster.length ? roster.map((e) => {
       const c = chars.get(e.s)!;
-      const filled = Object.values(e.stats).some((v) => v);
+      const filled = Object.values(e.stats).some((v) => v !== undefined);
       return `<div class="rchip" data-el="${esc(c.el)}">
         <button type="button" class="rchip-edit" data-edit="${esc(e.key)}" aria-pressed="${editing === e.key}" title="${esc(t('Редактировать'))}">
           <img src="${esc(c.i)}" alt="" width="40" height="40" loading="lazy"><span><b>${esc(c.n)}</b><small>${esc(t('ур.'))} ${e.level} · C${e.cons}${filled ? '' : ' · ' + esc(t('без статов'))}</small></span></button>
@@ -590,10 +590,11 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     // Итоговые статы — 40
     const st = e.stats;
     const filled = Object.values(st).some((v) => v !== undefined);
-    if (!filled) {
+    const incomplete = () => {
       score += 16;
       notes.push({ ok: null, text: t('Статы не указаны — оценка неполная. Впишите их с экрана персонажа или загрузите по UID') });
-    } else {
+    };
+    if (!filled) incomplete(); else {
       const parts: number[] = [];
       const cls = b?.cls ?? 'sub';
       const usesCrit = !b || b.main.circlet.some((k) => ['crit', 'cr', 'cd'].includes(k));
@@ -631,7 +632,8 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         parts.push(clamp((st.er - 100) / (target - 100)));
         if (st.er < target - 10) notes.push({ ok: false, text: t('Восст. энергии {v}%: для этого персонажа лучше {target}%+, иначе взрыв стихии не будет готов к ротации', { v: st.er, target }) });
       }
-      score += 40 * (parts.length ? parts.reduce((s, p) => s + p, 0) / parts.length : 0.6);
+      if (parts.length) score += 40 * parts.reduce((s, p) => s + p, 0) / parts.length;
+      else incomplete();
     }
 
     // Созвездия и таланты — небольшой бонус сверху, если что-то сильно отстаёт — предупреждение

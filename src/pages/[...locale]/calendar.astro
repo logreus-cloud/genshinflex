@@ -212,19 +212,28 @@ const items = await calendarItems(lang);
     const groups: { entry: HTMLElement; item: CalItem }[][] = [[], [], []];
     const active = document.activeElement as HTMLElement | null;
     let restoreFocus = false;
-    list.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
-      const item = items[Number(entry.dataset.item)];
+    const present = new Map<number, HTMLElement>([...list.querySelectorAll<HTMLElement>('[data-item]')].map((entry) => [Number(entry.dataset.item), entry]));
+    for (const { item, index } of visible()) {
       const status = state(item, now);
       const group = status === 'current' ? 0 : status === 'future' ? 1 : 2;
-      if (group === 2 && moment(item.end ?? item.start) < now - 14 * dayMs) { entry.remove(); return; }
-      entry.classList.toggle('is-past', status === 'past');
-      entry.classList.toggle('is-current', status === 'current');
-      if (regionChanged) {
-        entry.setAttribute('aria-label', `${item.title}, ${laneNames[itemLane(item)]}, ${rangeText(item)}`);
-        entry.querySelector<HTMLElement>('.cal-card-dates')!.textContent = rangeText(item);
+      if (group === 2 && moment(item.end ?? item.start) < now - 14 * dayMs) continue;
+      let entry = present.get(index);
+      if (!entry) {
+        const holder = document.createElement('div');
+        holder.innerHTML = card({ item, index }, now);
+        entry = holder.firstElementChild as HTMLElement;
+      } else {
+        entry.classList.toggle('is-past', status === 'past');
+        entry.classList.toggle('is-current', status === 'current');
+        if (regionChanged) {
+          entry.setAttribute('aria-label', `${item.title}, ${laneNames[itemLane(item)]}, ${rangeText(item)}`);
+          entry.querySelector<HTMLElement>('.cal-card-dates')!.textContent = rangeText(item);
+        }
       }
       groups[group].push({ entry, item });
-    });
+      present.delete(index);
+    }
+    for (const entry of present.values()) entry.remove();
     groups[0].sort((a, b) => moment(a.item.end!) - moment(b.item.end!));
     groups[1].sort((a, b) => moment(a.item.start) - moment(b.item.start));
     groups[2].sort((a, b) => moment(b.item.end ?? b.item.start) - moment(a.item.end ?? a.item.start));
@@ -317,12 +326,13 @@ const items = await calendarItems(lang);
   timeline.addEventListener('click', openItem);
   list.addEventListener('click', openItem);
   timeline.addEventListener('wheel', (event) => {
-    if (event.shiftKey || !(event.deltaMode !== 0 || (Math.abs(event.deltaY) >= 50 && event.deltaX === 0))) return;
+    const deltaY = event.deltaY * (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? timeline.clientWidth : 1);
+    if (event.shiftKey || event.deltaX !== 0 || !deltaY || !(event.deltaMode !== 0 || Math.abs(event.deltaY) >= 50)) return;
     if (timeline.scrollWidth <= timeline.clientWidth) return;
-    if (event.deltaY < 0 && timeline.scrollLeft <= 0) return;
-    if (event.deltaY > 0 && timeline.scrollLeft >= timeline.scrollWidth - timeline.clientWidth - 1) return;
+    if (deltaY < 0 && timeline.scrollLeft <= 0) return;
+    if (deltaY > 0 && timeline.scrollLeft >= timeline.scrollWidth - timeline.clientWidth - 1) return;
     event.preventDefault();
-    timeline.scrollLeft += event.deltaY * (event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? timeline.clientWidth : 1);
+    timeline.scrollLeft += deltaY;
   }, { passive: false });
   document.addEventListener('gf:region', () => {
     if (view === 'timeline') { render(true); return; }
