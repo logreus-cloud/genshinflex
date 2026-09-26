@@ -87,6 +87,11 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 .h-sec { display: flex; align-items: center; gap: .6rem; }
 .h-sec::before { content: ""; width: 4px; height: 1.1em; border-radius: 2px; background: var(--accent); flex: none; }
 .h-sec small { margin-left: auto; font: 400 .82rem var(--font); color: var(--muted); letter-spacing: 0; }
+@media (max-width: 640px) {
+  .h-sec { flex-wrap: wrap; row-gap: .15rem; }
+  .h-sec::before { align-self: flex-start; margin-top: .15em; }
+  .h-sec small { flex-basis: 100%; margin-left: calc(4px + .6rem); }
+}
 
 .muted { color: var(--muted); }
 .small { font-size: .85rem; }

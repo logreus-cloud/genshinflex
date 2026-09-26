@@ -83,7 +83,6 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   <body>
     <Splash />
     <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
-<<<<<<< HEAD
     <aside class="side" id="side" aria-label={t('Навигация')} aria-hidden="true" inert>
       <div class="side-head">
         <a class="logo" href={`${base}/`}>
@@ -92,13 +91,6 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         </a>
         <button class="icon-btn side-close" type="button" aria-label={t('Закрыть меню')}>×</button>
       </div>
-=======
-    <aside class="side" id="side" aria-label={t('Навигация')}>
-      <a class="logo" href={`${base}/`}>
-        <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
-        <span>Genshin<b>Flex</b></span>
-      </a>
->>>>>>> main
       <nav>
         {nav.map(({ group, items, ...rest }) => (
           <div class:list={['group', { soon: 'soon' in rest }]}>
@@ -162,40 +154,20 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
-          <a class="icon-btn tg" href="https://t.me/genshinflex" target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
+          <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
           </a>
+          {social.discord && (
+            <a class="icon-btn dc" href={social.discord} target="_blank" rel="noopener" aria-label={t('Discord-сервер проекта')} title={t('Discord-сервер проекта')}>
+              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M6.1 5.3a13 13 0 0 1 7.8 0l.5 1.2c1.1.3 2 .8 2.7 1.3.6 2.1.6 4.2 0 6.3-.9.7-1.9 1.2-3 1.6l-.7-1.1m-6.8 0-.7 1.1c-1.1-.4-2.1-.9-3-1.6-.6-2.1-.6-4.2 0-6.3.7-.5 1.6-1 2.7-1.3Zm.5 7.7c2.4 1.2 5.4 1.2 7.8 0M7.1 10.8h.1m5.6 0h.1" /></svg>
+            </a>
+          )}
         </div>
-<<<<<<< HEAD
         <div class="search-panel" id="search-panel" hidden><QuickSearch /></div>
-=======
-        <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
-          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14Z" fill="currentColor"/><circle cx="10" cy="10" r="7" /></svg>
-        </button>
-        <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
-          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
-        </a>
-        {social.discord && (
-          <a class="icon-btn dc" href={social.discord} target="_blank" rel="noopener" aria-label={t('Discord-сервер проекта')} title={t('Discord-сервер проекта')}>
-            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M6.1 5.3a13 13 0 0 1 7.8 0l.5 1.2c1.1.3 2 .8 2.7 1.3.6 2.1.6 4.2 0 6.3-.9.7-1.9 1.2-3 1.6l-.7-1.1m-6.8 0-.7 1.1c-1.1-.4-2.1-.9-3-1.6-.6-2.1-.6-4.2 0-6.3.7-.5 1.6-1 2.7-1.3Zm.5 7.7c2.4 1.2 5.4 1.2 7.8 0M7.1 10.8h.1m5.6 0h.1" /></svg>
-          </a>
-        )}
->>>>>>> main
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
       <footer class="footer">
         <div class="f-grid">
-<<<<<<< HEAD
-=======
-          <div class="f-brand">
-            <a class="f-logo" href={`${base}/`}>
-              <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
-              <span>Genshin<b>Flex</b></span>
-            </a>
-            <p>{t('Билды, команды и инструменты для Genshin Impact. Без рекламы и регистрации.')}</p>
-            <a class="btn f-cta" href={`${base}/feedback/?from=${encodeURIComponent(path === '/' ? '/' : path + '/')}`}>{t('Сообщить об ошибке')}</a>
-          </div>
->>>>>>> main
           {footerCols.map(([title, links]) => (
             <nav class="f-col" aria-label={t(title)}>
               <h2>{t(title)}</h2>
@@ -325,6 +297,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .side.open { transform: none; }
   .side-head { display: flex; align-items: center; flex: none; }
   .logo { display: flex; align-items: center; gap: .6rem; height: var(--top-h); padding: 0 0 0 1.1rem; text-decoration: none; color: var(--accent-text); min-width: 0; flex: 1; }
+  .logo svg { flex: none; }
   .side-close { margin: 0 .6rem; font-size: 1.6rem; }
   .logo span { font: 600 1.05rem var(--font-display); color: var(--text); }
   .logo b { color: var(--accent); font-weight: 600; }
@@ -391,7 +364,6 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .icon-btn { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; flex: none; text-decoration: none; }
   .icon-btn:hover { background: var(--surface-2); }
   .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
-<<<<<<< HEAD
   .language { position: relative; }
   .langs { position: absolute; top: calc(100% + 12px); right: 0; display: grid; min-width: 90px; padding: .3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 32px rgb(0 0 0 / .3); }
   .langs[hidden], .search-panel[hidden] { display: none; }
@@ -404,19 +376,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .search-panel :global(.qs-input) { border-color: var(--accent); border-radius: 999px; }
   .tg { color: var(--muted); }
   .tg:hover { color: #2aabee; }
-  .content { width: 100%; max-width: 1240px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; view-transition-name: page; }
-=======
-  .tg { color: var(--muted); }
-  .tg:hover { color: #2aabee; }
   .dc { color: var(--muted); }
   .dc:hover { color: #5865f2; }
-  .langs { margin-left: auto; display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2px; }
-  .langs a { font-size: .78rem; font-weight: 600; padding: .35rem .5rem; border-radius: 7px; text-decoration: none; color: var(--muted); }
-  .langs a:hover { color: var(--text); }
-  .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
-  .burger { display: none; }
-  .content { width: 100%; max-width: 1180px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; }
->>>>>>> main
+  .content { width: 100%; max-width: 1240px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; view-transition-name: page; }
   .content.wide { max-width: 1400px; }
   .footer { background: var(--bg-deep); border-top: 1px solid var(--border); padding: 1.8rem 24px 1.5rem; margin-top: 2rem; }
   .f-grid, .f-bottom { max-width: 1240px; margin-left: auto; margin-right: auto; }

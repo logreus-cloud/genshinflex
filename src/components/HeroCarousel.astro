@@ -56,6 +56,8 @@ const { slides } = Astro.props;
     let remaining = 7000;
     let started = 0;
     let startX = 0;
+    let startY = 0;
+    let pointerId: number | undefined;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const isPaused = () => document.hidden || root.matches(':focus-visible') || Boolean(root.querySelector(':focus-visible'));
     const updatePause = () => {
@@ -140,11 +142,20 @@ const { slides } = Astro.props;
         show(current + (e.key === 'ArrowRight' ? 1 : -1));
       }
     });
-    root.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') startX = e.clientX; });
+    root.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+    });
     root.addEventListener('pointerup', (e) => {
-      if (e.pointerType === 'touch' && Math.abs(e.clientX - startX) > 45) {
-        show(current + (e.clientX < startX ? 1 : -1));
-      }
+      if (e.pointerType === 'mouse' || e.pointerId !== pointerId) return;
+      pointerId = undefined;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - startY)) show(current + (dx < 0 ? 1 : -1));
+    });
+    root.addEventListener('pointercancel', (e) => {
+      if (e.pointerId === pointerId) pointerId = undefined;
     });
     root.addEventListener('focusin', () => requestAnimationFrame(updatePause));
     root.addEventListener('focusout', () => requestAnimationFrame(updatePause));
@@ -201,13 +212,15 @@ const { slides } = Astro.props;
   }
   @media (max-width: 700px) {
     .carousel { margin: -1.2rem -16px 2.5rem; }
-    .slide { min-height: 0; padding-top: 185px; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
-    .slide::after { background: linear-gradient(0deg, var(--bg-deep) 25%, transparent 75%); }
-    .splash-art { right: 0; top: -65px; width: 100%; height: 300px; opacity: .55; object-position: right top; }
-    .copy { padding: 0 1.4rem 3rem; }
-    .phase { font-size: 1.45rem; }
-    h1 { max-width: 100%; font-size: clamp(2.7rem, 11vw, 3.3rem); }
-    .arrow { top: 120px; }
+    .slide { min-height: 0; padding-top: 170px; touch-action: pan-y; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
+    .slide::after { background: linear-gradient(0deg, var(--bg-deep) 35%, transparent 80%); }
+    .splash-art { right: 0; top: 0; width: 100%; height: 230px; opacity: .8; object-position: center top; }
+    .copy { padding: 0 1.1rem 2.6rem; }
+    .phase { font-size: 1.2rem; margin-bottom: .5rem; }
+    h1 { max-width: 100%; font-size: clamp(2.2rem, 10vw, 2.8rem); }
+    .actions { flex-wrap: wrap; }
+    .time { margin-top: .9rem; }
+    .arrow { top: 95px; width: 40px; height: 40px; font-size: 2rem; }
     .prev { left: 0; } .next { right: 0; }
   }
 </style>

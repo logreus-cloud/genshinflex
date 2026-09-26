@@ -1,12 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import CharacterCard from '../../components/CharacterCard.astro';
-import CalendarWidget from '../../components/CalendarWidget.astro';
+import AbyssGate from '../../components/AbyssGate.astro';
 import HeroCarousel from '../../components/HeroCarousel.astro';
 import FeatureTabs from '../../components/FeatureTabs.astro';
 import weaponArt from '../../data/generated/weapon-art.json';
 import { siteNews, newsDate } from '../../lib/news';
+import { calendarItems } from '../../lib/calendar';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
@@ -14,7 +14,9 @@ const { characters, weapons, artifacts, getCharacter, MODES, resetAt, base, t, l
 const latestNews = (await siteNews(lang))[0];
 
 const now = new Date();
-const builds = await getCollection('builds');
+const moment = (value: string) => Date.parse(`${value.replace(' ', 'T').slice(0, 16)}+01:00`);
+const calendarArt = (await calendarItems(lang)).filter((item) => item.image);
+const calendarImage = calendarArt.find((item) => moment(item.start) <= now.getTime() && (item.end === null || moment(item.end) > now.getTime())) ?? calendarArt.find((item) => moment(item.start) > now.getTime());
 const order = Object.keys(MODES);
 const rotations = (await getCollection('rotations')).sort((a, b) => order.indexOf(a.data.mode) - order.indexOf(b.data.mode));
 
@@ -25,6 +27,8 @@ const nextBanner = banners.find((b) => b.start > banner.start && new Date(b.star
 const slides = [banner, nextBanner].filter((b): b is typeof banner => Boolean(b)).flatMap((b) =>
   b.featured.map((f) => getCharacter(f.slug)).filter((hero) => hero.rarity === 5)
     .map((hero) => ({ banner: b, hero, upcoming: new Date(b.start) > now })));
+const newsImage = latestNews?.data.image || slides[0]?.hero.splash;
+const newsFallback = !latestNews?.data.image;
 const featuredWeapon = (banner as { weapons?: (string | { slug: string })[] }).weapons?.[0];
 const weaponSlug = typeof featuredWeapon === 'string' ? featuredWeapon : featuredWeapon?.slug;
 const weapon = weapons.find((w) => w.slug === weaponSlug);
@@ -47,67 +51,104 @@ const modes = [
   ...modeItems,
   { label: 'Все режимы', href: '/rotation', icon: 'moon', until: modeItems.map((item) => item.until).sort()[0] },
 ];
-const buildSet = new Set(builds.map((b) => b.data.character));
 
 const leaks = characters.filter((c) => c.beta);
 const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
-const newWeapons = weapons.filter((w) => w.version === newest[0]?.version).slice(0, 6);
+const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
 ---
 <Layout>
   <HeroCarousel slides={slides} />
-  <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
 
+  <h2 class="home-title">{t('Новости сайта')}</h2>
   {latestNews && (
-    <a class="site-news" href={`${base}/news/#${latestNews.data.anchor}`}>
-      <div class="news-copy">
-        <div class="news-meta"><span>{t('Новости сайта')}</span><time datetime={latestNews.data.date.toISOString()}>{newsDate(latestNews.data.date, lang)}</time></div>
-        <h2>{latestNews.data.title}</h2>
+    <a class:list={['promo-card', 'news-card', { 'no-image': !newsImage }]} href={`${base}/news/#${latestNews.data.anchor}`}>
+      <div class="promo-copy">
+        <time datetime={latestNews.data.date.toISOString()}>{t('Обновлено {date}', { date: newsDate(latestNews.data.date, lang) })}</time>
+        <h3>{latestNews.data.title}</h3>
         <p>{latestNews.data.summary}</p>
+        <span class="promo-link"><span aria-hidden="true">▶ </span>{t('Все новости и обновления')}</span>
       </div>
-      <span class="news-link">{t('Все новости и обновления')} <span aria-hidden="true">→</span></span>
+      {newsImage && (
+        <div class:list={['promo-visual', { fallback: newsFallback }]}>
+          <img src={newsImage} alt="" loading="lazy" />
+        </div>
+      )}
     </a>
   )}
 
-  <CalendarWidget />
-
-  <h2 class="h-sec">{t('Новые персонажи')} <small><a href={`${base}/characters`}>{t('Все {n}', { n: characters.length - leaks.length })}</a> · <a href={`${base}/guides`}>{t('Руководства')} ({builds.length})</a></small></h2>
-  <div class="character-carousel" data-character-carousel>
-    <button class="character-arrow prev" type="button" aria-label={t('Предыдущие персонажи')} aria-controls="new-characters" hidden>‹</button>
-    <div class="cards" id="new-characters" role="region" aria-label={t('Новые персонажи')}>
-      <div class="cards-track">{leaks.map((c) => <CharacterCard slug={c.slug} />)}{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>
+  <h2 class="home-title">{t('Календарь событий')}</h2>
+  <a class:list={['promo-card', 'calendar-card', { 'no-image': !calendarImage?.image }]} href={`${base}/calendar/`}>
+    {calendarImage?.image && (
+      <div class="promo-visual"><img src={calendarImage.image} alt="" loading="lazy" /></div>
+    )}
+    <div class="promo-copy">
+      <time datetime={now.toISOString()}>{t('Обновлено {date}', { date: newsDate(now, lang) })}</time>
+      <h3>{t('Баннеры, ивенты, обновления и сбросы эндгейма на одной шкале')}</h3>
+      <p>{t('Время — по серверу выбранного региона.')}</p>
+      <span class="promo-link"><span aria-hidden="true">▶ </span>{t('Открыть полный календарь')}</span>
     </div>
-    <button class="character-arrow next" type="button" aria-label={t('Следующие персонажи')} aria-controls="new-characters">›</button>
+  </a>
+
+  <div class="feature-band">
+    <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
   </div>
 
-  {newWeapons.length > 0 && (
-    <>
-      <h2 class="h-sec">{t('Новое оружие')} <small><a href={`${base}/weapons`}>{t('Всё оружие')}</a></small></h2>
-      <div class="weapons">
-        {newWeapons.map((w) => (
-          <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
-            <img src={w.icon} alt="" width="64" height="64" loading="lazy" />
-            <span>{w.name}</span>
-          </a>
-        ))}
+  <section class="collection-band">
+    <div class="collection-row">
+      <h2 class="pill-title">{t('Новые персонажи')}</h2>
+      <div class="gate-carousel" data-gate-carousel>
+        <AbyssGate dir="prev" label={t('Предыдущие персонажи')} controls="new-characters" />
+        <div class="gate-list" id="new-characters" role="region" aria-label={t('Новые персонажи')} tabindex="0">
+          <div class="tile-track">
+            {[...leaks, ...newest].map((c) => (
+              <a class:list={['tile', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element} aria-label={c.name} title={c.name}>
+                <img src={c.icon} alt="" width="96" height="96" loading="lazy" />
+                {c.beta && <span class="beta">BETA</span>}
+              </a>
+            ))}
+          </div>
+        </div>
+        <AbyssGate dir="next" label={t('Следующие персонажи')} controls="new-characters" />
       </div>
-    </>
-  )}
+    </div>
+
+    {newWeapons.length > 0 && (
+      <div class="collection-row">
+        <h2 class="pill-title">{t('Новое оружие')}</h2>
+        <div class="gate-carousel" data-gate-carousel>
+          <AbyssGate dir="prev" label={t('Предыдущее оружие')} controls="new-weapons" />
+          <div class="gate-list" id="new-weapons" role="region" aria-label={t('Новое оружие')} tabindex="0">
+            <div class="tile-track">
+              {newWeapons.map((w) => (
+                <a class:list={['tile', 'weapon', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`} aria-label={w.name} title={w.name}>
+                  <img src={w.icon} alt="" width="96" height="96" loading="lazy" />
+                </a>
+              ))}
+            </div>
+          </div>
+          <AbyssGate dir="next" label={t('Следующее оружие')} controls="new-weapons" />
+        </div>
+      </div>
+    )}
+  </section>
 </Layout>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-character-carousel]').forEach((root) => {
-    const list = root.querySelector<HTMLElement>('.cards')!;
-    const track = root.querySelector<HTMLElement>('.cards-track')!;
-    const prev = root.querySelector<HTMLButtonElement>('.prev')!;
-    const next = root.querySelector<HTMLButtonElement>('.next')!;
+  document.querySelectorAll<HTMLElement>('[data-gate-carousel]').forEach((root) => {
+    const list = root.querySelector<HTMLElement>('.gate-list')!;
+    const track = root.querySelector<HTMLElement>('.tile-track')!;
+    const prev = root.querySelector<HTMLButtonElement>('[data-dir="prev"]')!;
+    const next = root.querySelector<HTMLButtonElement>('[data-dir="next"]')!;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let scrolling = false;
     let destination: number | undefined;
     let restoreTimer: number | undefined;
     const maxScroll = () => list.scrollWidth - list.clientWidth;
     const update = () => {
-      prev.hidden = list.scrollLeft <= 1;
-      next.hidden = list.scrollLeft >= list.scrollWidth - list.clientWidth - 1;
+      prev.disabled = list.scrollLeft <= 1;
+      next.disabled = list.scrollLeft >= maxScroll() - 1;
+      prev.classList.toggle('shut', prev.disabled);
+      next.classList.toggle('shut', next.disabled);
     };
     const peek = (direction: number) => {
       if (scrolling) return;
@@ -138,7 +179,7 @@ const newWeapons = weapons.filter((w) => w.version === newest[0]?.version).slice
       restoreTimer = window.setTimeout(restoreSnap, 1200);
     };
     const page = () => {
-      const card = track.querySelector<HTMLElement>('.cc');
+      const card = track.querySelector<HTMLElement>('.tile');
       if (!card) return { step: list.clientWidth, distance: list.clientWidth };
       const gap = parseFloat(getComputedStyle(track).gap) || 0;
       const step = card.offsetWidth + gap;
@@ -170,36 +211,59 @@ const newWeapons = weapons.filter((w) => w.version === newest[0]?.version).slice
       if (destination === undefined || Math.abs(list.scrollLeft - destination) <= 1) restoreSnap();
     });
     window.addEventListener('resize', update);
-    root.classList.add('ready');
     update();
   });
 </script>
 
 <style>
-  .site-news { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin: .2rem 0 1.2rem; padding: 1.1rem 1.3rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--accent-soft), var(--surface)); text-decoration: none; }
-  .site-news:hover { border-color: var(--accent); }
-  .news-copy { flex: 1 1 32rem; min-width: 0; overflow-wrap: anywhere; }
-  .news-meta { display: flex; flex-wrap: wrap; gap: .35rem 1rem; font-size: .78rem; color: var(--muted); }
-  .news-meta > span { color: var(--accent-text); font-weight: 600; }
-  .site-news h2 { margin: .4rem 0; font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.45; }
-  .site-news p { margin: 0; color: var(--muted); font-size: .9rem; }
-  .news-link { color: var(--accent-text); font-size: .85rem; }
-  .character-carousel { position: relative; min-width: 0; }
-  .cards { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-  .cards::-webkit-scrollbar { display: none; }
-  .cards-track { display: flex; gap: 10px; width: max-content; min-width: 100%; transition: transform var(--dur) var(--ease); }
-  .cards-track > :global(.cc) { flex: 0 0 130px; scroll-snap-align: start; }
-  .character-arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; display: none; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%; background: rgb(10 11 16 / .6); color: rgb(255 255 255 / .55); font: 200 2.4rem/1 var(--font); cursor: pointer; padding: 0 0 .25rem; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
-  .ready .character-arrow:not([hidden]) { display: grid; }
-  .character-arrow:hover, .character-arrow:focus-visible { color: #fff; background: rgb(255 255 255 / .25); }
-  .character-arrow.prev { left: .4rem; } .character-arrow.next { right: .4rem; }
-  @media (max-width: 700px) { .cards-track > :global(.cc) { flex-basis: 104px; } .ready .character-arrow { display: none; } }
-  .weapons { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .wcard { display: flex; align-items: center; gap: .6rem; padding: .5rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; font-size: .86rem; }
-  /* Длинные названия оружия переносятся внутри карточки, а не вылезают за неё */
-  .wcard span { min-width: 0; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
-  .wcard img { border-radius: 8px; background: linear-gradient(160deg, #5b4b82, #9679c4); flex: none; padding: 4px; box-sizing: border-box; }
-  .wcard.r5 img { background: linear-gradient(160deg, #7a5226, #d1953f); }
-  .wcard:hover { border-color: var(--accent); }
-
+  .home-title { margin: 2.2rem 0 1.2rem; font: 600 clamp(1.5rem, 3vw, 2rem) var(--font-display); text-align: center; }
+  .promo-card { display: grid; min-height: 220px; max-width: 1240px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(90deg, var(--surface-2), color-mix(in srgb, var(--surface-2) 60%, transparent)); color: var(--text); text-decoration: none; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+  .promo-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / .18); }
+  .promo-card.no-image { grid-template-columns: 1fr; }
+  .news-card { grid-template-columns: 1.6fr 1fr; }
+  .calendar-card { grid-template-columns: 1fr 1.6fr; }
+  .promo-copy { display: flex; flex-direction: column; min-width: 0; padding: 1.4rem 1.6rem; overflow-wrap: anywhere; }
+  .promo-copy time { color: var(--muted); font-size: .75rem; }
+  .promo-copy h3 { margin: .5rem 0 .7rem; font: 600 clamp(1.4rem, 2.6vw, 2rem)/1.15 var(--font-display); }
+  .promo-copy p { margin: 0 0 1rem; color: var(--muted); font-size: .9rem; }
+  .promo-link { align-self: flex-end; margin-top: auto; color: var(--accent); font-size: .78rem; }
+  /* Картинка не влияет на высоту карточки — её задаёт текст */
+  .promo-visual { position: relative; min-width: 0; overflow: hidden; }
+  .promo-visual img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+  .promo-visual.fallback { background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 25%, var(--surface-2)), var(--surface-2)); }
+  .promo-visual.fallback img { object-fit: contain; object-position: center bottom; }
+  .feature-band, .collection-band { margin-inline: calc(50% - 50vw); padding: 2.5rem calc(50vw - 50%); }
+  .feature-band { --band-a: color-mix(in srgb, var(--bg) 94%, #fff 6%); margin-top: 2.5rem; background: var(--band-a); }
+  .collection-band { margin-bottom: -3rem; background: #111a2e; }
+  .collection-row + .collection-row { margin-top: 2.4rem; }
+  .pill-title { display: table; margin: 0 auto 1.4rem; padding: .55rem 1.6rem; border-radius: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); font: 600 1rem var(--font-display); text-align: center; }
+  .gate-carousel { display: flex; align-items: center; justify-content: center; gap: 1.2rem; min-width: 0; }
+  .gate-list { flex: 0 1 calc(7 * 96px + 6 * 22px + 10px); min-width: 0; max-width: calc(100% - 152px - 2.4rem); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .gate-list::-webkit-scrollbar { display: none; }
+  .tile-track { display: flex; gap: 22px; width: max-content; min-width: 100%; padding: 8px 5px; /* место под подъём и контур плитки */ transition: transform var(--dur) var(--ease); }
+  .tile { position: relative; display: block; flex: 0 0 96px; width: 96px; height: 96px; overflow: hidden; border-radius: 10px; background: linear-gradient(180deg, #5b4b82, #9679c4); scroll-snap-align: start; transition: transform var(--dur) var(--ease); }
+  .tile.r5 { background: linear-gradient(180deg, #7a5226, #d1953f); }
+  .tile.r3 { background: linear-gradient(180deg, #4a5a78, #6b86b0); }
+  .tile.emblem { background: linear-gradient(180deg, color-mix(in srgb, var(--el) 55%, #1c2033), color-mix(in srgb, var(--el) 85%, #fff)); }
+  .tile img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .tile.weapon img { padding: 8px; box-sizing: border-box; object-fit: contain; }
+  .tile .beta { position: absolute; top: 5px; right: 5px; padding: .05rem .3rem; border-radius: 4px; background: #e0457b; color: #fff; font-size: .6rem; font-weight: 600; letter-spacing: .04em; }
+  .tile:hover, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-3px); }
+  :global(.content:has(> .collection-band) + .footer) { margin-top: 0; }
+  :global(html[data-theme='light']) .feature-band { --band-a: var(--bg-deep); }
+  :global(html[data-theme='light']) .collection-band { background: #dfe6f3; }
+  @media (prefers-color-scheme: light) {
+    :global(html:not([data-theme])) .feature-band { --band-a: var(--bg-deep); }
+    :global(html:not([data-theme])) .collection-band { background: #dfe6f3; }
+  }
+  @media (max-width: 900px) { .collection-band { margin-bottom: -2.5rem; } }
+  @media (max-width: 700px) {
+    .promo-card { grid-template-columns: 1fr; }
+    .news-card, .calendar-card { grid-template-columns: 1fr; }
+    .promo-visual { height: 160px; }
+    .news-card .promo-visual { order: -1; }
+    .gate-list { flex: 1 1 auto; max-width: 100%; }
+    .tile-track { gap: 12px; }
+    .tile { flex-basis: 72px; width: 72px; height: 72px; }
+  }
 </style>

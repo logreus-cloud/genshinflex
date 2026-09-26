@@ -111,11 +111,16 @@ const buttons: Record<string, string> = {
   .detail b { color: var(--accent-text); }
   .card .btn { justify-content: center; width: 100%; margin-top: auto; font-size: .82rem; }
   @media (max-width: 700px) {
-    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .cards > .card:last-child:nth-child(3n + 1) { grid-column: auto; }
-    .cards > .card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 7px); }
-    .card { padding: 1rem; min-height: 260px; }
-    .tabs button { padding: .55rem .8rem; font-size: .8rem; }
+    .cards > .card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; justify-self: stretch; width: auto; }
+    .card { min-height: 0; padding: .9rem .7rem; }
+    .card > svg { width: 26px; height: 26px; }
+    .art { height: 84px; }
+    .detail { min-height: 84px; font-size: .85rem; }
+    h4 { font-size: 1rem; margin: .5rem 0 .4rem; }
+    .card .btn { font-size: .76rem; padding-inline: .5rem; }
+    .tabs { width: 100%; }
+    .tabs button { flex: 1; padding: .55rem .4rem; font-size: .8rem; }
   }
-  @media (max-width: 420px) { .cards { grid-template-columns: 1fr; } .cards > .card:last-child:nth-child(2n + 1) { width: auto; } }
 </style>
