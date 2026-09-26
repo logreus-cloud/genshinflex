@@ -3,7 +3,8 @@ import '../styles/global.css';
 import '../styles/season-snezhnaya.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import Splash from '../components/Splash.astro';
-import RootsDivider from '../components/RootsDivider.astro';
+import AmbientMusic from '../components/AmbientMusic.astro';
+import SnowDivider from '../components/SnowDivider.astro';
 import season from '../data/season.json';
 import social from '../data/social.json';
 import { ogPath } from '../lib/og';
@@ -33,7 +34,7 @@ const nav = [
   { group: 'Эндгейм', items: [['Все режимы', '/rotation', 'moon'], ['Витая бездна', '/abyss', 'spiral'], ['Театр воображариума', '/theater', 'mask'], ['Натиск', '/onslaught', 'flame']] },
   { group: 'Таймлайн', items: [['Календарь', '/calendar', 'calendar'], ['Баннеры', '/banners', 'moon']] },
   { group: 'Гайды', items: [['Руководства', '/guides', 'book']] },
-  { group: 'Сайт', items: [['Новости сайта', '/news', 'book']] },
+  { group: 'Сайт', items: [['Мой профиль', '/profile', 'user'], ['Новости сайта', '/news', 'book']] },
   { group: 'Инструменты', items: [['Симулятор команды', '/tools/simulator', 'chart'], ['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
   // Разделы, которые выйдут не скоро: отдельно и приглушённо, чтобы не путать с готовыми
   { group: 'В разработке', soon: true, items: [['Рейтинг', '/rating', 'chart']] },
@@ -215,22 +216,26 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
               {LANGS.map((l) => <a href={alt(l)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
             </div>
           </div>
+          <AmbientMusic />
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
+          <a class="icon-btn profile" href={`${base}/profile/`} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" /><path d="M4 17c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2" /></svg>
+          </a>
           <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
           </a>
           {social.discord && (
             <a class="icon-btn dc" href={social.discord} target="_blank" rel="noopener" aria-label={t('Discord-сервер проекта')} title={t('Discord-сервер проекта')}>
-              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M6.1 5.3a13 13 0 0 1 7.8 0l.5 1.2c1.1.3 2 .8 2.7 1.3.6 2.1.6 4.2 0 6.3-.9.7-1.9 1.2-3 1.6l-.7-1.1m-6.8 0-.7 1.1c-1.1-.4-2.1-.9-3-1.6-.6-2.1-.6-4.2 0-6.3.7-.5 1.6-1 2.7-1.3Zm.5 7.7c2.4 1.2 5.4 1.2 7.8 0M7.1 10.8h.1m5.6 0h.1" /></svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.1 14.1 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z" /></svg>
             </a>
           )}
         </div>
         <div class="search-panel" id="search-panel" hidden><QuickSearch /></div>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
-      <RootsDivider />
+      <SnowDivider />
       <footer class="footer">
         <div class="f-grid">
           {footerCols.map(([title, links]) => (
@@ -439,9 +444,12 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .search-panel { position: absolute; top: calc(100% + 8px); right: 80px; display: flex; width: min(460px, calc(100vw - 32px)); padding: .7rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35); }
   .search-panel :global(.qs) { width: 100%; max-width: none; }
   .search-panel :global(.qs-input) { border-color: var(--accent); border-radius: 999px; }
+  .profile[aria-current] { color: var(--accent-text); }
   .tg { color: var(--muted); }
   .tg:hover { color: #2aabee; }
   .dc { color: var(--muted); }
+  /* Логотип Discord залитый, а не контурный, как остальные иконки шапки */
+  .dc svg { fill: currentColor; stroke: none; }
   .dc:hover { color: #5865f2; }
   .content { width: 100%; max-width: 1240px; margin: 0 auto; padding: 1.8rem 24px 0; flex: 1; view-transition-name: page; }
   .content.wide { max-width: 1400px; }
@@ -494,6 +502,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     .top-logo { gap: .2rem; }
     .top-logo strong { font-size: .82rem; }
     .icon-btn { width: 34px; height: 34px; }
+    .tg { display: none; }
     .search-panel { left: 8px; right: 8px; }
+  }
+  /* Шесть иконок в шапке: на узких экранах от логотипа остаётся значок, иначе надпись наезжает на кнопки */
+  @media (max-width: 540px) {
+    .top-logo span { display: none; }
+  }
+  @media (max-width: 359px) {
+    .dc { display: none; }
   }
 </style>

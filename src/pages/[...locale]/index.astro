@@ -147,8 +147,7 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
     const prev = root.querySelector<HTMLButtonElement>('[data-dir="prev"]')!;
     const next = root.querySelector<HTMLButtonElement>('[data-dir="next"]')!;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let scrolling = false;
-    let peeked = 0;
+    const tiles = [...track.querySelectorAll<HTMLElement>('.tile')];
     const loadTiles = () => {
       track.querySelectorAll<HTMLImageElement>('img').forEach((img) => { img.loading = 'eager'; });
     };
@@ -156,81 +155,52 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
       if (entries.some((entry) => entry.isIntersecting)) { loadTiles(); observer.disconnect(); }
     }, { rootMargin: '300px 0px' });
     observer.observe(root);
-    let destination: number | undefined;
-    let restoreTimer: number | undefined;
     const maxScroll = () => list.scrollWidth - list.clientWidth;
-    const update = () => {
-      prev.disabled = list.scrollLeft <= 1;
-      next.disabled = list.scrollLeft >= maxScroll() - 1;
-      prev.classList.toggle('shut', prev.disabled);
-      next.classList.toggle('shut', next.disabled);
-    };
-    const peek = (direction: number, arrow: HTMLButtonElement) => {
-      if (scrolling || arrow.disabled || motion.matches || peeked === direction) return;
-      const room = direction > 0 ? maxScroll() - list.scrollLeft : list.scrollLeft;
-      if (room < 1) return;
-      track.style.transform = `translateX(${direction * -Math.min(page().step, room)}px)`;
-      peeked = direction;
-    };
-    const clearPeek = () => {
-      if (peeked === 0) return;
-      track.style.removeProperty('transform');
-      peeked = 0;
-    };
-    const restoreSnap = () => {
-      if (restoreTimer !== undefined) clearTimeout(restoreTimer);
-      restoreTimer = undefined;
-      destination = undefined;
-      scrolling = false;
-      list.style.removeProperty('scroll-snap-type');
-    };
-    const settlePeek = () => {
-      const transform = getComputedStyle(track).transform;
-      if (transform === 'none') return;
-      const offset = new DOMMatrixReadOnly(transform).m41;
-      scrolling = true;
-      track.style.transition = 'none';
-      list.style.scrollSnapType = 'none';
-      if (Math.abs(offset) >= .1) list.scrollLeft -= offset;
-      track.style.removeProperty('transform');
-      peeked = 0;
-      void track.offsetWidth;
-      track.style.removeProperty('transition');
-      if (restoreTimer !== undefined) clearTimeout(restoreTimer);
-      restoreTimer = window.setTimeout(restoreSnap, 1200);
-    };
     const page = () => {
       const card = track.querySelector<HTMLElement>('.tile');
       if (!card) return { step: list.clientWidth, distance: list.clientWidth };
       const gap = parseFloat(getComputedStyle(track).gap) || 0;
       const step = card.offsetWidth + gap;
-      return { step, distance: Math.max(1, Math.floor((list.clientWidth + gap) / step)) * step };
+      return { step, distance: Math.max(1, Math.floor((list.clientWidth + gap) / step) - 1) * step };
+    };
+    const update = () => {
+      prev.disabled = list.scrollLeft <= 1;
+      next.disabled = list.scrollLeft >= maxScroll() - 1;
+      prev.classList.toggle('shut', prev.disabled);
+      next.classList.toggle('shut', next.disabled);
+      root.classList.toggle('peek-prev', !prev.disabled && (prev.matches(':hover') || prev.matches(':focus-visible')));
+      root.classList.toggle('peek-next', !next.disabled && (next.matches(':hover') || next.matches(':focus-visible')));
+      list.style.setProperty('--fade-l', prev.disabled ? '0px' : root.classList.contains('peek-prev') ? '24px' : '64px');
+      list.style.setProperty('--fade-r', next.disabled ? '0px' : root.classList.contains('peek-next') ? '24px' : '64px');
+      const { step } = page();
+      const first = Math.floor((list.scrollLeft + 6) / step);
+      const last = Math.floor((list.scrollLeft + list.clientWidth - 6) / step);
+      tiles.forEach((tile, index) => {
+        tile.classList.toggle('edge-prev', index === first || index === first + 1);
+        tile.classList.toggle('edge-next', index === last || index === last - 1);
+      });
     };
     [[prev, -1], [next, 1]].forEach(([button, direction]) => {
       const arrow = button as HTMLButtonElement;
       const sign = direction as number;
-      arrow.addEventListener('pointerenter', () => { loadTiles(); peek(sign, arrow); });
-      arrow.addEventListener('pointerleave', clearPeek);
-      arrow.addEventListener('focus', () => { loadTiles(); peek(sign, arrow); });
-      arrow.addEventListener('blur', clearPeek);
+      arrow.addEventListener('pointerenter', () => { loadTiles(); update(); });
+      arrow.addEventListener('pointerleave', update);
+      arrow.addEventListener('focus', () => { loadTiles(); update(); });
+      arrow.addEventListener('blur', update);
       arrow.addEventListener('click', () => {
         const { step, distance } = page();
         const target = Math.max(0, Math.min(maxScroll(), Math.round(list.scrollLeft / step) * step + sign * distance));
-        settlePeek();
-        destination = target;
-        scrolling = true;
         list.scrollTo({ left: target, behavior: motion.matches ? 'auto' : 'smooth' });
-        if (Math.abs(list.scrollLeft - target) <= 1) restoreSnap();
-        else {
-          if (restoreTimer !== undefined) clearTimeout(restoreTimer);
-          restoreTimer = window.setTimeout(restoreSnap, 1200);
-        }
       });
     });
-    list.addEventListener('scroll', () => { settlePeek(); update(); }, { passive: true });
-    list.addEventListener('scrollend', () => {
-      if (destination === undefined || Math.abs(list.scrollLeft - destination) <= 1) restoreSnap();
-    });
+    let frame = 0;
+    list.addEventListener('scroll', () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    }, { passive: true });
     window.addEventListener('resize', update);
     update();
   });
@@ -238,6 +208,11 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
 
 <style>
   .home-title { margin: 2.2rem 0 1.2rem; font: 600 clamp(1.5rem, 3vw, 2rem) var(--font-display); text-align: center; }
+  /* Новости и календарь ближе к «Функционалу»: у полосы и так большой нижний отступ */
+  .feature-band + .home-title { margin-top: -1.2rem; }
+  .home-title + .promo-card + .home-title { margin-top: 1.4rem; }
+  /* Календарь не впритык к полосе лент */
+  .calendar-card + .collection-band { margin-top: 2.6rem; }
   .promo-card { display: grid; min-height: 220px; max-width: 1240px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(90deg, var(--surface-2), color-mix(in srgb, var(--surface-2) 60%, transparent)); color: var(--text); text-decoration: none; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
   .promo-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / .18); }
   .promo-card.no-image { grid-template-columns: 1fr; }
@@ -255,16 +230,21 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   .calendar-card .promo-visual .backdrop { object-fit: cover; filter: blur(18px) saturate(1.1); transform: scale(1.15); opacity: .7; }
   .promo-visual.fallback { background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 25%, var(--surface-2)), var(--surface-2)); }
   .promo-visual.fallback img { object-fit: contain; object-position: center bottom; }
-  .feature-band, .collection-band { margin-inline: calc(50% - 50vw); padding: 2.5rem calc(50vw - 50%); }
-  .feature-band { --band-a: color-mix(in srgb, var(--bg) 94%, #fff 6%); margin-top: -3rem; background: var(--band-a); }
-  .collection-band { background: #111a2e; }
+  .feature-band, .collection-band { position: relative; isolation: isolate; margin-inline: calc(50% - 50vw); padding: 2.5rem calc(50vw - 50%); background: transparent; }
+  .feature-band::before, .collection-band::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%); }
+  .feature-band { margin-top: -3rem; }
+  .feature-band::before { background: linear-gradient(115deg, rgb(38 42 60 / .82) 0%, rgb(30 36 58 / .78) 45%, rgb(44 38 64 / .8) 100%); }
+  .collection-band::before { background: linear-gradient(115deg, rgb(14 26 52 / .85) 0%, rgb(12 34 58 / .8) 50%, rgb(28 22 58 / .85) 100%); }
   .collection-row + .collection-row { margin-top: 2.4rem; }
   .pill-title { display: table; margin: 0 auto 1.4rem; padding: .55rem 1.6rem; border-radius: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); font: 600 1rem var(--font-display); text-align: center; }
   .gate-carousel { display: flex; align-items: center; justify-content: center; gap: 1.2rem; min-width: 0; }
-  .gate-list { flex: 0 1 calc(7 * 96px + 6 * 22px + 12px); min-width: 0; max-width: calc(100% - 152px - 2.4rem); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 6px; scrollbar-width: none; }
+  @property --fade-l { syntax: '<length>'; inherits: false; initial-value: 0px; }
+  @property --fade-r { syntax: '<length>'; inherits: false; initial-value: 0px; }
+  .gate-list { flex: 0 1 calc(7 * 96px + 6 * 22px + 12px + .45 * 96px + 22px); min-width: 0; max-width: calc(100% - 152px - 2.4rem); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 6px; scrollbar-width: none; mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%); transition: --fade-l .25s, --fade-r .25s; }
   .gate-list::-webkit-scrollbar { display: none; }
-  .tile-track { display: flex; gap: 22px; width: max-content; min-width: 100%; padding: 8px 6px; /* место под подъём и контур плитки */ transition: transform .45s var(--ease); }
-  .tile { position: relative; display: block; flex: 0 0 96px; width: 96px; height: 96px; overflow: hidden; border-radius: 10px; background: linear-gradient(180deg, #5b4b82, #9679c4); scroll-snap-align: start; transition: transform var(--dur) var(--ease); }
+  .tile-track { display: flex; gap: 22px; width: max-content; min-width: 100%; padding: 8px 6px; /* место под подъём и контур плитки */ }
+  .tile { position: relative; display: block; flex: 0 0 96px; width: 96px; height: 96px; overflow: hidden; border-radius: 10px; background: linear-gradient(180deg, #5b4b82, #9679c4); scroll-snap-align: start; transition: transform var(--dur) var(--ease), filter .25s; }
+  .gate-carousel.peek-prev .tile.edge-prev, .gate-carousel.peek-next .tile.edge-next { filter: brightness(1.15); }
   .tile.r5 { background: linear-gradient(180deg, #7a5226, #d1953f); }
   .tile.r3 { background: linear-gradient(180deg, #4a5a78, #6b86b0); }
   .tile.emblem { background: linear-gradient(180deg, color-mix(in srgb, var(--el) 55%, #1c2033), color-mix(in srgb, var(--el) 85%, #fff)); }
@@ -272,11 +252,11 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   .tile.weapon img { padding: 8px; box-sizing: border-box; object-fit: contain; }
   .tile .beta { position: absolute; top: 5px; right: 5px; padding: .05rem .3rem; border-radius: 4px; background: #e0457b; color: #fff; font-size: .6rem; font-weight: 600; letter-spacing: .04em; }
   .tile:hover, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-3px); }
-  :global(html[data-theme='light']) .feature-band { --band-a: var(--bg-deep); }
-  :global(html[data-theme='light']) .collection-band { background: #dfe6f3; }
+  :global(html[data-theme='light']) .feature-band::before { background: linear-gradient(115deg, rgb(236 240 248 / .85) 0%, rgb(226 232 246 / .8) 45%, rgb(236 230 246 / .85) 100%); }
+  :global(html[data-theme='light']) .collection-band::before { background: linear-gradient(115deg, rgb(221 232 245 / .88) 0%, rgb(214 232 242 / .85) 50%, rgb(228 224 244 / .88) 100%); }
   @media (prefers-color-scheme: light) {
-    :global(html:not([data-theme])) .feature-band { --band-a: var(--bg-deep); }
-    :global(html:not([data-theme])) .collection-band { background: #dfe6f3; }
+    :global(html:not([data-theme])) .feature-band::before { background: linear-gradient(115deg, rgb(236 240 248 / .85) 0%, rgb(226 232 246 / .8) 45%, rgb(236 230 246 / .85) 100%); }
+    :global(html:not([data-theme])) .collection-band::before { background: linear-gradient(115deg, rgb(221 232 245 / .88) 0%, rgb(214 232 242 / .85) 50%, rgb(228 224 244 / .88) 100%); }
   }
   @media (max-width: 700px) {
     .promo-card { grid-template-columns: 1fr; }
@@ -287,5 +267,8 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
     .gate-list { flex: 1 1 auto; max-width: 100%; }
     .tile-track { gap: 12px; }
     .tile { flex-basis: 72px; width: 72px; height: 72px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate-list, .tile { transition: none; }
   }
 </style>

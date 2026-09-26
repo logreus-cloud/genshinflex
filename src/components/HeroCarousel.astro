@@ -53,7 +53,7 @@ const { slides } = Astro.props;
     const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
     if (slides.length < 2) return;
     let current = 0;
-    let finishTransition: ((keepHeight?: boolean) => void) | undefined;
+    let finishTransition: (() => void) | undefined;
     let timer: number | undefined;
     let remaining = 7000;
     let started = 0;
@@ -62,6 +62,34 @@ const { slides } = Astro.props;
     let pointerId: number | undefined;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const isPaused = () => document.hidden || root.matches(':focus-visible') || Boolean(root.querySelector(':focus-visible'));
+    const measureHeight = () => {
+      root.style.height = `${root.offsetHeight}px`;
+      const mobile = window.matchMedia('(max-width: 700px)').matches;
+      let maxHeight = 0;
+      slides.forEach((slide) => {
+        const hidden = slide.hidden;
+        const style = slide.getAttribute('style');
+        slide.hidden = false;
+        slide.style.position = 'absolute';
+        slide.style.visibility = 'hidden';
+        slide.style.inset = '0 auto auto 0';
+        slide.style.width = '100%';
+        slide.style.minHeight = mobile ? '0' : '400px';
+        maxHeight = Math.max(maxHeight, slide.offsetHeight);
+        if (style === null) slide.removeAttribute('style');
+        else slide.setAttribute('style', style);
+        slide.hidden = hidden;
+      });
+      root.style.height = `${maxHeight}px`;
+    };
+    let resizeFrame: number | undefined;
+    const scheduleMeasure = () => {
+      if (resizeFrame !== undefined) return;
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = undefined;
+        measureHeight();
+      });
+    };
     const updatePause = () => {
       const paused = isPaused();
       root.classList.toggle('paused', paused);
@@ -96,22 +124,17 @@ const { slides } = Astro.props;
         resetProgress();
         return;
       }
-      finishTransition?.(true);
+      finishTransition?.();
       const forward = index > current;
       const old = slides[current];
       const next = slides[target];
-      const fromHeight = root.getBoundingClientRect().height;
       next.hidden = false;
       next.inert = false;
       next.setAttribute('aria-hidden', 'false');
-      const toHeight = next.offsetHeight;
       old.inert = true;
       old.setAttribute('aria-hidden', 'true');
-      root.style.height = `${fromHeight}px`;
       old.classList.add('moving', forward ? 'leave-forward' : 'leave-backward');
       next.classList.add('moving', forward ? 'enter-forward' : 'enter-backward');
-      void root.offsetHeight;
-      root.style.height = `${toHeight}px`;
       current = target;
       dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === current);
@@ -121,10 +144,8 @@ const { slides } = Astro.props;
       const onEnd = (event: AnimationEvent) => {
         if (event.target === next) finish();
       };
-      const finish = (keepHeight = false) => {
+      const finish = () => {
         next.removeEventListener('animationend', onEnd);
-        if (keepHeight) root.style.height = `${root.getBoundingClientRect().height}px`;
-        else root.style.removeProperty('height');
         old.hidden = true;
         old.classList.remove('moving', 'leave-forward', 'leave-backward');
         next.classList.remove('moving', 'enter-forward', 'enter-backward');
@@ -163,14 +184,17 @@ const { slides } = Astro.props;
     root.addEventListener('focusout', () => requestAnimationFrame(updatePause));
     document.addEventListener('visibilitychange', updatePause);
     motion.addEventListener('change', resetProgress);
+    measureHeight();
+    document.fonts?.ready.then(scheduleMeasure);
+    window.addEventListener('resize', scheduleMeasure);
     root.classList.add('ready');
     resetProgress();
   });
 </script>
 <style>
-  .carousel { --hc-bg: #1b1c23; --hc-text: #ececf0; --hc-muted: #c5c6ce; --hc-strong: #fff; --hc-name-base: white; --hc-name-ratio: 70%; --hc-stars: var(--accent); --hc-arrow: rgb(255 255 255 / .45); --hc-arrow-hover: #fff; --hc-arrow-shadow: 0 0 14px rgb(255 255 255 / .75), 0 0 2px #fff; --hc-dot: rgb(255 255 255 / .5); --hc-dot-active: rgb(255 255 255 / .35); --hc-fill: #fff; position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; background: var(--hc-bg); }
-  .carousel.ready { transition: height calc(var(--dur) * 2) var(--ease); }
-  .slide { --bg-deep: var(--hc-bg); --hc-slide-bg: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); position: relative; min-height: 400px; overflow: hidden; isolation: isolate; color: var(--hc-text); background: var(--hc-slide-bg); }
+  .carousel { --hc-bg: #1b1c23; --hc-text: #ececf0; --hc-muted: #c5c6ce; --hc-strong: #fff; --hc-name-base: white; --hc-name-ratio: 70%; --hc-stars: var(--accent); --hc-arrow: rgb(255 255 255 / .45); --hc-arrow-hover: #fff; --hc-arrow-shadow: 0 0 14px rgb(255 255 255 / .75), 0 0 2px #fff; --hc-dot: rgb(255 255 255 / .5); --hc-dot-active: rgb(255 255 255 / .35); --hc-fill: #fff; position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; overflow-anchor: none; background: var(--hc-bg); }
+  .carousel.ready .slide { min-height: 100%; box-sizing: border-box; }
+  .slide { --bg-deep: var(--hc-bg); --hc-slide-bg: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 400px; overflow: hidden; isolation: isolate; color: var(--hc-text); background: var(--hc-slide-bg); }
   .slide[hidden] { display: none; }
   .slide.moving { position: absolute; top: 0; left: 0; width: 100%; }
   .slide.enter-forward { animation: enter-forward calc(var(--dur) * 2) var(--ease) both; }
@@ -188,7 +212,7 @@ const { slides } = Astro.props;
   .namecard.pattern { opacity: .12; }
   .namecard.pattern::before { content: ""; position: absolute; inset: 0; background: var(--el); mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath d='M40 4 56 20 40 36 24 20ZM40 44 56 60 40 76 24 60ZM0 24 16 40 0 56M80 24 64 40 80 56' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E") center / 80px 80px repeat; }
   .splash-art { position: absolute; top: 0; right: max(2vw, calc((100vw - 1400px) / 2)); width: min(56vw, 780px); height: 100%; object-fit: contain; object-position: right center; z-index: -1; }
-  .copy { position: relative; width: min(100%, 1240px); margin: auto; padding: 2rem 4rem 1.4rem; }
+  .copy { position: relative; width: min(100%, 1240px); margin: 0 auto; padding: 2rem 4rem 1.4rem; }
   .phase { color: var(--hc-text); font: 600 clamp(1.5rem, 3vw, 2.25rem)/1.2 var(--font-display); margin: 0 0 1rem; }
   .title, .region { color: var(--hc-muted); font-size: .9rem; margin: 0; }
   h1 { max-width: 60%; margin: .2rem 0 .5rem; color: color-mix(in srgb, var(--el) var(--hc-name-ratio), var(--hc-name-base)); font-size: clamp(3rem, 6vw, 5.25rem); overflow-wrap: anywhere; }

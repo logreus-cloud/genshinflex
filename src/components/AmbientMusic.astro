@@ -1,0 +1,333 @@
+---
+import season from '../data/season.json';
+import ost from '../data/snezhnaya-ost.json';
+import { useData } from '../lib/data';
+const { t } = useData(Astro.currentLocale);
+---
+{season.theme === 'snezhnaya' && (
+  <>
+    <button class="icon-btn music" type="button" aria-pressed="false" aria-label={t('Включить музыку')} title={t('Включить музыку')} aria-controls="music-panel" data-on-label={t('Выключить музыку')} data-off-label={t('Включить музыку')}>
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+        <path d="M12 14.5V4.5l5-1v8.8M12 14.5c0 1.2-1.1 2-2.5 2S7 15.7 7 14.5s1.1-2 2.5-2c1 0 1.9.4 2.5 1Z" />
+        <path class="waves" d="M4.4 7.1a4 4 0 0 0 0 5.8M2.2 5.2a7 7 0 0 0 0 9.6" />
+      </svg>
+    </button>
+    <section class="music-panel" id="music-panel" role="region" aria-label={t('Музыка Снежной')} data-disc-label={t('Диск')} data-skip-label={t('Не удалось воспроизвести трек, пропускаем…')} data-error-label={t('Музыка недоступна в этом браузере или регионе')} hidden>
+      <div class="music-expanded">
+        <div id="snezhnaya-ost-player"></div>
+        <div class="music-body">
+          <div class="music-info">
+            <strong class="music-title">Snezhnaya</strong>
+            <small class="music-disc"></small>
+          </div>
+          <div class="music-controls">
+            <button class="music-previous" type="button" aria-label={t('Предыдущий трек')} title={t('Предыдущий трек')}>⏮</button>
+            <button class="music-next" type="button" aria-label={t('Следующий трек')} title={t('Следующий трек')}>⏭</button>
+            <button class="music-shuffle" type="button" aria-label={t('Перемешать')} title={t('Перемешать')} aria-pressed="false">⇄</button>
+            <button class="music-mute" type="button" aria-label={t('Без звука')} title={t('Без звука')} aria-pressed="false" data-mute-label={t('Без звука')} data-unmute-label={t('Включить звук')}>
+              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+                <path d="M3 8h3l4-3v10l-4-3H3z" />
+                <path class="sound-wave-one" d="M12.5 7a4 4 0 0 1 0 6" />
+                <path class="sound-wave-two" d="M14.5 5a7 7 0 0 1 0 10" />
+                <path class="sound-muted" d="M13 8l4 4m0-4l-4 4" />
+              </svg>
+            </button>
+            <input class="music-volume" type="range" min="0" max="100" step="1" value="35" aria-label={t('Громкость')} />
+            <button class="music-collapse" type="button" aria-label={t('Свернуть')} title={t('Свернуть')}>−</button>
+            <button class="music-close" type="button" aria-label={t('Закрыть')} title={t('Закрыть')}>×</button>
+          </div>
+          <p class="music-credit"><a href={ost.source} target="_blank" rel="noopener">{t('Музыка: HOYO-MiX — «Where Mercy Endures» · официальный канал Genshin Impact')}</a></p>
+          <p class="music-status" role="status" hidden></p>
+        </div>
+      </div>
+      <button class="music-compact" type="button" aria-label={t('Развернуть')} title={t('Развернуть')} hidden>
+        <span class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="compact-title">Snezhnaya</span>
+      </button>
+    </section>
+  </>
+)}
+
+<script>
+  import ost from '../data/snezhnaya-ost.json';
+  type Player = {
+    loadVideoById(value: { videoId: string; startSeconds: number; endSeconds: number }): void; playVideo(): void; pauseVideo(): void;
+    setVolume(value: number): void; getVolume(): number; getCurrentTime(): number; getPlayerState(): number;
+  };
+  type YouTubeWindow = Window & { YT?: { Player: new (id: string, options: object) => Player }; onYouTubeIframeAPIReady?: () => void };
+  const button = document.querySelector<HTMLButtonElement>('.music');
+  if (button) {
+    const panel = document.querySelector<HTMLElement>('.music-panel')!;
+    const title = panel.querySelector<HTMLElement>('.music-title')!, disc = panel.querySelector<HTMLElement>('.music-disc')!;
+    const compact = panel.querySelector<HTMLButtonElement>('.music-compact')!, compactTitle = panel.querySelector<HTMLElement>('.compact-title')!;
+    const status = panel.querySelector<HTMLElement>('.music-status')!, shuffleButton = panel.querySelector<HTMLButtonElement>('.music-shuffle')!;
+    const muteButton = panel.querySelector<HTMLButtonElement>('.music-mute')!, volumeInput = panel.querySelector<HTMLInputElement>('.music-volume')!;
+    const youtube = window as YouTubeWindow;
+    const tracks = ost.discs.filter((item) => item.disc <= 3).flatMap((item) => item.tracks.filter((track) => !track.battle).map((track) => ({ ...track, video: item.video, disc: item.disc, discTitle: item.title })));
+    const natural = tracks.map((_, i) => i);
+    let order = [...natural], index = 0, cursor = 0, resumeTime = tracks[0].start, errors = 0, version = 0;
+    let enabled = false, armed = false, playing = false, loaded = false, collapsed = false, shuffle = false, playerReady = false;
+    let player: Player | undefined, apiPromise: Promise<void> | undefined, playerPromise: Promise<Player> | undefined;
+    let playerGeneration = 0;
+    let volumeTimer: ReturnType<typeof setInterval> | undefined, positionTimer: ReturnType<typeof setInterval> | undefined;
+    let volume = 35, previousVolume = 35, rampKind: 'in' | 'out' | undefined, rampEnd = 0;
+    document.body.append(panel);
+    const savePreference = () => { try { localStorage.setItem('gf:music', enabled ? 'on' : 'off'); } catch {} };
+    const renderVolume = () => {
+      volumeInput.value = String(volume);
+      volumeInput.style.setProperty('--volume-percent', `${volume}%`);
+      muteButton.dataset.level = volume === 0 ? 'muted' : volume < 50 ? 'low' : 'high';
+      muteButton.setAttribute('aria-pressed', String(volume === 0));
+      const label = muteButton.dataset[volume === 0 ? 'unmuteLabel' : 'muteLabel']!;
+      muteButton.setAttribute('aria-label', label); muteButton.title = label;
+    };
+    const render = () => {
+      const label = button.dataset[enabled ? 'onLabel' : 'offLabel']!;
+      button.setAttribute('aria-pressed', String(enabled)); button.setAttribute('aria-label', label); button.title = label;
+      button.classList.toggle('armed', armed && !playing);
+      const track = tracks[index];
+      title.textContent = compactTitle.textContent = track.title;
+      disc.textContent = `${panel.dataset.discLabel} ${track.disc} · ${track.discTitle}`;
+      shuffleButton.setAttribute('aria-pressed', String(shuffle));
+      renderVolume();
+    };
+    const savePosition = () => {
+      const track = tracks[index], time = playing ? player?.getCurrentTime() : resumeTime;
+      if (time !== undefined && Number.isFinite(time) && time >= track.start && time < track.end) resumeTime = time;
+      try { localStorage.setItem('gf:music-pos', JSON.stringify({ index, time: resumeTime, shuffle, order: shuffle ? order : undefined })); } catch {}
+    };
+    const startPositionTimer = () => {
+      clearInterval(positionTimer);
+      positionTimer = setInterval(savePosition, 5000);
+    };
+    const mix = (items: number[]) => {
+      for (let i = items.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [items[i], items[j]] = [items[j], items[i]]; }
+      return items;
+    };
+    const clearRamp = () => {
+      clearInterval(volumeTimer);
+      volumeTimer = undefined; rampKind = undefined;
+    };
+    const ramp = (target: number, duration: number, done?: () => void, kind: 'in' | 'out' = 'in') => {
+      clearRamp();
+      if (!player) { done?.(); return; }
+      const from = player.getVolume(), began = performance.now();
+      if (from === target) { done?.(); return; }
+      rampKind = kind; rampEnd = began + duration;
+      volumeTimer = setInterval(() => {
+        const step = Math.min(1, (performance.now() - began) / duration);
+        player?.setVolume(Math.round(from + (target - from) * step));
+        if (step === 1) { clearRamp(); done?.(); }
+      }, 50);
+    };
+    const setVolume = (value: number) => {
+      volume = Math.max(0, Math.min(100, Math.round(value)));
+      if (volume > 0) previousVolume = volume;
+      try { localStorage.setItem('gf:music-volume', String(volume)); } catch {}
+      renderVolume();
+      if (!playerReady || !player) return;
+      if (rampKind === 'in') ramp(volume, Math.max(1, rampEnd - performance.now()));
+      else if (rampKind !== 'out') player.setVolume(volume);
+    };
+    const fadeOut = (done: () => void) => {
+      clearInterval(positionTimer); positionTimer = undefined;
+      clearRamp();
+      if (!playerReady || !player || !playing) { if (playerReady) player?.pauseVideo(); playing = false; done(); return; }
+      ramp(0, 800, () => { savePosition(); player?.pauseVideo(); playing = false; done(); }, 'out');
+    };
+    const playTrack = (time = tracks[index].start) => {
+      const track = tracks[index];
+      resumeTime = time; loaded = false; playing = false;
+      clearInterval(positionTimer); positionTimer = undefined;
+      clearRamp();
+      render();
+      if (playerReady && player) {
+        player.setVolume(0);
+        player.loadVideoById({ videoId: track.video, startSeconds: time, endSeconds: track.end });
+        loaded = true;
+      }
+      savePosition();
+    };
+    const next = () => {
+      if (shuffle && cursor === order.length - 1) {
+        const last = index; order = mix([...natural]);
+        if (order[0] === last) [order[0], order[1]] = [order[1], order[0]];
+        cursor = 0;
+      } else cursor = (cursor + 1) % order.length;
+      index = order[cursor]; playTrack();
+    };
+    const previous = () => { cursor = (cursor - 1 + order.length) % order.length; index = order[cursor]; playTrack(); };
+    const stop = (failed = false) => {
+      savePosition(); enabled = false; armed = false; ++version; savePreference(); render();
+      fadeOut(() => { if (!enabled) panel.hidden = !failed; });
+    };
+    const loadApi = () => {
+      if (youtube.YT?.Player) return Promise.resolve();
+      return apiPromise ??= new Promise<void>((resolve, reject) => {
+        const previous = youtube.onYouTubeIframeAPIReady;
+        youtube.onYouTubeIframeAPIReady = () => { previous?.(); resolve(); };
+        const script = document.createElement('script');
+        script.src = 'https://www.youtube.com/iframe_api';
+        script.onerror = () => { apiPromise = undefined; reject(new Error('YouTube API')); };
+        document.head.append(script);
+      });
+    };
+    const getPlayer = async () => {
+      await loadApi();
+      if (!playerPromise) playerPromise = new Promise<Player>((resolve, reject) => {
+        const generation = ++playerGeneration;
+        const timeout = setTimeout(() => {
+          if (generation !== playerGeneration) return;
+          ++playerGeneration; playerReady = false; player = undefined; loaded = false; playing = false;
+          clearRamp(); clearInterval(positionTimer);
+          const mount = panel.querySelector('#snezhnaya-ost-player');
+          if (mount) { const replacement = document.createElement('div'); replacement.id = 'snezhnaya-ost-player'; mount.replaceWith(replacement); }
+          reject(new Error('YouTube player timeout'));
+        }, 15000);
+        try {
+          player = new youtube.YT!.Player('snezhnaya-ost-player', {
+            host: 'https://www.youtube-nocookie.com', width: 356, height: 200,
+            playerVars: { autoplay: 1, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, iv_load_policy: 3 },
+            events: {
+              onReady: (event: { target: Player }) => {
+                if (generation !== playerGeneration) return;
+                clearTimeout(timeout); player = event.target; playerReady = true; player.setVolume(0);
+                if (!enabled || collapsed) player.pauseVideo();
+                resolve(player);
+              },
+              onStateChange: (event: { data: number }) => {
+                if (generation !== playerGeneration || !playerReady) return;
+                if (event.data === 1) {
+                  if (!enabled || collapsed) { clearRamp(); clearInterval(positionTimer); playing = false; player?.pauseVideo(); return; }
+                  errors = 0; playing = true; status.hidden = true; ramp(volume, 2000);
+                  startPositionTimer();
+                } else if (event.data === 0 && enabled) next();
+                else if (event.data === 2) { savePosition(); playing = false; clearInterval(positionTimer); clearRamp(); }
+              },
+              onError: (event: { data: number }) => {
+                if (generation !== playerGeneration || !playerReady || !enabled || ![2, 5, 100, 101, 150].includes(event.data)) return;
+                errors++; status.hidden = false; status.textContent = panel.dataset.skipLabel!;
+                if (errors >= 3) { status.textContent = panel.dataset.errorLabel!; stop(true); } else next();
+              },
+            },
+          });
+        } catch (error) { clearTimeout(timeout); ++playerGeneration; playerReady = false; player = undefined; reject(error); }
+      });
+      try { return await playerPromise; }
+      catch (error) { playerPromise = undefined; throw error; }
+    };
+    const start = async () => {
+      if (!enabled) return;
+      const turn = ++version;
+      armed = false; collapsed = false; panel.hidden = false; panel.classList.remove('collapsed'); compact.hidden = true;
+      clearRamp(); status.hidden = true; render();
+      try {
+        const target = await getPlayer();
+        if (turn !== version || !enabled || collapsed) return;
+        if (loaded) { target.playVideo(); if (target.getPlayerState() === 1) { playing = true; ramp(volume, 2000); startPositionTimer(); } }
+        else playTrack(resumeTime);
+      } catch { if (turn !== version) return; status.hidden = false; status.textContent = panel.dataset.errorLabel!; stop(true); }
+    };
+    try {
+      const savedVolume = localStorage.getItem('gf:music-volume');
+      if (savedVolume !== null && savedVolume.trim() !== '' && Number.isFinite(Number(savedVolume))) volume = Math.max(0, Math.min(100, Math.round(Number(savedVolume))));
+      if (volume > 0) previousVolume = volume;
+    } catch {}
+    try {
+      const saved = JSON.parse(localStorage.getItem('gf:music-pos') || 'null');
+      if (saved && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < tracks.length) {
+        index = saved.index; shuffle = saved.shuffle === true;
+        resumeTime = tracks[index].start;
+        if (shuffle && Array.isArray(saved.order) && saved.order.length === tracks.length && new Set(saved.order).size === tracks.length && saved.order.every((i: number) => Number.isInteger(i) && i >= 0 && i < tracks.length)) order = saved.order;
+        else if (shuffle) order = [index, ...mix(natural.filter((i) => i !== index))];
+        cursor = order.indexOf(index);
+        const track = tracks[index];
+        if (Number.isFinite(saved.time) && saved.time >= track.start && saved.time < track.end) resumeTime = saved.time;
+      }
+      armed = enabled = localStorage.getItem('gf:music') === 'on';
+    } catch {}
+    render();
+    const firstGesture = (event: Event) => {
+      document.removeEventListener('pointerdown', firstGesture, true); document.removeEventListener('keydown', firstGesture, true);
+      if (!button.contains(event.target as Node)) void start();
+    };
+    if (armed) {
+      document.addEventListener('pointerdown', firstGesture, { once: true, capture: true });
+      document.addEventListener('keydown', firstGesture, { once: true, capture: true });
+    }
+    button.addEventListener('click', () => {
+      if (armed) { void start(); return; }
+      if (enabled) { stop(); return; }
+      enabled = true; savePreference(); void start();
+    });
+    panel.querySelector('.music-previous')?.addEventListener('click', previous);
+    panel.querySelector('.music-next')?.addEventListener('click', next);
+    shuffleButton.addEventListener('click', () => {
+      shuffle = !shuffle; order = shuffle ? [index, ...mix(natural.filter((i) => i !== index))] : [...natural];
+      cursor = order.indexOf(index); render(); savePosition();
+    });
+    panel.querySelector('.music-collapse')?.addEventListener('click', () => {
+      savePosition(); collapsed = true;
+      fadeOut(() => { if (enabled && collapsed) { panel.classList.add('collapsed'); compact.hidden = false; } });
+    });
+    muteButton.addEventListener('click', () => setVolume(volume === 0 ? previousVolume || 35 : 0));
+    volumeInput.addEventListener('input', () => setVolume(volumeInput.valueAsNumber));
+    volumeInput.addEventListener('wheel', (event) => {
+      if (event.deltaY === 0) return;
+      event.preventDefault();
+      setVolume(volume + (event.deltaY < 0 ? 5 : -5));
+    }, { passive: false });
+    compact.addEventListener('click', () => { collapsed = false; panel.classList.remove('collapsed'); compact.hidden = true; void start(); });
+    panel.querySelector('.music-close')?.addEventListener('click', () => stop());
+    window.addEventListener('pagehide', savePosition);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) savePosition(); });
+  }
+</script>
+
+<style>
+  .music { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; flex: none; }
+  .music:hover { background: var(--surface-2); }
+  .music svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .music .waves { opacity: 0; }
+  .music[aria-pressed="true"] { color: var(--accent-text); }
+  .music[aria-pressed="true"] .waves { opacity: 1; }
+  .music.armed { animation: music-pulse 2.4s ease-in-out infinite; }
+  .music[hidden] { display: none; }
+  .music-panel { position: fixed; right: 16px; bottom: 16px; z-index: 45; width: 356px; max-width: calc(100vw - 32px); overflow: hidden; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35); }
+  .music-panel[hidden] { display: none; }
+  .music-panel :global(#snezhnaya-ost-player) { display: block; width: 100%; height: 200px; border: 0; }
+  .music-body { padding: .7rem; }
+  .music-info { display: grid; gap: .15rem; min-width: 0; }
+  .music-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .88rem; }
+  .music-disc { color: var(--muted); font-size: .74rem; }
+  .music-controls { display: flex; align-items: center; justify-content: flex-end; gap: .25rem; margin-top: .55rem; }
+  .music-controls button { min-width: 34px; height: 34px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text); cursor: pointer; font-size: 1.1rem; }
+  .music-controls button:hover { background: var(--surface-2); }
+  .music-mute { display: grid; place-items: center; }
+  .music-mute svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .music-mute .sound-muted, .music-mute[data-level="muted"] .sound-wave-one, .music-mute[data-level="muted"] .sound-wave-two, .music-mute[data-level="low"] .sound-wave-two { display: none; }
+  .music-mute[data-level="muted"] .sound-muted { display: block; }
+  .music-volume { appearance: none; width: 96px; height: 6px; margin: 0 .25rem; border-radius: 999px; background: linear-gradient(to right, var(--accent) var(--volume-percent, 35%), var(--surface-2) var(--volume-percent, 35%)); accent-color: var(--accent); cursor: pointer; }
+  .music-volume::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
+  .music-volume::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
+  .music-shuffle[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+  .music-credit { margin: .55rem 0 0; font-size: .68rem; line-height: 1.35; }
+  .music-credit a { color: var(--muted); }
+  .music-status { margin: .5rem 0 0; color: var(--accent-text); font-size: .75rem; }
+  .music-status[hidden] { display: none; }
+  .music-compact { display: flex; align-items: center; gap: .6rem; width: 100%; max-width: 356px; padding: .7rem; border: 0; background: transparent; color: var(--text); cursor: pointer; text-align: left; }
+  .music-compact[hidden] { display: none; }
+  .music-panel.collapsed { width: max-content; }
+  .music-panel.collapsed .music-expanded { display: none; }
+  .compact-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .music-eq { display: flex; align-items: end; gap: 2px; height: 16px; flex: none; }
+  .music-eq i { width: 3px; height: 12px; background: var(--accent); animation: music-eq .8s ease-in-out infinite alternate; }
+  .music-eq i:nth-child(2) { animation-delay: .2s; }
+  .music-eq i:nth-child(3) { animation-delay: .4s; }
+  @keyframes music-pulse { 50% { background: var(--accent-soft); box-shadow: 0 0 0 5px var(--accent-soft); } }
+  @keyframes music-eq { to { height: 4px; } }
+  @media (prefers-reduced-motion: reduce) { .music.armed, .music-eq i { animation: none; } }
+  @media (max-width: 700px) { .music-panel, .music-panel.collapsed { left: 8px; right: 8px; width: auto; max-width: none; } .music-panel :global(#snezhnaya-ost-player) { height: auto; min-height: 200px; aspect-ratio: 16 / 9; } }
+  @media (max-width: 700px) { .music-volume { flex: 1; min-width: 0; } }
+  @media (max-width: 400px) { .music { width: 34px; height: 34px; } }
+</style>
