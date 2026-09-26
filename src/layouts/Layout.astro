@@ -210,13 +210,13 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         if (searchPanel.hidden) return;
         searchPanel.hidden = true;
         searchButtons.forEach((button) => button.setAttribute('aria-expanded', 'false'));
-        if (restore) searchTrigger.focus();
+        if (restore) searchTrigger.focus({ preventScroll: true });
       };
       const closeLanguage = (restore = false) => {
         if (languageMenu.hidden) return;
         languageMenu.hidden = true;
         languageButton.setAttribute('aria-expanded', 'false');
-        if (restore) languageButton.focus();
+        if (restore) languageButton.focus({ preventScroll: true });
       };
       const toggle = (open: boolean, restore = false) => {
         if (open) { closeSearch(); closeLanguage(); }
@@ -229,9 +229,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         burger.setAttribute('aria-label', open ? closeMenuLabel : openMenuLabel);
         if (open) {
           shell.inert = true;
-          side.querySelector<HTMLElement>('.side-close')?.focus();
+          side.querySelector<HTMLElement>('.side-close')?.focus({ preventScroll: true });
         }
-        else if (restore) burger.focus();
+        else if (restore) burger.focus({ preventScroll: true });
       };
       burger.addEventListener('click', () => toggle(!side.classList.contains('open')));
       side.querySelector('.side-close')?.addEventListener('click', () => toggle(false, true));
@@ -243,7 +243,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           searchTrigger = button;
           searchPanel.hidden = false;
           searchButtons.forEach((item) => item.setAttribute('aria-expanded', 'true'));
-          searchPanel.querySelector<HTMLInputElement>('input')?.focus();
+          searchPanel.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true });
         } else closeSearch(true);
       }));
       languageButton.addEventListener('click', () => {
@@ -251,7 +251,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         closeSearch();
         languageMenu.hidden = !open;
         languageButton.setAttribute('aria-expanded', String(open));
-        if (open) languageMenu.querySelector<HTMLAnchorElement>('a')?.focus();
+        if (open) languageMenu.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
       });
       document.addEventListener('pointerdown', (e) => {
         const target = e.target as Node;
@@ -266,10 +266,10 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         const first = items[0], last = items.at(-1);
         if (e.shiftKey && (document.activeElement === first || !side.contains(document.activeElement))) {
           e.preventDefault();
-          last?.focus();
+          last?.focus({ preventScroll: true });
         } else if (!e.shiftKey && (document.activeElement === last || !side.contains(document.activeElement))) {
           e.preventDefault();
-          first?.focus();
+          first?.focus({ preventScroll: true });
         }
       }, true);
       document.addEventListener('keydown', (e) => {

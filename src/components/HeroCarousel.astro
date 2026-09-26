@@ -165,10 +165,11 @@ const { slides } = Astro.props;
   .slide.enter-backward { animation: enter-backward calc(var(--dur) * 2) var(--ease) both; }
   .slide.leave-backward { animation: leave-backward calc(var(--dur) * 2) var(--ease) both; }
   .ready .slide:is(.enter-forward, .enter-backward) .copy { animation: gf-fade-up .5s .1s var(--ease) both; }
-  @keyframes enter-forward { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-  @keyframes leave-forward { from { transform: translateX(0); } to { transform: translateX(100%); } }
-  @keyframes enter-backward { from { transform: translateX(100%); } to { transform: translateX(0); } }
-  @keyframes leave-backward { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+  /* Как в галерее: вперёд новый слайд приходит справа (всё едет влево), назад — слева */
+  @keyframes enter-forward { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes leave-forward { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+  @keyframes enter-backward { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+  @keyframes leave-backward { from { transform: translateX(0); } to { transform: translateX(100%); } }
   .slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); }
   .splash-art { position: absolute; top: 0; right: max(2vw, calc((100vw - 1400px) / 2)); width: min(56vw, 780px); height: 100%; object-fit: contain; object-position: right center; z-index: -1; }
   .copy { position: relative; width: min(100%, 1240px); margin: auto; padding: 2rem 4rem 1.4rem; }
