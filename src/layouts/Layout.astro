@@ -33,7 +33,7 @@ const nav = [
   { group: 'Эндгейм', items: [['Все режимы', '/rotation', 'moon'], ['Витая бездна', '/abyss', 'spiral'], ['Театр воображариума', '/theater', 'mask'], ['Натиск', '/onslaught', 'flame']] },
   { group: 'Таймлайн', items: [['Календарь', '/calendar', 'calendar'], ['Баннеры', '/banners', 'moon']] },
   { group: 'Гайды', items: [['Руководства', '/guides', 'book']] },
-  { group: 'Сайт', items: [['Новости сайта', '/news', 'book']] },
+  { group: 'Сайт', items: [['Мой профиль', '/profile', 'user'], ['Новости сайта', '/news', 'book']] },
   { group: 'Инструменты', items: [['Симулятор команды', '/tools/simulator', 'chart'], ['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
   // Разделы, которые выйдут не скоро: отдельно и приглушённо, чтобы не путать с готовыми
   { group: 'В разработке', soon: true, items: [['Рейтинг', '/rating', 'chart']] },
@@ -218,6 +218,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
+          <a class="icon-btn profile" href={`${base}/profile/`} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" /><path d="M4 17c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2" /></svg>
+          </a>
           <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
           </a>
@@ -439,6 +442,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .search-panel { position: absolute; top: calc(100% + 8px); right: 80px; display: flex; width: min(460px, calc(100vw - 32px)); padding: .7rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35); }
   .search-panel :global(.qs) { width: 100%; max-width: none; }
   .search-panel :global(.qs-input) { border-color: var(--accent); border-radius: 999px; }
+  .profile[aria-current] { color: var(--accent-text); }
   .tg { color: var(--muted); }
   .tg:hover { color: #2aabee; }
   .dc { color: var(--muted); }
@@ -496,6 +500,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     .top-logo { gap: .2rem; }
     .top-logo strong { font-size: .82rem; }
     .icon-btn { width: 34px; height: 34px; }
+    .tg { display: none; }
     .search-panel { left: 8px; right: 8px; }
+  }
+  /* Совсем узкие экраны (320px): остаётся только значок логотипа, иначе иконки наезжают на надпись */
+  @media (max-width: 359px) {
+    .top-logo span { display: none; }
   }
 </style>
