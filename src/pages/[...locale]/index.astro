@@ -209,8 +209,10 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
 <style>
   .home-title { margin: 2.2rem 0 1.2rem; font: 600 clamp(1.5rem, 3vw, 2rem) var(--font-display); text-align: center; }
   /* Новости и календарь ближе к «Функционалу»: у полосы и так большой нижний отступ */
-  .feature-band + .home-title { margin-top: -.6rem; }
+  .feature-band + .home-title { margin-top: -1.2rem; }
   .home-title + .promo-card + .home-title { margin-top: 1.4rem; }
+  /* Календарь не впритык к полосе лент */
+  .calendar-card + .collection-band { margin-top: 2.6rem; }
   .promo-card { display: grid; min-height: 220px; max-width: 1240px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(90deg, var(--surface-2), color-mix(in srgb, var(--surface-2) 60%, transparent)); color: var(--text); text-decoration: none; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
   .promo-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / .18); }
   .promo-card.no-image { grid-template-columns: 1fr; }
