@@ -28,3 +28,6 @@ pnpm-debug.log*
 .i18n-missing.json
 .cache/
 .dev.vars
+
+# черновики патч-ноутов (публикуются вручную через новости сайта)
+patch_notes/

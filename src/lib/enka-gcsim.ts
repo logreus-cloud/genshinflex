@@ -20,6 +20,10 @@ const prop: Record<string, string> = {
   FIGHT_PROP_ICE_ADD_HURT: 'cryo%',
 };
 const maxLevels = [20, 40, 50, 60, 70, 80, 90];
+// Путешественник (Итер 10000005, Люмин 10000007) — стихию берём по максимальной энергии: у персонажа ненулевое ровно одно поле 70–76
+const TRAVELER_ELEMENT: Record<string, string> = { '70': 'pyro', '71': 'electro', '72': 'hydro', '73': 'dendro', '74': 'anemo', '75': 'cryo', '76': 'geo' };
+// После полного возвышения персонажа можно поднять до 95 и 100 уровня — потолок тогда 95 или 100, gcsim это понимает
+const charCap = (level: number, promote: number) => (promote === 6 && level > 90 ? (level <= 95 ? 95 : 100) : maxLevels[promote]);
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const number = (value: unknown): number | null => {
@@ -38,11 +42,16 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
     const avatar = record(value);
     const avatarId = integer(avatar.avatarId, 1, Number.MAX_SAFE_INTEGER);
     if (avatarId === null) continue;
-    const slug = Object.hasOwn(ids.chars, String(avatarId)) ? ids.chars[String(avatarId)] : undefined;
+    let slug = Object.hasOwn(ids.chars, String(avatarId)) ? ids.chars[String(avatarId)] : undefined;
+    if (avatarId === 10000005 || avatarId === 10000007) {
+      const fight = record(avatar.fightPropMap);
+      const energy = Object.keys(TRAVELER_ELEMENT).find((k) => (number(fight[k]) ?? 0) > 0);
+      slug = energy ? `traveler-${TRAVELER_ELEMENT[energy]}` : undefined;
+    }
     const props = record(avatar.propMap);
     const level = integer(record(props['4001']).val, 1, 100);
     const promote = integer(record(props['1002']).val, 0, 6);
-    if (!slug || level === null || promote === null || level > maxLevels[promote]) {
+    if (!slug || level === null || promote === null || level > charCap(level, promote)) {
       skipped.push(avatarId);
       continue;
     }
@@ -80,7 +89,7 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
     }
     const stats = Object.fromEntries(Object.entries(sums).map(([name, value]) => [name, +value.toFixed(4)]));
     builds.push({
-      slug, level, maxLevel: maxLevels[promote], cons: Math.min(6, Array.isArray(avatar.talentIdList) ? avatar.talentIdList.length : 0),
+      slug, level, maxLevel: charCap(level, promote), cons: Math.min(6, Array.isArray(avatar.talentIdList) ? avatar.talentIdList.length : 0),
       talents, weapon, sets, stats, unknownSets,
     });
   }

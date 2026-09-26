@@ -13,10 +13,16 @@ import beta from '../data/beta-characters.json';
 
 export type { Lang };
 // beta — персонаж из утечек: данных мало, в инструментах (проверка команды, конструктор ротаций) не участвует
-export type Character = (typeof characters)[number] & { beta?: boolean; betaMaterials?: string[][] };
+export type Character = (typeof characters)[number] & {
+  beta?: boolean; betaMaterials?: string[][];
+  // Утёкшие навыки: чего нет в утечке (skill/burst) и краткий разбор, помеченный как «анализ ИИ»
+  betaMissing?: string[]; betaAnalysis?: string;
+};
 export type Weapon = (typeof weapons)[number];
 export type Artifact = (typeof artifacts)[number];
 export const BETA_SOURCE = beta.source;
+export const BETA_KIT_SOURCE = beta.kitSource;
+export const BETA_TALENT_LEVEL = beta.talentLevel;
 
 
 const index = <T extends { slug: string }>(list: T[]) => new Map(list.map((x) => [x.slug, x]));
@@ -77,10 +83,14 @@ export const LANGS: Lang[] = ['ru', 'en', 'es'];
 export const prefixOf = (lang: Lang) => (lang === 'ru' ? '' : `/${lang}`);
 export const toLang = (v: string | undefined): Lang => (v === 'en' || v === 'es' ? v : 'ru');
 
+type KitTalent = { name: string; description: string; scaling: string[][] };
+const talent = (k?: KitTalent | null) => k ? { name: k.name, description: k.description, icon: null, scaling: k.scaling.map(([name, value]) => ({ name, values: [value] })) } : null;
+
 // Утечки дописываем в конец списка в том же формате, что и сгенерированные персонажи
 const betaCharacters = (lang: Lang): Character[] => beta.characters.map((b) => {
   const t = translate(lang);
   const text = b.i18n[lang];
+  const kit = b.kit[lang];
   return {
     id: 0, slug: b.slug, nameEn: text.nameEn, name: text.name,
     title: t('Утечка из бета-версии'),
@@ -89,9 +99,13 @@ const betaCharacters = (lang: Lang): Character[] => beta.characters.map((b) => {
     region: '', constellationName: '', birthday: '', substat: text.substat, version: '',
     icon: `/img/beta/${b.slug}-icon.webp?v=2`, card: `/img/beta/${b.slug}-icon.webp?v=2`, splash: `/img/beta/${b.slug}-splash.webp?v=2`, emblem: null,
     stats: [{ level: '90', ...b.stats }], substatPercent: b.substatPercent,
-    talents: { normal: null, skill: null, burst: null, passives: [] } as unknown as Character['talents'],
-    constellations: [],
-    beta: true, betaMaterials: b.materials,
+    // Навыки из утечки — в формате сгенерированных: множители только на одном уровне таланта
+    talents: {
+      normal: talent(kit.normal), skill: talent((kit as { skill?: KitTalent }).skill), burst: talent((kit as { burst?: KitTalent }).burst),
+      passives: kit.passives.map((p) => ({ ...p, icon: null })),
+    } as unknown as Character['talents'],
+    constellations: kit.constellations.map((k) => (k ? { ...k, icon: null } : null)) as unknown as Character['constellations'],
+    beta: true, betaMaterials: b.materials, betaMissing: kit.missing, betaAnalysis: kit.analysis,
   } as Character;
 });
 

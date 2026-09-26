@@ -1,5 +1,6 @@
 # Симулятор команды
 T = [
+("Не удалось разобрать данные витрины: {list}.", "Couldn't read the showcase data for: {list}.", "No se pudieron leer los datos del escaparate de: {list}."),
 ("Оружие {name} пока не поддерживается в gcsim — в симуляции эталонное.", "{name}'s weapon isn't supported by gcsim yet, so the simulation uses the reference one.", "El arma de {name} aún no es compatible con gcsim, así que la simulación usa la de referencia."),
 ("Сет артефактов {name} пока не поддерживается в gcsim — учтены только статы, без бонуса сета.", "{name}'s artifact set isn't supported by gcsim yet: only the stats count, without the set bonus.", "El set de artefactos de {name} aún no es compatible con gcsim: solo cuentan las estadísticas, sin el bono del set."),
 ("Симулятор команды", "Team Simulator", "Simulador de equipos"),
@@ -13,8 +14,6 @@ T = [
 ("Загрузка витрины", "Load showcase", "Cargar escaparate"),
 ("Загрузить витрину", "Load showcase", "Cargar escaparate"),
 ("Персонажи витрины", "Showcased characters", "Personajes del escaparate"),
-("Пропущены: {list}", "Skipped: {list}", "Omitidos: {list}"),
-("Путешественник пока не поддерживается.", "The Traveler is not supported yet.", "El Viajero aún no es compatible."),
 ("нет эталонной команды", "no reference team", "sin equipo de referencia"),
 ("Эталонная команда", "Reference team", "Equipo de referencia"),
 ("ваш билд", "your build", "tu build"),

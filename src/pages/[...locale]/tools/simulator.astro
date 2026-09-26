@@ -116,7 +116,7 @@ const { t } = useData(Astro.currentLocale);
     }).join('');
     $('showcase-panel').hidden = false;
     $('skipped').textContent = skipped.length
-      ? `${t('Пропущены: {list}', { list: skipped.map((id) => id === 10000005 || id === 10000007 ? t('Путешественник') : String(id)).join(', ') })} ${t('Путешественник пока не поддерживается.')}`
+      ? t('Не удалось разобрать данные витрины: {list}.', { list: skipped.map((id) => id === 10000005 || id === 10000007 ? t('Путешественник') : name(data!.presets.ids.chars[String(id)] ?? String(id))).join(', ') })
       : '';
   }
   function renderTeam() {

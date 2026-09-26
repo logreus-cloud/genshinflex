@@ -1,0 +1,6 @@
+# Адреса *.pages.dev (тестовая ветка и служебный адрес основного сайта) не индексируем:
+# в поиске должен быть только genshinflex.com
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex

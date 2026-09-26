@@ -6,7 +6,7 @@ import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
 import Investments from '../../../components/Investments.astro';
 import investments from '../../../data/investments.json';
-import { useData, LANGS, BETA_SOURCE, type Character } from '../../../lib/data';
+import { useData, LANGS, BETA_SOURCE, BETA_KIT_SOURCE, BETA_TALENT_LEVEL, type Character } from '../../../lib/data';
 import { makeLookup, renderGuide } from '../../../lib/guide-markup';
 const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
 
@@ -48,7 +48,10 @@ for (const t of [
 const related = [...merged.values()];
 
 const talentKeys = ['normal', 'skill', 'burst'] as const;
-const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ...(c.beta ? [['materials', t('Материалы')]] : [['talents', t('Таланты')], ['constellations', t('Созвездия')]])];
+// У персонажей из утечек часть созвездий неизвестна — раздел показываем, только если есть хоть одно
+const hasCons = c.constellations.some(Boolean);
+const missingNames = (c.betaMissing ?? []).map((k) => TALENTS[k as keyof typeof TALENTS] ?? k);
+const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ...(c.beta ? [['materials', t('Материалы')]] : []), ['talents', t('Таланты')], ...(hasCons ? [['constellations', t('Созвездия')]] : []), ...(c.betaAnalysis ? [['analysis', t('Анализ')]] : [])];
 // Подписи материалов утечки: ключи из beta-characters.json
 const betaLabels: Record<string, string> = {
   mora: t('Мора'), wit: t('Опыт героя'), weekly: t('Материал с еженедельного босса'), crown: t('Корона прозрения'),
@@ -239,21 +242,32 @@ const jsonLd = b && {
       </p>
     )}
 
-    {c.beta ? (
+    {c.beta && (
       <section id="materials">
         <h2 class="h-sec">{t('Материалы')} <small>{t('на возвышение и все таланты до 10 уровня')}</small></h2>
         <dl class="panel mats">
           {(c.betaMaterials ?? []).map(([k, v]) => <div><dt>{betaLabels[k] ?? k}</dt><dd>{v}</dd></div>)}
         </dl>
       </section>
-    ) : (<>
+    )}
+    {(<>
     <section id="talents">
       <h2 class="h-sec">{t('Таланты')}
+        {c.beta ? (
+          <small data-pagefind-ignore>{t('множители на {n} уровне таланта', { n: BETA_TALENT_LEVEL })}</small>
+        ) : (
         <small data-pagefind-ignore>
           <label class="lvl">{t('Уровень')} <output>10</output>
             <input type="range" min="1" max={c.talents.skill?.scaling?.[0]?.values.length ?? 15} value="10" data-talent-level /></label>
         </small>
+        )}
       </h2>
+      {c.beta && (
+        <p class="muted small" data-pagefind-ignore>
+          {missingNames.length > 0 && <>{t('Ещё не утекло: {list}.', { list: missingNames.join(', ') })} </>}
+          {t('Описания навыков')}: <a href={BETA_KIT_SOURCE.url} rel="noopener noreferrer" target="_blank">{BETA_KIT_SOURCE.title}</a>.
+        </p>
+      )}
       <div class="talents">
         {talentKeys.map((k) => c.talents[k] && (
           <div class="panel talent" data-el={c.element}>
@@ -288,7 +302,7 @@ const jsonLd = b && {
       </div>
     </section>
 
-    <section id="constellations">
+    {hasCons && <section id="constellations">
       <h2 class="h-sec">{t('Созвездия')}</h2>
       <div class="small-grid">
         {c.constellations.map((k, i) => k && (
@@ -301,7 +315,17 @@ const jsonLd = b && {
           </div>
         ))}
       </div>
-    </section>
+      {c.beta && <p class="muted small">{t('Остальные созвездия ещё не утекли.')}</p>}
+    </section>}
+    {c.betaAnalysis && (
+      <section id="analysis">
+        <h2 class="h-sec">{t('Анализ')} <span class="chip ai">{t('анализ ИИ')}</span></h2>
+        <div class="panel analysis">
+          {c.betaAnalysis.split(/\n{2,}/).map((para) => <p>{para}</p>)}
+          <p class="muted small">{t('Разбор написан ИИ по утёкшим описаниям навыков, без симуляций. Релизная версия персонажа может отличаться.')}</p>
+        </div>
+      </section>
+    )}
     </>)}
 
     <section class="browse" data-pagefind-ignore>
@@ -410,6 +434,9 @@ const jsonLd = b && {
   .lvl { display: inline-flex; align-items: center; gap: .5rem; }
   .lvl output { color: var(--accent); font-weight: 600; min-width: 1.4em; }
   .lvl input { accent-color: var(--accent); width: 140px; }
+  .chip.ai { margin-left: .5rem; font: 600 .7rem var(--font); letter-spacing: .03em; background: var(--accent-soft); color: var(--accent); border-color: transparent; vertical-align: middle; }
+  .analysis p { margin: 0 0 .8rem; line-height: 1.6; }
+  .analysis p:last-child { margin: 0; }
   .chip.beta { background: #e0457b; border-color: #e0457b; color: #fff; font-weight: 600; letter-spacing: .04em; }
   .mats { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: .6rem 1.2rem; margin: 0; }
   .mats div { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: .4rem; }
