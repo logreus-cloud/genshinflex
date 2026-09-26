@@ -37,7 +37,8 @@
 
 :root[data-season="snezhnaya"] .season-scene {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: var(--scene-shade), url('/img/season/snezhnaya-bg.webp') center top / cover no-repeat;
+  background: var(--scene-shade), url('/img/season/snezhnaya-bg.webp') 71.9% top / cover no-repeat;
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06);
 }
 :root[data-season="snezhnaya"] :is(body, .shell, .content) { background: transparent; }
 :root[data-season="snezhnaya"] .promo-card { background: linear-gradient(90deg, var(--surface-2), var(--surface)); }

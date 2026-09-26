@@ -10,8 +10,9 @@ const { t } = useData(Astro.currentLocale);
       <span>Genshin<b>Flex</b></span>
     </div>
   </div>
+  <div class="parallax">
   <div class="scene">
-    <img src="/img/season/snezhnaya-bg.webp" alt="" width="2560" height="1240" loading="eager" />
+    <img src="/img/season/snezhnaya-bg.webp" alt="" width="1920" height="930" loading="eager" />
     <div class="vignette" aria-hidden="true"></div>
     <button class="light" type="button" aria-label={t('Войти на сайт')}>
       <span class="glow" aria-hidden="true"></span>
@@ -27,6 +28,7 @@ const { t } = useData(Astro.currentLocale);
         <path d="M50 27 52 48 64 50 52 52 50 73 48 52 36 50 48 48Z" transform="rotate(45 50 50)" fill="url(#entry-star-gradient)" />
       </svg>
     </button>
+  </div>
   </div>
   <button class="hint" type="button">{t('Коснитесь звезды, чтобы войти')} <span aria-hidden="true">◇</span></button>
   <small class="caption">{t('Версия 7.1 · Снежная')}</small>
@@ -48,10 +50,12 @@ const { t } = useData(Astro.currentLocale);
     gate.hidden = false;
     document.documentElement.style.overflow = 'hidden';
     light.focus({ preventScroll: true });
+    var stopParallax = window.gfParallax(gate.querySelector('.parallax'), 24, 16);
 
     function finish() {
       document.removeEventListener('keydown', onKeydown, true);
       document.removeEventListener('focusin', keepFocus, true);
+      stopParallax();
       gate.remove();
       document.documentElement.style.overflow = previousOverflow;
       try { sessionStorage.setItem('gf:entered', '1'); } catch (e) {}
@@ -116,14 +120,18 @@ const { t } = useData(Astro.currentLocale);
   #gf-entry { position: fixed; inset: 0; z-index: 54; overflow: hidden; background: #0a0e1a; color: #fff; transition: opacity .5s ease; }
   #gf-entry[hidden] { display: none; }
   #gf-entry.fade { opacity: 0; }
+  /* Запас масштаба под смещение до 24×16px даже на низких окнах (от ~420px) */
+  .parallax { position: absolute; inset: 0; transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.08); }
   .scene {
     /* Сцена прижата к верху, чтобы звезда оставалась в кадре */
-    position: absolute; top: 0; left: 50%; width: max(100vw, calc(100vh * 2560 / 1240)); height: max(100vh, calc(100vw * 1240 / 2560));
-    translate: -50% 0; transform-origin: 50% 9%; animation: entry-breathe 20s ease-in-out infinite alternate;
+    --scene-w: max(100vw, calc(100vh * 1920 / 930));
+    --scene-h: max(100vh, calc(100vw * 930 / 1920));
+    position: absolute; top: 0; left: clamp(calc(100vw - var(--scene-w)), calc(50vw - var(--scene-w) * .719), 0px); width: var(--scene-w); height: var(--scene-h);
+    translate: none; transform-origin: 71.9% 26.9%; animation: entry-breathe 20s ease-in-out infinite alternate;
   }
   .scene img { display: block; width: 100%; height: 100%; object-fit: fill; }
   .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgb(8 12 24 / .55) 100%); }
-  .light { position: absolute; top: 9%; left: 50%; z-index: 2; width: clamp(84px, 10vw, 140px); aspect-ratio: 1; translate: -50% -50%; transform: scale(1); border: 0; border-radius: 50%; background: none; cursor: pointer; transition: transform var(--dur) var(--ease); }
+  .light { position: absolute; top: 26.9%; left: 71.9%; z-index: 2; width: clamp(84px, 10vw, 140px); aspect-ratio: 1; translate: -50% -50%; transform: scale(1); border: 0; border-radius: 50%; background: none; cursor: pointer; transition: transform var(--dur) var(--ease); }
   .light span { position: absolute; border-radius: 50%; pointer-events: none; }
   .glow { inset: -30%; background: radial-gradient(circle, rgb(210 245 255 / .9) 0, rgb(120 220 255 / .45) 22%, rgb(90 200 240 / .15) 45%, transparent 68%); animation: entry-glow 2.8s ease-in-out infinite alternate; transition: filter var(--dur) var(--ease); }
   .ring { inset: 12%; border: 1px solid rgb(210 245 255 / .7); box-shadow: 0 0 12px rgb(143 227 255 / .6); opacity: .5; animation: entry-ring 2.6s ease-out infinite; }
