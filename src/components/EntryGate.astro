@@ -11,15 +11,24 @@ const { t } = useData(Astro.currentLocale);
     </div>
   </div>
   <div class="scene">
-    <img src="/img/season/snezhnaya-bg.webp" alt="" width="1920" height="1002" loading="eager" />
+    <img src="/img/season/snezhnaya-bg.webp" alt="" width="2560" height="1240" loading="eager" />
     <div class="vignette" aria-hidden="true"></div>
     <button class="light" type="button" aria-label={t('Войти на сайт')}>
-      <span class="halo" aria-hidden="true"></span>
-      <span class="rays" aria-hidden="true"></span>
-      <span class="core" aria-hidden="true"></span>
+      <span class="glow" aria-hidden="true"></span>
+      <span class="ring" aria-hidden="true"></span>
+      <span class="glints" aria-hidden="true"></span>
+      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <defs><radialGradient id="entry-star-gradient">
+          <stop offset="0" stop-color="#ffffff" />
+          <stop offset=".45" stop-color="#d9f6ff" />
+          <stop offset="1" stop-color="#8fe3ff" />
+        </radialGradient></defs>
+        <path d="M50 0 56 43 85 50 56 57 50 100 44 57 15 50 44 43Z" fill="url(#entry-star-gradient)" />
+        <path d="M50 27 52 48 64 50 52 52 50 73 48 52 36 50 48 48Z" transform="rotate(45 50 50)" fill="url(#entry-star-gradient)" />
+      </svg>
     </button>
   </div>
-  <button class="hint" type="button">{t('Коснитесь света, чтобы войти')} <span aria-hidden="true">◇</span></button>
+  <button class="hint" type="button">{t('Коснитесь звезды, чтобы войти')} <span aria-hidden="true">◇</span></button>
   <small class="caption">{t('Версия 7.1 · Снежная')}</small>
   <div class="flash" aria-hidden="true"></div>
 </div>
@@ -71,12 +80,12 @@ const { t } = useData(Astro.currentLocale);
       }
     }
     function keepFocus(event) {
-      if (!entering && !side.classList.contains('open') && !gate.contains(event.target)) {
+      if (!entering && !(side && side.classList.contains('open')) && !gate.contains(event.target)) {
         menu.focus({ preventScroll: true });
       }
     }
     function onKeydown(event) {
-      if (side.classList.contains('open')) return;
+      if ((side && side.classList.contains('open'))) return;
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
@@ -108,21 +117,26 @@ const { t } = useData(Astro.currentLocale);
   #gf-entry[hidden] { display: none; }
   #gf-entry.fade { opacity: 0; }
   .scene {
-    /* Прижата к верху: на широких низких экранах обрезается туман внизу, а свет всегда остаётся в кадре */
-    position: absolute; top: 0; left: 50%; width: max(100vw, calc(100vh * 1920 / 1002)); height: max(100vh, calc(100vw * 1002 / 1920));
-    translate: -50% 0; transform-origin: 50% 16%; animation: entry-breathe 20s ease-in-out infinite alternate;
+    /* Сцена прижата к верху, чтобы звезда оставалась в кадре */
+    position: absolute; top: 0; left: 50%; width: max(100vw, calc(100vh * 2560 / 1240)); height: max(100vh, calc(100vw * 1240 / 2560));
+    translate: -50% 0; transform-origin: 50% 9%; animation: entry-breathe 20s ease-in-out infinite alternate;
   }
   .scene img { display: block; width: 100%; height: 100%; object-fit: fill; }
   .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgb(8 12 24 / .55) 100%); }
-  .light { position: absolute; top: 16%; left: 50%; z-index: 2; width: clamp(90px, 11vw, 160px); aspect-ratio: 1; translate: -50% -50%; border: 0; border-radius: 50%; background: none; cursor: pointer; transition: filter var(--dur) var(--ease); }
+  .light { position: absolute; top: 9%; left: 50%; z-index: 2; width: clamp(84px, 10vw, 140px); aspect-ratio: 1; translate: -50% -50%; transform: scale(1); border: 0; border-radius: 50%; background: none; cursor: pointer; transition: transform var(--dur) var(--ease); }
   .light span { position: absolute; border-radius: 50%; pointer-events: none; }
-  .core { inset: -15%; background: radial-gradient(circle, #fffbe8 0, rgb(255 236 170 / .85) 25%, rgb(255 214 120 / .35) 50%, transparent 70%); }
-  .rays { inset: -65%; mix-blend-mode: screen; background: conic-gradient(transparent 0 8%, rgb(255 246 210 / .7) 8.3% 8.8%, transparent 9% 24%, rgb(255 246 210 / .6) 24.3% 24.8%, transparent 25% 42%, rgb(255 246 210 / .7) 42.3% 42.8%, transparent 43% 58%, rgb(255 246 210 / .6) 58.3% 58.8%, transparent 59% 76%, rgb(255 246 210 / .7) 76.3% 76.8%, transparent 77% 92%, rgb(255 246 210 / .6) 92.3% 92.8%, transparent 93%); animation: entry-rays 60s linear infinite; }
-  .halo { inset: -55%; background: radial-gradient(circle, rgb(255 238 181 / .5), transparent 65%); animation: entry-halo 2.6s ease-in-out infinite alternate; }
-  .light:hover, .light:focus-visible { filter: brightness(1.25); }
-  .light:hover .halo, .light:focus-visible .halo { scale: 1.35; }
-  .light:focus-visible { outline: 2px solid #fff6d8; outline-offset: 6px; }
+  .glow { inset: -30%; background: radial-gradient(circle, rgb(210 245 255 / .9) 0, rgb(120 220 255 / .45) 22%, rgb(90 200 240 / .15) 45%, transparent 68%); animation: entry-glow 2.8s ease-in-out infinite alternate; transition: filter var(--dur) var(--ease); }
+  .ring { inset: 12%; border: 1px solid rgb(210 245 255 / .7); box-shadow: 0 0 12px rgb(143 227 255 / .6); opacity: .5; animation: entry-ring 2.6s ease-out infinite; }
+  .glints { inset: -45%; mix-blend-mode: screen; background: conic-gradient(transparent 0 11%, rgb(217 246 255 / .6) 12%, transparent 13% 36%, rgb(217 246 255 / .6) 37%, transparent 38% 61%, rgb(217 246 255 / .6) 62%, transparent 63% 86%, rgb(217 246 255 / .6) 87%, transparent 88%); opacity: 0; transition: opacity var(--dur) var(--ease); }
+  .light svg { position: absolute; inset: 15%; width: 70%; height: 70%; pointer-events: none; filter: drop-shadow(0 0 8px #8fe3ff); animation: entry-spark 2.8s ease-in-out infinite alternate; }
+  .light:hover, .light:focus-visible { transform: scale(1.15); }
+  .light:hover .glow, .light:focus-visible .glow { filter: brightness(1.3); }
+  .light:hover .glints, .light:focus-visible .glints { opacity: .6; }
+  .light:focus-visible { outline: 2px solid #dff6ff; outline-offset: 6px; }
   .panel { position: absolute; top: 1.2rem; left: 2rem; z-index: 3; display: flex; align-items: center; gap: .7rem; }
+  /* Клики проходят сквозь плашку к звезде — ловит только кнопка меню */
+  .panel { pointer-events: none; }
+  .panel .menu { pointer-events: auto; }
   .menu { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; background: none; color: #fff; font: 2rem/1 var(--font); cursor: pointer; }
   .brand { display: flex; align-items: center; gap: .5rem; font: 600 1.15rem var(--font-display); white-space: nowrap; }
   .brand svg, .brand b { color: #f3d38a; }
@@ -131,21 +145,25 @@ const { t } = useData(Astro.currentLocale);
   .hint span { display: block; margin-top: .3rem; font-size: 1.1rem; animation: entry-chevron 1.4s ease-in-out infinite; }
   .caption { position: absolute; bottom: 1.4rem; left: 2rem; z-index: 3; color: rgb(255 255 255 / .8); text-shadow: 0 2px 10px #081018; }
   .menu:focus-visible, .hint:focus-visible { outline: 2px solid #fff6d8; outline-offset: 4px; }
-  .flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at var(--flash-x) var(--flash-y), #fff 0, #eaf4ff 40%, #fff 70%); }
+  .flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at var(--flash-x) var(--flash-y), #ffffff 0, #e6f7ff 40%, #ffffff 70%); }
   .entering .flash { opacity: 1; animation: entry-flash .7s ease-out both; }
   @keyframes entry-breathe { to { transform: scale(1.04); } }
-  @keyframes entry-rays { to { rotate: 360deg; } }
-  @keyframes entry-halo { from { scale: 1; opacity: .55; } to { scale: 1.25; opacity: .15; } }
+  @keyframes entry-spark { from { transform: scale(.92) rotate(-6deg); } to { transform: scale(1.06) rotate(6deg); } }
+  @keyframes entry-glow { from { opacity: .6; } to { opacity: 1; } }
+  @keyframes entry-ring { from { transform: scale(1); opacity: .5; } to { transform: scale(1.6); opacity: 0; } }
   @keyframes entry-hint { to { opacity: 1; } }
   @keyframes entry-chevron { 50% { opacity: .35; translate: 0 4px; } }
   @keyframes entry-flash { from { clip-path: circle(0 at var(--flash-x) var(--flash-y)); } to { clip-path: circle(150% at var(--flash-x) var(--flash-y)); } }
   @media (max-width: 480px) {
     .panel { top: 1rem; left: 1rem; }
+    /* На узком экране — только бургер: плашка с логотипом закрывала звезду по центру */
+    .panel .brand { display: none; }
     .caption { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     #gf-entry { transition-duration: .3s; }
-    .scene, .rays, .halo, .hint, .hint span { animation: none; }
+    .scene, .glow, .ring, .light svg, .hint, .hint span { animation: none; }
+    .light, .glow, .glints { transition: none; }
     .hint { opacity: 1; }
     .entering .flash { display: none; }
   }

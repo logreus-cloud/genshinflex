@@ -33,6 +33,7 @@ const buttons: Record<string, string> = {
     {groups.map((group, i) => <button id={`feature-tab-${i}`} type="button" role="tab" aria-controls={`feature-panel-${i}`}
       aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{t(group.label)}</button>)}
   </div>
+  <div class="panels">
   {groups.map((group, i) => (
     <div class="group" data-group={group.key} id={`feature-panel-${i}`} role="tabpanel" aria-labelledby={`feature-tab-${i}`}>
       <h3 class="group-title">{t(group.label)}</h3>
@@ -51,6 +52,7 @@ const buttons: Record<string, string> = {
       </div>
     </div>
   ))}
+  </div>
 </section>
 <script>
   document.querySelectorAll<HTMLElement>('[data-features]').forEach((root) => {
@@ -60,6 +62,8 @@ const buttons: Record<string, string> = {
       tabs.forEach((tab, i) => {
         tab.setAttribute('aria-selected', String(i === index));
         tab.tabIndex = i === index ? 0 : -1;
+        panels[i].setAttribute('aria-hidden', String(i !== index));
+        panels[i].inert = i !== index;
         panels[i].hidden = i !== index;
       });
     };
@@ -85,7 +89,9 @@ const buttons: Record<string, string> = {
   .tabs button { border: 0; border-radius: 999px; padding: .6rem 1.2rem; background: none; color: var(--text); cursor: pointer; white-space: nowrap; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
   .tabs button[aria-selected="true"] { color: #20212a; background: #e4e4e7; font-weight: 600; }
   .group { margin-top: 1.5rem; }
-  .group[hidden] { display: none; }
+  .ready .panels { display: grid; }
+  .ready .group { grid-area: 1 / 1; }
+  .ready .group[hidden] { display: block; visibility: hidden; pointer-events: none; }
   .ready .group:not([hidden]) { animation: gf-fade-in .4s var(--ease) both; }
   .group-title { margin: 0 0 1rem; }
   .ready .group-title { display: none; }
@@ -112,6 +118,8 @@ const buttons: Record<string, string> = {
   .detail { display: grid; align-content: center; min-height: 130px; margin: auto 0; color: var(--muted); }
   .detail b { color: var(--accent-text); }
   .card .btn { justify-content: center; width: 100%; margin-top: auto; font-size: .82rem; }
+  .group[data-group="endgame"] .detail { margin: .8rem 0; }
+  .group[data-group="endgame"] .card .btn { margin-top: 1rem; }
   @media (max-width: 700px) {
     .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(3n + 1) { grid-column: auto; }
