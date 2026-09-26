@@ -9,6 +9,8 @@ T = [
     ("До начала", "Starts in", "Comienza en"),
     ("Предыдущий баннер", "Previous banner", "Banner anterior"),
     ("Следующий баннер", "Next banner", "Banner siguiente"),
+    ("Предыдущие персонажи", "Previous characters", "Personajes anteriores"),
+    ("Следующие персонажи", "Next characters", "Personajes siguientes"),
     ("Функционал сайта", "Explore the site", "Explora el sitio"),
     ("Список всех персонажей", "All characters", "Todos los personajes"),
     ("Список всего оружия", "All weapons", "Todas las armas"),

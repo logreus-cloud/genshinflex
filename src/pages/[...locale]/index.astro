@@ -50,8 +50,8 @@ const modes = [
 const buildSet = new Set(builds.map((b) => b.data.character));
 
 const leaks = characters.filter((c) => c.beta);
-const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 8 - leaks.length);
-const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(0, 6);
+const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
+const newWeapons = weapons.filter((w) => w.version === newest[0]?.version).slice(0, 6);
 ---
 <Layout>
   <HeroCarousel slides={slides} />
@@ -71,7 +71,13 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   <CalendarWidget />
 
   <h2 class="h-sec">{t('Новые персонажи')} <small><a href={`${base}/characters`}>{t('Все {n}', { n: characters.length - leaks.length })}</a> · <a href={`${base}/guides`}>{t('Руководства')} ({builds.length})</a></small></h2>
-  <div class="cards">{leaks.map((c) => <CharacterCard slug={c.slug} />)}{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>
+  <div class="character-carousel" data-character-carousel>
+    <button class="character-arrow prev" type="button" aria-label={t('Предыдущие персонажи')} aria-controls="new-characters" hidden>‹</button>
+    <div class="cards" id="new-characters" role="region" aria-label={t('Новые персонажи')}>
+      <div class="cards-track">{leaks.map((c) => <CharacterCard slug={c.slug} />)}{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>
+    </div>
+    <button class="character-arrow next" type="button" aria-label={t('Следующие персонажи')} aria-controls="new-characters">›</button>
+  </div>
 
   {newWeapons.length > 0 && (
     <>
@@ -88,6 +94,87 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   )}
 </Layout>
 
+<script>
+  document.querySelectorAll<HTMLElement>('[data-character-carousel]').forEach((root) => {
+    const list = root.querySelector<HTMLElement>('.cards')!;
+    const track = root.querySelector<HTMLElement>('.cards-track')!;
+    const prev = root.querySelector<HTMLButtonElement>('.prev')!;
+    const next = root.querySelector<HTMLButtonElement>('.next')!;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let scrolling = false;
+    let destination: number | undefined;
+    let restoreTimer: number | undefined;
+    const maxScroll = () => list.scrollWidth - list.clientWidth;
+    const update = () => {
+      prev.hidden = list.scrollLeft <= 1;
+      next.hidden = list.scrollLeft >= list.scrollWidth - list.clientWidth - 1;
+    };
+    const peek = (direction: number) => {
+      if (scrolling) return;
+      const room = direction > 0 ? list.scrollWidth - list.clientWidth - list.scrollLeft : list.scrollLeft;
+      track.style.transform = `translateX(${direction * -Math.min(60, Math.max(0, room))}px)`;
+    };
+    const clearPeek = () => { track.style.removeProperty('transform'); };
+    const restoreSnap = () => {
+      if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+      restoreTimer = undefined;
+      destination = undefined;
+      scrolling = false;
+      list.style.removeProperty('scroll-snap-type');
+    };
+    const settlePeek = () => {
+      const transform = getComputedStyle(track).transform;
+      if (transform === 'none') return;
+      const offset = new DOMMatrixReadOnly(transform).m41;
+      if (Math.abs(offset) < .1) return;
+      scrolling = true;
+      track.style.transition = 'none';
+      list.style.scrollSnapType = 'none';
+      list.scrollLeft -= offset;
+      track.style.removeProperty('transform');
+      void track.offsetWidth;
+      track.style.removeProperty('transition');
+      if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+      restoreTimer = window.setTimeout(restoreSnap, 1200);
+    };
+    const page = () => {
+      const card = track.querySelector<HTMLElement>('.cc');
+      if (!card) return { step: list.clientWidth, distance: list.clientWidth };
+      const gap = parseFloat(getComputedStyle(track).gap) || 0;
+      const step = card.offsetWidth + gap;
+      return { step, distance: Math.max(1, Math.floor((list.clientWidth + gap) / step)) * step };
+    };
+    [[prev, -1], [next, 1]].forEach(([button, direction]) => {
+      const arrow = button as HTMLButtonElement;
+      const sign = direction as number;
+      arrow.addEventListener('pointerenter', () => peek(sign));
+      arrow.addEventListener('pointerleave', clearPeek);
+      arrow.addEventListener('focus', () => peek(sign));
+      arrow.addEventListener('blur', clearPeek);
+      arrow.addEventListener('click', () => {
+        const { step, distance } = page();
+        const target = Math.max(0, Math.min(maxScroll(), Math.round(list.scrollLeft / step) * step + sign * distance));
+        settlePeek();
+        destination = target;
+        scrolling = true;
+        list.scrollTo({ left: target, behavior: motion.matches ? 'auto' : 'smooth' });
+        if (Math.abs(list.scrollLeft - target) <= 1) restoreSnap();
+        else {
+          if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+          restoreTimer = window.setTimeout(restoreSnap, 1200);
+        }
+      });
+    });
+    list.addEventListener('scroll', () => { settlePeek(); update(); }, { passive: true });
+    list.addEventListener('scrollend', () => {
+      if (destination === undefined || Math.abs(list.scrollLeft - destination) <= 1) restoreSnap();
+    });
+    window.addEventListener('resize', update);
+    root.classList.add('ready');
+    update();
+  });
+</script>
+
 <style>
   .site-news { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin: .2rem 0 1.2rem; padding: 1.1rem 1.3rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--accent-soft), var(--surface)); text-decoration: none; }
   .site-news:hover { border-color: var(--accent); }
@@ -97,7 +184,16 @@ const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(
   .site-news h2 { margin: .4rem 0; font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.45; }
   .site-news p { margin: 0; color: var(--muted); font-size: .9rem; }
   .news-link { color: var(--accent); font-size: .85rem; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+  .character-carousel { position: relative; min-width: 0; }
+  .cards { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .cards::-webkit-scrollbar { display: none; }
+  .cards-track { display: flex; gap: 10px; width: max-content; min-width: 100%; transition: transform var(--dur) var(--ease); }
+  .cards-track > :global(.cc) { flex: 0 0 130px; scroll-snap-align: start; }
+  .character-arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; display: none; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%; background: rgb(10 11 16 / .6); color: rgb(255 255 255 / .55); font: 200 2.4rem/1 var(--font); cursor: pointer; padding: 0 0 .25rem; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+  .ready .character-arrow:not([hidden]) { display: grid; }
+  .character-arrow:hover, .character-arrow:focus-visible { color: #fff; background: rgb(255 255 255 / .25); }
+  .character-arrow.prev { left: .4rem; } .character-arrow.next { right: .4rem; }
+  @media (max-width: 700px) { .cards-track > :global(.cc) { flex-basis: 104px; } .ready .character-arrow { display: none; } }
   .weapons { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
   .wcard { display: flex; align-items: center; gap: .6rem; padding: .5rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; font-size: .86rem; }
   /* Длинные названия оружия переносятся внутри карточки, а не вылезают за неё */

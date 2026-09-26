@@ -25,7 +25,7 @@
   --font: "Onest", system-ui, sans-serif;
   --font-display: "Unbounded", "Onest", sans-serif;
   --ease: cubic-bezier(.2, .7, .2, 1);
-  --dur: .2s;
+  --dur: .3s;
   color-scheme: dark;
 }
 :root[data-theme="light"] {
@@ -44,10 +44,10 @@
 }
 
 @view-transition { navigation: auto; }
-::view-transition-old(root) { animation: gf-fade-out .15s var(--ease) both; }
-::view-transition-new(root) { animation: gf-fade-in .2s var(--ease) both; }
-::view-transition-old(page) { animation: gf-fade-out .15s var(--ease) both; }
-::view-transition-new(page) { animation: gf-fade-up .3s var(--ease) both; }
+::view-transition-old(root) { animation: gf-fade-out .25s var(--ease) both; }
+::view-transition-new(root) { animation: gf-fade-in .32s var(--ease) both; }
+::view-transition-old(page) { animation: gf-fade-out .25s var(--ease) both; }
+::view-transition-new(page) { animation: gf-fade-up .5s var(--ease) both; }
 @keyframes gf-fade-out { to { opacity: 0; } }
 @keyframes gf-fade-in { from { opacity: 0; } }
 @keyframes gf-fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -131,7 +131,7 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 .notice > :last-child { margin-bottom: 0; }
 
 details summary { cursor: pointer; }
-details[open] > :not(summary) { animation: gf-fade-up .25s var(--ease) backwards; }
+details[open] > :not(summary) { animation: gf-fade-up .4s var(--ease) backwards; }
 table { border-collapse: collapse; width: 100%; font-size: .9rem; }
 th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--border); }
 th { color: var(--muted); font-weight: 500; }
