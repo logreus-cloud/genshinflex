@@ -58,7 +58,21 @@ const buttons: Record<string, string> = {
   document.querySelectorAll<HTMLElement>('[data-features]').forEach((root) => {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const container = root.querySelector<HTMLElement>('.panels')!;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let active = -1;
+    let fallback: number | undefined;
+    const finish = () => {
+      if (fallback !== undefined) clearTimeout(fallback);
+      fallback = undefined;
+      container.style.removeProperty('height');
+      container.classList.remove('resizing');
+    };
     const select = (index: number) => {
+      if (index === active) return;
+      const animate = active !== -1 && !motion.matches;
+      const height = animate ? container.getBoundingClientRect().height : 0;
+      if (animate) { container.style.transition = 'none'; container.style.height = `${height}px`; }
       tabs.forEach((tab, i) => {
         tab.setAttribute('aria-selected', String(i === index));
         tab.tabIndex = i === index ? 0 : -1;
@@ -66,7 +80,28 @@ const buttons: Record<string, string> = {
         panels[i].inert = i !== index;
         panels[i].hidden = i !== index;
       });
+      active = index;
+      if (!animate) {
+        container.style.removeProperty('transition');
+        finish();
+        return;
+      }
+      container.style.height = 'auto';
+      const nextHeight = container.scrollHeight;
+      container.style.height = `${height}px`;
+      void container.offsetHeight;
+      container.style.removeProperty('transition');
+      if (Math.abs(nextHeight - height) < 1) { finish(); return; }
+      container.classList.add('resizing');
+      container.style.height = `${nextHeight}px`;
+      // Страховка: transitionend не приходит, если переход прервали или вкладка в фоне
+      if (fallback !== undefined) clearTimeout(fallback);
+      fallback = window.setTimeout(finish, 450);
     };
+    container.addEventListener('transitionend', (event) => {
+      if (event.target === container && event.propertyName === 'height') finish();
+    });
+    motion.addEventListener('change', () => { if (motion.matches) finish(); });
     root.classList.add('ready');
     select(0);
     tabs.forEach((tab, i) => {
@@ -89,9 +124,8 @@ const buttons: Record<string, string> = {
   .tabs button { border: 0; border-radius: 999px; padding: .6rem 1.2rem; background: none; color: var(--text); cursor: pointer; white-space: nowrap; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
   .tabs button[aria-selected="true"] { color: #20212a; background: #e4e4e7; font-weight: 600; }
   .group { margin-top: 1.5rem; }
-  .ready .panels { display: grid; }
-  .ready .group { grid-area: 1 / 1; }
-  .ready .group[hidden] { display: block; visibility: hidden; pointer-events: none; }
+  .ready .panels { display: flow-root; }
+  .ready .panels.resizing { overflow: hidden; transition: height .35s var(--ease); }
   .ready .group:not([hidden]) { animation: gf-fade-in .4s var(--ease) both; }
   .group-title { margin: 0 0 1rem; }
   .ready .group-title { display: none; }
