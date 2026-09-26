@@ -397,7 +397,7 @@ const jsonLd = b && {
   }
   .tabs a { padding: .75rem 1rem; text-decoration: none; color: var(--muted); white-space: nowrap; border-bottom: 2px solid transparent; font-size: .93rem; }
   .tabs a:hover { color: var(--text); }
-  .tabs a[aria-current] { color: var(--accent); border-bottom-color: var(--accent); }
+  .tabs a[aria-current] { color: var(--accent-text); border-bottom-color: var(--accent); }
 
   .two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; }
   .ratings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
@@ -407,7 +407,7 @@ const jsonLd = b && {
   .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }
   .rank li { display: flex; gap: .7rem; align-items: center; }
   .rank .n { width: 1.4rem; text-align: center; color: var(--muted); font: 600 .85rem var(--font-display); flex: none; }
-  .rank li:first-child .n { color: var(--accent); }
+  .rank li:first-child .n { color: var(--accent-text); }
   /* Отступ внутри рамки: иконки оружия нарисованы до краёв, и скругление срезало бы кончики */
   .rank img { border-radius: 8px; background: var(--surface-3); flex: none; padding: 3px; box-sizing: border-box; }
   .rank img.r5 { background: linear-gradient(160deg, #7a5226, #d1953f); }
@@ -432,9 +432,9 @@ const jsonLd = b && {
 
   .sub { margin: 1.6rem 0 .7rem; }
   .lvl { display: inline-flex; align-items: center; gap: .5rem; }
-  .lvl output { color: var(--accent); font-weight: 600; min-width: 1.4em; }
+  .lvl output { color: var(--accent-text); font-weight: 600; min-width: 1.4em; }
   .lvl input { accent-color: var(--accent); width: 140px; }
-  .chip.ai { margin-left: .5rem; font: 600 .7rem var(--font); letter-spacing: .03em; background: var(--accent-soft); color: var(--accent); border-color: transparent; vertical-align: middle; }
+  .chip.ai { margin-left: .5rem; font: 600 .7rem var(--font); letter-spacing: .03em; background: var(--accent-soft); color: var(--accent-text); border-color: transparent; vertical-align: middle; }
   .analysis p { margin: 0 0 .8rem; line-height: 1.6; }
   .analysis p:last-child { margin: 0; }
   .chip.beta { background: #e0457b; border-color: #e0457b; color: #fff; font-weight: 600; letter-spacing: .04em; }
@@ -449,7 +449,7 @@ const jsonLd = b && {
   .t-head h3 { margin: .1rem 0 0; }
   .desc { white-space: pre-line; color: var(--muted); font-size: .9rem; margin: 0; }
   .talent details { margin-top: .8rem; }
-  .talent summary { color: var(--accent); font-size: .9rem; }
+  .talent summary { color: var(--accent-text); font-size: .9rem; }
   .talent table { margin-top: .5rem; }
   .talent td { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .talent th { font-weight: 400; }

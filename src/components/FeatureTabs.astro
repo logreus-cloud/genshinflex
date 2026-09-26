@@ -2,7 +2,7 @@
 import { useData } from '../lib/data';
 import { icons } from '../lib/nav-icons';
 const { base, t } = useData(Astro.currentLocale);
-interface Item { label: string; href: string; icon: string; image?: string; imageClass?: string; until?: string; description?: string; }
+interface Item { label: string; href: string; icon: string; image?: string; imageClass?: string; until?: string; description?: string; soon?: boolean; }
 interface Props { heroIcon?: string; weaponImage?: string; artifactIcon?: string; modes: { label: string; href: string; icon: string; until?: string }[]; }
 const { heroIcon, weaponImage, artifactIcon, modes } = Astro.props;
 const groups: { label: string; items: Item[] }[] = [
@@ -18,6 +18,7 @@ const groups: { label: string; items: Item[] }[] = [
     { label: 'Трекер круток', href: '/tools/wishes', icon: 'star', description: 'Следите за гарантом и историей круток.' },
     { label: 'Калькулятор прокачки', href: '/tools/calculator', icon: 'calc', description: 'Посчитайте материалы для прокачки.' },
     { label: 'Конструктор ротаций', href: '/tools/rotation-builder', icon: 'tool', description: 'Составьте порядок действий отряда.' },
+    { label: 'Рейтинг', href: '/rating', icon: 'chart', description: 'Рейтинг персонажей от сообщества и по забегам.', soon: true },
   ] },
 ];
 const buttons: Record<string, string> = {
@@ -37,9 +38,10 @@ const buttons: Record<string, string> = {
       <h3 class="group-title">{t(group.label)}</h3>
       <div class="cards">
         {group.items.map((item) => (
-          <article class="card">
-            <svg viewBox="0 0 20 20" width="30" height="30" aria-hidden="true"><path d={icons[item.icon]} /></svg>
+          <article class:list={['card', { soon: item.soon }]}>
+            <svg viewBox="0 0 20 20" width="34" height="34" aria-hidden="true" set:html={icons[item.icon]} />
             <h4>{t(item.label)}</h4>
+            {item.soon && <span class="soon-tag">{t('в разработке')}</span>}
             {item.image ? <img class:list={['art', item.imageClass]} src={item.image} alt="" loading="lazy" /> :
               item.until ? <p class="detail">{t('Обновится через')} <b data-until={item.until} data-done={t('обновилось')}>…</b></p> :
               <p class="detail">{item.description ? t(item.description) : ''}</p>}
@@ -88,6 +90,12 @@ const buttons: Record<string, string> = {
   .group-title { margin: 0 0 1rem; }
   .ready .group-title { display: none; }
   .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  /* Одинокая карточка в последнем ряду — по центру */
+  .cards > .card:last-child:nth-child(3n + 1) { grid-column: 2; }
+  /* Раздел в разработке: приглушён, но открывается */
+  .card.soon { opacity: .6; }
+  .card.soon:hover, .card.soon:focus-within { opacity: .85; }
+  .soon-tag { margin: -.2rem 0 .3rem; padding: .1rem .55rem; border: 1px solid var(--border); border-radius: 999px; font-size: .72rem; color: var(--muted); }
   .card { display: flex; flex-direction: column; align-items: center; min-width: 0; min-height: 280px; padding: 1.4rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
   .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgb(0 0 0 / .18); }
   .ready .group:not([hidden]) .card { animation: gf-fade-up .38s var(--ease) backwards; }
@@ -95,17 +103,19 @@ const buttons: Record<string, string> = {
   .ready .group:not([hidden]) .card:nth-child(3) { animation-delay: .12s; }
   .ready .group:not([hidden]) .card:nth-child(4) { animation-delay: .18s; }
   .ready .group:not([hidden]) .card:nth-child(5) { animation-delay: .24s; }
-  .card > svg { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .card > svg { fill: currentColor; color: var(--accent); flex: none; --icon-cut: var(--surface); }
   h4 { margin: .7rem 0 .5rem; font: 600 1.15rem var(--font-display); overflow-wrap: anywhere; }
   .art { width: 100%; height: 130px; object-fit: contain; margin: auto 0; }
   .art.character { border-radius: 50%; }
   .detail { display: grid; align-content: center; min-height: 130px; margin: auto 0; color: var(--muted); }
-  .detail b { color: var(--accent); }
+  .detail b { color: var(--accent-text); }
   .card .btn { justify-content: center; width: 100%; margin-top: auto; font-size: .82rem; }
   @media (max-width: 700px) {
     .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cards > .card:last-child:nth-child(3n + 1) { grid-column: auto; }
+    .cards > .card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 7px); }
     .card { padding: 1rem; min-height: 260px; }
     .tabs button { padding: .55rem .8rem; font-size: .8rem; }
   }
-  @media (max-width: 420px) { .cards { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .cards { grid-template-columns: 1fr; } .cards > .card:last-child:nth-child(2n + 1) { width: auto; } }
 </style>

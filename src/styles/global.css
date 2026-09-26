@@ -11,6 +11,9 @@
   --accent: #e3b04b;
   --accent-ink: #241a05;
   --accent-soft: rgb(227 176 75 / .14);
+  /* Акцент как цвет ТЕКСТА и рамка фокуса: в тёмной теме — то же золото, в светлой — читаемые на белом */
+  --accent-text: var(--accent);
+  --focus: var(--accent);
   --r5: #c8872e;
   --r4: #8a63c4;
   --r3: #4b7aa6;
@@ -30,15 +33,15 @@
 }
 :root[data-theme="light"] {
   --bg: #f3f3f5; --bg-deep: #e8e8ec; --surface: #fff; --surface-2: #ececf0; --surface-3: #dedee4;
-  --text: #20212a; --muted: #565966; --border: #d2d3dc; --accent: #8a5c0b; --accent-ink: #fff;
-  --accent-soft: rgb(156 108 18 / .12);
+  --text: #20212a; --muted: #565966; --border: #d2d3dc; --accent: #e3a51c; --accent-ink: #1f1600; --accent-text: var(--text); --focus: #8f6200;
+  --accent-soft: rgb(227 165 28 / .2);
   color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --bg: #f3f3f5; --bg-deep: #e8e8ec; --surface: #fff; --surface-2: #ececf0; --surface-3: #dedee4;
-    --text: #20212a; --muted: #565966; --border: #d2d3dc; --accent: #8a5c0b; --accent-ink: #fff;
-    --accent-soft: rgb(156 108 18 / .12);
+    --text: #20212a; --muted: #565966; --border: #d2d3dc; --accent: #e3a51c; --accent-ink: #1f1600; --accent-text: var(--text); --focus: #8f6200;
+    --accent-soft: rgb(227 165 28 / .2);
     color-scheme: light;
   }
 }
@@ -65,7 +68,7 @@ a, .btn, .icon-btn, .chip, .input, input, select, textarea, .panel {
     transform var(--dur) var(--ease), opacity var(--dur) var(--ease),
     filter var(--dur) var(--ease);
 }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
   ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
@@ -98,7 +101,7 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
   font-size: .78rem; background: var(--surface-2); color: var(--muted); white-space: nowrap; text-decoration: none;
 }
 .chip[data-el] { color: #fff; background: color-mix(in srgb, var(--el) 80%, #000); }
-.chip.gold { background: var(--accent-soft); color: var(--accent); }
+.chip.gold { background: var(--accent-soft); color: var(--accent-text); }
 /* Стихия: цвет (--el) и официальная иконка (--el-icon) — наследуются от ближайшего [data-el] */
 [data-el="pyro"] { --el: var(--pyro); --el-icon: url(/elements/pyro.png); }
 [data-el="hydro"] { --el: var(--hydro); --el-icon: url(/elements/hydro.png); }
@@ -119,7 +122,7 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 .btn.primary:hover { filter: brightness(1.08); }
 .btn.light { background: #e4e4e7; border-color: #e4e4e7; color: #20212a; }
 .btn.dark { background: #111217; border-color: #111217; color: #f5f5f7; }
-.btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
 
 .input {
   width: 100%; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
@@ -144,7 +147,7 @@ th { color: var(--muted); font-weight: 500; }
 .prose ul, .prose ol { margin: .4rem 0; padding-left: 1.3rem; max-width: 80ch; }
 .prose li { margin: .15rem 0; }
 .prose blockquote { margin: .6rem 0; padding: .1rem 0 .1rem .9rem; border-left: 3px solid var(--border); color: var(--muted); }
-.prose mark { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 .2em; }
+.prose mark { background: var(--accent-soft); color: var(--accent-text); border-radius: 4px; padding: 0 .2em; }
 .prose .chip { font-size: .85em; vertical-align: .05em; }
 .gm-item { padding-left: .2em; color: var(--text); background: var(--surface-3); }
 .gm-item img { width: 1.5em; height: 1.5em; margin: -.2em 0; border-radius: 50%; object-fit: cover; }
@@ -204,7 +207,7 @@ a.gm-item:hover { outline: 1px solid var(--accent); }
 .cb-item small { color: var(--muted); font-size: 0.78rem; }
 .cb-item mark {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
   border-radius: 4px;
   padding: 0 0.2em;
   font-weight: inherit;

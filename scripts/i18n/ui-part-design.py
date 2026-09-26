@@ -1,4 +1,5 @@
 T = [
+    ("Рейтинг персонажей от сообщества и по забегам.", "Character ratings from the community and from runs.", "Clasificación de personajes según la comunidad y las partidas."),
     ("{n} из {total}", "{n} of {total}", "{n} de {total}"),
     ("Билды, команды и многое другое!", "Builds, teams, and more!", "¡Guías de personajes, equipos y mucho más!"),
     ("Закрыть меню", "Close menu", "Cerrar menú"),

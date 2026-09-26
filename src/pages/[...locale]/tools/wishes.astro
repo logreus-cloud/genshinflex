@@ -395,11 +395,11 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   .banners :global(.bcard header) { display: flex; justify-content: space-between; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .8rem; }
   .banners :global(.bcard h3) { margin: 0; }
   .banners :global(.pity) { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center; }
-  .banners :global(.pnum b) { font: 700 2.4rem/1 var(--font-display); color: var(--accent); }
+  .banners :global(.pnum b) { font: 700 2.4rem/1 var(--font-display); color: var(--accent-text); }
   .banners :global(.bar) { position: relative; height: 10px; border-radius: 5px; background: var(--surface-3); margin: .35rem 0; }
   .banners :global(.bar i) { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); }
   .banners :global(.bar em) { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); opacity: .5; }
-  .banners :global(.soft) { color: var(--accent); }
+  .banners :global(.soft) { color: var(--accent-text); }
   .banners :global(.kv) { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 1rem 0; }
   .banners :global(.kv div) { background: var(--surface-2); border-radius: var(--radius-sm); padding: .4rem .5rem; }
   .banners :global(.kv dt) { font-size: .72rem; color: var(--muted); }
@@ -413,7 +413,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   .table-wrap { overflow-x: auto; padding: .4rem .6rem; }
   #history :global(.it) { display: inline-flex; align-items: center; gap: .5rem; }
   #history :global(img) { border-radius: 6px; }
-  #history :global(tr.r5 td:nth-child(2)) { color: var(--accent); font-weight: 600; }
+  #history :global(tr.r5 td:nth-child(2)) { color: var(--accent-text); font-weight: 600; }
   #history :global(tr.r4 td:nth-child(2)) { color: #b595ec; }
   @media (max-width: 480px) { .banners :global(.kv) { grid-template-columns: repeat(2, 1fr); } }
 </style>

@@ -96,7 +96,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
             {group && <p class="gtitle">{t(group)}</p>}
             {items.map(([label, href, icon]) => (
               <a href={`${base}${href}`} aria-current={active(href) ? 'page' : undefined}>
-                <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d={icons[icon]} /></svg>
+                <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" set:html={icons[icon]} />
                 {t(label)}
                 {'soon' in rest && <small class="soon-tag">{t('скоро')}</small>}
               </a>
@@ -290,7 +290,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   }
   .side.open { transform: none; }
   .side-head { display: flex; align-items: center; flex: none; }
-  .logo { display: flex; align-items: center; gap: .6rem; height: var(--top-h); padding: 0 0 0 1.1rem; text-decoration: none; color: var(--accent); min-width: 0; flex: 1; }
+  .logo { display: flex; align-items: center; gap: .6rem; height: var(--top-h); padding: 0 0 0 1.1rem; text-decoration: none; color: var(--accent-text); min-width: 0; flex: 1; }
   .side-close { margin: 0 .6rem; font-size: 1.6rem; }
   .logo span { font: 600 1.05rem var(--font-display); color: var(--text); }
   .logo b { color: var(--accent); font-weight: 600; }
@@ -300,10 +300,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     display: flex; align-items: center; gap: .65rem; padding: .45rem .6rem; border-radius: var(--radius-sm);
     text-decoration: none; color: var(--muted); font-size: .93rem;
   }
-  nav svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  /* Иконки меню — залитые силуэты (src/lib/nav-icons.ts); --icon-cut — цвет «прорезей» под фон панели */
+  nav svg { fill: currentColor; flex: none; --icon-cut: var(--bg-deep); }
   nav a:hover { color: var(--text); background: var(--surface); }
   nav a[aria-current] { color: var(--text); background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
-  nav a[aria-current] svg { stroke: var(--accent); }
+  nav a[aria-current] svg { color: var(--accent); }
   nav a { transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), opacity var(--dur) var(--ease); }
   .group.soon a:not([aria-current]) { opacity: .7; }
   .soon-tag { margin-left: auto; padding: .05rem .4rem; border: 1px solid var(--border); border-radius: 999px; font-size: .68rem; color: var(--muted); }
@@ -362,7 +363,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .langs:not([hidden]), .search-panel:not([hidden]) { animation: gf-pop-in .32s var(--ease) both; }
   .langs a { font-size: .82rem; font-weight: 600; padding: .4rem .6rem; border-radius: 7px; text-decoration: none; color: var(--muted); }
   .langs a:hover { color: var(--text); }
-  .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
+  .langs a[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
   .search-panel { position: absolute; top: calc(100% + 8px); right: 80px; display: flex; width: min(460px, calc(100vw - 32px)); padding: .7rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35); }
   .search-panel :global(.qs) { width: 100%; max-width: none; }
   .search-panel :global(.qs-input) { border-color: var(--accent); border-radius: 999px; }
@@ -381,7 +382,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .f-col h2 { font: 600 .82rem var(--font); color: var(--text); margin: .3rem 0 .8rem; letter-spacing: .02em; }
   .f-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
   .f-col a { color: var(--muted); text-decoration: none; font-size: .82rem; }
-  .f-col a:hover { color: var(--accent); }
+  .f-col a:hover { color: var(--accent-text); }
   .f-bottom { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1.2rem; display: flex; justify-content: space-between; gap: 2rem; }
   .f-bottom p { color: var(--muted); }
   .f-meta { display: flex; flex-direction: column; align-items: flex-end; max-width: 70ch; text-align: right; }

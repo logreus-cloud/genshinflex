@@ -44,8 +44,8 @@ const modeItems = rotations.map(({ data: r }) => ({
   until: resetAt(r.start > now ? r.start : r.end),
 }));
 const modes = [
-  { label: 'Все режимы', href: '/rotation', icon: 'moon', until: modeItems.map((item) => item.until).sort()[0] },
   ...modeItems,
+  { label: 'Все режимы', href: '/rotation', icon: 'moon', until: modeItems.map((item) => item.until).sort()[0] },
 ];
 const buildSet = new Set(builds.map((b) => b.data.character));
 
@@ -180,10 +180,10 @@ const newWeapons = weapons.filter((w) => w.version === newest[0]?.version).slice
   .site-news:hover { border-color: var(--accent); }
   .news-copy { flex: 1 1 32rem; min-width: 0; overflow-wrap: anywhere; }
   .news-meta { display: flex; flex-wrap: wrap; gap: .35rem 1rem; font-size: .78rem; color: var(--muted); }
-  .news-meta > span { color: var(--accent); font-weight: 600; }
+  .news-meta > span { color: var(--accent-text); font-weight: 600; }
   .site-news h2 { margin: .4rem 0; font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.45; }
   .site-news p { margin: 0; color: var(--muted); font-size: .9rem; }
-  .news-link { color: var(--accent); font-size: .85rem; }
+  .news-link { color: var(--accent-text); font-size: .85rem; }
   .character-carousel { position: relative; min-width: 0; }
   .cards { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
   .cards::-webkit-scrollbar { display: none; }
