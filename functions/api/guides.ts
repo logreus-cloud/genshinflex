@@ -1,8 +1,10 @@
 // Приём гайдов из редактора: проверка, защита от спама, запись в очередь модерации (D1).
 // На сайт ничего не попадает само: заявки смотрим через npm run guides, одобренную превращаем в файл билда — npm run guide:md <id>
-interface Env { DB: D1Database }
-interface Ctx { request: Request; env: Env }
-type D1Database = { prepare: (q: string) => { bind: (...v: unknown[]) => { first: <T>() => Promise<T | null>; run: () => Promise<unknown> } } };
+import { guideMessages, sendAll, type DiscordEnv } from '../lib/discord';
+
+interface Env extends DiscordEnv { DB: D1Database }
+interface Ctx { request: Request; env: Env; waitUntil: (p: Promise<unknown>) => void }
+type D1Database = { prepare: (q: string) => { bind: (...v: unknown[]) => { first: <T>() => Promise<T | null>; run: () => Promise<{ meta?: { last_row_id?: number } }> } } };
 
 const LIMIT_PER_HOUR = 3;
 const MAX_PAYLOAD = 60_000;
@@ -11,11 +13,12 @@ const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice
 const slugs = (v: unknown, max: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && slug.test(x)).slice(0, max) : []);
 const list = (v: unknown, max: number) => (Array.isArray(v) ? v.slice(0, max).filter((x) => x && typeof x === 'object') as Record<string, unknown>[] : []);
 
-export async function onRequestPost({ request, env }: Ctx) {
+export async function onRequestPost({ request, env, waitUntil }: Ctx) {
   const raw = await request.text();
   if (raw.length > MAX_PAYLOAD) return json({ error: 'Гайд слишком большой — сократите текст' }, 413);
   let body: Record<string, unknown>;
   try { body = JSON.parse(raw); } catch { return json({ error: 'Не удалось прочитать гайд' }, 400); }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Не удалось прочитать гайд' }, 400);
 
   // Скрытое поле-ловушка для ботов
   if (typeof body.website === 'string' && body.website.trim()) return json({ ok: true }, 201);
@@ -60,8 +63,11 @@ export async function onRequestPost({ request, env }: Ctx) {
   ).bind(ipHash).first<{ n: number }>();
   if ((recent?.n ?? 0) >= LIMIT_PER_HOUR) return json({ error: 'Слишком много гайдов подряд — попробуйте через час' }, 429);
 
-  await env.DB.prepare('INSERT INTO guide_submissions (character, mode, author, contact, comment, payload, ip_hash) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(character, body.mode === 'edit' ? 'edit' : 'new', author, str(body.contact, 120) || null, str(body.comment, 1000) || null, JSON.stringify(guide), ipHash).run();
+  const mode = body.mode === 'edit' ? 'edit' : 'new';
+  const comment = str(body.comment, 1000) || null;
+  const result = await env.DB.prepare('INSERT INTO guide_submissions (character, mode, author, contact, comment, payload, ip_hash) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    .bind(character, mode, author, str(body.contact, 120) || null, comment, JSON.stringify(guide), ipHash).run();
+  waitUntil(sendAll(guideMessages(env, { id: result.meta?.last_row_id, kind, target, mode, author, comment, site: 'https://genshinflex.com' })));
   return json({ ok: true }, 201);
 }
 

@@ -24,6 +24,8 @@
  "8 врагов": "8 enemigos",
  "80 и таланты 1/9/9": "80 y talentos 1/9/9",
  "90 и таланты 9/9/9": "90 y talentos 9/9/9",
+ "Discord-сервер": "Servidor de Discord",
+ "Discord-сервер проекта": "Servidor de Discord del proyecto",
  "ELO по забегам": "ELO por partidas",
  "ELO сообщества": "ELO de la comunidad",
  "Game8 — этаж 10": "Game8 — piso 10",
@@ -485,7 +487,10 @@
  "Откройте игру на ПК и зайдите в «Молитва» → «История».": "Abre el juego en PC y ve a «Gachapón» → «Historial».",
  "Открыть": "Abrir",
  "Открыть меню": "Abrir menú",
+<<<<<<< HEAD
  "Открыть поиск": "Abrir búsqueda",
+=======
+>>>>>>> main
  "Откуда данные": "De dónde vienen los datos",
  "Отмена": "Cancelar",
  "Отправить": "Enviar",

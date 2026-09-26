@@ -27,6 +27,8 @@ T = [
 ("Разбор написан ИИ по утёкшим описаниям навыков, без симуляций. Релизная версия персонажа может отличаться.", "This breakdown was written by AI from leaked skill descriptions, without simulations. The released character may differ.", "Este análisis lo ha escrito una IA a partir de las descripciones filtradas, sin simulaciones. La versión final del personaje puede ser distinta."),
 ("Telegram-канал проекта", "Project Telegram channel", "Canal de Telegram del proyecto"),
 ("Telegram-канал", "Telegram channel", "Canal de Telegram"),
+("Discord-сервер проекта", "Project Discord server", "Servidor de Discord del proyecto"),
+("Discord-сервер", "Discord server", "Servidor de Discord"),
 ("Команду и ротацию мы собрали сами по открытому гайду: в базе симуляций gcsim подходящей команды нет. Билды напарников — из наших гайдов, доп. статы всей команды подобраны по стандарту KQM под каждое оружие отдельно. C0 с {four}: {dps} урона в секунду.",
  "We put this team and rotation together ourselves from an open guide, since the gcsim simulation database has no suitable team. Teammate builds come from our guides; the whole team's substats are tuned to the KQM standard for each weapon separately. C0 with {four}: {dps} damage per second.",
  "Armamos este equipo y su rotación a partir de una guía abierta, porque la base de simulaciones de gcsim no tiene un equipo adecuado. Las builds de los compañeros salen de nuestras guías; las estadísticas secundarias de todo el equipo se ajustan al estándar de KQM para cada arma por separado. C0 con {four}: {dps} de daño por segundo."),

@@ -24,6 +24,8 @@
  "8 врагов": "8 enemies",
  "80 и таланты 1/9/9": "80 and talents 1/9/9",
  "90 и таланты 9/9/9": "90 and talents 9/9/9",
+ "Discord-сервер": "Discord server",
+ "Discord-сервер проекта": "Project Discord server",
  "ELO по забегам": "Clear-time ELO",
  "ELO сообщества": "Community ELO",
  "Game8 — этаж 10": "Game8 — floor 10",
@@ -485,7 +487,10 @@
  "Откройте игру на ПК и зайдите в «Молитва» → «История».": "Open the game on PC and go to “Wish” → “History”.",
  "Открыть": "Open",
  "Открыть меню": "Open menu",
+<<<<<<< HEAD
  "Открыть поиск": "Open search",
+=======
+>>>>>>> main
  "Откуда данные": "Where the data comes from",
  "Отмена": "Cancel",
  "Отправить": "Send",

@@ -1,0 +1,9 @@
+name = "genshinflex-reminders"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[triggers]
+crons = ["5 * * * *"]
+
+[vars]
+SITE = "https://genshinflex.com"

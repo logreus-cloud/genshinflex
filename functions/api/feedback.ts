@@ -1,14 +1,17 @@
 // Приём обратной связи: проверка, защита от спама, запись в D1. Читать сообщения: npm run feedback
-interface Env { DB: D1Database }
-interface Ctx { request: Request; env: Env }
-type D1Database = { prepare: (q: string) => { bind: (...v: unknown[]) => { first: <T>() => Promise<T | null>; run: () => Promise<unknown> } } };
+import { feedbackMessages, sendAll, type DiscordEnv } from '../lib/discord';
+
+interface Env extends DiscordEnv { DB: D1Database }
+interface Ctx { request: Request; env: Env; waitUntil: (p: Promise<unknown>) => void }
+type D1Database = { prepare: (q: string) => { bind: (...v: unknown[]) => { first: <T>() => Promise<T | null>; run: () => Promise<{ meta?: { last_row_id?: number } }> } } };
 
 const KINDS = new Set(['data', 'idea', 'bug', 'other']);
 const LIMIT_PER_HOUR = 5;
 
-export async function onRequestPost({ request, env }: Ctx) {
+export async function onRequestPost({ request, env, waitUntil }: Ctx) {
   let body: Record<string, unknown>;
   try { body = await request.json(); } catch { return json({ error: 'Не удалось прочитать форму' }, 400); }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Не удалось прочитать форму' }, 400);
 
   // Скрытое поле-ловушка: человек его не видит, бот заполняет. Отвечаем «успешно», чтобы бот не подбирал обход.
   if (typeof body.website === 'string' && body.website.trim()) return json({ ok: true }, 201);
@@ -31,8 +34,9 @@ export async function onRequestPost({ request, env }: Ctx) {
   ).bind(ipHash).first<{ n: number }>();
   if ((recent?.n ?? 0) >= LIMIT_PER_HOUR) return json({ error: 'Слишком много сообщений подряд — попробуйте через час' }, 429);
 
-  await env.DB.prepare('INSERT INTO feedback (kind, page, message, contact, ip_hash) VALUES (?, ?, ?, ?, ?)')
+  const result = await env.DB.prepare('INSERT INTO feedback (kind, page, message, contact, ip_hash) VALUES (?, ?, ?, ?, ?)')
     .bind(kind, page || null, message, contact || null, ipHash).run();
+  waitUntil(sendAll(feedbackMessages(env, { id: result.meta?.last_row_id, kind, page: page || null, message })));
   return json({ ok: true }, 201);
 }
 
