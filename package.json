@@ -23,6 +23,7 @@
     "sim:presets": "node scripts/export-sim-presets.mjs",
     "test:sim": "node --experimental-strip-types scripts/test-enka-gcsim.mjs",
     "test:discord": "node --experimental-strip-types scripts/test-discord.mjs",
+    "test:reminders": "node --experimental-strip-types scripts/test-reminders.mjs",
     "import:sources": "node scripts/import-weapon-sources.mjs",
     "import:calendar": "node scripts/import-calendar.mjs",
     "import:weapon-art": "python scripts/import-weapon-art.py"

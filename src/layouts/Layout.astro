@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import Splash from '../components/Splash.astro';
+import social from '../data/social.json';
 import { ogPath } from '../lib/og';
 import { useData, LANGS, prefixOf } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
@@ -58,7 +59,7 @@ const footerCols: [string, [string, string][]][] = [
   ['Эндгейм', [['Календарь', '/calendar/'], ['Витая бездна', '/abyss/'], ['Театр воображариума', '/theater/'], ['Натиск', '/onslaught/'], ['Баннеры', '/banners/'], ['История баннеров', '/banners/#history'], ['Рейтинг', '/rating/']]],
   ['Инструменты', [['Симулятор команды', '/tools/simulator/'], ['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'], ['Калькулятор прокачки', '/tools/calculator/'],
     ['Карта Тейвата', `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`]]],
-  ['Сайт', [['Новости сайта', '/news/'], ['Telegram-канал', 'https://t.me/genshinflex'], ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Sitemap', '/sitemap.xml']]],
+  ['Сайт', [['Новости сайта', '/news/'], ['Telegram-канал', social.telegram], ...(social.discord ? [['Discord-сервер', social.discord] as [string, string]] : []), ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Sitemap', '/sitemap.xml']]],
 ];
 const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 ---
@@ -154,9 +155,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14Z" fill="currentColor"/><circle cx="10" cy="10" r="7" /></svg>
         </button>
-        <a class="icon-btn tg" href="https://t.me/genshinflex" target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
+        <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
         </a>
+        {social.discord && (
+          <a class="icon-btn dc" href={social.discord} target="_blank" rel="noopener" aria-label={t('Discord-сервер проекта')} title={t('Discord-сервер проекта')}>
+            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M6.1 5.3a13 13 0 0 1 7.8 0l.5 1.2c1.1.3 2 .8 2.7 1.3.6 2.1.6 4.2 0 6.3-.9.7-1.9 1.2-3 1.6l-.7-1.1m-6.8 0-.7 1.1c-1.1-.4-2.1-.9-3-1.6-.6-2.1-.6-4.2 0-6.3.7-.5 1.6-1 2.7-1.3Zm.5 7.7c2.4 1.2 5.4 1.2 7.8 0M7.1 10.8h.1m5.6 0h.1" /></svg>
+          </a>
+        )}
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
       <footer class="footer">
@@ -266,12 +272,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   }
   .icon-btn { display: grid; place-items: center; width: 38px; height: 38px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); cursor: pointer; flex: none; }
   .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+  .tg { color: var(--muted); }
+  .tg:hover { color: #2aabee; }
+  .dc { color: var(--muted); }
+  .dc:hover { color: #5865f2; }
   .langs { margin-left: auto; display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2px; }
   .langs a { font-size: .78rem; font-weight: 600; padding: .35rem .5rem; border-radius: 7px; text-decoration: none; color: var(--muted); }
   .langs a:hover { color: var(--text); }
   .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
-  .tg { color: var(--muted); }
-  .tg:hover { color: #2aabee; }
   .burger { display: none; }
   .content { width: 100%; max-width: 1180px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; }
   .content.wide { max-width: 1400px; }
