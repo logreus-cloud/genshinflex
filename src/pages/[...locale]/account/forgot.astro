@@ -1,0 +1,57 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Восстановить пароль')} noindex>
+  <div class="auth-page" id="forgot" data-base={base}
+    data-sent={t('Если такой аккаунт есть, мы отправили письмо.')}
+    data-error={t('Не удалось отправить письмо. Попробуйте позже.')}
+    data-captcha-error={t('Не удалось загрузить капчу. Попробуйте ещё раз.')}>
+    <h1>{t('Восстановить пароль')}</h1>
+    <p class="lead">{t('Укажите email аккаунта.')}</p>
+    <form class="panel auth-panel auth-form">
+      <label>{t('Email')}<input class="input" name="email" type="email" autocomplete="email" required /></label>
+      <div class="captcha"></div>
+      <button class="btn primary" type="submit">{t('Отправить письмо')}</button>
+      <p class="status small" aria-live="polite"></p>
+    </form>
+    <p class="auth-bottom"><a data-page="login" href={`${base}/account/login/`}>{t('Вернуться ко входу')}</a></p>
+  </div>
+</Layout>
+
+<script>
+  import { authUrl, getSupabase, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
+  onPage('#forgot', (root) => {
+    root.querySelector<HTMLAnchorElement>('[data-page]')!.href = authUrl(root.dataset.base || '', 'login', pageNext());
+    const form = root.querySelector('form')!;
+    const status = form.querySelector<HTMLElement>('.status')!;
+    let captcha: Awaited<ReturnType<typeof mountCaptcha>> | undefined;
+    mountCaptcha(root.querySelector<HTMLElement>('.captcha')!).then((widget) => { captcha = widget; }).catch(() => {
+      status.textContent = root.dataset.captchaError || '';
+      status.className = 'status small bad';
+    });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const button = form.querySelector('button')!;
+      button.disabled = true;
+      status.textContent = '';
+      try {
+        if (!captcha) throw new Error('captcha');
+        const email = String((form.elements.namedItem('email') as HTMLInputElement).value).trim();
+        await getSupabase().auth.resetPasswordForEmail(email, {
+          redirectTo: new URL(authUrl(root.dataset.base || '', 'reset'), location.origin).toString(),
+          captchaToken: captcha.token(),
+        });
+        status.textContent = root.dataset.sent || '';
+        status.className = 'status small ok';
+      } catch (error) {
+        status.textContent = error instanceof Error && error.message === 'captcha'
+          ? root.dataset.captchaError || '' : root.dataset.error || '';
+        status.className = 'status small bad';
+      } finally { captcha?.reset(); button.disabled = false; }
+    });
+  });
+</script>

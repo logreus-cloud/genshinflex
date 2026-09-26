@@ -152,6 +152,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <div class="langs" role="group" aria-label={t('Язык')}>
           {LANGS.map((l) => <a href={alt(l)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
         </div>
+        <a class="icon-btn account-link" id="account-link" href={`${base}/account/login/`}
+          data-base={base} data-login={t('Войти')} data-account={t('Аккаунт')} aria-label={t('Войти')} title={t('Войти')}>
+          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d={icons.user} /></svg>
+          <span class="account-letter" hidden></span>
+        </a>
         <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14Z" fill="currentColor"/><circle cx="10" cy="10" r="7" /></svg>
         </button>
@@ -272,6 +277,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   }
   .icon-btn { display: grid; place-items: center; width: 38px; height: 38px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); cursor: pointer; flex: none; }
   .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+  .account-link { position: relative; color: var(--muted); text-decoration: none; }
+  .account-link:hover { color: var(--accent); }
+  .account-letter:not([hidden]) { position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .65rem; font-weight: 700; }
   .tg { color: var(--muted); }
   .tg:hover { color: #2aabee; }
   .dc { color: var(--muted); }
@@ -302,6 +310,25 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   @media (max-width: 900px) { .f-grid { grid-template-columns: 1fr 1fr; } .f-brand { grid-column: 1 / -1; } }
   .skip:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; clip: auto; padding: .5rem 1rem; background: var(--accent); color: var(--accent-ink); z-index: 100; border-radius: var(--radius); }
   .scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .5); z-index: 35; }
+
+  :global(.auth-page) { max-width: 620px; margin: 0 auto; min-width: 0; }
+  :global(.auth-page h1) { margin-bottom: .5rem; }
+  :global(.auth-page .lead) { color: var(--muted); }
+  :global(.auth-panel) { display: grid; gap: 1.1rem; min-width: 0; }
+  :global(.auth-form) { display: grid; gap: .9rem; min-width: 0; }
+  :global(.auth-form label) { display: grid; gap: .35rem; min-width: 0; font-size: .9rem; }
+  :global(.auth-form .input) { width: 100%; min-width: 0; }
+  :global(.auth-form .btn) { justify-content: center; }
+  :global(.auth-form .status), :global(.auth-success .status) { margin: 0; }
+  :global(.auth-page .status.bad) { color: var(--bad); }
+  :global(.auth-page .status.ok) { color: var(--good); }
+  :global(.auth-row) { display: flex; justify-content: flex-end; }
+  :global(.auth-bottom) { text-align: center; }
+  :global(.auth-check) { display: flex !important; align-items: flex-start; gap: .5rem; }
+  :global(.auth-check input) { margin-top: .2rem; accent-color: var(--accent); flex: none; }
+  :global(.auth-actions) { display: flex; gap: .6rem; flex-wrap: wrap; }
+  :global(.account-details) { overflow-wrap: anywhere; }
+  :global(.auth-page [hidden]) { display: none !important; }
 
   @media (max-width: 900px) {
     .side { transform: translateX(-100%); transition: transform .2s ease; }

@@ -1,0 +1,77 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+import AuthProviders from '../../../components/AuthProviders.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+const labels = {
+  general: t('Не удалось войти. Попробуйте ещё раз.'),
+  invalid_credentials: t('Неверный email или пароль.'),
+  email_not_confirmed: t('Сначала подтвердите email.'),
+  user_already_exists: t('Аккаунт уже существует.'),
+  weak_password: t('Пароль слишком слабый.'),
+  over_email_send_rate_limit: t('Слишком много попыток. Попробуйте позже.'),
+  captcha_failed: t('Проверка капчи не пройдена.'),
+  same_password: t('Новый пароль совпадает со старым.'),
+};
+---
+<Layout title={t('Войти')} noindex>
+  <div class="auth-page" id="login" data-base={base} data-labels={JSON.stringify(labels)}>
+    <h1>{t('Войти')}</h1>
+    <p class="lead">{t('Войдите в свой аккаунт GenshinFlex.')}</p>
+    <div class="panel auth-panel">
+      <form class="auth-form">
+        <label>{t('Email')}<input class="input" name="email" type="email" autocomplete="email" required /></label>
+        <label>{t('Пароль')}<input class="input" name="password" type="password" autocomplete="current-password" required /></label>
+        <div class="auth-row">
+          <a data-page="forgot" href={`${base}/account/forgot/`}>{t('Забыли пароль?')}</a>
+        </div>
+        <div class="captcha"></div>
+        <button class="btn primary" type="submit">{t('Войти')}</button>
+        <p class="status small" aria-live="polite"></p>
+      </form>
+      <AuthProviders />
+    </div>
+    <p class="auth-bottom">{t('Нет аккаунта?')} <a data-page="register" href={`${base}/account/register/`}>{t('Регистрация')}</a></p>
+  </div>
+</Layout>
+
+<script>
+  import { authUrl, errorText, getSupabase, labelsOf, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
+  onPage('#login', (root) => {
+    const next = pageNext();
+    for (const link of root.querySelectorAll<HTMLAnchorElement>('[data-page]')) {
+      link.href = authUrl(root.dataset.base || '', link.dataset.page!, next);
+    }
+    const form = root.querySelector('form')!;
+    const status = form.querySelector<HTMLElement>('.status')!;
+    let captcha: Awaited<ReturnType<typeof mountCaptcha>> | undefined;
+    mountCaptcha(form.querySelector<HTMLElement>('.captcha')!).then((widget) => { captcha = widget; }).catch(() => {
+      status.textContent = (labelsOf(root).captcha_failed || '');
+      status.className = 'status small bad';
+    });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const button = form.querySelector('button')!;
+      button.disabled = true;
+      status.textContent = '';
+      const data = new FormData(form);
+      try {
+        if (!captcha) throw new Error('captcha');
+        const { error } = await getSupabase().auth.signInWithPassword({
+          email: String(data.get('email')).trim(),
+          password: String(data.get('password')),
+          options: { captchaToken: captcha.token() },
+        });
+        if (error) throw error;
+        document.dispatchEvent(new Event('gf:auth'));
+        location.assign(next || authUrl(root.dataset.base || '', ''));
+      } catch (error) {
+        status.textContent = error instanceof Error && error.message === 'captcha'
+          ? (labelsOf(root).captcha_failed || '') : errorText(error, labelsOf(root));
+        status.className = 'status small bad';
+      } finally { captcha?.reset(); button.disabled = false; }
+    });
+  });
+</script>

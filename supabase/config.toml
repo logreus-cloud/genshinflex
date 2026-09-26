@@ -4,9 +4,16 @@ project_id = "genshinflex"
 enabled = true
 site_url = "https://genshinflex.com"
 additional_redirect_urls = [
-  "https://test.genshinflex.pages.dev",
-  "http://localhost:4321"
+  "https://genshinflex.com/**",
+  "https://test.genshinflex.pages.dev/**",
+  "http://localhost:4321/**"
 ]
+
+# Включить после настройки секрета Turnstile в Supabase.
+[auth.captcha]
+enabled = false
+provider = "turnstile"
+secret = "env(TURNSTILE_SECRET)"
 
 [auth.email]
 enable_signup = true

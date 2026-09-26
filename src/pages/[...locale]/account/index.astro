@@ -1,0 +1,81 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Аккаунт')} noindex>
+  <div class="auth-page" id="account" data-base={base}
+    data-error={t('Не удалось загрузить профиль.')}
+    data-telegram={t('Telegram')} data-soon={t('Профиль и синхронизация — скоро.')}>
+    <h1>{t('Аккаунт')}</h1>
+    <div class="panel auth-panel">
+      <p class="status small" aria-live="polite"></p>
+      <div class="account-details" hidden>
+        <p><strong>{t('Ник')}:</strong> <span data-field="username">—</span></p>
+        <p><strong>{t('Отображаемое имя')}:</strong> <span data-field="display_name">—</span></p>
+        <p><strong>{t('Email')}:</strong> <span data-field="email">—</span></p>
+        <p><strong>{t('Способы входа')}:</strong> <span data-field="providers">—</span></p>
+        <p class="muted">{t('Профиль и синхронизация — скоро.')}</p>
+        <div class="auth-actions">
+          <a class="btn" data-page="reset" href={`${base}/account/reset/`} hidden>{t('Сменить пароль')}</a>
+          <button class="btn" type="button" id="signout">{t('Выйти')}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { authUrl, getSupabase, onPage, signOut } from '../../../scripts/auth';
+  onPage('#account', (root) => {
+    const base = root.dataset.base || '';
+    const status = root.querySelector<HTMLElement>('.status')!;
+    const details = root.querySelector<HTMLElement>('.account-details')!;
+    const field = (name: string, value: string) => {
+      root.querySelector<HTMLElement>(`[data-field="${name}"]`)!.textContent = value || '—';
+    };
+    const load = async () => {
+      try {
+        const supabase = getSupabase();
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) {
+          location.replace(authUrl(base, 'login', location.pathname));
+          return;
+        }
+        const user = session.session.user;
+        const { data: profile } = await supabase.from('profiles')
+          .select('username,display_name').eq('id', user.id).maybeSingle();
+        if (!root.isConnected) return;
+        field('username', String(profile?.username || ''));
+        field('display_name', String(profile?.display_name || user.user_metadata?.display_name || ''));
+        const telegram = user.app_metadata?.telegram_id;
+        const synthetic = /^tg\d+@telegram\.genshinflex\.com$/i.test(user.email || '');
+        field('email', synthetic
+          ? `${root.dataset.telegram} @${user.user_metadata?.telegram_username || telegram || ''}`
+          : user.email || '');
+        const providers = new Set((user.identities || []).map((identity) => identity.provider));
+        if (telegram) providers.add('telegram');
+        field('providers', [...providers].map((provider) => provider === 'telegram' ? root.dataset.telegram || 'Telegram' : provider).join(', '));
+        const reset = root.querySelector<HTMLAnchorElement>('[data-page="reset"]')!;
+        reset.href = authUrl(base, 'reset');
+        reset.hidden = !providers.has('email');
+        details.hidden = false;
+      } catch {
+        status.textContent = root.dataset.error || '';
+        status.className = 'status small bad';
+      }
+    };
+    void load();
+    root.querySelector<HTMLButtonElement>('#signout')!.addEventListener('click', async () => {
+      const { error } = await signOut();
+      if (error) {
+        status.textContent = root.dataset.error || '';
+        status.className = 'status small bad';
+        return;
+      }
+      document.dispatchEvent(new Event('gf:auth'));
+      location.assign(`${base}/`);
+    });
+  });
+</script>

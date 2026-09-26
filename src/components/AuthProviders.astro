@@ -1,0 +1,87 @@
+---
+import { useData } from '../lib/data';
+import { TELEGRAM_BOT } from '../lib/platform';
+const { base, lang, t } = useData(Astro.currentLocale);
+---
+<div class="auth-providers" data-base={base} data-lang={lang}
+  data-error={t('Не удалось войти. Попробуйте ещё раз.')}>
+  <p class="auth-divider">{t('или')}</p>
+  <div class="auth-provider-buttons">
+    <button class="btn" type="button" data-provider="discord">{t('Войти через Discord')}</button>
+    <button class="btn" type="button" data-provider="google">{t('Войти через Google')}</button>
+  </div>
+  <div class="telegram-widget" data-bot={TELEGRAM_BOT}></div>
+  <p class="muted small">{t('Вход через Telegram работает только на genshinflex.com.')}</p>
+  <p class="status small" aria-live="polite"></p>
+</div>
+
+<script>
+  import { API_URL } from '../lib/platform';
+  import { authUrl, getSupabase, onPage, pageNext } from '../scripts/auth';
+
+  declare global {
+    interface Window {
+      onGenshinFlexTelegram?: (auth: Record<string, unknown>) => void;
+    }
+  }
+
+  onPage('.auth-providers', (root) => {
+    const base = root.dataset.base || '';
+    const next = pageNext();
+    const status = root.querySelector<HTMLElement>('.status')!;
+    const error = () => { status.textContent = root.dataset.error || ''; status.className = 'status small bad'; };
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-provider]')) {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        try {
+          const callback = new URL(authUrl(base, 'callback', next), location.origin).toString();
+          const { error: authError } = await getSupabase().auth.signInWithOAuth({
+            provider: button.dataset.provider as 'discord' | 'google',
+            options: { redirectTo: callback },
+          });
+          if (authError) error();
+        } catch { error(); }
+        finally { button.disabled = false; }
+      });
+    }
+
+    window.onGenshinFlexTelegram = async (auth) => {
+      status.textContent = '';
+      try {
+        const response = await fetch(`${API_URL}/auth/telegram`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ auth, lang: root.dataset.lang }),
+        });
+        if (!response.ok) throw new Error('telegram');
+        const body = await response.json() as { token_hash?: string };
+        if (!body.token_hash) throw new Error('telegram');
+        const { error: authError } = await getSupabase().auth.verifyOtp({ token_hash: body.token_hash, type: 'magiclink' });
+        if (authError) throw authError;
+        document.dispatchEvent(new Event('gf:auth'));
+        location.assign(next || authUrl(base, ''));
+      } catch { error(); }
+    };
+
+    const holder = root.querySelector<HTMLElement>('.telegram-widget')!;
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    script.dataset.telegramLogin = holder.dataset.bot || '';
+    script.dataset.size = 'large';
+    script.dataset.onauth = 'onGenshinFlexTelegram(user)';
+    holder.append(script);
+  });
+</script>
+
+<style>
+  .auth-providers { display: grid; gap: .8rem; text-align: center; }
+  .auth-divider { display: flex; align-items: center; gap: .7rem; margin: .2rem 0; color: var(--muted); }
+  .auth-divider::before, .auth-divider::after { content: ''; height: 1px; background: var(--border); flex: 1; }
+  .auth-provider-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .auth-provider-buttons .btn { min-width: 0; white-space: normal; }
+  .telegram-widget { min-height: 40px; }
+  .status { margin: 0; }
+  .bad { color: var(--bad); }
+  @media (max-width: 520px) { .auth-provider-buttons { grid-template-columns: 1fr; } }
+</style>

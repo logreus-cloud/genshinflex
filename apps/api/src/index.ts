@@ -4,9 +4,10 @@ import { userIdFromToken } from './lib/auth.ts';
 import type { Env } from './lib/env.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
+import { telegramLogin } from './lib/telegram-login.ts';
 
 const app = new Hono<{ Bindings: Env }>();
-const version = '0.1.0';
+const version = '0.2.0';
 
 app.use('*', async (c, next) => {
   const origin = c.req.header('Origin');
@@ -46,17 +47,32 @@ app.get('/me', async (c) => {
 });
 
 app.post('/auth/telegram', async (c) => {
-  if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
+  if (!c.env.TELEGRAM_BOT_TOKEN || !c.env.SUPABASE_URL || !c.env.SUPABASE_SERVICE_ROLE_KEY) return c.json({ error: 'Сервис недоступен' }, 503);
   let body: unknown;
   try {
     body = await c.req.json();
   } catch {
     return c.json({ error: 'Неверный JSON' }, 400);
   }
-  const telegram = await verifyTelegram(body, c.env.TELEGRAM_BOT_TOKEN);
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return c.json({ error: 'Неверные данные' }, 400);
+  const input = body as { auth?: unknown; lang?: unknown };
+  const telegram = await verifyTelegram(input.auth, c.env.TELEGRAM_BOT_TOKEN, Date.now(), 3_600_000);
   if (!telegram) return c.json({ error: 'Неверная подпись Telegram' }, 401);
-  // TODO этапа 2: найти или создать пользователя Supabase и выдать сессию.
-  return c.json({ ok: true, telegram });
+  const auth = input.auth as Record<string, unknown>;
+  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  try {
+    const token_hash = await telegramLogin(supabase, {
+      ...telegram,
+      first_name: typeof auth.first_name === 'string' ? auth.first_name : undefined,
+      last_name: typeof auth.last_name === 'string' ? auth.last_name : undefined,
+      photo_url: typeof auth.photo_url === 'string' ? auth.photo_url : undefined,
+    }, typeof input.lang === 'string' ? input.lang : undefined);
+    return c.json({ ok: true, token_hash });
+  } catch {
+    return c.json({ error: 'Сервис недоступен' }, 500);
+  }
 });
 
 app.post('/hooks/sanity', async (c) => {

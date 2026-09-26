@@ -16,7 +16,7 @@
 Пользователь → Supabase Auth → access token → Worker → Postgres
 ```
 
-Studio редактирует содержимое Content Lake. Опубликованный сайт получает контент при сборке. Пользователь входит через Supabase Auth; Worker проверяет JWT и читает профиль. Telegram Login Widget на этапе 1 только проверяет подпись: сессия Supabase появится на этапе 2.
+Studio редактирует содержимое Content Lake. Опубликованный сайт получает контент при сборке. Пользователь входит через Supabase Auth; Worker проверяет JWT и читает профиль. На этапе 2 Telegram Login Widget передаёт подписанные данные Worker, который выдаёт одноразовый `token_hash` для сессии Supabase.
 
 ## Бесплатные лимиты
 
@@ -33,16 +33,17 @@ Studio редактирует содержимое Content Lake. Опублик�
 ## Настройка
 
 1. Создать проект Sanity и dataset `production`. Указать `SANITY_STUDIO_PROJECT_ID` и `SANITY_STUDIO_DATASET` для Studio; добавить разрешённые CORS origins сайта и Studio. Создать токен записи для будущих серверных операций, хранить его как `SANITY_WRITE_TOKEN` только в Worker. Настроить вебхук на `https://api.genshinflex.com/hooks/sanity` с секретом `SANITY_WEBHOOK_SECRET`, методом POST и событиями опубликованных документов.
-2. Создать проект Supabase в регионе EU. Связать проект с CLI и выполнить `supabase db push`. Настроить SMTP Resend, подтверждение email, провайдеры Discord и Google и redirect URL для `https://genshinflex.com`, `https://test.genshinflex.pages.dev` и `http://localhost:4321`. Секреты OAuth и SMTP хранить в окружении.
+2. Создать проект Supabase в регионе EU. Связать проект с CLI и выполнить `supabase db push`. В Authentication → URL Configuration указать Site URL `https://genshinflex.com` и Redirect URLs `https://genshinflex.com/**`, `https://test.genshinflex.pages.dev/**`, `http://localhost:4321/**`. В Providers включить Discord (приложение в Discord Developer Portal) и Google (OAuth client в Google Cloud); redirect обоих провайдеров — `https://qhfufvdculphsqxuqxsw.supabase.co/auth/v1/callback`. В SMTP настроить Resend. В Bot protection включить Turnstile, его секрет хранить в Supabase, а site key задать в Pages как `PUBLIC_TURNSTILE_SITE_KEY`. Секреты OAuth и SMTP хранить в окружении.
 3. Создать Cloudflare Pages Deploy Hook. Сохранить его URL в секрете Worker `CF_DEPLOY_HOOK_URL`.
 4. Для Worker задать `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_TOKEN`, `SANITY_WEBHOOK_SECRET` и `CF_DEPLOY_HOOK_URL` через секреты Wrangler. При необходимости HS256 задать `SUPABASE_JWT_SECRET`; для асимметричных JWT используется JWKS Supabase. Выполнить `wrangler deploy` из `apps/api` и назначить маршрут `api.genshinflex.com`.
 5. Установить зависимости рабочих областей, собрать и развернуть Studio. После настройки проекта проверить `npm run api:test`.
+6. В `@BotFather` выполнить `/setdomain` для `genshinflex.com`. Из `apps/api` задать Worker-секреты командами `npx wrangler secret put TELEGRAM_BOT_TOKEN` и `npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY`.
 
 Не публиковать service role key, токены Sanity, Telegram и URL Deploy Hook в клиентском коде или репозитории. Публичные страницы профилей читают `public.public_profiles`; прямое чтение `profiles` ограничено публичными столбцами. Приватный `game_uid` читает Worker с service role key, а менять его может только владелец профиля.
 
 ## Следующие этапы
 
-2. Вход, регистрация, Telegram-сессия, профили и синхронизация пользовательских данных.
+2. Вход, регистрация и Telegram-сессия — реализованы; профили и синхронизация пользовательских данных — этап 3.
 3. Перенос форм обратной связи и заявок гайдов в API и модерацию.
 4. Миграция Markdown и JSON в Sanity, чтение контента сайтом.
 5. Перенос Astro в `apps/web` и объединение сборки рабочих областей.

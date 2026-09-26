@@ -1,0 +1,131 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+import AuthProviders from '../../../components/AuthProviders.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, lang, t } = useData(Astro.currentLocale);
+const labels = {
+  general: t('Не удалось зарегистрироваться. Попробуйте ещё раз.'),
+  invalid_credentials: t('Неверный email или пароль.'),
+  email_not_confirmed: t('Сначала подтвердите email.'),
+  user_already_exists: t('Аккаунт уже существует.'),
+  weak_password: t('Пароль слишком слабый.'),
+  over_email_send_rate_limit: t('Слишком много попыток. Попробуйте позже.'),
+  captcha_failed: t('Проверка капчи не пройдена.'),
+  same_password: t('Новый пароль совпадает со старым.'),
+};
+---
+<Layout title={t('Регистрация')} noindex>
+  <div class="auth-page" id="register" data-base={base} data-lang={lang} data-labels={JSON.stringify(labels)}
+    data-mismatch={t('Пароли не совпадают.')} data-weak={t('Слабый')} data-fair={t('Нормальный')}
+    data-strong={t('Надёжный')} data-sent={t('Проверьте почту: мы отправили ссылку на')}
+    data-resend={t('Отправить ещё раз')} data-wait={t('Повторить через')}
+    data-captcha-error={t('Не удалось загрузить капчу. Попробуйте ещё раз.')}>
+    <h1>{t('Регистрация')}</h1>
+    <p class="lead">{t('Создайте аккаунт GenshinFlex.')}</p>
+    <div class="panel auth-panel">
+      <form class="auth-form">
+        <label>{t('Email')}<input class="input" name="email" type="email" autocomplete="email" required /></label>
+        <label>{t('Пароль')}<input class="input" name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <p class="muted small">{t('Минимум 8 символов.')} <span id="strength"></span></p>
+        <label>{t('Повторите пароль')}<input class="input" name="confirm" type="password" autocomplete="new-password" required /></label>
+        <label class="auth-check"><input name="age" type="checkbox" required /> {t('Мне есть 13 лет и я соглашаюсь с тем, что сайт хранит мой email и данные аккаунта.')}</label>
+        <div class="captcha"></div>
+        <button class="btn primary" type="submit">{t('Зарегистрироваться')}</button>
+        <p class="status small" aria-live="polite"></p>
+      </form>
+      <div class="auth-success" hidden>
+        <p class="lead"></p>
+        <button class="btn" type="button">{t('Отправить ещё раз')}</button>
+        <p class="status small" aria-live="polite"></p>
+      </div>
+      <AuthProviders />
+    </div>
+    <p class="auth-bottom">{t('Уже есть аккаунт?')} <a data-page="login" href={`${base}/account/login/`}>{t('Войти')}</a></p>
+  </div>
+</Layout>
+
+<script>
+  import { authUrl, errorText, getSupabase, labelsOf, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
+  onPage('#register', (root) => {
+    root.querySelector<HTMLAnchorElement>('[data-page]')!.href = authUrl(root.dataset.base || '', 'login', pageNext());
+    const form = root.querySelector('form')!;
+    const password = form.elements.namedItem('password') as HTMLInputElement;
+    const confirm = form.elements.namedItem('confirm') as HTMLInputElement;
+    const strength = root.querySelector<HTMLElement>('#strength')!;
+    const status = form.querySelector<HTMLElement>('.status')!;
+    const success = root.querySelector<HTMLElement>('.auth-success')!;
+    const resend = success.querySelector('button')!;
+    let email = '';
+    let remaining = 0;
+    let captcha: Awaited<ReturnType<typeof mountCaptcha>> | undefined;
+    mountCaptcha(root.querySelector<HTMLElement>('.captcha')!).then((widget) => { captcha = widget; }).catch(() => {
+      status.textContent = (labelsOf(root).captcha_failed || '');
+      status.className = 'status small bad';
+    });
+    password.addEventListener('input', () => {
+      const value = password.value;
+      const kinds = [/[a-z]/.test(value), /[A-Z]/.test(value), /\d/.test(value), /[^a-zA-Z0-9]/.test(value)].filter(Boolean).length;
+      strength.textContent = !value ? '' : value.length < 8 || kinds < 2 ? root.dataset.weak || '' : value.length >= 12 && kinds >= 3 ? root.dataset.strong || '' : root.dataset.fair || '';
+    });
+    const tick = () => {
+      resend.disabled = remaining > 0;
+      resend.textContent = remaining > 0 ? `${root.dataset.wait} ${remaining--} c` : root.dataset.resend || '';
+    };
+    const startTimer = () => {
+      remaining = 60;
+      tick();
+      const timer = window.setInterval(() => {
+        if (!root.isConnected || remaining <= 0) { clearInterval(timer); if (root.isConnected) tick(); return; }
+        tick();
+      }, 1000);
+    };
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      if (password.value !== confirm.value) {
+        status.textContent = root.dataset.mismatch || '';
+        status.className = 'status small bad';
+        return;
+      }
+      const button = form.querySelector('button')!;
+      button.disabled = true;
+      status.textContent = '';
+      email = String((form.elements.namedItem('email') as HTMLInputElement).value).trim();
+      try {
+        if (!captcha) throw new Error('captcha');
+        const { error } = await getSupabase().auth.signUp({
+          email, password: password.value,
+          options: {
+            emailRedirectTo: new URL(authUrl(root.dataset.base || '', 'callback'), location.origin).toString(),
+            data: { lang: root.dataset.lang },
+            captchaToken: captcha.token(),
+          },
+        });
+        if (error && error.code !== 'user_already_exists' && error.message !== 'User already registered') throw error;
+        form.hidden = true;
+        success.hidden = false;
+        success.querySelector<HTMLElement>('.lead')!.textContent = `${root.dataset.sent} ${email}`;
+        startTimer();
+      } catch (error) {
+        status.textContent = error instanceof Error && error.message === 'captcha'
+          ? (labelsOf(root).captcha_failed || '') : errorText(error, labelsOf(root));
+        status.className = 'status small bad';
+      } finally { captcha?.reset(); button.disabled = false; }
+    });
+    resend.addEventListener('click', async () => {
+      if (remaining > 0) return;
+      resend.disabled = true;
+      try {
+        const { error } = await getSupabase().auth.resend({ type: 'signup', email });
+        if (error) throw error;
+        startTimer();
+      } catch (error) {
+        const message = success.querySelector<HTMLElement>('.status')!;
+        message.textContent = errorText(error, labelsOf(root));
+        message.className = 'status small bad';
+        resend.disabled = false;
+      }
+    });
+  });
+</script>

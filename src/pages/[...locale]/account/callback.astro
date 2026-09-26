@@ -1,0 +1,57 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Подтверждение входа')} noindex>
+  <div class="auth-page" id="callback" data-base={base}
+    data-loading={t('Подтверждаем вход…')} data-done={t('Почта подтверждена.')}
+    data-error={t('Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.')}>
+    <h1>{t('Подтверждение входа')}</h1>
+    <div class="panel auth-panel">
+      <p class="status small" aria-live="polite">{t('Подтверждаем вход…')}</p>
+      <a data-page="login" href={`${base}/account/login/`} hidden>{t('Вернуться ко входу')}</a>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { authUrl, getSupabase, onPage, pageNext, safeNext } from '../../../scripts/auth';
+  onPage('#callback', (root) => {
+    const status = root.querySelector<HTMLElement>('.status')!;
+    const login = root.querySelector<HTMLAnchorElement>('[data-page]')!;
+    const base = root.dataset.base || '';
+    const next = pageNext();
+    login.href = authUrl(base, 'login', next);
+    const query = new URLSearchParams(location.search);
+    const hash = new URLSearchParams(location.hash.slice(1));
+    const failed = () => {
+      status.textContent = root.dataset.error || '';
+      status.className = 'status small bad';
+      login.hidden = false;
+    };
+    if (query.has('error') || query.has('error_description') || hash.has('error') || hash.has('error_description')) {
+      failed();
+      return;
+    }
+    const auth = getSupabase().auth;
+    let done = false;
+    const finish = () => {
+      if (done || !root.isConnected) return;
+      done = true;
+      status.textContent = root.dataset.done || '';
+      status.className = 'status small ok';
+      document.dispatchEvent(new Event('gf:auth'));
+      location.replace(next ? safeNext(next) : authUrl(base, ''));
+    };
+    const { data: listener } = auth.onAuthStateChange((event, session) => {
+      if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED')) finish();
+    });
+    void auth.getSession().then(({ data, error }) => {
+      if (data.session) finish();
+      else if (error || root.isConnected) failed();
+    }).catch(failed);
+    document.addEventListener('astro:before-swap', () => listener.subscription.unsubscribe(), { once: true });
+  });
+</script>

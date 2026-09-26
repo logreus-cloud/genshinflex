@@ -78,3 +78,34 @@ function tick() {
 tick();
 setInterval(tick, 30_000);
 document.addEventListener('gf:region', tick);
+
+async function updateAccountLink() {
+  const link = document.getElementById('account-link') as HTMLAnchorElement | null;
+  if (!link) return;
+  const base = link.dataset.base || '';
+  const login = link.dataset.login || '';
+  const account = link.dataset.account || '';
+  const path = location.pathname + location.search;
+  link.href = `${base}/account/login/?next=${encodeURIComponent(path)}`;
+  link.setAttribute('aria-label', login);
+  link.title = login;
+  const letter = link.querySelector<HTMLElement>('.account-letter');
+  if (letter) { letter.textContent = ''; letter.hidden = true; }
+
+  try {
+    if (!localStorage.getItem('gf:auth')) return;
+    const { getSupabase } = await import('./auth');
+    const { data } = await getSupabase().auth.getSession();
+    if (!data.session || !link.isConnected) return;
+    link.href = `${base}/account/`;
+    link.setAttribute('aria-label', account);
+    link.title = account;
+    const user = data.session.user;
+    const name = String(user.user_metadata?.username || user.user_metadata?.display_name || user.email || '');
+    if (letter && name) { letter.textContent = name[0].toUpperCase(); letter.hidden = false; }
+  } catch { /* Хранилище и сеть могут быть недоступны. */ }
+}
+
+updateAccountLink();
+document.addEventListener('astro:page-load', updateAccountLink);
+document.addEventListener('gf:auth', updateAccountLink);
