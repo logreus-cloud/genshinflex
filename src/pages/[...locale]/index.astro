@@ -3,8 +3,11 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import AbyssGate from '../../components/AbyssGate.astro';
 import HeroCarousel from '../../components/HeroCarousel.astro';
+import EntryGate from '../../components/EntryGate.astro';
 import FeatureTabs from '../../components/FeatureTabs.astro';
+import season from '../../data/season.json';
 import weaponArt from '../../data/generated/weapon-art.json';
+import namecards from '../../data/generated/namecards.json';
 import { siteNews, newsDate } from '../../lib/news';
 import { calendarItems } from '../../lib/calendar';
 import { useData, LANGS } from '../../lib/data';
@@ -26,7 +29,7 @@ const banner = banners.find((b) => new Date(b.end) > now) ?? banners.at(-1)!;
 const nextBanner = banners.find((b) => b.start > banner.start && new Date(b.start) > now);
 const slides = [banner, nextBanner].filter((b): b is typeof banner => Boolean(b)).flatMap((b) =>
   b.featured.map((f) => getCharacter(f.slug)).filter((hero) => hero.rarity === 5)
-    .map((hero) => ({ banner: b, hero, upcoming: new Date(b.start) > now })));
+    .map((hero) => ({ banner: b, hero: { ...hero, namecard: (namecards as Record<string, string>)[hero.slug] }, upcoming: new Date(b.start) > now })));
 const newsImage = latestNews?.data.image || slides[0]?.hero.splash;
 const newsFallback = !latestNews?.data.image;
 const featuredWeapon = (banner as { weapons?: (string | { slug: string })[] }).weapons?.[0];
@@ -57,7 +60,12 @@ const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.ver
 const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
 ---
 <Layout>
+  {season.theme === 'snezhnaya' && <EntryGate />}
   <HeroCarousel slides={slides} />
+
+  <div class="feature-band">
+    <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
+  </div>
 
   <h2 class="home-title">{t('Новости сайта')}</h2>
   {latestNews && (
@@ -79,7 +87,10 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   <h2 class="home-title">{t('Календарь событий')}</h2>
   <a class:list={['promo-card', 'calendar-card', { 'no-image': !calendarImage?.image }]} href={`${base}/calendar/`}>
     {calendarImage?.image && (
-      <div class="promo-visual"><img src={calendarImage.image} alt="" loading="lazy" /></div>
+      <div class="promo-visual">
+        <img class="backdrop" src={calendarImage.image} alt="" aria-hidden="true" loading="lazy" />
+        <img src={calendarImage.image} alt="" loading="lazy" />
+      </div>
     )}
     <div class="promo-copy">
       <time datetime={now.toISOString()}>{t('Обновлено {date}', { date: newsDate(now, lang) })}</time>
@@ -88,10 +99,6 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
       <span class="promo-link"><span aria-hidden="true">▶ </span>{t('Открыть полный календарь')}</span>
     </div>
   </a>
-
-  <div class="feature-band">
-    <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
-  </div>
 
   <section class="collection-band">
     <div class="collection-row">
@@ -244,11 +251,13 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   /* Картинка не влияет на высоту карточки — её задаёт текст */
   .promo-visual { position: relative; min-width: 0; overflow: hidden; }
   .promo-visual img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+  .calendar-card .promo-visual img { object-fit: contain; }
+  .calendar-card .promo-visual .backdrop { object-fit: cover; filter: blur(18px) saturate(1.1); transform: scale(1.15); opacity: .7; }
   .promo-visual.fallback { background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 25%, var(--surface-2)), var(--surface-2)); }
   .promo-visual.fallback img { object-fit: contain; object-position: center bottom; }
   .feature-band, .collection-band { margin-inline: calc(50% - 50vw); padding: 2.5rem calc(50vw - 50%); }
-  .feature-band { --band-a: color-mix(in srgb, var(--bg) 94%, #fff 6%); margin-top: 2.5rem; background: var(--band-a); }
-  .collection-band { margin-bottom: -3rem; background: #111a2e; }
+  .feature-band { --band-a: color-mix(in srgb, var(--bg) 94%, #fff 6%); margin-top: -3rem; background: var(--band-a); }
+  .collection-band { background: #111a2e; }
   .collection-row + .collection-row { margin-top: 2.4rem; }
   .pill-title { display: table; margin: 0 auto 1.4rem; padding: .55rem 1.6rem; border-radius: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); font: 600 1rem var(--font-display); text-align: center; }
   .gate-carousel { display: flex; align-items: center; justify-content: center; gap: 1.2rem; min-width: 0; }
@@ -263,17 +272,16 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   .tile.weapon img { padding: 8px; box-sizing: border-box; object-fit: contain; }
   .tile .beta { position: absolute; top: 5px; right: 5px; padding: .05rem .3rem; border-radius: 4px; background: #e0457b; color: #fff; font-size: .6rem; font-weight: 600; letter-spacing: .04em; }
   .tile:hover, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-3px); }
-  :global(.content:has(> .collection-band) + .footer) { margin-top: 0; }
   :global(html[data-theme='light']) .feature-band { --band-a: var(--bg-deep); }
   :global(html[data-theme='light']) .collection-band { background: #dfe6f3; }
   @media (prefers-color-scheme: light) {
     :global(html:not([data-theme])) .feature-band { --band-a: var(--bg-deep); }
     :global(html:not([data-theme])) .collection-band { background: #dfe6f3; }
   }
-  @media (max-width: 900px) { .collection-band { margin-bottom: -2.5rem; } }
   @media (max-width: 700px) {
     .promo-card { grid-template-columns: 1fr; }
     .news-card, .calendar-card { grid-template-columns: 1fr; }
+    .feature-band { margin-top: -2.5rem; }
     .promo-visual { height: 160px; }
     .news-card .promo-visual { order: -1; }
     .gate-list { flex: 1 1 auto; max-width: 100%; }

@@ -82,7 +82,13 @@
 
 :root[data-season="snezhnaya"] .carousel .slide::before {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(0deg, rgb(10 14 26 / .55), transparent 35%);
+}
+:root[data-season="snezhnaya"][data-theme="light"] .carousel .slide::before {
   background: linear-gradient(0deg, rgb(169 220 255 / .18), transparent 30%);
+}
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .carousel .slide::before { background: linear-gradient(0deg, rgb(169 220 255 / .18), transparent 30%); }
 }
 :root[data-season="snezhnaya"] .carousel .copy { z-index: 1; }
 :root[data-season="snezhnaya"] .pill-title {
@@ -122,12 +128,6 @@
   outline-color: var(--frost); box-shadow: 0 0 16px rgb(111 182 255 / .25);
 }
 
-:root[data-season="snezhnaya"] .season-drift { height: 26px; flex: none; margin-top: 2rem; }
-:root[data-season="snezhnaya"] .season-drift svg { display: block; width: 100%; height: 100%; }
-:root[data-season="snezhnaya"] .season-drift .bank { fill: var(--bg-deep); }
-:root[data-season="snezhnaya"] .season-drift .edge { fill: none; stroke: rgb(244 248 255 / .5); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-:root[data-season="snezhnaya"] .content:has(> .collection-band) + .season-drift { margin-top: 0; }
-:root[data-season="snezhnaya"] .season-drift + .footer { margin-top: 0; border-top: 0; }
 @media (max-width: 700px) {
   :root[data-season="snezhnaya"] .season-snow::after { display: none; }
   :root[data-season="snezhnaya"] .top::after { height: 6px; background-size: 120px 6px; }

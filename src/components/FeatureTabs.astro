@@ -5,14 +5,14 @@ const { base, t } = useData(Astro.currentLocale);
 interface Item { label: string; href: string; icon: string; image?: string; imageClass?: string; until?: string; description?: string; soon?: boolean; }
 interface Props { heroIcon?: string; weaponImage?: string; artifactIcon?: string; modes: { label: string; href: string; icon: string; until?: string }[]; }
 const { heroIcon, weaponImage, artifactIcon, modes } = Astro.props;
-const groups: { label: string; items: Item[] }[] = [
-  { label: 'База', items: [
+const groups: { key: string; label: string; items: Item[] }[] = [
+  { key: 'base', label: 'База', items: [
     { label: 'Персонажи', href: '/characters', icon: 'user', image: heroIcon, imageClass: 'character' },
     { label: 'Оружие', href: '/weapons', icon: 'sword', image: weaponImage, imageClass: 'weapon' },
     { label: 'Артефакты', href: '/artifacts', icon: 'flower', image: artifactIcon, imageClass: 'artifact' },
   ] },
-  { label: 'Эндгейм', items: modes },
-  { label: 'Инструменты', items: [
+  { key: 'endgame', label: 'Эндгейм', items: modes },
+  { key: 'tools', label: 'Инструменты', items: [
     { label: 'Симулятор команды', href: '/tools/simulator', icon: 'chart', description: 'Соберите отряд и сравните варианты.' },
     { label: 'Проверка команды', href: '/tools/team-check', icon: 'check', description: 'Проверьте отряд для текущей Бездны.' },
     { label: 'Трекер круток', href: '/tools/wishes', icon: 'star', description: 'Следите за гарантом и историей круток.' },
@@ -34,7 +34,7 @@ const buttons: Record<string, string> = {
       aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{t(group.label)}</button>)}
   </div>
   {groups.map((group, i) => (
-    <div class="group" id={`feature-panel-${i}`} role="tabpanel" aria-labelledby={`feature-tab-${i}`}>
+    <div class="group" data-group={group.key} id={`feature-panel-${i}`} role="tabpanel" aria-labelledby={`feature-tab-${i}`}>
       <h3 class="group-title">{t(group.label)}</h3>
       <div class="cards">
         {group.items.map((item) => (
@@ -91,12 +91,13 @@ const buttons: Record<string, string> = {
   .ready .group-title { display: none; }
   .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   /* Одинокая карточка в последнем ряду — по центру */
-  .cards > .card:last-child:nth-child(3n + 1) { grid-column: 2; }
+  .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(3n + 1) { grid-column: 2; }
+  .group[data-group="endgame"] .card { justify-content: center; }
   /* Раздел в разработке: приглушён, но открывается */
   .card.soon { opacity: .6; }
   .card.soon:hover, .card.soon:focus-within { opacity: .85; }
   .soon-tag { margin: -.2rem 0 .3rem; padding: .1rem .55rem; border: 1px solid var(--border); border-radius: 999px; font-size: .72rem; color: var(--muted); }
-  .card { display: flex; flex-direction: column; align-items: center; min-width: 0; min-height: 280px; padding: 1.4rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+  .card { display: flex; flex-direction: column; align-items: center; min-width: 0; min-height: 320px; padding: 1.4rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
   .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgb(0 0 0 / .18); }
   .ready .group:not([hidden]) .card { animation: gf-fade-up .38s var(--ease) backwards; }
   .ready .group:not([hidden]) .card:nth-child(2) { animation-delay: .06s; }
@@ -105,18 +106,20 @@ const buttons: Record<string, string> = {
   .ready .group:not([hidden]) .card:nth-child(5) { animation-delay: .24s; }
   .card > svg { fill: currentColor; color: var(--accent); flex: none; --icon-cut: var(--surface); }
   h4 { margin: .7rem 0 .5rem; font: 600 1.15rem var(--font-display); overflow-wrap: anywhere; }
-  .art { width: 100%; height: 130px; object-fit: contain; margin: auto 0; }
-  .art.character { border-radius: 50%; }
+  .group[data-group="endgame"] .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .art { width: 100%; height: 104px; object-fit: contain; box-sizing: border-box; padding: 4px; margin: auto 0; }
+  .art.character { width: 104px; aspect-ratio: 1; object-fit: cover; object-position: center 15%; border-radius: 50%; }
   .detail { display: grid; align-content: center; min-height: 130px; margin: auto 0; color: var(--muted); }
   .detail b { color: var(--accent-text); }
   .card .btn { justify-content: center; width: 100%; margin-top: auto; font-size: .82rem; }
   @media (max-width: 700px) {
     .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .cards > .card:last-child:nth-child(3n + 1) { grid-column: auto; }
-    .cards > .card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; justify-self: stretch; width: auto; }
-    .card { min-height: 0; padding: .9rem .7rem; }
+    .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(3n + 1) { grid-column: auto; }
+    .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; justify-self: stretch; width: auto; }
+    .card { min-height: 260px; padding: .9rem .7rem; }
     .card > svg { width: 26px; height: 26px; }
-    .art { height: 84px; }
+    .art { height: 72px; }
+    .art.character { width: 72px; }
     .detail { min-height: 84px; font-size: .85rem; }
     h4 { font-size: 1rem; margin: .5rem 0 .4rem; }
     .card .btn { font-size: .76rem; padding-inline: .5rem; }

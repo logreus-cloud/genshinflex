@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/season-snezhnaya.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import Splash from '../components/Splash.astro';
+import RootsDivider from '../components/RootsDivider.astro';
 import season from '../data/season.json';
 import social from '../data/social.json';
 import { ogPath } from '../lib/og';
@@ -113,7 +114,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <svg class="contours" viewBox="0 0 200 90" aria-hidden="true" preserveAspectRatio="none">
           <path d="M-10 70c30-18 55-8 80-22s45-30 80-18 40 6 60-4M-10 84c35-16 60-4 88-18s50-26 82-14 38 8 50 2M20 -4c10 18 30 24 52 20s40 6 48 22" />
         </svg>
-        <svg class="compass" viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+        <svg class="compass" viewBox="0 0 40 40" width="30" height="30" aria-hidden="true">
           <circle cx="20" cy="20" r="17" class="ring" />
           <circle cx="20" cy="20" r="12.5" class="ring thin" />
           <path d="M20 2 23 17 38 20 23 23 20 38 17 23 2 20 17 17Z" class="star" />
@@ -170,14 +171,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <div class="search-panel" id="search-panel" hidden><QuickSearch /></div>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
-      {season.theme && (
-        <div class="season-drift" aria-hidden="true">
-          <svg viewBox="0 0 1200 26" preserveAspectRatio="none">
-            <path class="bank" d="M0 16C100 4 175 26 290 14S470 5 590 17 765 24 890 12 1070 4 1200 16V26H0Z" />
-            <path class="edge" d="M0 16C100 4 175 26 290 14S470 5 590 17 765 24 890 12 1070 4 1200 16" />
-          </svg>
-        </div>
-      )}
+      <RootsDivider />
       <footer class="footer">
         <div class="f-grid">
           {footerCols.map(([title, links]) => (
@@ -329,8 +323,8 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .soon-tag { margin-left: auto; padding: .05rem .4rem; border: 1px solid var(--border); border-radius: 999px; font-size: .68rem; color: var(--muted); }
   /* Кнопка карты: рамка как у окон в игре — двойная золотая линия и ромбы по углам */
   .map-card {
-    position: relative; display: flex; align-items: center; gap: .6rem; margin: 0 .8rem 1rem; padding: .7rem .7rem;
-    text-decoration: none; border-radius: 4px; isolation: isolate; padding-right: 1.6rem;
+    position: relative; display: flex; align-items: center; gap: .3rem; margin: 0 .6rem 1rem; padding: .65rem 1.2rem .65rem .55rem;
+    text-decoration: none; border-radius: 4px; isolation: isolate;
     background: radial-gradient(120% 140% at 0% 0%, #2c4a5a 0%, #1d2a44 55%, #171b2e 100%);
     border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
     box-shadow: inset 0 0 0 3px #171b2e, inset 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
@@ -348,9 +342,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .compass .star { fill: #e3b04b; }
   .compass .star-in { fill: #fff3d0; opacity: .85; }
   .compass .pin { fill: #171b2e; }
-  .map-text { display: grid; line-height: 1.2; min-width: 0; }
-  .map-text b { font: 600 .88rem var(--font-display); color: #f3d38a; white-space: nowrap; }
-  .map-text small { font-size: .72rem; color: #c9c2ad; }
+  .map-text { display: grid; flex: 1; min-width: 0; line-height: 1.2; }
+  .map-text b { font: 600 .74rem var(--font-display); color: #f3d38a; }
+  .map-text small { font-size: .72rem; line-height: 1.25; color: #c9c2ad; }
   .ext { position: absolute; top: .55rem; right: .55rem; fill: none; stroke: #e3b04b; stroke-width: 1.6; stroke-linecap: round; opacity: .7; }
   .map-card:hover { border-color: var(--accent); box-shadow: inset 0 0 0 3px #171b2e, inset 0 0 0 4px var(--accent), 0 0 18px rgb(227 176 75 / .18); }
   .map-card:hover .compass { rotate: 45deg; }
@@ -390,9 +384,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .tg:hover { color: #2aabee; }
   .dc { color: var(--muted); }
   .dc:hover { color: #5865f2; }
-  .content { width: 100%; max-width: 1240px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; view-transition-name: page; }
+  .content { width: 100%; max-width: 1240px; margin: 0 auto; padding: 1.8rem 24px 0; flex: 1; view-transition-name: page; }
   .content.wide { max-width: 1400px; }
-  .footer { background: var(--bg-deep); border-top: 1px solid var(--border); padding: 1.8rem 24px 1.5rem; margin-top: 2rem; }
+  .footer {
+    --text: #f6f3ec; --muted: #b6bac6; --accent: #e3b04b; --accent-text: #f3cb79; --border: rgb(255 255 255 / .18);
+    background: #0c0d12; color: var(--text); padding: 1.8rem 24px 1.5rem;
+  }
+  :global(:root[data-theme="light"]) .footer { background: #2a2f3a; }
+  @media (prefers-color-scheme: light) { :global(:root:not([data-theme])) .footer { background: #2a2f3a; } }
   .f-grid, .f-bottom { max-width: 1240px; margin-left: auto; margin-right: auto; }
   .f-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
   .f-logo { display: inline-flex; align-items: center; gap: .55rem; color: var(--accent); text-decoration: none; }
@@ -419,7 +418,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   @media (max-width: 900px) {
     .top { padding: 0 16px; gap: .5rem; }
     .top-logo small, .search-pill { display: none; }
-    .content { padding: 1.2rem 16px 2.5rem; }
+    .content { padding: 1.2rem 16px 0; }
     .footer { padding: 2rem 16px 1.4rem; }
   }
   @media (max-width: 700px) {
