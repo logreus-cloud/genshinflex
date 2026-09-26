@@ -2,6 +2,16 @@ name = "genshinflex-api"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
 
+# Собственный адрес API: DNS-запись Cloudflare создаст сам при деплое (домен уже в Cloudflare)
+routes = [{ pattern = "api.genshinflex.com", custom_domain = true }]
+
 [vars]
 SITE_ORIGINS = "https://genshinflex.com,https://test.genshinflex.pages.dev,http://localhost:4321"
 SUPABASE_URL = "https://qhfufvdculphsqxuqxsw.supabase.co"
+# Публичный (publishable) ключ Supabase: стоит в коде любого клиента, доступ ограничивают правила RLS
+SUPABASE_ANON_KEY = "sb_publishable_3IqstX40IpHaa2g9_o4wVg_n54We4l_"
+SANITY_PROJECT_ID = "6qrew4ya"
+SANITY_DATASET = "production"
+
+# Секреты задаются командой `npx wrangler secret put <ИМЯ>` из этой папки, НЕ в файле:
+# SUPABASE_SERVICE_ROLE_KEY, TELEGRAM_BOT_TOKEN, SANITY_WRITE_TOKEN, SANITY_WEBHOOK_SECRET, CF_DEPLOY_HOOK_URL
