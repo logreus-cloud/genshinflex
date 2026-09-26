@@ -1,0 +1,30 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+import social from '../../data/social.json';
+import { Content as RuContent } from '../../data/privacy/ru.md';
+import { Content as EnContent } from '../../data/privacy/en.md';
+import { Content as EsContent } from '../../data/privacy/es.md';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, lang, t } = useData(Astro.currentLocale);
+const Content = { ru: RuContent, en: EnContent, es: EsContent }[lang];
+const privacyEmail = (social as typeof social & { privacyEmail?: string }).privacyEmail;
+---
+<Layout title={t('Политика конфиденциальности')}>
+  <div class="privacy-prose">
+    <h1>{t('Политика конфиденциальности')}</h1>
+    <p class="muted">{t('Редакция от 27 сентября 2026')}</p>
+    <Content />
+    <p>
+      <a href={`${base}/feedback/`}>{t('Форма обратной связи')}</a>
+      {social.discord && <> · <a href={social.discord} target="_blank" rel="noopener">{t('Discord-сервер проекта')}</a></>}
+      {privacyEmail && <> · <a href={`mailto:${privacyEmail}`}>{privacyEmail}</a></>}
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .privacy-prose { max-width: 75ch; overflow-wrap: anywhere; }
+  .privacy-prose h1 { margin-bottom: .3rem; }
+  :global(.privacy-prose h2) { margin-top: 1.8rem; }
+</style>

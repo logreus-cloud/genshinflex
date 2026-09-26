@@ -31,6 +31,7 @@ const labels = {
         <p class="status small" aria-live="polite"></p>
       </form>
       <AuthProviders />
+      <p class="muted small">{t('Входя, вы соглашаетесь с')} <a href={`${base}/privacy/`}>{t('политикой конфиденциальности')}</a>.</p>
     </div>
     <p class="auth-bottom">{t('Нет аккаунта?')} <a data-page="register" href={`${base}/account/register/`}>{t('Регистрация')}</a></p>
   </div>

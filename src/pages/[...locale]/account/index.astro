@@ -7,7 +7,11 @@ const { base, t } = useData(Astro.currentLocale);
 <Layout title={t('Аккаунт')} noindex>
   <div class="auth-page" id="account" data-base={base}
     data-error={t('Не удалось загрузить профиль.')}
-    data-telegram={t('Telegram')} data-soon={t('Профиль и синхронизация — скоро.')}>
+    data-telegram={t('Telegram')} data-soon={t('Профиль и синхронизация — скоро.')}
+    data-export-error={t('Не удалось скачать данные. Попробуйте позже.')}
+    data-delete-error={t('Не удалось удалить аккаунт. Попробуйте позже.')}
+    data-reauth={t('Для удаления войдите заново.')}
+    data-delete-word={t('УДАЛИТЬ')}>
     <h1>{t('Аккаунт')}</h1>
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite"></p>
@@ -22,25 +26,49 @@ const { base, t } = useData(Astro.currentLocale);
           <button class="btn" type="button" id="signout">{t('Выйти')}</button>
         </div>
       </div>
+      <div class="account-details" hidden>
+        <h2>{t('Данные и конфиденциальность')}</h2>
+        <p><a href={`${base}/privacy/`}>{t('Политика конфиденциальности')}</a></p>
+        <button class="btn" type="button" id="export-data">{t('Скачать мои данные')}</button>
+        <details id="delete-account">
+          <summary>{t('Удалить аккаунт')}</summary>
+          <p class="muted">{t('Аккаунт, профиль, данные и аватары будут удалены. Это нельзя отменить.')}</p>
+          <label>{t('Введите УДАЛИТЬ')}
+            <input class="input" id="delete-word" type="text" autocomplete="off" />
+          </label>
+          <div class="auth-actions">
+            <button class="btn" type="button" id="delete-submit" disabled>{t('Удалить аккаунт')}</button>
+            <button class="btn" type="button" id="reauth" hidden>{t('Войти заново')}</button>
+          </div>
+        </details>
+      </div>
+      <p class="status small" id="data-status" aria-live="polite"></p>
     </div>
   </div>
 </Layout>
 
 <script>
   import { authUrl, getSupabase, onPage, signOut } from '../../../scripts/auth';
+  import { API_URL } from '../../../lib/platform';
   onPage('#account', (root) => {
     const base = root.dataset.base || '';
     const status = root.querySelector<HTMLElement>('.status')!;
-    const details = root.querySelector<HTMLElement>('.account-details')!;
+    const details = root.querySelectorAll<HTMLElement>('.account-details');
     const field = (name: string, value: string) => {
       root.querySelector<HTMLElement>(`[data-field="${name}"]`)!.textContent = value || '—';
     };
+    const dataStatus = root.querySelector<HTMLElement>('#data-status')!;
+    const showDataStatus = (message: string) => {
+      dataStatus.textContent = message;
+      dataStatus.className = 'status small bad';
+    };
+    if (location.hash === '#delete') root.querySelector<HTMLDetailsElement>('#delete-account')!.open = true;
     const load = async () => {
       try {
         const supabase = getSupabase();
         const { data: session } = await supabase.auth.getSession();
         if (!session.session) {
-          location.replace(authUrl(base, 'login', location.pathname));
+          location.replace(authUrl(base, 'login', location.pathname + location.search + location.hash));
           return;
         }
         const user = session.session.user;
@@ -62,13 +90,90 @@ const { base, t } = useData(Astro.currentLocale);
         const reset = root.querySelector<HTMLAnchorElement>('[data-page="reset"]')!;
         reset.href = authUrl(base, 'reset');
         reset.hidden = !providers.has('email');
-        details.hidden = false;
+        details.forEach((detail) => { detail.hidden = false; });
       } catch {
         status.textContent = root.dataset.error || '';
         status.className = 'status small bad';
       }
     };
     void load();
+    const accessToken = async () => {
+      const { data, error } = await getSupabase().auth.getSession();
+      if (error || !data.session) throw new Error('session');
+      return data.session.access_token;
+    };
+    root.querySelector<HTMLButtonElement>('#export-data')!.addEventListener('click', async (event) => {
+      const button = event.currentTarget as HTMLButtonElement;
+      button.disabled = true;
+      dataStatus.textContent = '';
+      try {
+        const token = await accessToken();
+        const response = await fetch(`${API_URL}/me/export`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error('export');
+        const url = URL.createObjectURL(await response.blob());
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'genshinflex-data.json';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch {
+        showDataStatus(root.dataset.exportError || '');
+      } finally {
+        button.disabled = false;
+      }
+    });
+    const word = root.querySelector<HTMLInputElement>('#delete-word')!;
+    const submit = root.querySelector<HTMLButtonElement>('#delete-submit')!;
+    const reauth = root.querySelector<HTMLButtonElement>('#reauth')!;
+    let deleting = false;
+    const updateSubmit = () => {
+      submit.disabled = deleting || word.value.trim().toLocaleUpperCase() !== (root.dataset.deleteWord || '').toLocaleUpperCase();
+    };
+    word.addEventListener('input', () => {
+      updateSubmit();
+    });
+    submit.addEventListener('click', async () => {
+      if (deleting || submit.disabled) return;
+      deleting = true;
+      word.disabled = true;
+      updateSubmit();
+      dataStatus.textContent = '';
+      try {
+        const token = await accessToken();
+        const response = await fetch(`${API_URL}/me`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ confirm: 'DELETE' }),
+        });
+        if (response.status === 401) {
+          const data = await response.json() as { code?: string };
+          if (data.code === 'reauth_required') {
+            showDataStatus(root.dataset.reauth || '');
+            reauth.hidden = false;
+            return;
+          }
+        }
+        if (!response.ok) throw new Error('delete');
+        await getSupabase().auth.signOut({ scope: 'local' });
+        document.dispatchEvent(new Event('gf:auth'));
+        location.assign(`${base}/account/deleted/`);
+      } catch {
+        showDataStatus(root.dataset.deleteError || '');
+      } finally {
+        deleting = false;
+        word.disabled = false;
+        updateSubmit();
+      }
+    });
+    reauth.addEventListener('click', async () => {
+      await getSupabase().auth.signOut({ scope: 'local' });
+      document.dispatchEvent(new Event('gf:auth'));
+      location.assign(authUrl(base, 'login', `${base}/account/#delete`));
+    });
     root.querySelector<HTMLButtonElement>('#signout')!.addEventListener('click', async () => {
       const { error } = await signOut();
       if (error) {

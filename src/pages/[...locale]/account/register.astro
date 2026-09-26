@@ -29,7 +29,7 @@ const labels = {
         <label>{t('Пароль')}<input class="input" name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
         <p class="muted small">{t('Минимум 8 символов.')} <span id="strength"></span></p>
         <label>{t('Повторите пароль')}<input class="input" name="confirm" type="password" autocomplete="new-password" required /></label>
-        <label class="auth-check"><input name="age" type="checkbox" required /> {t('Мне есть 13 лет и я соглашаюсь с тем, что сайт хранит мой email и данные аккаунта.')}</label>
+        <label class="auth-check"><input name="age" type="checkbox" required /> <span>{t('Мне есть 13 лет и я соглашаюсь с')} <a href={`${base}/privacy/`} target="_blank" rel="noopener">{t('политикой конфиденциальности')}</a></span></label>
         <div class="captcha"></div>
         <button class="btn primary" type="submit">{t('Зарегистрироваться')}</button>
         <p class="status small" aria-live="polite"></p>

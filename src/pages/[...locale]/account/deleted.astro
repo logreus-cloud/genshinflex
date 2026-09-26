@@ -1,0 +1,13 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Аккаунт удалён')} noindex>
+  <div class="auth-page">
+    <h1>{t('Аккаунт удалён')}</h1>
+    <p class="lead">{t('Ваш аккаунт и связанные данные удалены.')}</p>
+    <p><a class="btn primary" href={`${base}/`}>{t('На главную')}</a></p>
+  </div>
+</Layout>
