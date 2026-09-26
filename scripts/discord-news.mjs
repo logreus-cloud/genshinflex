@@ -1,5 +1,7 @@
-import { readFile, readdir, mkdir, writeFile, rename } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
+import matter from 'gray-matter';
+import YAML from 'yaml';
+import { store } from './cms/store.mjs';
 
 try { process.loadEnvFile('.env'); } catch {}
 
@@ -8,7 +10,6 @@ if (!webhook) {
   console.log('Discord: вебхук новостей не задан, пропускаю');
 } else {
   const dry = process.argv.includes('--dry');
-  const directory = 'src/content/news/ru';
   const stateFile = '.cache/discord-news.json';
   const clip = (value, limit) => {
     const chars = Array.from(value);
@@ -16,22 +17,17 @@ if (!webhook) {
   };
 
   async function news() {
-    const files = (await readdir(directory)).filter((file) => file.endsWith('.md'));
+    const files = (await store.listEntries('news')).filter((id) => id.startsWith('ru/'));
     const items = await Promise.all(files.map(async (file) => {
-      const source = await readFile(join(directory, file), 'utf8');
-      const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
-      if (!frontmatter) throw new Error(`Нет frontmatter: ${file}`);
-      const data = Object.fromEntries(frontmatter.split(/\r?\n/).map((line) => {
-        const match = line.match(/^([a-z]+):\s*(.*)$/);
-        if (!match) return [];
-        const value = match[2].trim().replace(/^(['"])(.*)\1$/, '$2');
-        return [match[1], value];
-      }).filter((entry) => entry.length));
+      const source = (await store.readEntry('news', file)).text;
+      if (!/^---\r?\n/.test(source)) throw new Error(`Нет frontmatter: ${file}`);
+      const data = matter(source, { engines: { yaml: (text) => YAML.parse(text) } }).data;
+      if (data.draft === true) return null;
       if (!data.anchor || !data.title || !data.summary || !data.date || Number.isNaN(Date.parse(data.date)))
         throw new Error(`Неполные данные новости: ${file}`);
       return { ...data, date: new Date(data.date).toISOString() };
     }));
-    return items.sort((a, b) => a.date.localeCompare(b.date));
+    return items.filter(Boolean).sort((a, b) => a.date.localeCompare(b.date));
   }
 
   async function publish() {

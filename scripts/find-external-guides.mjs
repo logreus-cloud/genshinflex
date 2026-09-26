@@ -2,7 +2,8 @@
 // Сейчас — краткие гайды KeqingMains (keqingmains.com/q/<имя>-quickguide/): адрес подбираем по имени
 // и проверяем, что заголовок страницы действительно про этого персонажа. Уже добавленные ссылки не трогаем.
 // Запуск: node scripts/find-external-guides.mjs
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import { store } from './cms/store.mjs';
 
 const chars = JSON.parse(readFileSync('src/data/generated/characters.en.json', 'utf8'));
 const words = (s) => s.toLowerCase().replace(/[^a-z0-9\s-]/g, '').split(/[\s-]+/).filter(Boolean);
@@ -21,11 +22,12 @@ async function kqm(c) {
 }
 
 let added = 0;
-for (const file of readdirSync('src/content/builds')) {
-  const path = `src/content/builds/${file}`;
-  const md = readFileSync(path, 'utf8');
+for (const slug of await store.listEntries('builds')) {
+  const current = await store.readEntry('builds', slug);
+  if (!current) continue;
+  const md = current.text;
   if (/^external:/m.test(md)) continue;
-  const c = chars.find((x) => x.slug === file.replace(/\.md$/, ''));
+  const c = chars.find((x) => x.slug === slug);
   if (!c || c.slug.startsWith('traveler-')) continue;
   const url = await kqm(c);
   if (!url) { console.log(`— ${c.slug}: не нашли`); continue; }
@@ -34,7 +36,7 @@ for (const file of readdirSync('src/content/builds')) {
   const block = ['external:', '  - title: "KeqingMains Quick Guide"', `    url: ${url}`, '    author: KQM', '    lang: en', ''].join(eol);
   // Вставляем перед закрывающей чертой frontmatter
   const end = md.indexOf(`${eol}---`, 3) + eol.length;
-  writeFileSync(path, `${md.slice(0, end)}${block}${md.slice(end)}`);
+  await store.writeEntry('builds', slug, `${md.slice(0, end)}${block}${md.slice(end)}`, { ifRevision: current.rev, mustNotExist: !current });
   added++;
   console.log(`✓ ${c.slug}: ${url}`);
 }

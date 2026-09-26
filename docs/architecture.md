@@ -74,3 +74,20 @@ Studio редактирует содержимое Content Lake. Опублик�
 4. В sanity.io/manage → API → Webhooks → Create указать URL `https://api.genshinflex.com/hooks/sanity`, dataset `production`, Trigger on Create/Update/Delete, фильтр `_type in ["build","news","rotation","banner","weaponGuide","endgameGuide"]`, projection `{_id, _type}` и HTTP method POST. Для Secret создать случайную строку и задать её в Worker командой `npx wrangler secret put SANITY_WEBHOOK_SECRET` из `apps/api`; после этого выполнить `npx wrangler deploy`. Drafts выключить, чтобы вебхук срабатывал только при публикации.
 5. Проверить вручную: Actions → «Deploy from Sanity» → Run workflow. Затем изменить документ в Studio и нажать Publish: примерно через 2–3 минуты изменение должно появиться на `platform.genshinflex.pages.dev`.
 6. После слияния `platform` в `main` изменить в `apps/api/wrangler.toml` значения на `DEPLOY_REF = "main"` и `DEPLOY_BRANCH = ""`, затем выполнить `npx wrangler deploy` из `apps/api`.
+
+## Этап 4c: скрипты и Sanity
+
+Без `CONTENT_SOURCE` скрипты читают и пишут файлы `src/content`. Для работы с опубликованными документами Sanity задайте `CONTENT_SOURCE=sanity` в корневом `.env`. Скрипты `guide:md` и `cms:external` записывают изменения в Sanity; `sim` читает билды, а `discord:news` читает новости. Сборка сайта после публикации запускается вебхуком этапа 4b.
+
+Для записи откройте sanity.io/manage → API → Tokens, создайте токен с ролью Editor и сохраните его в корневом `.env` как `SANITY_WRITE_TOKEN`. Не добавляйте `.env` в git. Чтение использует `SANITY_READ_TOKEN` или `SANITY_WRITE_TOKEN`. Если у документа есть неопубликованный черновик, скрипт предупреждает: последующая публикация черновика может перезаписать запись скрипта.
+
+`npm run cms:push -- src/content/builds-i18n` выгружает отдельные файлы или папки в Sanity независимо от `CONTENT_SOURCE`. Это нужно, например, после `scripts/i18n/bodies.py`. Скрипт хранит ревизии в `.cache/cms-push.json`: если содержимое в Studio изменилось после последней выгрузки, файл не заменяется. `--dry` показывает действия без записи; `--force` разрешает перезапись. Документы с одинаковым содержимым пропускаются.
+
+При слиянии `platform` в `main` переключайте источник в таком порядке:
+
+1. Заморозьте правки Markdown.
+2. Из актуального `main` выполните `npm run cms:export` и импортируйте результат с `--replace`. Это последний импорт, при котором Markdown перезаписывает Sanity.
+3. Укажите `CONTENT_SOURCE=sanity` в `.env`; в `apps/api/wrangler.toml` установите `DEPLOY_REF = "main"` и `DEPLOY_BRANCH = ""`.
+4. С этого момента редактируйте контент только через Studio и скрипты.
+
+Проверки: `npm run cms:store-test` и `npm run cms:test`.
