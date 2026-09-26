@@ -24,6 +24,15 @@ const { t } = useData(Astro.currentLocale);
             <button class="music-previous" type="button" aria-label={t('Предыдущий трек')} title={t('Предыдущий трек')}>⏮</button>
             <button class="music-next" type="button" aria-label={t('Следующий трек')} title={t('Следующий трек')}>⏭</button>
             <button class="music-shuffle" type="button" aria-label={t('Перемешать')} title={t('Перемешать')} aria-pressed="false">⇄</button>
+            <button class="music-mute" type="button" aria-label={t('Без звука')} title={t('Без звука')} aria-pressed="false" data-mute-label={t('Без звука')} data-unmute-label={t('Включить звук')}>
+              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+                <path d="M3 8h3l4-3v10l-4-3H3z" />
+                <path class="sound-wave-one" d="M12.5 7a4 4 0 0 1 0 6" />
+                <path class="sound-wave-two" d="M14.5 5a7 7 0 0 1 0 10" />
+                <path class="sound-muted" d="M13 8l4 4m0-4l-4 4" />
+              </svg>
+            </button>
+            <input class="music-volume" type="range" min="0" max="100" step="1" value="35" aria-label={t('Громкость')} />
             <button class="music-collapse" type="button" aria-label={t('Свернуть')} title={t('Свернуть')}>−</button>
             <button class="music-close" type="button" aria-label={t('Закрыть')} title={t('Закрыть')}>×</button>
           </div>
@@ -52,6 +61,7 @@ const { t } = useData(Astro.currentLocale);
     const title = panel.querySelector<HTMLElement>('.music-title')!, disc = panel.querySelector<HTMLElement>('.music-disc')!;
     const compact = panel.querySelector<HTMLButtonElement>('.music-compact')!, compactTitle = panel.querySelector<HTMLElement>('.compact-title')!;
     const status = panel.querySelector<HTMLElement>('.music-status')!, shuffleButton = panel.querySelector<HTMLButtonElement>('.music-shuffle')!;
+    const muteButton = panel.querySelector<HTMLButtonElement>('.music-mute')!, volumeInput = panel.querySelector<HTMLInputElement>('.music-volume')!;
     const youtube = window as YouTubeWindow;
     const tracks = ost.discs.filter((item) => item.disc <= 3).flatMap((item) => item.tracks.filter((track) => !track.battle).map((track) => ({ ...track, video: item.video, disc: item.disc, discTitle: item.title })));
     const natural = tracks.map((_, i) => i);
@@ -60,8 +70,17 @@ const { t } = useData(Astro.currentLocale);
     let player: Player | undefined, apiPromise: Promise<void> | undefined, playerPromise: Promise<Player> | undefined;
     let playerGeneration = 0;
     let volumeTimer: ReturnType<typeof setInterval> | undefined, positionTimer: ReturnType<typeof setInterval> | undefined;
+    let volume = 35, previousVolume = 35, rampKind: 'in' | 'out' | undefined, rampEnd = 0;
     document.body.append(panel);
     const savePreference = () => { try { localStorage.setItem('gf:music', enabled ? 'on' : 'off'); } catch {} };
+    const renderVolume = () => {
+      volumeInput.value = String(volume);
+      volumeInput.style.setProperty('--volume-percent', `${volume}%`);
+      muteButton.dataset.level = volume === 0 ? 'muted' : volume < 50 ? 'low' : 'high';
+      muteButton.setAttribute('aria-pressed', String(volume === 0));
+      const label = muteButton.dataset[volume === 0 ? 'unmuteLabel' : 'muteLabel']!;
+      muteButton.setAttribute('aria-label', label); muteButton.title = label;
+    };
     const render = () => {
       const label = button.dataset[enabled ? 'onLabel' : 'offLabel']!;
       button.setAttribute('aria-pressed', String(enabled)); button.setAttribute('aria-label', label); button.title = label;
@@ -70,6 +89,7 @@ const { t } = useData(Astro.currentLocale);
       title.textContent = compactTitle.textContent = track.title;
       disc.textContent = `${panel.dataset.discLabel} ${track.disc} · ${track.discTitle}`;
       shuffleButton.setAttribute('aria-pressed', String(shuffle));
+      renderVolume();
     };
     const savePosition = () => {
       const track = tracks[index], time = playing ? player?.getCurrentTime() : resumeTime;
@@ -84,28 +104,42 @@ const { t } = useData(Astro.currentLocale);
       for (let i = items.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [items[i], items[j]] = [items[j], items[i]]; }
       return items;
     };
-    const ramp = (target: number, duration: number, done?: () => void) => {
+    const clearRamp = () => {
       clearInterval(volumeTimer);
+      volumeTimer = undefined; rampKind = undefined;
+    };
+    const ramp = (target: number, duration: number, done?: () => void, kind: 'in' | 'out' = 'in') => {
+      clearRamp();
       if (!player) { done?.(); return; }
       const from = player.getVolume(), began = performance.now();
       if (from === target) { done?.(); return; }
+      rampKind = kind; rampEnd = began + duration;
       volumeTimer = setInterval(() => {
         const step = Math.min(1, (performance.now() - began) / duration);
         player?.setVolume(Math.round(from + (target - from) * step));
-        if (step === 1) { clearInterval(volumeTimer); volumeTimer = undefined; done?.(); }
+        if (step === 1) { clearRamp(); done?.(); }
       }, 50);
+    };
+    const setVolume = (value: number) => {
+      volume = Math.max(0, Math.min(100, Math.round(value)));
+      if (volume > 0) previousVolume = volume;
+      try { localStorage.setItem('gf:music-volume', String(volume)); } catch {}
+      renderVolume();
+      if (!playerReady || !player) return;
+      if (rampKind === 'in') ramp(volume, Math.max(1, rampEnd - performance.now()));
+      else if (rampKind !== 'out') player.setVolume(volume);
     };
     const fadeOut = (done: () => void) => {
       clearInterval(positionTimer); positionTimer = undefined;
-      clearInterval(volumeTimer); volumeTimer = undefined;
+      clearRamp();
       if (!playerReady || !player || !playing) { if (playerReady) player?.pauseVideo(); playing = false; done(); return; }
-      ramp(0, 800, () => { savePosition(); player?.pauseVideo(); playing = false; done(); });
+      ramp(0, 800, () => { savePosition(); player?.pauseVideo(); playing = false; done(); }, 'out');
     };
     const playTrack = (time = tracks[index].start) => {
       const track = tracks[index];
       resumeTime = time; loaded = false; playing = false;
       clearInterval(positionTimer); positionTimer = undefined;
-      clearInterval(volumeTimer); volumeTimer = undefined;
+      clearRamp();
       render();
       if (playerReady && player) {
         player.setVolume(0);
@@ -145,7 +179,7 @@ const { t } = useData(Astro.currentLocale);
         const timeout = setTimeout(() => {
           if (generation !== playerGeneration) return;
           ++playerGeneration; playerReady = false; player = undefined; loaded = false; playing = false;
-          clearInterval(volumeTimer); clearInterval(positionTimer);
+          clearRamp(); clearInterval(positionTimer);
           const mount = panel.querySelector('#snezhnaya-ost-player');
           if (mount) { const replacement = document.createElement('div'); replacement.id = 'snezhnaya-ost-player'; mount.replaceWith(replacement); }
           reject(new Error('YouTube player timeout'));
@@ -164,11 +198,11 @@ const { t } = useData(Astro.currentLocale);
               onStateChange: (event: { data: number }) => {
                 if (generation !== playerGeneration || !playerReady) return;
                 if (event.data === 1) {
-                  if (!enabled || collapsed) { clearInterval(volumeTimer); clearInterval(positionTimer); playing = false; player?.pauseVideo(); return; }
-                  errors = 0; playing = true; status.hidden = true; ramp(35, 2000);
+                  if (!enabled || collapsed) { clearRamp(); clearInterval(positionTimer); playing = false; player?.pauseVideo(); return; }
+                  errors = 0; playing = true; status.hidden = true; ramp(volume, 2000);
                   startPositionTimer();
                 } else if (event.data === 0 && enabled) next();
-                else if (event.data === 2) { savePosition(); playing = false; clearInterval(positionTimer); clearInterval(volumeTimer); }
+                else if (event.data === 2) { savePosition(); playing = false; clearInterval(positionTimer); clearRamp(); }
               },
               onError: (event: { data: number }) => {
                 if (generation !== playerGeneration || !playerReady || !enabled || ![2, 5, 100, 101, 150].includes(event.data)) return;
@@ -186,14 +220,19 @@ const { t } = useData(Astro.currentLocale);
       if (!enabled) return;
       const turn = ++version;
       armed = false; collapsed = false; panel.hidden = false; panel.classList.remove('collapsed'); compact.hidden = true;
-      clearInterval(volumeTimer); status.hidden = true; render();
+      clearRamp(); status.hidden = true; render();
       try {
         const target = await getPlayer();
         if (turn !== version || !enabled || collapsed) return;
-        if (loaded) { target.playVideo(); if (target.getPlayerState() === 1) { playing = true; ramp(35, 2000); startPositionTimer(); } }
+        if (loaded) { target.playVideo(); if (target.getPlayerState() === 1) { playing = true; ramp(volume, 2000); startPositionTimer(); } }
         else playTrack(resumeTime);
       } catch { if (turn !== version) return; status.hidden = false; status.textContent = panel.dataset.errorLabel!; stop(true); }
     };
+    try {
+      const savedVolume = localStorage.getItem('gf:music-volume');
+      if (savedVolume !== null && savedVolume.trim() !== '' && Number.isFinite(Number(savedVolume))) volume = Math.max(0, Math.min(100, Math.round(Number(savedVolume))));
+      if (volume > 0) previousVolume = volume;
+    } catch {}
     try {
       const saved = JSON.parse(localStorage.getItem('gf:music-pos') || 'null');
       if (saved && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < tracks.length) {
@@ -231,6 +270,13 @@ const { t } = useData(Astro.currentLocale);
       savePosition(); collapsed = true;
       fadeOut(() => { if (enabled && collapsed) { panel.classList.add('collapsed'); compact.hidden = false; } });
     });
+    muteButton.addEventListener('click', () => setVolume(volume === 0 ? previousVolume || 35 : 0));
+    volumeInput.addEventListener('input', () => setVolume(volumeInput.valueAsNumber));
+    volumeInput.addEventListener('wheel', (event) => {
+      if (event.deltaY === 0) return;
+      event.preventDefault();
+      setVolume(volume + (event.deltaY < 0 ? 5 : -5));
+    }, { passive: false });
     compact.addEventListener('click', () => { collapsed = false; panel.classList.remove('collapsed'); compact.hidden = true; void start(); });
     panel.querySelector('.music-close')?.addEventListener('click', () => stop());
     window.addEventListener('pagehide', savePosition);
@@ -254,9 +300,16 @@ const { t } = useData(Astro.currentLocale);
   .music-info { display: grid; gap: .15rem; min-width: 0; }
   .music-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .88rem; }
   .music-disc { color: var(--muted); font-size: .74rem; }
-  .music-controls { display: flex; justify-content: flex-end; gap: .25rem; margin-top: .55rem; }
+  .music-controls { display: flex; align-items: center; justify-content: flex-end; gap: .25rem; margin-top: .55rem; }
   .music-controls button { min-width: 34px; height: 34px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text); cursor: pointer; font-size: 1.1rem; }
   .music-controls button:hover { background: var(--surface-2); }
+  .music-mute { display: grid; place-items: center; }
+  .music-mute svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .music-mute .sound-muted, .music-mute[data-level="muted"] .sound-wave-one, .music-mute[data-level="muted"] .sound-wave-two, .music-mute[data-level="low"] .sound-wave-two { display: none; }
+  .music-mute[data-level="muted"] .sound-muted { display: block; }
+  .music-volume { appearance: none; width: 96px; height: 6px; margin: 0 .25rem; border-radius: 999px; background: linear-gradient(to right, var(--accent) var(--volume-percent, 35%), var(--surface-2) var(--volume-percent, 35%)); accent-color: var(--accent); cursor: pointer; }
+  .music-volume::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
+  .music-volume::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
   .music-shuffle[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
   .music-credit { margin: .55rem 0 0; font-size: .68rem; line-height: 1.35; }
   .music-credit a { color: var(--muted); }
@@ -275,5 +328,6 @@ const { t } = useData(Astro.currentLocale);
   @keyframes music-eq { to { height: 4px; } }
   @media (prefers-reduced-motion: reduce) { .music.armed, .music-eq i { animation: none; } }
   @media (max-width: 700px) { .music-panel, .music-panel.collapsed { left: 8px; right: 8px; width: auto; max-width: none; } .music-panel :global(#snezhnaya-ost-player) { height: auto; min-height: 200px; aspect-ratio: 16 / 9; } }
+  @media (max-width: 700px) { .music-volume { flex: 1; min-width: 0; } }
   @media (max-width: 400px) { .music { width: 34px; height: 34px; } }
 </style>
