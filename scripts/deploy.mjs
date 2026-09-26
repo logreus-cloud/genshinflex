@@ -50,6 +50,13 @@ try {
   await step('Индексирую поиск', 'npx pagefind --site dist');
   const out = await step(test ? 'Выкладываю тестовую версию' : 'Выкладываю на Cloudflare', `npx wrangler pages deploy dist --project-name genshinflex${test ? ' --branch test' : ''}`);
   const url = out.match(/https:\/\/\S+\.pages\.dev\S*/)?.[0];
+  if (!test) {
+    try {
+      await step('Публикую новости в Discord', 'node scripts/discord-news.mjs');
+    } catch {
+      console.warn('⚠️ Новости в Discord не опубликованы');
+    }
+  }
   console.log(`\n🌙 Готово за ${time(Date.now() - total)}${url ? ` — ${url}` : ''}`);
 } catch {
   process.exitCode = 1;
