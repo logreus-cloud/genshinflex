@@ -12,7 +12,7 @@ const { base, t } = useData(Astro.currentLocale);
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite"></p>
       <div class="account-details" hidden>
-        <p><strong>{t('Ник')}:</strong> <span data-field="username">—</span></p>
+        <p><strong>{t('Ник')}:</strong> <span data-field="nickname">—</span></p>
         <p><strong>{t('Отображаемое имя')}:</strong> <span data-field="display_name">—</span></p>
         <p><strong>{t('Email')}:</strong> <span data-field="email">—</span></p>
         <p><strong>{t('Способы входа')}:</strong> <span data-field="providers">—</span></p>
@@ -44,10 +44,12 @@ const { base, t } = useData(Astro.currentLocale);
           return;
         }
         const user = session.session.user;
-        const { data: profile } = await supabase.from('profiles')
-          .select('username,display_name').eq('id', user.id).maybeSingle();
+        const { data: profile, error } = await supabase.from('profiles')
+          .select('nickname,display_name').eq('id', user.id).maybeSingle();
         if (!root.isConnected) return;
-        field('username', String(profile?.username || ''));
+        // Сбой запроса не выдаём за пустой профиль
+        if (error) throw error;
+        field('nickname', String(profile?.nickname || ''));
         field('display_name', String(profile?.display_name || user.user_metadata?.display_name || ''));
         const telegram = user.app_metadata?.telegram_id;
         const synthetic = /^tg\d+@telegram\.genshinflex\.com$/i.test(user.email || '');

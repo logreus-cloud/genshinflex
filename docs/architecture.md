@@ -53,3 +53,15 @@ Studio редактирует содержимое Content Lake. Опублик�
 
 - **`bio` публичный.** Описание «о себе» — это часть публичного профиля (`/u/ник`), пользователь сам решает, что туда писать, и может скрыть профиль целиком (`is_public = false`). Приватные поля — `game_uid` и всё в `user_data`.
 - **Враги в ротациях** хранятся объектами `{ id }` (из genshin-db — названия переводятся по базе) или `{ name }` (редкий ручной случай, без перевода).
+
+## Этап 4: переезд контента на Sanity
+
+Сайт читает контент из Sanity, только если при сборке задано `CONTENT_SOURCE=sanity` (`npm run build:sanity`); иначе — из `src/content`, как раньше. Страницы не меняются: загрузчик `src/lib/sanity-loader.ts` отдаёт те же данные, id и `render(entry)`, что и `glob`.
+
+1. `npm run cms:test` — проверка без потерь: md/JSON → документ Sanity → обратно, сравнение данных и HTML. Должно быть 0 расхождений.
+2. `npm run cms:export` — пишет `.cache/sanity-import.ndjson` (детерминированные `_id`, повторный экспорт перезаписывает те же документы).
+3. Импорт (из `apps/studio`, после `npx sanity login`): `npx sanity dataset import ../../.cache/sanity-import.ndjson production --replace`.
+4. `npm run build:sanity` и сравнение с обычной сборкой.
+5. Переключение: сборка сайта с `CONTENT_SOURCE=sanity`.
+
+После переключения источник правды — Sanity. Скрипты `guide-to-md`, `find-external-guides`, `sim-investments` и `scripts/i18n/bodies.py` пока работают с md; повторный `cms:export` + импорт с `--replace` перезапишет правки, сделанные в Studio. Этап 4b — автосборка после публикации (вебхук Sanity → Worker → GitHub Actions → Pages).

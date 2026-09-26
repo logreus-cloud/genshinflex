@@ -9,6 +9,9 @@
     "apps/*"
   ],
   "scripts": {
+    "cms:export": "node --import tsx scripts/cms/export-to-sanity.mjs",
+    "cms:test": "node --import tsx scripts/cms/roundtrip-test.mjs",
+    "build:sanity": "node scripts/cms/build-sanity.mjs",
     "import": "node scripts/import-data.mjs && node scripts/import-wiki-enemies.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/add-beta-levelup.mjs && node scripts/import-weapon-sources.mjs && python scripts/import-weapon-art.py && node scripts/import-calendar.mjs",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
@@ -36,6 +39,7 @@
     "api:test": "npm run test -w @genshinflex/api"
   },
   "dependencies": {
+    "@sanity/client": "^7.0.0",
     "@supabase/supabase-js": "^2.0.0",
     "astro": "^7.3.4"
   },
@@ -43,8 +47,15 @@
     "esbuild": true
   },
   "devDependencies": {
+    "@portabletext/block-tools": "^3.0.0",
+    "@sanity/schema": "^4.0.0",
     "genshin-db": "^5.2.14",
+    "gray-matter": "^4.0.3",
+    "jsdom": "^26.0.0",
+    "marked": "^15.0.0",
     "pagefind": "^1.5.2",
-    "wrangler": "^4.137.0"
+    "tsx": "^4.0.0",
+    "wrangler": "^4.137.0",
+    "yaml": "^2.0.0"
   }
 }

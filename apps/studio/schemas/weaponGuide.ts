@@ -1,3 +1,4 @@
+import { bodyBlock } from './objects';
 import { defineField, defineType } from 'sanity';
 
 export const weaponGuide = defineType({
@@ -14,7 +15,9 @@ export const weaponGuide = defineType({
     defineField({ name: 'updated', title: 'Обновлено', type: 'date', validation: (Rule) => Rule.required() }),
     defineField({ name: 'authors', title: 'Авторы', type: 'array', of: [{ type: 'string' }], initialValue: [] }),
     defineField({ name: 'external', title: 'Другие гайды', type: 'array', of: [{ type: 'externalLink' }], initialValue: [] }),
-    defineField({ name: 'body', title: 'Текст гайда', type: 'array', of: [{ type: 'block' }], validation: (Rule) => Rule.required() }),
+    defineField({ name: 'body', title: 'Текст гайда', type: 'array', of: [bodyBlock], validation: (Rule) => Rule.required() }),
+    defineField({ name: 'bodyMarkdown', title: 'Исходный Markdown', type: 'text', hidden: true }),
+    defineField({ name: 'bodyHash', title: 'Отпечаток текста', type: 'string', hidden: true }),
   ],
   preview: { select: { title: 'slug', subtitle: 'updated' } },
 });

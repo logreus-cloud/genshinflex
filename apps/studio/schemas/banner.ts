@@ -7,6 +7,10 @@ export const banner = defineType({
   title: 'Баннер',
   type: 'document',
   fields: [
+    defineField({
+      name: 'slug', title: 'Слаг файла', type: 'slug',
+      options: { source: 'version' }, validation: (Rule) => Rule.required(),
+    }),
     defineField({ name: 'version', title: 'Версия', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'phase', title: 'Фаза', type: 'number', validation: (Rule) => Rule.required().integer() }),
     // Серверное время сохраняем строкой: его нельзя переводить в UTC до выбора региона.
