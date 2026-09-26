@@ -1,0 +1,144 @@
+:root[data-season="snezhnaya"] {
+  --frost: #a9dcff; --frost-2: #6fb6ff; --frost-soft: rgb(169 220 255 / .12);
+  --snow: #f4f8ff; --aurora-a: #2fd3c5; --aurora-b: #5a7dff; --royal: #9b2335;
+  --bg: #1f2330; --bg-deep: #171a24; --surface: #141722; --surface-2: #272c3b; --surface-3: #323849; --border: #313a4d;
+  --scene-shade: linear-gradient(180deg, rgb(13 18 32 / .5) 0, rgb(15 20 34 / .55) 55vh, rgb(20 24 36 / .68) 100%);
+  --top-glass: rgb(20 24 36 / .72); --feature-glass: rgb(31 35 48 / .62); --collection-glass: rgb(13 21 38 / .72);
+}
+:root[data-season="snezhnaya"][data-theme="light"] {
+  --bg: #eef3f9; --bg-deep: #e2eaf4; --surface: #fff; --surface-2: #e4ebf5; --surface-3: #d8e1ec; --border: #cdd8e6; --frost: #2f7fc9;
+  --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .6) 0, rgb(238 243 249 / .65) 55vh, rgb(238 243 249 / .78) 100%);
+  --top-glass: rgb(244 247 251 / .75); --feature-glass: rgb(238 243 249 / .82); --collection-glass: rgb(221 232 245 / .88);
+}
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) {
+    --bg: #eef3f9; --bg-deep: #e2eaf4; --surface: #fff; --surface-2: #e4ebf5; --surface-3: #d8e1ec; --border: #cdd8e6; --frost: #2f7fc9;
+    --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .6) 0, rgb(238 243 249 / .65) 55vh, rgb(238 243 249 / .78) 100%);
+    --top-glass: rgb(244 247 251 / .75); --feature-glass: rgb(238 243 249 / .82); --collection-glass: rgb(221 232 245 / .88);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-season="snezhnaya"] {
+    --scene-shade: linear-gradient(180deg, rgb(13 18 32 / .95), rgb(15 20 34 / .95) 55vh, rgb(20 24 36 / .95));
+    --top-glass: rgb(20 24 36 / .95); --feature-glass: rgb(31 35 48 / .95); --collection-glass: rgb(13 21 38 / .95);
+  }
+  :root[data-season="snezhnaya"][data-theme="light"] {
+    --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .95), rgb(238 243 249 / .95) 55vh, rgb(238 243 249 / .95));
+    --top-glass: rgb(244 247 251 / .95); --feature-glass: rgb(238 243 249 / .95); --collection-glass: rgb(221 232 245 / .95);
+  }
+}
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) {
+    --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .95), rgb(238 243 249 / .95) 55vh, rgb(238 243 249 / .95));
+    --top-glass: rgb(244 247 251 / .95); --feature-glass: rgb(238 243 249 / .95); --collection-glass: rgb(221 232 245 / .95);
+  }
+}
+
+:root[data-season="snezhnaya"] .season-scene {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--scene-shade), url('/img/season/snezhnaya-bg.webp') center 30% / cover no-repeat;
+}
+:root[data-season="snezhnaya"] :is(body, .shell, .content) { background: transparent; }
+:root[data-season="snezhnaya"] .promo-card { background: linear-gradient(90deg, var(--surface-2), var(--surface)); }
+:root[data-season="snezhnaya"] .top {
+  background: var(--top-glass); backdrop-filter: blur(10px) saturate(1.2);
+}
+:root[data-season="snezhnaya"] .top::before {
+  content: ""; position: absolute; right: 0; bottom: -1px; left: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--frost), transparent); pointer-events: none;
+}
+:root[data-season="snezhnaya"] .top::after {
+  content: ""; position: absolute; top: 100%; right: 0; left: 0; height: 10px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10'%3E%3Cpath d='M8 0h6l-3 8ZM43 0h5l-2.5 5ZM83 0h7l-3.5 10ZM111 0h4l-2 6Z' fill='%23a9dcff' fill-opacity='.35'/%3E%3C/svg%3E") left top / 120px 10px repeat-x;
+}
+:root[data-season="snezhnaya"] .top-logo svg { filter: drop-shadow(0 0 6px rgb(169 220 255 / .45)); }
+
+:root[data-season="snezhnaya"] .season-snow {
+  --flake-small: rgb(255 255 255 / .5); --flake-medium: rgb(255 255 255 / .65); --flake-large: rgb(255 255 255 / .8);
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; opacity: .55;
+  background: radial-gradient(circle at 24px 35px, var(--flake-small) 1.5px, transparent 2px) 0 0 / 180px 180px;
+  animation: snezhnaya-snow-small 18s linear infinite;
+}
+:root[data-season="snezhnaya"] .season-snow::before {
+  content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 95px 72px, var(--flake-medium) 2.5px, transparent 3px) 0 0 / 260px 260px;
+  animation: snezhnaya-snow-medium 26s linear infinite;
+}
+:root[data-season="snezhnaya"] .season-snow::after {
+  content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 180px 110px, var(--flake-large) 3.5px, transparent 4px) 0 0 / 340px 340px;
+  animation: snezhnaya-snow-large 34s linear infinite;
+}
+@keyframes snezhnaya-snow-small { to { background-position: 180px 720px; } }
+@keyframes snezhnaya-snow-medium { to { background-position: -260px 780px; } }
+@keyframes snezhnaya-snow-large { to { background-position: 340px 1020px; } }
+:root[data-season="snezhnaya"][data-theme="light"] .season-snow {
+  --flake-small: rgb(111 160 210 / .6); --flake-medium: rgb(111 160 210 / .6); --flake-large: rgb(111 160 210 / .6); opacity: .35;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .season-snow {
+    --flake-small: rgb(111 160 210 / .6); --flake-medium: rgb(111 160 210 / .6); --flake-large: rgb(111 160 210 / .6); opacity: .35;
+  }
+}
+
+:root[data-season="snezhnaya"] .carousel .slide::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(0deg, rgb(169 220 255 / .18), transparent 30%);
+}
+:root[data-season="snezhnaya"] .carousel .copy { z-index: 1; }
+:root[data-season="snezhnaya"] .pill-title {
+  background: rgb(169 220 255 / .08); border: 1px solid rgb(169 220 255 / .25); backdrop-filter: blur(6px);
+}
+:root[data-season="snezhnaya"] .pill-title::before {
+  content: ""; display: inline-block; width: 1em; height: 1em; margin-right: .55em; vertical-align: -.12em; background: var(--frost);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1v14M1.94 4.5l12.12 7M1.94 11.5l12.12-7' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:root[data-season="snezhnaya"] .tabs {
+  background: rgb(169 220 255 / .08); border: 1px solid rgb(169 220 255 / .25); backdrop-filter: blur(6px);
+}
+:root[data-season="snezhnaya"] .feature-band {
+  background-color: var(--feature-glass);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  backdrop-filter: blur(8px);
+}
+:root[data-season="snezhnaya"] .collection-band {
+  background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .22), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .25), transparent 50%), var(--collection-glass);
+  backdrop-filter: blur(8px);
+}
+:root[data-season="snezhnaya"][data-theme="light"] .collection-band {
+  background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .12), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .14), transparent 50%), var(--collection-glass);
+}
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .collection-band {
+    background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .12), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .14), transparent 50%), var(--collection-glass);
+  }
+}
+
+:root[data-season="snezhnaya"] :is(.promo-card, .feature-band .card, .panel):hover {
+  border-color: color-mix(in srgb, var(--frost) 55%, var(--border));
+  box-shadow: 0 0 0 1px var(--frost-soft), 0 10px 28px rgb(111 182 255 / .18);
+}
+:root[data-season="snezhnaya"] .tile:hover {
+  outline-color: var(--frost); box-shadow: 0 0 16px rgb(111 182 255 / .25);
+}
+
+:root[data-season="snezhnaya"] .season-drift { height: 26px; flex: none; margin-top: 2rem; }
+:root[data-season="snezhnaya"] .season-drift svg { display: block; width: 100%; height: 100%; }
+:root[data-season="snezhnaya"] .season-drift .bank { fill: var(--bg-deep); }
+:root[data-season="snezhnaya"] .season-drift .edge { fill: none; stroke: rgb(244 248 255 / .5); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+:root[data-season="snezhnaya"] .content:has(> .collection-band) + .season-drift { margin-top: 0; }
+:root[data-season="snezhnaya"] .season-drift + .footer { margin-top: 0; border-top: 0; }
+@media (max-width: 700px) {
+  :root[data-season="snezhnaya"] .season-snow::after { display: none; }
+  :root[data-season="snezhnaya"] .top::after { height: 6px; background-size: 120px 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="snezhnaya"] .season-snow { display: none; }
+}
+
+/* Текст, лежащий прямо на сцене (заголовки и подзаголовки страниц, крошки), — с мягкой тенью для читаемости */
+:root[data-season="snezhnaya"] .content > :is(h1, h2, p, nav, .lead, .home-title) { text-shadow: 0 1px 10px rgb(8 12 24 / .75); }
+:root[data-season="snezhnaya"][data-theme="light"] .content > :is(h1, h2, p, nav, .lead, .home-title) { text-shadow: 0 1px 10px rgb(255 255 255 / .9); }
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .content > :is(h1, h2, p, nav, .lead, .home-title) { text-shadow: 0 1px 10px rgb(255 255 255 / .9); }
+}

@@ -57,13 +57,13 @@ const plural = (n: number, [one, few, many]: [string, string, string]) => {
   const m10 = n % 10, m100 = n % 100;
   return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? few : many;
 };
-export function humanLeft(ms: number) {
+export function humanLeft(ms: number, full = false) {
   if (ms <= 0) return null;
   const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), m = Math.floor((ms % 36e5) / 6e4);
   const lang = pageLang();
   const dayWord = lang === 'ru' ? plural(d, ['день', 'дня', 'дней']) : lang === 'es' ? (d === 1 ? 'día' : 'días') : (d === 1 ? 'day' : 'days');
   const [hh, mm] = lang === 'ru' ? ['ч', 'мин'] : ['h', 'min'];
-  if (d > 0) return `${d} ${dayWord} ${h} ${hh}`;
+  if (d > 0) return `${d} ${dayWord} ${h} ${hh}${full ? ` ${m} ${mm}` : ''}`;
   if (h > 0) return `${h} ${hh} ${m} ${mm}`;
   return `${m} ${mm}`;
 }
@@ -71,7 +71,7 @@ export function humanLeft(ms: number) {
 // <span data-until="2026-10-16T04:00" data-done="Обновилось">…</span> — обратный отсчёт до события сервера
 function tick() {
   for (const el of document.querySelectorAll<HTMLElement>('[data-until]')) {
-    const left = humanLeft(serverMoment(el.dataset.until!) - Date.now());
+    const left = humanLeft(serverMoment(el.dataset.until!) - Date.now(), el.hasAttribute('data-full'));
     el.textContent = left ? `${el.dataset.prefix ?? ''}${left}` : el.dataset.done ?? '—';
   }
 }

@@ -141,6 +141,14 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
     const next = root.querySelector<HTMLButtonElement>('[data-dir="next"]')!;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let scrolling = false;
+    let peeked = 0;
+    const loadTiles = () => {
+      track.querySelectorAll<HTMLImageElement>('img').forEach((img) => { img.loading = 'eager'; });
+    };
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) { loadTiles(); observer.disconnect(); }
+    }, { rootMargin: '300px 0px' });
+    observer.observe(root);
     let destination: number | undefined;
     let restoreTimer: number | undefined;
     const maxScroll = () => list.scrollWidth - list.clientWidth;
@@ -150,12 +158,18 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
       prev.classList.toggle('shut', prev.disabled);
       next.classList.toggle('shut', next.disabled);
     };
-    const peek = (direction: number) => {
-      if (scrolling) return;
-      const room = direction > 0 ? list.scrollWidth - list.clientWidth - list.scrollLeft : list.scrollLeft;
-      track.style.transform = `translateX(${direction * -Math.min(60, Math.max(0, room))}px)`;
+    const peek = (direction: number, arrow: HTMLButtonElement) => {
+      if (scrolling || arrow.disabled || motion.matches || peeked === direction) return;
+      const room = direction > 0 ? maxScroll() - list.scrollLeft : list.scrollLeft;
+      if (room < 1) return;
+      track.style.transform = `translateX(${direction * -Math.min(page().step, room)}px)`;
+      peeked = direction;
     };
-    const clearPeek = () => { track.style.removeProperty('transform'); };
+    const clearPeek = () => {
+      if (peeked === 0) return;
+      track.style.removeProperty('transform');
+      peeked = 0;
+    };
     const restoreSnap = () => {
       if (restoreTimer !== undefined) clearTimeout(restoreTimer);
       restoreTimer = undefined;
@@ -167,12 +181,12 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
       const transform = getComputedStyle(track).transform;
       if (transform === 'none') return;
       const offset = new DOMMatrixReadOnly(transform).m41;
-      if (Math.abs(offset) < .1) return;
       scrolling = true;
       track.style.transition = 'none';
       list.style.scrollSnapType = 'none';
-      list.scrollLeft -= offset;
+      if (Math.abs(offset) >= .1) list.scrollLeft -= offset;
       track.style.removeProperty('transform');
+      peeked = 0;
       void track.offsetWidth;
       track.style.removeProperty('transition');
       if (restoreTimer !== undefined) clearTimeout(restoreTimer);
@@ -188,9 +202,9 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
     [[prev, -1], [next, 1]].forEach(([button, direction]) => {
       const arrow = button as HTMLButtonElement;
       const sign = direction as number;
-      arrow.addEventListener('pointerenter', () => peek(sign));
+      arrow.addEventListener('pointerenter', () => { loadTiles(); peek(sign, arrow); });
       arrow.addEventListener('pointerleave', clearPeek);
-      arrow.addEventListener('focus', () => peek(sign));
+      arrow.addEventListener('focus', () => { loadTiles(); peek(sign, arrow); });
       arrow.addEventListener('blur', clearPeek);
       arrow.addEventListener('click', () => {
         const { step, distance } = page();
@@ -238,9 +252,9 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   .collection-row + .collection-row { margin-top: 2.4rem; }
   .pill-title { display: table; margin: 0 auto 1.4rem; padding: .55rem 1.6rem; border-radius: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); font: 600 1rem var(--font-display); text-align: center; }
   .gate-carousel { display: flex; align-items: center; justify-content: center; gap: 1.2rem; min-width: 0; }
-  .gate-list { flex: 0 1 calc(7 * 96px + 6 * 22px + 10px); min-width: 0; max-width: calc(100% - 152px - 2.4rem); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .gate-list { flex: 0 1 calc(7 * 96px + 6 * 22px + 12px); min-width: 0; max-width: calc(100% - 152px - 2.4rem); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 6px; scrollbar-width: none; }
   .gate-list::-webkit-scrollbar { display: none; }
-  .tile-track { display: flex; gap: 22px; width: max-content; min-width: 100%; padding: 8px 5px; /* место под подъём и контур плитки */ transition: transform var(--dur) var(--ease); }
+  .tile-track { display: flex; gap: 22px; width: max-content; min-width: 100%; padding: 8px 6px; /* место под подъём и контур плитки */ transition: transform .45s var(--ease); }
   .tile { position: relative; display: block; flex: 0 0 96px; width: 96px; height: 96px; overflow: hidden; border-radius: 10px; background: linear-gradient(180deg, #5b4b82, #9679c4); scroll-snap-align: start; transition: transform var(--dur) var(--ease); }
   .tile.r5 { background: linear-gradient(180deg, #7a5226, #d1953f); }
   .tile.r3 { background: linear-gradient(180deg, #4a5a78, #6b86b0); }

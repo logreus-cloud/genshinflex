@@ -373,6 +373,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
 
 <style>
   .wt { display: grid; gap: 14px; }
+  .wt > * { min-width: 0; }
   .itabs { display: flex; gap: 4px; margin-bottom: 1rem; flex-wrap: wrap; }
   .itabs button { border: 1px solid var(--border); background: var(--surface-2); border-radius: var(--radius-sm); padding: .45rem .8rem; cursor: pointer; color: var(--muted); }
   .itabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
@@ -416,4 +417,16 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   #history :global(tr.r5 td:nth-child(2)) { color: var(--accent-text); font-weight: 600; }
   #history :global(tr.r4 td:nth-child(2)) { color: #b595ec; }
   @media (max-width: 480px) { .banners :global(.kv) { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .itabs { flex-wrap: nowrap; }
+    .itabs button { flex: 1; text-align: center; padding-inline: .4rem; }
+    .steps, .steps li, .steps details { min-width: 0; }
+    .cmd code { flex-basis: 100%; min-width: 0; }
+    .script { max-width: 100%; }
+    .toolbar > * { min-width: 0; max-width: 100%; }
+    .toolbar .uid { flex-wrap: wrap; }
+    .toolbar .uid select { max-width: 100%; }
+    .toolbar .btn { white-space: normal; }
+    .banners { grid-template-columns: minmax(0, 1fr); }
+  }
 </style>

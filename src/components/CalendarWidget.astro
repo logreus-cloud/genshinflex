@@ -100,7 +100,12 @@ const shown = (await calendarItems(lang)).filter((item) =>
   .copy small { color: var(--muted); }
   .copy b { color: var(--accent-text); font-size: .82rem; }
   @media (max-width: 900px) {
-    .calendar-cards { display: flex; overflow-x: auto; padding-bottom: .5rem; scroll-snap-type: x proximity; }
+    .calendar-cards { display: flex; overflow-x: auto; padding-bottom: .5rem; scrollbar-width: none; scroll-snap-type: x mandatory; scroll-padding-inline: 0; }
+    .calendar-cards::-webkit-scrollbar { display: none; }
     .calendar-card { flex: 0 0 180px; scroll-snap-align: start; }
+  }
+  @media (max-width: 700px) {
+    .calendar-cards { margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+    .calendar-card { flex-basis: 160px; }
   }
 </style>

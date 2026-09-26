@@ -1,0 +1,67 @@
+---
+interface Props { dir: 'prev' | 'next'; label: string; controls: string; }
+const { dir, label, controls } = Astro.props;
+const id = `${controls}-${dir}`;
+---
+<button type="button" class:list={['gate', dir, { shut: dir === 'prev' }]} data-dir={dir} aria-label={label} aria-controls={controls} disabled={dir === 'prev'}>
+  <svg class="frame" viewBox="0 0 64 120" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${id}-stone`} x2="0" y2="1"><stop stop-color="#8a6a55" /><stop offset="1" stop-color="#5d4638" /></linearGradient>
+      <radialGradient id={`${id}-portal`}><stop stop-color="#7fd4ff" /><stop offset=".55" stop-color="#2f6bff" /><stop offset="1" stop-color="#2f6bff" stop-opacity="0" /></radialGradient>
+    </defs>
+    <g class="portal">
+      <path d="M16 111V47Q16 21 48 18V111Z" fill={`url(#${id}-portal)`} />
+      <path class="flame" d="M25 105Q36 80 29 57Q45 71 39 105Z" />
+      <path class="flame" d="M37 107Q32 78 46 43Q42 78 49 107Z" />
+      <path class="flame" d="M19 108Q31 91 25 72Q37 92 32 108Z" />
+    </g>
+    <path d="M8 112V47Q8 13 48 9L54 16Q23 19 23 47V112Z" fill={`url(#${id}-stone)`} stroke="#8a6a55" />
+    <path d="M22 110V47Q22 22 50 17" fill="none" stroke="#ffb347" stroke-width="1.5" opacity=".7" />
+    <g class="runes">
+      <path d="M13 47l3-5 3 5-3 5Zm8-22 4-4 4 4-4 4Zm16-10 4-4 4 4-4 4Z" fill="#6ee7e0" />
+      <path d="M13 64v8m0 8v8M20 35l4-4M30 19l5-3" fill="none" stroke="#ffb347" stroke-width="1.5" />
+      <path d="m48 3 7 8-7 8-7-8Z" fill="#5d4638" stroke="#6ee7e0" stroke-width="1.5" />
+      <path d="m48 7 3 4-3 4-3-4Z" fill="#6ee7e0" />
+    </g>
+  </svg>
+  <span class="leaf" aria-hidden="true">
+    <svg viewBox="0 0 64 120">
+      <defs><linearGradient id={`${id}-leaf`} x2="0" y2="1"><stop stop-color="#3a2f2a" /><stop offset="1" stop-color="#241d1a" /></linearGradient></defs>
+      <path d="M22 109V47Q22 25 48 21V109Z" fill={`url(#${id}-leaf)`} stroke="#8a6a55" stroke-width="1.5" />
+      <path d="m39 55-8 9 8 9" fill="none" stroke="#ffb347" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".55" />
+    </svg>
+  </span>
+</button>
+
+<style>
+  .gate { position: relative; flex: none; width: 76px; height: 142px; padding: 0; border: 0; background: none; cursor: pointer; perspective: 400px; transform-style: preserve-3d; }
+  .gate > *, .gate svg { pointer-events: none; }
+  .gate svg { display: block; width: 100%; height: 100%; }
+  .frame { transform: rotateY(18deg); }
+  .next .frame { transform: rotateY(-18deg) scaleX(-1); }
+  .portal { opacity: .15; transition: opacity .5s var(--ease), filter .5s var(--ease); }
+  .flame { fill: #7fd4ff; opacity: .35; transform-origin: center bottom; }
+  .flame:nth-child(3) { fill: #2f6bff; }
+  .runes { opacity: .6; transition: opacity .5s var(--ease), filter .5s var(--ease); }
+  .leaf { position: absolute; inset: 0; transform: rotateY(18deg); transform-origin: 26px center; transform-box: fill-box; transform-style: preserve-3d; transition: transform .5s var(--ease); }
+  .next .leaf { transform: rotateY(-18deg); transform-origin: 50px center; }
+  .next .leaf svg { transform: scaleX(-1); }
+  .gate:is(:hover, :focus-visible):not(:disabled) .portal { opacity: 1; filter: drop-shadow(0 0 10px #4aa3ff); }
+  .gate:is(:hover, :focus-visible):not(:disabled) .runes { opacity: 1; filter: drop-shadow(0 0 4px #ffb347); }
+  .gate:is(:hover, :focus-visible):not(:disabled) .flame { animation: breathe 1.2s ease-in-out infinite alternate; }
+  .gate:is(:hover, :focus-visible):not(:disabled) .leaf { transform: rotateY(-55deg); }
+  .gate.next:is(:hover, :focus-visible):not(:disabled) .leaf { transform: rotateY(55deg); }
+  .gate:active:not(:disabled) .leaf { transform: rotateY(-75deg); }
+  .gate.next:active:not(:disabled) .leaf { transform: rotateY(75deg); }
+  .gate:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 8px; }
+  .gate.shut, .gate:disabled { opacity: .35; cursor: default; }
+  @keyframes breathe { to { transform: scaleY(1.08); } }
+  @media (max-width: 700px) { .gate { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .gate:is(:hover, :focus-visible):not(:disabled) .flame { animation: none; }
+    .gate:is(:hover, :focus-visible):not(:disabled) .leaf { transform: rotateY(18deg); }
+    .gate.next:is(:hover, :focus-visible):not(:disabled) .leaf { transform: rotateY(-18deg); }
+    .gate:active:not(:disabled) .leaf { transform: rotateY(18deg); }
+    .gate.next:active:not(:disabled) .leaf { transform: rotateY(-18deg); }
+  }
+</style>

@@ -29,7 +29,7 @@ const { slides } = Astro.props;
             <a class="btn dark" href={`${base}/banners`}>{t('Все баннеры')}</a>
           </div>
           <p class="time"><span>{upcoming ? t('До начала') : t('Оставшееся время')}</span>
-            <b data-until={upcoming ? banner.start : banner.end} data-done={upcoming ? t('Идёт сейчас') : t('уже закончился')}>…</b>
+            <b data-until={upcoming ? banner.start : banner.end} data-full data-done={upcoming ? t('Идёт сейчас') : t('уже закончился')}>…</b>
           </p>
         </div>
       </div>
@@ -166,9 +166,9 @@ const { slides } = Astro.props;
   });
 </script>
 <style>
-  .carousel { position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; background: #1b1c23; }
+  .carousel { position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; background: #fff; }
   .carousel.ready { transition: height calc(var(--dur) * 2) var(--ease); }
-  .slide { --bg-deep: #1b1c23; position: relative; min-height: 400px; overflow: hidden; isolation: isolate; color: #ececf0; background: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); }
+  .slide { --bg-deep: #ffffff; position: relative; min-height: 400px; overflow: hidden; isolation: isolate; color: #14161d; background: linear-gradient(90deg, #ffffff 0%, #f5f8fc 32%, color-mix(in srgb, var(--el) 55%, #dff) 100%); }
   .slide[hidden] { display: none; }
   .slide.moving { position: absolute; top: 0; left: 0; width: 100%; }
   .slide.enter-forward { animation: enter-forward calc(var(--dur) * 2) var(--ease) both; }
@@ -181,29 +181,29 @@ const { slides } = Astro.props;
   @keyframes leave-forward { from { transform: translateX(0); } to { transform: translateX(-100%); } }
   @keyframes enter-backward { from { transform: translateX(-100%); } to { transform: translateX(0); } }
   @keyframes leave-backward { from { transform: translateX(0); } to { transform: translateX(100%); } }
-  .slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); }
+  .slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #fff 12%, rgb(255 255 255 / 0) 72%); }
   .splash-art { position: absolute; top: 0; right: max(2vw, calc((100vw - 1400px) / 2)); width: min(56vw, 780px); height: 100%; object-fit: contain; object-position: right center; z-index: -1; }
   .copy { position: relative; width: min(100%, 1240px); margin: auto; padding: 2rem 4rem 1.4rem; }
-  .phase { font: 600 clamp(1.5rem, 3vw, 2.25rem)/1.2 var(--font-display); margin: 0 0 1rem; }
-  .title, .region { color: #c5c6ce; font-size: .9rem; margin: 0; }
-  h1 { max-width: 60%; margin: .2rem 0 .5rem; color: color-mix(in srgb, var(--el) 70%, white); font-size: clamp(3rem, 6vw, 5.25rem); overflow-wrap: anywhere; }
+  .phase { color: #14161d; font: 600 clamp(1.5rem, 3vw, 2.25rem)/1.2 var(--font-display); margin: 0 0 1rem; }
+  .title, .region { color: #4a4f5c; font-size: .9rem; margin: 0; }
+  h1 { max-width: 60%; margin: .2rem 0 .5rem; color: color-mix(in srgb, var(--el) 72%, #0b0d14); font-size: clamp(3rem, 6vw, 5.25rem); overflow-wrap: anywhere; }
   .identity { display: flex; align-items: center; gap: .5rem; }
   .el-dot { font-size: 1.6rem; }
-  .stars { color: var(--accent); letter-spacing: .12em; }
+  .stars { color: #c98a1a; letter-spacing: .12em; }
   .region { margin-left: 2.1rem; }
   .actions { display: flex; gap: .6rem; margin-top: 1rem; }
-  .time { display: grid; gap: .1rem; margin: 1.2rem 0 0; color: #c5c6ce; font-size: .85rem; }
-  .time b { color: #fff; font: 600 1.15rem var(--font-display); }
+  .time { display: grid; gap: .1rem; margin: 1.2rem 0 0; color: #4a4f5c; font-size: .85rem; }
+  .time b { color: #14161d; font: 600 1.15rem var(--font-display); }
   .controls { display: none; }
   .ready .controls { display: contents; }
-  /* Стрелки приглушённые, при наведении и фокусе светлеют */
-  .arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%; background: none; color: rgb(255 255 255 / .45); font: 200 2.4rem/1 var(--font); cursor: pointer; padding: 0 0 .25rem; transition: color var(--dur) var(--ease), text-shadow var(--dur) var(--ease); }
-  .arrow:hover, .arrow:focus-visible { color: #fff; text-shadow: 0 0 14px rgb(255 255 255 / .75), 0 0 2px #fff; }
+  /* Стрелки приглушённые, при наведении и фокусе темнеют */
+  .arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%; background: none; color: rgb(20 22 30 / .4); font: 200 2.4rem/1 var(--font); cursor: pointer; padding: 0 0 .25rem; transition: color var(--dur) var(--ease), text-shadow var(--dur) var(--ease); }
+  .arrow:hover, .arrow:focus-visible { color: #14161d; text-shadow: none; }
   .prev { left: .4rem; } .next { right: .4rem; }
   .dots { position: absolute; bottom: 1rem; left: 50%; translate: -50% 0; display: flex; gap: .45rem; z-index: 2; }
-  .dot { width: 18px; height: 4px; overflow: hidden; border: 0; border-radius: 99px; padding: 0; background: rgb(255 255 255 / .5); cursor: pointer; transition: width var(--dur) var(--ease); }
-  .dot.active { width: 42px; background: rgb(255 255 255 / .35); }
-  .fill { display: block; width: 100%; height: 100%; background: #fff; transform: scaleX(0); transform-origin: left; }
+  .dot { width: 18px; height: 4px; overflow: hidden; border: 0; border-radius: 99px; padding: 0; background: rgb(20 22 30 / .18); cursor: pointer; transition: width var(--dur) var(--ease); }
+  .dot.active { width: 42px; background: rgb(20 22 30 / .12); }
+  .fill { display: block; width: 100%; height: 100%; background: #1b1c23; transform: scaleX(0); transform-origin: left; }
   .ready .dot.active .fill { animation: fill-progress 7s linear both; }
   .ready.paused .dot.active .fill { animation-play-state: paused; }
   @keyframes fill-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -212,8 +212,8 @@ const { slides } = Astro.props;
   }
   @media (max-width: 700px) {
     .carousel { margin: -1.2rem -16px 2.5rem; }
-    .slide { min-height: 0; padding-top: 170px; touch-action: pan-y; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
-    .slide::after { background: linear-gradient(0deg, var(--bg-deep) 35%, transparent 80%); }
+    .slide { min-height: 0; padding-top: 170px; touch-action: pan-y; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, #fff), #fff 75%); }
+    .slide::after { background: linear-gradient(0deg, #fff 35%, rgb(255 255 255 / 0) 80%); }
     .splash-art { right: 0; top: 0; width: 100%; height: 230px; opacity: .8; object-position: center top; }
     .copy { padding: 0 1.1rem 2.6rem; }
     .phase { font-size: 1.2rem; margin-bottom: .5rem; }

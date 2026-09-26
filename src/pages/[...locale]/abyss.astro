@@ -91,9 +91,12 @@ const guides = new Map(await Promise.all(floors.map(async (f) => [f.floor, await
   .blessing { margin-bottom: 1rem; border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
   .blessing p { margin: 0; }
   .floor-nav { position: sticky; top: var(--top-h); z-index: 5; display: flex; gap: .4rem; padding: .6rem 0; background: var(--bg); overflow-x: auto; scrollbar-width: none; }
-  @media (max-width: 640px) { .floor-nav { flex-wrap: wrap; overflow-x: visible; } }
   .floor-nav a { flex: none; padding: .4rem .9rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); text-decoration: none; font-size: .9rem; }
   .floor-nav a:hover { border-color: var(--accent); color: var(--accent-text); }
+  @media (max-width: 640px) {
+    .floor-nav { flex-wrap: nowrap; }
+    .floor-nav a { flex: 1; text-align: center; padding-inline: .3rem; }
+  }
   .floor { scroll-margin-top: calc(var(--top-h) + 56px); margin-top: 1rem; }
   .disorder { list-style: none; margin: 0 0 .8rem; padding: 0; display: grid; gap: .35rem; }
   .disorder .chip { margin-right: .3rem; }
