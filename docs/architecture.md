@@ -1,0 +1,54 @@
+# Архитектура платформы
+
+## Сервисы и данные
+
+| Сервис | Ответственность |
+| --- | --- |
+| Astro на Cloudflare Pages | Публичный сайт и страницы контента |
+| Sanity Content Lake и Studio | Билды, ротации, баннеры, новости и гайды |
+| Supabase Postgres, Auth и Storage | Аккаунты, пользовательские данные, роли и аватары |
+| Cloudflare Worker на Hono | Авторизованный API, проверка подписей и запуск сборки |
+
+Переводы билдов, новостей и гайдов хранятся отдельными документами Sanity с языком `ru`, `en` или `es`. Ротации используют объекты `localeString` для видимого текста. Слаги персонажей и оружия по-прежнему ссылаются на данные сайта. При миграции на этапе 4 каждую группу `halves[].need` нужно преобразовать из массива стихий в `{ elements: [...] }`, а строковых врагов в `floors[].chambers[].halves[].enemies` и `stages[].halves[].enemies` — в объекты `{ name: ... }`. Названия и примечания команд ротации нужно перенести в поле `ru` объекта `localeString`.
+
+```text
+Редактор → Sanity → подписанный вебхук → Worker → Deploy Hook → Pages
+Пользователь → Supabase Auth → access token → Worker → Postgres
+```
+
+Studio редактирует содержимое Content Lake. Опубликованный сайт получает контент при сборке. Пользователь входит через Supabase Auth; Worker проверяет JWT и читает профиль. Telegram Login Widget на этапе 1 только проверяет подпись: сессия Supabase появится на этапе 2.
+
+## Бесплатные лимиты
+
+Лимиты меняются; перед запуском сверяйте условия сервисов:
+
+| Сервис | Бесплатный план |
+| --- | --- |
+| [Sanity](https://www.sanity.io/pricing) | Бесплатный проект с лимитами документов, API и участников |
+| [Supabase](https://supabase.com/pricing) | Бесплатный проект с лимитами базы, Storage и Auth |
+| [Cloudflare Workers](https://developers.cloudflare.com/workers/platform/pricing/) | 100 000 запросов в день и 10 мс CPU на вызов |
+| [Cloudflare Pages](https://developers.cloudflare.com/pages/platform/limits/) | Бесплатные сборки с месячным лимитом |
+| [Resend](https://resend.com/pricing) | Бесплатная отправка писем с лимитом отправок |
+
+## Настройка
+
+1. Создать проект Sanity и dataset `production`. Указать `SANITY_STUDIO_PROJECT_ID` и `SANITY_STUDIO_DATASET` для Studio; добавить разрешённые CORS origins сайта и Studio. Создать токен записи для будущих серверных операций, хранить его как `SANITY_WRITE_TOKEN` только в Worker. Настроить вебхук на `https://api.genshinflex.com/hooks/sanity` с секретом `SANITY_WEBHOOK_SECRET`, методом POST и событиями опубликованных документов.
+2. Создать проект Supabase в регионе EU. Связать проект с CLI и выполнить `supabase db push`. Настроить SMTP Resend, подтверждение email, провайдеры Discord и Google и redirect URL для `https://genshinflex.com`, `https://test.genshinflex.pages.dev` и `http://localhost:4321`. Секреты OAuth и SMTP хранить в окружении.
+3. Создать Cloudflare Pages Deploy Hook. Сохранить его URL в секрете Worker `CF_DEPLOY_HOOK_URL`.
+4. Для Worker задать `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_TOKEN`, `SANITY_WEBHOOK_SECRET` и `CF_DEPLOY_HOOK_URL` через секреты Wrangler. При необходимости HS256 задать `SUPABASE_JWT_SECRET`; для асимметричных JWT используется JWKS Supabase. Выполнить `wrangler deploy` из `apps/api` и назначить маршрут `api.genshinflex.com`.
+5. Установить зависимости рабочих областей, собрать и развернуть Studio. После настройки проекта проверить `npm run api:test`.
+
+Не публиковать service role key, токены Sanity, Telegram и URL Deploy Hook в клиентском коде или репозитории. Публичные страницы профилей читают `public.public_profiles`; прямое чтение `profiles` ограничено публичными столбцами. Приватный `game_uid` читает Worker с service role key, а менять его может только владелец профиля.
+
+## Следующие этапы
+
+2. Вход, регистрация, Telegram-сессия, профили и синхронизация пользовательских данных.
+3. Перенос форм обратной связи и заявок гайдов в API и модерацию.
+4. Миграция Markdown и JSON в Sanity, чтение контента сайтом.
+5. Перенос Astro в `apps/web` и объединение сборки рабочих областей.
+6. Наблюдаемость, лимиты запросов, резервное копирование и завершение перехода.
+
+## Решения
+
+- **`bio` публичный.** Описание «о себе» — это часть публичного профиля (`/u/ник`), пользователь сам решает, что туда писать, и может скрыть профиль целиком (`is_public = false`). Приватные поля — `game_uid` и всё в `user_data`.
+- **Враги в ротациях** хранятся объектами `{ id }` (из genshin-db — названия переводятся по базе) или `{ name }` (редкий ручной случай, без перевода).
