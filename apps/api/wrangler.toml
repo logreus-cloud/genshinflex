@@ -1,0 +1,7 @@
+name = "genshinflex-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+SITE_ORIGINS = "https://genshinflex.com,https://test.genshinflex.pages.dev,http://localhost:4321"
+SUPABASE_URL = ""

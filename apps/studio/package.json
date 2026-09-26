@@ -1,0 +1,23 @@
+{
+  "name": "@genshinflex/studio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "validate": "esbuild validate-schema.mjs --bundle --platform=node --format=esm --packages=external --outfile=.sanity/validate-schema.mjs --log-level=error && node .sanity/validate-schema.mjs"
+  },
+  "dependencies": {
+    "@sanity/document-internationalization": "^4.0.0",
+    "@sanity/locale-ru-kz": "^1.0.0",
+    "@sanity/vision": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sanity": "^4.0.0",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "*"
+  }
+}

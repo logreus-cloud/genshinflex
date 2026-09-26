@@ -5,6 +5,9 @@
   "engines": {
     "node": ">=22.12.0"
   },
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "import": "node scripts/import-data.mjs && node scripts/import-wiki-enemies.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/add-beta-levelup.mjs && node scripts/import-weapon-sources.mjs && python scripts/import-weapon-art.py && node scripts/import-calendar.mjs",
     "dev": "astro dev",
@@ -26,7 +29,10 @@
     "test:reminders": "node --experimental-strip-types scripts/test-reminders.mjs",
     "import:sources": "node scripts/import-weapon-sources.mjs",
     "import:calendar": "node scripts/import-calendar.mjs",
-    "import:weapon-art": "python scripts/import-weapon-art.py"
+    "import:weapon-art": "python scripts/import-weapon-art.py",
+    "studio": "npm run dev -w @genshinflex/studio",
+    "api:dev": "npm run dev -w @genshinflex/api",
+    "api:test": "npm run test -w @genshinflex/api"
   },
   "dependencies": {
     "astro": "^7.3.4"
