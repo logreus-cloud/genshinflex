@@ -102,6 +102,8 @@ const { slides } = Astro.props;
   .carousel { position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; background: #1b1c23; }
   .slide { --bg-deep: #1b1c23; position: relative; min-height: 400px; overflow: hidden; isolation: isolate; color: #ececf0; background: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); }
   .slide[hidden] { display: none; }
+  .ready .slide:not([hidden]) { animation: gf-fade-in .3s var(--ease) both; }
+  .ready .slide:not([hidden]) .copy { animation: gf-fade-up .3s .06s var(--ease) both; }
   .slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); }
   .splash-art { position: absolute; top: 0; right: max(2vw, calc((100vw - 1400px) / 2)); width: min(56vw, 780px); height: 100%; object-fit: contain; object-position: right center; z-index: -1; }
   .copy { position: relative; width: min(100%, 1240px); margin: auto; padding: 2rem 4rem 1.4rem; }
@@ -120,7 +122,7 @@ const { slides } = Astro.props;
   .arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; border: 0; background: none; color: #fff; font: 200 3rem var(--font); cursor: pointer; padding: .2rem .8rem; }
   .prev { left: .4rem; } .next { right: .4rem; }
   .dots { position: absolute; bottom: 1rem; left: 50%; translate: -50% 0; display: flex; gap: .45rem; z-index: 2; }
-  .dot { width: 18px; height: 4px; border: 0; border-radius: 99px; padding: 0; background: rgb(255 255 255 / .5); cursor: pointer; }
+  .dot { width: 18px; height: 4px; border: 0; border-radius: 99px; padding: 0; background: rgb(255 255 255 / .5); cursor: pointer; transition: width var(--dur) var(--ease), background-color var(--dur) var(--ease); }
   .dot.active { width: 42px; background: #fff; }
   @media (max-width: 700px) {
     .carousel { margin: -1.2rem -16px 2.5rem; }

@@ -80,14 +80,21 @@ const buttons: Record<string, string> = {
   .features > h2 { text-align: center; font-size: clamp(2rem, 4vw, 2.5rem); margin: 0 0 1.5rem; }
   .tabs { display: none; justify-content: center; width: fit-content; max-width: 100%; margin: 0 auto 1.5rem; padding: 5px; background: var(--surface); border-radius: 999px; }
   .ready .tabs { display: flex; }
-  .tabs button { border: 0; border-radius: 999px; padding: .6rem 1.2rem; background: none; color: var(--text); cursor: pointer; white-space: nowrap; }
+  .tabs button { border: 0; border-radius: 999px; padding: .6rem 1.2rem; background: none; color: var(--text); cursor: pointer; white-space: nowrap; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
   .tabs button[aria-selected="true"] { color: #20212a; background: #e4e4e7; font-weight: 600; }
   .group { margin-top: 1.5rem; }
   .group[hidden] { display: none; }
+  .ready .group:not([hidden]) { animation: gf-fade-in .25s var(--ease) both; }
   .group-title { margin: 0 0 1rem; }
   .ready .group-title { display: none; }
   .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-  .card { display: flex; flex-direction: column; align-items: center; min-width: 0; min-height: 280px; padding: 1.4rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .card { display: flex; flex-direction: column; align-items: center; min-width: 0; min-height: 280px; padding: 1.4rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgb(0 0 0 / .18); }
+  .ready .group:not([hidden]) .card { animation: gf-fade-up .24s var(--ease) backwards; }
+  .ready .group:not([hidden]) .card:nth-child(2) { animation-delay: .035s; }
+  .ready .group:not([hidden]) .card:nth-child(3) { animation-delay: .07s; }
+  .ready .group:not([hidden]) .card:nth-child(4) { animation-delay: .105s; }
+  .ready .group:not([hidden]) .card:nth-child(5) { animation-delay: .14s; }
   .card > svg { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   h4 { margin: .7rem 0 .5rem; font: 600 1.15rem var(--font-display); overflow-wrap: anywhere; }
   .art { width: 100%; height: 130px; object-fit: contain; margin: auto 0; }
