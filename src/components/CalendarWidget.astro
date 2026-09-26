@@ -87,20 +87,25 @@ const shown = (await calendarItems(lang)).filter((item) =>
 <style>
   .calendar-widget { margin-top: 1.8rem; }
   .calendar-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
-  .calendar-card { display: grid; align-content: start; gap: .6rem; min-width: 0; padding: .75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); text-decoration: none; }
+  .calendar-card { display: grid; align-content: start; gap: .6rem; min-width: 0; padding: .75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); text-decoration: none; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
   .calendar-card[hidden] { display: none; }
-  .calendar-card:hover { border-color: var(--accent); }
+  .calendar-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / .18); }
   .art { width: 100%; height: 76px; object-fit: cover; border-radius: var(--radius-sm); }
   .icons { display: flex; align-items: center; height: 76px; }
   .icons img { width: 52px; height: 52px; object-fit: cover; border-radius: 50%; background: var(--surface-2); }
   .icons img + img { margin-left: -12px; }
-  .symbol { display: grid; place-items: center; height: 76px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent); font-size: 2rem; }
+  .symbol { display: grid; place-items: center; height: 76px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent-text); font-size: 2rem; }
   .copy { display: grid; gap: .25rem; min-width: 0; }
   .copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .86rem; }
   .copy small { color: var(--muted); }
-  .copy b { color: var(--accent); font-size: .82rem; }
+  .copy b { color: var(--accent-text); font-size: .82rem; }
   @media (max-width: 900px) {
-    .calendar-cards { display: flex; overflow-x: auto; padding-bottom: .5rem; scroll-snap-type: x proximity; }
+    .calendar-cards { display: flex; overflow-x: auto; padding-bottom: .5rem; scrollbar-width: none; scroll-snap-type: x mandatory; scroll-padding-inline: 0; }
+    .calendar-cards::-webkit-scrollbar { display: none; }
     .calendar-card { flex: 0 0 180px; scroll-snap-align: start; }
+  }
+  @media (max-width: 700px) {
+    .calendar-cards { margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+    .calendar-card { flex-basis: 160px; }
   }
 </style>

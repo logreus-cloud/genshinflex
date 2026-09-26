@@ -108,8 +108,8 @@ const signed = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v)}%`;
   .opt img { border-radius: 8px; background: linear-gradient(160deg, #7a5226, #d1953f); flex: none; padding: 3px; box-sizing: border-box; }
   .opt div { display: grid; min-width: 0; flex: 1; }
   .opt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .opt strong { font: 700 1.2rem var(--font-display); color: var(--accent); white-space: nowrap; }
-  .cbadge { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--surface-3); font: 700 .95rem var(--font-display); color: var(--accent); }
+  .opt strong { font: 700 1.2rem var(--font-display); color: var(--accent-text); white-space: nowrap; }
+  .cbadge { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--surface-3); font: 700 .95rem var(--font-display); color: var(--accent-text); }
   .hint { margin: -.3rem 0 0; color: var(--muted); }
   .bars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 2.2rem minmax(80px, 1fr) max-content max-content; gap: .45rem .7rem; align-items: center; }
   .bars li { display: contents; }
@@ -122,9 +122,9 @@ const signed = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v)}%`;
   .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   .tag { font-size: .78rem; padding: .15em .6em; border-radius: 999px; justify-self: start; white-space: nowrap; }
   .tag.skip { background: var(--surface-2); color: var(--muted); }
-  .tag.nice { background: var(--accent-soft); color: var(--accent); }
+  .tag.nice { background: var(--accent-soft); color: var(--accent-text); }
   .tag.big { background: var(--accent); color: var(--accent-ink); }
-  .how summary { cursor: pointer; color: var(--accent); }
+  .how summary { cursor: pointer; color: var(--accent-text); }
   .how p { margin: .5rem 0; max-width: 80ch; }
   .team { display: flex; gap: .4rem; }
   @media (max-width: 760px) {

@@ -125,6 +125,7 @@ const news = defineCollection({
     anchor: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
     title: z.string().min(1),
     summary: z.string().min(1),
+    image: z.string().optional(),
     date: z.coerce.date(),
     draft: z.boolean().default(false),
   }),

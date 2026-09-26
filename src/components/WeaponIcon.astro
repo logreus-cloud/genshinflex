@@ -13,7 +13,7 @@ const w = getWeapon(slug);
 
 <style>
   .wi { display: inline-flex; flex-direction: column; align-items: center; gap: .3rem; text-decoration: none; width: calc(var(--s) + 16px); max-width: 100%; flex: none; }
-  .frame { width: min(var(--s), 100%); aspect-ratio: 1; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: linear-gradient(170deg, #36436a, #4b7aa6); }
+  .frame { width: min(var(--s), 100%); aspect-ratio: 1; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: linear-gradient(170deg, #36436a, #4b7aa6); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
   .frame.r4 { background: linear-gradient(170deg, #4a3d6d, #9679c4); }
   .frame.r5 { background: linear-gradient(170deg, #6b4520, #d1953f); }
   .frame img { width: 80%; height: auto; }
@@ -21,5 +21,5 @@ const w = getWeapon(slug);
     width: 100%; font-size: .72rem; text-align: center; line-height: 1.15; hyphens: auto; overflow-wrap: anywhere;
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
   }
-  .wi:hover .frame { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .wi:hover .frame { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / .2); }
 </style>

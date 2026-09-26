@@ -1,0 +1,137 @@
+---
+import { useData } from '../lib/data';
+import { icons } from '../lib/nav-icons';
+const { base, t } = useData(Astro.currentLocale);
+interface Item { label: string; href: string; icon: string; image?: string; imageClass?: string; until?: string; description?: string; soon?: boolean; }
+interface Props { heroIcon?: string; weaponImage?: string; artifactIcon?: string; modes: { label: string; href: string; icon: string; until?: string }[]; }
+const { heroIcon, weaponImage, artifactIcon, modes } = Astro.props;
+const groups: { key: string; label: string; items: Item[] }[] = [
+  { key: 'base', label: 'База', items: [
+    { label: 'Персонажи', href: '/characters', icon: 'user', image: heroIcon, imageClass: 'character' },
+    { label: 'Оружие', href: '/weapons', icon: 'sword', image: weaponImage, imageClass: 'weapon' },
+    { label: 'Артефакты', href: '/artifacts', icon: 'flower', image: artifactIcon, imageClass: 'artifact' },
+  ] },
+  { key: 'endgame', label: 'Эндгейм', items: modes },
+  { key: 'tools', label: 'Инструменты', items: [
+    { label: 'Симулятор команды', href: '/tools/simulator', icon: 'chart', description: 'Соберите отряд и сравните варианты.' },
+    { label: 'Проверка команды', href: '/tools/team-check', icon: 'check', description: 'Проверьте отряд для текущей Бездны.' },
+    { label: 'Трекер круток', href: '/tools/wishes', icon: 'star', description: 'Следите за гарантом и историей круток.' },
+    { label: 'Калькулятор прокачки', href: '/tools/calculator', icon: 'calc', description: 'Посчитайте материалы для прокачки.' },
+    { label: 'Конструктор ротаций', href: '/tools/rotation-builder', icon: 'tool', description: 'Составьте порядок действий отряда.' },
+    { label: 'Рейтинг', href: '/rating', icon: 'chart', description: 'Рейтинг персонажей от сообщества и по забегам.', soon: true },
+  ] },
+];
+const buttons: Record<string, string> = {
+  Персонажи: 'Список всех персонажей',
+  Оружие: 'Список всего оружия',
+  Артефакты: 'Список всех артефактов',
+};
+---
+<section class="features" data-features>
+  <h2>{t('Функционал сайта')}</h2>
+  <div class="tabs" role="tablist" aria-label={t('Функционал сайта')}>
+    {groups.map((group, i) => <button id={`feature-tab-${i}`} type="button" role="tab" aria-controls={`feature-panel-${i}`}
+      aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{t(group.label)}</button>)}
+  </div>
+  <div class="panels">
+  {groups.map((group, i) => (
+    <div class="group" data-group={group.key} id={`feature-panel-${i}`} role="tabpanel" aria-labelledby={`feature-tab-${i}`}>
+      <h3 class="group-title">{t(group.label)}</h3>
+      <div class="cards">
+        {group.items.map((item) => (
+          <article class:list={['card', { soon: item.soon }]}>
+            <svg viewBox="0 0 20 20" width="34" height="34" aria-hidden="true" set:html={icons[item.icon]} />
+            <h4>{t(item.label)}</h4>
+            {item.soon && <span class="soon-tag">{t('в разработке')}</span>}
+            {item.image ? <img class:list={['art', item.imageClass]} src={item.image} alt="" loading="lazy" /> :
+              item.until ? <p class="detail">{t('Обновится через')} <b data-until={item.until} data-done={t('обновилось')}>…</b></p> :
+              <p class="detail">{item.description ? t(item.description) : ''}</p>}
+            <a class="btn light" href={`${base}${item.href}`}>{t(buttons[item.label] ?? 'Открыть')}</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  ))}
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-features]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const select = (index: number) => {
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+        panels[i].setAttribute('aria-hidden', String(i !== index));
+        panels[i].inert = i !== index;
+        panels[i].hidden = i !== index;
+      });
+    };
+    root.classList.add('ready');
+    select(0);
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        const next = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        select(next);
+        tabs[next].focus();
+      });
+    });
+  });
+</script>
+<style>
+  .features { margin: 2.5rem 0 3rem; }
+  .features > h2 { text-align: center; font-size: clamp(2rem, 4vw, 2.5rem); margin: 0 0 1.5rem; }
+  .tabs { display: none; justify-content: center; width: fit-content; max-width: 100%; margin: 0 auto 1.5rem; padding: 5px; background: var(--surface); border-radius: 999px; }
+  .ready .tabs { display: flex; }
+  .tabs button { border: 0; border-radius: 999px; padding: .6rem 1.2rem; background: none; color: var(--text); cursor: pointer; white-space: nowrap; transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+  .tabs button[aria-selected="true"] { color: #20212a; background: #e4e4e7; font-weight: 600; }
+  .group { margin-top: 1.5rem; }
+  .ready .panels { display: grid; }
+  .ready .group { grid-area: 1 / 1; }
+  .ready .group[hidden] { display: block; visibility: hidden; pointer-events: none; }
+  .ready .group:not([hidden]) { animation: gf-fade-in .4s var(--ease) both; }
+  .group-title { margin: 0 0 1rem; }
+  .ready .group-title { display: none; }
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  /* Одинокая карточка в последнем ряду — по центру */
+  .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(3n + 1) { grid-column: 2; }
+  .group[data-group="endgame"] .card { justify-content: center; }
+  /* Раздел в разработке: приглушён, но открывается */
+  .card.soon { opacity: .6; }
+  .card.soon:hover, .card.soon:focus-within { opacity: .85; }
+  .soon-tag { margin: -.2rem 0 .3rem; padding: .1rem .55rem; border: 1px solid var(--border); border-radius: 999px; font-size: .72rem; color: var(--muted); }
+  .card { display: flex; flex-direction: column; align-items: center; min-width: 0; min-height: 320px; padding: 1.4rem; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgb(0 0 0 / .18); }
+  .ready .group:not([hidden]) .card { animation: gf-fade-up .38s var(--ease) backwards; }
+  .ready .group:not([hidden]) .card:nth-child(2) { animation-delay: .06s; }
+  .ready .group:not([hidden]) .card:nth-child(3) { animation-delay: .12s; }
+  .ready .group:not([hidden]) .card:nth-child(4) { animation-delay: .18s; }
+  .ready .group:not([hidden]) .card:nth-child(5) { animation-delay: .24s; }
+  .card > svg { fill: currentColor; color: var(--accent); flex: none; --icon-cut: var(--surface); }
+  h4 { margin: .7rem 0 .5rem; font: 600 1.15rem var(--font-display); overflow-wrap: anywhere; }
+  .group[data-group="endgame"] .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .art { width: 100%; height: 104px; object-fit: contain; box-sizing: border-box; padding: 4px; margin: auto 0; }
+  .art.character { width: 104px; aspect-ratio: 1; object-fit: cover; object-position: center 15%; border-radius: 50%; }
+  .detail { display: grid; align-content: center; min-height: 130px; margin: auto 0; color: var(--muted); }
+  .detail b { color: var(--accent-text); }
+  .card .btn { justify-content: center; width: 100%; margin-top: auto; font-size: .82rem; }
+  .group[data-group="endgame"] .detail { margin: .8rem 0; }
+  .group[data-group="endgame"] .card .btn { margin-top: 1rem; }
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(3n + 1) { grid-column: auto; }
+    .group:not([data-group="endgame"]) .cards > .card:last-child:nth-child(2n + 1) { grid-column: 1 / -1; justify-self: stretch; width: auto; }
+    .card { min-height: 260px; padding: .9rem .7rem; }
+    .card > svg { width: 26px; height: 26px; }
+    .art { height: 72px; }
+    .art.character { width: 72px; }
+    .detail { min-height: 84px; font-size: .85rem; }
+    h4 { font-size: 1rem; margin: .5rem 0 .4rem; }
+    .card .btn { font-size: .76rem; padding-inline: .5rem; }
+    .tabs { width: 100%; }
+    .tabs button { flex: 1; padding: .55rem .4rem; font-size: .8rem; }
+  }
+</style>
