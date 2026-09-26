@@ -12,6 +12,7 @@ type Block = {
 const escapeText = (text: string) => text.replace(/([\\`*_[\]<>])/g, '\\$1');
 
 function spanToMarkdown(span: Span, defs: Mark[]): string {
+  // Перенос внутри абзаца — «\n» в тексте блока; оставляем как есть: renderGuide на сайте сам делает из него <br>
   let text = escapeText(span.text ?? '');
   for (const mark of span.marks ?? []) {
     if (mark === 'strong') text = `**${text}**`;

@@ -75,7 +75,8 @@ export function markdownToPortableText(markdown, path) {
       throw new Error(`${path}: заголовок h${token.depth} не поддерживается Portable Text`);
     }
   });
-  const html = marked.parse(markdown);
+  // breaks: сайт (renderGuide) показывает перенос строки внутри абзаца как <br> — сохраняем его как «\n» в тексте блока
+  const html = marked.parse(markdown, { breaks: true });
   try {
     let key = 0;
     return htmlToBlocks(html, blockType, {

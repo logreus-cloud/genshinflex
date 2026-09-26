@@ -4,7 +4,8 @@ import { JSDOM } from 'jsdom';
 import { files, readContent, toDocument, fromDocument, portableTextToMarkdown } from './mapping.mjs';
 
 function normalizeHtml(markdown) {
-  const document = new JSDOM(marked.parse(markdown)).window.document;
+  // breaks: переносы строк значимы для сайта (renderGuide делает из них <br>), их потеря — расхождение
+  const document = new JSDOM(marked.parse(markdown, { breaks: true })).window.document;
   const normalize = (node) => {
     if (node.nodeType === 3) return ['#text', node.textContent.replace(/\s+/g, ' ')];
     if (node.nodeType !== 1) return null;

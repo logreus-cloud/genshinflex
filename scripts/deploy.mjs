@@ -1,6 +1,13 @@
 // Тихий деплой: вместо простыни логов — луна-спиннер по шагам. Полный лог показываем, только если шаг упал.
 // Подробный вывод по-старому: npm run deploy:verbose
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+
+// --sanity — контент из Sanity (CONTENT_SOURCE=sanity); токен чтения SANITY_READ_TOKEN — из .env (в .gitignore)
+if (process.argv.includes('--sanity')) {
+  if (existsSync('.env')) process.loadEnvFile('.env');
+  process.env.CONTENT_SOURCE = 'sanity';
+}
 
 const MOON = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
 const tty = process.stdout.isTTY;

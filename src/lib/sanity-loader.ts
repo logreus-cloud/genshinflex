@@ -69,7 +69,10 @@ export function sanityLoader(collection: Collection) {
         collection === 'builds' ? document.lang === 'ru'
           : collection === 'buildsI18n' ? document.lang === 'en' || document.lang === 'es'
             : true);
-      if (!selected.length) throw new Error(`Sanity: коллекция ${collection} пуста`);
+      // Гайды пока пусты и в файлах; остальные коллекции пустыми не бывают — значит, нет доступа к данным
+      if (!selected.length && collection !== 'weaponGuides' && collection !== 'endgameGuides') {
+        throw new Error(`Sanity: коллекция ${collection} пуста. Dataset приватный — задайте SANITY_READ_TOKEN (токен Viewer) в .env или окружении сборки`);
+      }
       store.clear();
       const ids = new Set<string>();
       for (const document of selected) {
