@@ -17,6 +17,7 @@
     "dev:full": "npm run build && wrangler pages dev dist",
     "deploy": "node scripts/deploy.mjs",
     "deploy:test": "node scripts/deploy.mjs --test",
+    "deploy:platform": "node scripts/deploy.mjs --branch=platform",
     "deploy:verbose": "npm run build && wrangler pages deploy dist --project-name genshinflex",
     "discord:news": "node scripts/discord-news.mjs",
     "feedback": "wrangler d1 execute genshinflex-feedback --remote --command \"SELECT id, created_at, kind, page, contact, substr(message,1,300) AS message FROM feedback ORDER BY id DESC LIMIT 30\"",

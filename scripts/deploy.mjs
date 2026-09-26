@@ -41,14 +41,17 @@ function step(label, command) {
 
 // --test — тестовая версия: отдельная ветка Cloudflare Pages с постоянным адресом test.genshinflex.pages.dev,
 // основной сайт не трогается. База D1 общая с основным сайтом — отзывы с теста попадут в ту же админку.
-const test = process.argv.includes('--test');
+// --branch=<имя> — своя ветка Pages с адресом <имя>.genshinflex.pages.dev (например, platform — чтобы не затирать тестовый дизайн)
+const branchArg = process.argv.find((arg) => arg.startsWith('--branch='))?.slice('--branch='.length);
+const branch = branchArg || (process.argv.includes('--test') ? 'test' : '');
+const test = Boolean(branch);
 const total = Date.now();
 try {
   const build = await step('Собираю сайт', 'npx astro build');
   const pages = build.match(/(\d+) page\(s\) built/)?.[1];
   if (pages) console.log(`   📄 страниц: ${pages}`);
   await step('Индексирую поиск', 'npx pagefind --site dist');
-  const out = await step(test ? 'Выкладываю тестовую версию' : 'Выкладываю на Cloudflare', `npx wrangler pages deploy dist --project-name genshinflex${test ? ' --branch test' : ''}`);
+  const out = await step(test ? 'Выкладываю тестовую версию' : 'Выкладываю на Cloudflare', `npx wrangler pages deploy dist --project-name genshinflex${branch ? ` --branch ${branch}` : ''}`);
   const url = out.match(/https:\/\/\S+\.pages\.dev\S*/)?.[0];
   if (!test) {
     try {
