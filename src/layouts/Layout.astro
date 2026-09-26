@@ -3,7 +3,8 @@ import '../styles/global.css';
 import '../styles/season-snezhnaya.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import Splash from '../components/Splash.astro';
-import RootsDivider from '../components/RootsDivider.astro';
+import AmbientMusic from '../components/AmbientMusic.astro';
+import SnowDivider from '../components/SnowDivider.astro';
 import season from '../data/season.json';
 import social from '../data/social.json';
 import { ogPath } from '../lib/og';
@@ -215,6 +216,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
               {LANGS.map((l) => <a href={alt(l)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
             </div>
           </div>
+          <AmbientMusic />
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
@@ -233,7 +235,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <div class="search-panel" id="search-panel" hidden><QuickSearch /></div>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
-      <RootsDivider />
+      <SnowDivider />
       <footer class="footer">
         <div class="f-grid">
           {footerCols.map(([title, links]) => (
@@ -503,8 +505,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     .tg { display: none; }
     .search-panel { left: 8px; right: 8px; }
   }
-  /* Совсем узкие экраны (320px): остаётся только значок логотипа, иначе иконки наезжают на надпись */
-  @media (max-width: 359px) {
+  /* Шесть иконок в шапке: на узких экранах от логотипа остаётся значок, иначе надпись наезжает на кнопки */
+  @media (max-width: 540px) {
     .top-logo span { display: none; }
+  }
+  @media (max-width: 359px) {
+    .dc { display: none; }
   }
 </style>

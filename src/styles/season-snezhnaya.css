@@ -17,6 +17,11 @@
     --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .85) 0%, rgb(225 237 248 / .8) 45%, rgb(235 232 248 / .85) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .88) 0%, rgb(211 235 244 / .85) 50%, rgb(227 228 247 / .88) 100%);
   }
 }
+:root[data-season="snezhnaya"] .snow-divider { --snow-shadow: rgb(30 74 145 / .42); }
+:root[data-season="snezhnaya"][data-theme="light"] .snow-divider { --snow-shadow: rgb(30 74 145 / .2); }
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .snow-divider { --snow-shadow: rgb(30 74 145 / .2); }
+}
 
 @media (prefers-reduced-transparency: reduce) {
   :root[data-season="snezhnaya"] {

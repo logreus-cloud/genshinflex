@@ -1,0 +1,247 @@
+---
+import season from '../data/season.json';
+import { useData } from '../lib/data';
+const { t } = useData(Astro.currentLocale);
+---
+<button class="icon-btn music" type="button" aria-pressed="false" aria-label={t('Включить музыку')} title={t('Включить музыку')} data-on-label={t('Выключить музыку')} data-off-label={t('Включить музыку')} data-src={season.music ?? ''}>
+  <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+    <path d="M12 14.5V4.5l5-1v8.8M12 14.5c0 1.2-1.1 2-2.5 2S7 15.7 7 14.5s1.1-2 2.5-2c1 0 1.9.4 2.5 1Z" />
+    <path class="waves" d="M4.4 7.1a4 4 0 0 0 0 5.8M2.2 5.2a7 7 0 0 0 0 9.6" />
+  </svg>
+</button>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.music')!;
+  const Context = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Context) button.hidden = true;
+  else {
+    const file = button.dataset.src;
+    let enabled = false, armed = false, playing = false;
+    let ctx: AudioContext | undefined, master: GainNode | undefined, audio: HTMLAudioElement | undefined;
+    let timer: ReturnType<typeof setInterval> | undefined, stopTimer: ReturnType<typeof setTimeout> | undefined;
+    let nextChord = 0, nextBell = 0, chord = 0, version = 0, session = false;
+    let dry: GainNode, wet: GainNode, seed = 0x5eedc0de;
+    const sources = new Set<AudioScheduledSourceNode>(), nodes = new Set<AudioNode>();
+    const chords = [[50, 53, 60, 64], [46, 50, 53, 57], [53, 57, 60, 64], [48, 50, 55]];
+    const melody = [62, 65, 67, 69, 72, 74, 77, 79, 81, 84];
+    const random = () => {
+      seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
+      return (seed >>> 0) / 4294967296;
+    };
+    const hz = (midi: number) => 440 * 2 ** ((midi - 69) / 12);
+    const save = () => { try { localStorage.setItem('gf:music', enabled ? 'on' : 'off'); } catch {} };
+    const render = () => {
+      const label = button.dataset[enabled ? 'onLabel' : 'offLabel']!;
+      button.setAttribute('aria-pressed', String(enabled));
+      button.setAttribute('aria-label', label);
+      button.title = label;
+      button.classList.toggle('armed', armed && !playing);
+    };
+    const getContext = () => {
+      if (!ctx) {
+        ctx = new Context();
+        const limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.value = -20; limiter.knee.value = 20; limiter.ratio.value = 4;
+        master = ctx.createGain();
+        master.gain.value = 0;
+        master.connect(limiter);
+        limiter.connect(ctx.destination);
+      }
+      return ctx;
+    };
+    const track = (source: AudioScheduledSourceNode, chain: AudioNode[] = []) => {
+      sources.add(source);
+      chain.forEach((node) => nodes.add(node));
+      source.onended = () => {
+        sources.delete(source);
+        source.disconnect();
+        chain.forEach((node) => { node.disconnect(); nodes.delete(node); });
+      };
+    };
+    const makeSession = (context: AudioContext) => {
+      dry = context.createGain(); wet = context.createGain();
+      dry.gain.value = .65; wet.gain.value = .35;
+      dry.connect(master!);
+      const reverb = context.createConvolver();
+      reverb.normalize = false;
+      const impulse = context.createBuffer(2, context.sampleRate * 3, context.sampleRate);
+      for (let channel = 0; channel < 2; channel++) {
+        const data = impulse.getChannelData(channel);
+        for (let i = 0; i < data.length; i++) data[i] = (random() * 2 - 1) * Math.exp(-3 * i / data.length) / Math.sqrt(context.sampleRate * .5);
+      }
+      reverb.buffer = impulse;
+      wet.connect(reverb);
+      reverb.connect(master!);
+      [dry, wet, reverb].forEach((node) => nodes.add(node));
+      const noise = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
+      const samples = noise.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) samples[i] = random() * 2 - 1;
+      const wind = context.createBufferSource();
+      wind.buffer = noise; wind.loop = true;
+      const filter = context.createBiquadFilter();
+      filter.type = 'bandpass'; filter.frequency.value = 650; filter.Q.value = .7;
+      const windGain = context.createGain();
+      windGain.gain.value = .012;
+      wind.connect(filter); filter.connect(windGain); windGain.connect(master!);
+      const pitchLfo = context.createOscillator(), pitchDepth = context.createGain();
+      pitchLfo.frequency.value = .07; pitchDepth.gain.value = 240;
+      pitchLfo.connect(pitchDepth); pitchDepth.connect(filter.frequency);
+      const levelLfo = context.createOscillator(), levelDepth = context.createGain();
+      levelLfo.frequency.value = .09; levelDepth.gain.value = .005;
+      levelLfo.connect(levelDepth); levelDepth.connect(windGain.gain);
+      track(wind, [filter, windGain]); track(pitchLfo, [pitchDepth]); track(levelLfo, [levelDepth]);
+      wind.start(); pitchLfo.start(); levelLfo.start();
+      session = true;
+    };
+    const note = (midi: number, type: OscillatorType, level: number, time: number, pad = false) => {
+      const context = ctx!;
+      const oscillator = context.createOscillator(), gain = context.createGain();
+      oscillator.type = type;
+      oscillator.frequency.value = hz(midi);
+      oscillator.detune.value = pad ? (type === 'sine' ? -4 : 4) : 0;
+      oscillator.connect(gain);
+      const chain: AudioNode[] = [gain];
+      if (pad) {
+        const filter = context.createBiquadFilter();
+        filter.type = 'lowpass'; filter.frequency.value = 1200;
+        gain.connect(filter); filter.connect(dry); filter.connect(wet);
+        chain.push(filter);
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(level, time + 3);
+        gain.gain.setValueAtTime(level, time + 4);
+        gain.gain.linearRampToValueAtTime(0, time + 8);
+      } else {
+        gain.connect(dry); gain.connect(wet);
+        gain.gain.setValueAtTime(.0001, time);
+        gain.gain.linearRampToValueAtTime(level, time + .025);
+        gain.gain.exponentialRampToValueAtTime(.0001, time + 2.5);
+      }
+      track(oscillator, chain);
+      oscillator.start(time);
+      oscillator.stop(time + (pad ? 8.05 : 2.55));
+    };
+    const tick = () => {
+      if (!ctx || !session) return;
+      const horizon = ctx.currentTime + .3;
+      while (nextChord < horizon) {
+        chords[chord % chords.length].forEach((midi) => {
+          note(midi, 'sine', .028, nextChord, true);
+          note(midi, 'triangle', .011, nextChord, true);
+        });
+        chord++; nextChord += 8;
+      }
+      while (nextBell < horizon) {
+        const midi = melody[Math.floor(random() * melody.length)];
+        note(midi, 'sine', .018, nextBell);
+        if (random() < .18) note(melody[Math.floor(random() * melody.length)], 'sine', .011, nextBell + .15);
+        nextBell += .6 + random() * 1.2;
+      }
+    };
+    const release = () => {
+      for (const source of sources) {
+        source.onended = null;
+        try { source.stop(); } catch {}
+        source.disconnect();
+      }
+      sources.clear();
+      for (const node of nodes) node.disconnect();
+      nodes.clear();
+      session = false;
+    };
+    const stop = () => {
+      ++version;
+      clearInterval(timer); clearTimeout(stopTimer);
+      playing = false;
+      if (ctx && master) {
+        const time = ctx.currentTime;
+        master.gain.cancelScheduledValues(time);
+        master.gain.setValueAtTime(master.gain.value, time);
+        master.gain.linearRampToValueAtTime(0, time + .8);
+        stopTimer = setTimeout(() => {
+          audio?.pause();
+          if (session) release();
+          void ctx?.suspend().catch(() => {});
+        }, 850);
+      }
+      render();
+    };
+    const start = async () => {
+      if (!enabled || document.hidden) return;
+      armed = false; render();
+      clearTimeout(stopTimer);
+      const turn = ++version;
+      try {
+        const context = getContext();
+        if (file && !audio) {
+          const element = new Audio();
+          element.preload = 'none'; element.src = file; element.loop = true;
+          context.createMediaElementSource(element).connect(master!);
+          audio = element;
+        }
+        await Promise.all([context.resume(), file ? audio!.play() : Promise.resolve()]);
+        if (turn !== version || !enabled || document.hidden) {
+          if (document.hidden) { audio?.pause(); void context.suspend().catch(() => {}); }
+          return;
+        }
+        if (!file) {
+          if (!session) {
+            makeSession(context);
+            nextChord = context.currentTime + .05;
+            nextBell = context.currentTime + .65;
+          }
+          clearInterval(timer);
+          tick();
+          timer = setInterval(tick, 100);
+        }
+        const gain = master!.gain;
+        gain.cancelScheduledValues(context.currentTime);
+        gain.setValueAtTime(gain.value, context.currentTime);
+        gain.linearRampToValueAtTime(.35, context.currentTime + 2);
+        playing = true; render();
+      } catch (error) {
+        if (turn !== version || (error instanceof Error && error.name === 'AbortError')) return;
+        enabled = false; armed = false; save(); stop();
+      }
+    };
+    try { armed = enabled = localStorage.getItem('gf:music') === 'on'; } catch {}
+    render();
+    const firstGesture = (event: Event) => {
+      document.removeEventListener('pointerdown', firstGesture, true);
+      document.removeEventListener('keydown', firstGesture, true);
+      if (!button.contains(event.target as Node)) void start();
+    };
+    if (armed) {
+      document.addEventListener('pointerdown', firstGesture, { once: true, capture: true });
+      document.addEventListener('keydown', firstGesture, { once: true, capture: true });
+    }
+    button.addEventListener('click', () => {
+      if (armed) { void start(); return; }
+      enabled = !enabled; save();
+      if (enabled) void start();
+      else stop();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        ++version;
+        clearInterval(timer);
+        audio?.pause();
+        playing = false; render();
+        void ctx?.suspend().catch(() => {});
+      } else if (enabled && !armed) void start();
+    });
+  }
+</script>
+
+<style>
+  .music { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; flex: none; }
+  .music:hover { background: var(--surface-2); }
+  .music svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .music .waves { opacity: 0; }
+  .music[aria-pressed="true"] { color: var(--accent-text); }
+  .music[aria-pressed="true"] .waves { opacity: 1; }
+  .music.armed { animation: music-pulse 2.4s ease-in-out infinite; }
+  .music[hidden] { display: none; }
+  @keyframes music-pulse { 50% { background: var(--accent-soft); box-shadow: 0 0 0 5px var(--accent-soft); } }
+  @media (prefers-reduced-motion: reduce) { .music.armed { animation: none; } }
+  @media (max-width: 400px) { .music { width: 34px; height: 34px; } }
+</style>
