@@ -97,11 +97,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     </script>
   </head>
   <body>
+    <Splash />
     <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
     <aside class="side" id="side" aria-label={t('Навигация')}>
       <a class="logo" href={`${base}/`}>
         <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
-    <Splash />
         <span>Genshin<b>Flex</b></span>
       </a>
       <nav>
@@ -154,13 +154,13 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14Z" fill="currentColor"/><circle cx="10" cy="10" r="7" /></svg>
         </button>
+        <a class="icon-btn tg" href="https://t.me/genshinflex" target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
+          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
+        </a>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
       <footer class="footer">
         <div class="f-grid">
-        <a class="icon-btn tg" href="https://t.me/genshinflex" target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
-          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
-        </a>
           <div class="f-brand">
             <a class="f-logo" href={`${base}/`}>
               <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
