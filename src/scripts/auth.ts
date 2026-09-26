@@ -50,7 +50,9 @@ export function errorText(error: unknown, labels: AuthLabels) {
   if (code in labels && code !== 'general') return labels[code as keyof AuthLabels];
   if (value?.message === 'User already registered') return labels.user_already_exists;
   if (value?.status === 429) return labels.over_email_send_rate_limit;
-  return labels.general;
+  // Код ошибки в конце помогает понять причину по скриншоту, не раскрывая текст Supabase
+  const hint = code || (value?.status ? `HTTP ${value.status}` : '');
+  return hint ? `${labels.general} (${hint})` : labels.general;
 }
 
 export function labelsOf(el: HTMLElement): AuthLabels {
