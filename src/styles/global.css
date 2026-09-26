@@ -1,13 +1,13 @@
-/* GenshinFlex — ночной Тейват: индиго-основа, золото интерфейса игры, стихии как функциональный цвет */
+/* Графитовая основа оставляет золото и цвета стихий заметными. */
 :root {
-  --bg: #141726;
-  --bg-deep: #0f1220;
-  --surface: #1c2033;
-  --surface-2: #252a40;
-  --surface-3: #2f3550;
-  --text: #e9e6dc;
-  --muted: #9095ab;
-  --border: #2c3149;
+  --bg: #24252e;
+  --bg-deep: #1b1c23;
+  --surface: #17181e;
+  --surface-2: #2d2e39;
+  --surface-3: #383946;
+  --text: #ececf0;
+  --muted: #9c9dac;
+  --border: #34353f;
   --accent: #e3b04b;
   --accent-ink: #241a05;
   --accent-soft: rgb(227 176 75 / .14);
@@ -17,25 +17,25 @@
   --pyro: #ef6a4c; --hydro: #3e9be6; --anemo: #4fc0a4; --electro: #ad72e8;
   --dendro: #7fbf3a; --cryo: #7cc8dc; --geo: #d8a83a;
   --good: #58c28a; --bad: #e66a6a;
-  --radius-lg: 16px;
+  --radius-lg: 20px;
   --radius: 10px;
   --radius-sm: 6px;
   --side-w: 232px;
-  --top-h: 60px;
+  --top-h: 76px;
   --font: "Onest", system-ui, sans-serif;
   --font-display: "Unbounded", "Onest", sans-serif;
   color-scheme: dark;
 }
 :root[data-theme="light"] {
-  --bg: #f3f1ec; --bg-deep: #e9e6de; --surface: #fffdf8; --surface-2: #f0ece2; --surface-3: #e4dfd2;
-  --text: #1f1c17; --muted: #676154; --border: #ddd6c6; --accent: #9c6c12; --accent-ink: #fff8e8;
+  --bg: #f3f3f5; --bg-deep: #e8e8ec; --surface: #fff; --surface-2: #ececf0; --surface-3: #dedee4;
+  --text: #20212a; --muted: #565966; --border: #d2d3dc; --accent: #8a5c0b; --accent-ink: #fff;
   --accent-soft: rgb(156 108 18 / .12);
   color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg: #f3f1ec; --bg-deep: #e9e6de; --surface: #fffdf8; --surface-2: #f0ece2; --surface-3: #e4dfd2;
-    --text: #1f1c17; --muted: #676154; --border: #ddd6c6; --accent: #9c6c12; --accent-ink: #fff8e8;
+    --bg: #f3f3f5; --bg-deep: #e8e8ec; --surface: #fff; --surface-2: #ececf0; --surface-3: #dedee4;
+    --text: #20212a; --muted: #565966; --border: #d2d3dc; --accent: #8a5c0b; --accent-ink: #fff;
     --accent-soft: rgb(156 108 18 / .12);
     color-scheme: light;
   }
@@ -89,11 +89,13 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 
 .btn {
   display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--border); background: var(--surface-2);
-  border-radius: var(--radius); padding: .5rem .9rem; cursor: pointer; text-decoration: none; font-weight: 500; font-size: .92rem;
+  border-radius: 999px; padding: .5rem .9rem; cursor: pointer; text-decoration: none; font-weight: 500; font-size: .92rem;
 }
 .btn:hover { border-color: var(--muted); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn.primary:hover { filter: brightness(1.08); }
+.btn.light { background: #e4e4e7; border-color: #e4e4e7; color: #20212a; }
+.btn.dark { background: #111217; border-color: #111217; color: #f5f5f7; }
 .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
 .input {

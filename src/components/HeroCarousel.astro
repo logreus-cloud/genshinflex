@@ -1,0 +1,136 @@
+---
+import { useData } from '../lib/data';
+const { base, t } = useData(Astro.currentLocale);
+interface Slide {
+  banner: { version: string; phase: number; start: string; end: string };
+  hero: { slug: string; name: string; splash?: string | null; element: string; title?: string; region?: string };
+  upcoming: boolean;
+}
+interface Props { slides: Slide[]; }
+const { slides } = Astro.props;
+---
+{slides.length > 0 && (
+  <section class="carousel" aria-label={t('Баннеры')} aria-roledescription="carousel" tabindex="0" data-carousel>
+    {slides.map(({ banner, hero, upcoming }, i) => (
+      <div class="slide" role="group" aria-roledescription="slide" aria-label={t('{n} из {total}', { n: i + 1, total: slides.length })}
+        data-el={hero.element} hidden={i !== 0} inert={i !== 0} aria-hidden={i !== 0 ? 'true' : undefined}>
+        {hero.splash && <img class="splash-art" src={hero.splash} alt="" fetchpriority={i === 0 ? 'high' : 'auto'} />}
+        <div class="copy">
+          <p class="phase">{t('Баннер {v} фаза {p}', { v: banner.version, p: banner.phase })}</p>
+          {hero.title && <p class="title">{hero.title}</p>}
+          <h1>{hero.name}</h1>
+          <div class="identity">
+            <span class="el-dot" aria-hidden="true"></span>
+            <span class="stars" aria-label="5 ★">★★★★★</span>
+          </div>
+          {hero.region && <p class="region">{hero.region}</p>}
+          <div class="actions">
+            <a class="btn dark" href={`${base}/characters/${hero.slug}`}>{t('Гайд')}</a>
+            <a class="btn dark" href={`${base}/banners`}>{t('Все баннеры')}</a>
+          </div>
+          <p class="time"><span>{upcoming ? t('До начала') : t('Оставшееся время')}</span>
+            <b data-until={upcoming ? banner.start : banner.end} data-done={upcoming ? t('Идёт сейчас') : t('уже закончился')}>…</b>
+          </p>
+        </div>
+      </div>
+    ))}
+    {slides.length > 1 && (
+      <div class="controls">
+        <button class="arrow prev" type="button" aria-label={t('Предыдущий баннер')}>‹</button>
+        <button class="arrow next" type="button" aria-label={t('Следующий баннер')}>›</button>
+        <div class="dots" aria-label={t('Баннеры')}>
+          {slides.map((_, i) => <button type="button" class:list={['dot', { active: i === 0 }]} aria-label={t('{n} из {total}', { n: i + 1, total: slides.length })} aria-current={i === 0 ? 'true' : undefined} data-index={i}></button>)}
+        </div>
+      </div>
+    )}
+  </section>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    const slides = [...root.querySelectorAll<HTMLElement>('.slide')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
+    if (slides.length < 2) return;
+    root.classList.add('ready');
+    let current = 0;
+    let timer: number | undefined;
+    let startX = 0;
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        slide.hidden = i !== current;
+        slide.inert = i !== current;
+        slide.setAttribute('aria-hidden', String(i !== current));
+      });
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === current);
+        if (i === current) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+    };
+    const pause = () => clearInterval(timer);
+    const play = () => {
+      pause();
+      if (!motion.matches && !root.matches(':hover') && !root.contains(document.activeElement)) timer = window.setInterval(() => show(current + 1), 7000);
+    };
+    root.querySelector('.prev')?.addEventListener('click', () => { show(current - 1); play(); });
+    root.querySelector('.next')?.addEventListener('click', () => { show(current + 1); play(); });
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); play(); }));
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        show(current + (e.key === 'ArrowRight' ? 1 : -1));
+        play();
+      }
+    });
+    root.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') startX = e.clientX; });
+    root.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'touch' && Math.abs(e.clientX - startX) > 45) {
+        show(current + (e.clientX < startX ? 1 : -1));
+        play();
+      }
+    });
+    root.addEventListener('mouseenter', pause);
+    root.addEventListener('mouseleave', play);
+    root.addEventListener('focusin', pause);
+    root.addEventListener('focusout', (e) => { if (!root.contains(e.relatedTarget as Node)) requestAnimationFrame(play); });
+    motion.addEventListener('change', play);
+    play();
+  });
+</script>
+<style>
+  .carousel { position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; background: #1b1c23; }
+  .slide { --bg-deep: #1b1c23; position: relative; min-height: 400px; overflow: hidden; isolation: isolate; color: #ececf0; background: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); }
+  .slide[hidden] { display: none; }
+  .slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); }
+  .splash-art { position: absolute; top: 0; right: max(2vw, calc((100vw - 1400px) / 2)); width: min(56vw, 780px); height: 100%; object-fit: contain; object-position: right center; z-index: -1; }
+  .copy { position: relative; width: min(100%, 1240px); margin: auto; padding: 2rem 4rem 1.4rem; }
+  .phase { font: 600 clamp(1.5rem, 3vw, 2.25rem)/1.2 var(--font-display); margin: 0 0 1rem; }
+  .title, .region { color: #c5c6ce; font-size: .9rem; margin: 0; }
+  h1 { max-width: 60%; margin: .2rem 0 .5rem; color: color-mix(in srgb, var(--el) 70%, white); font-size: clamp(3rem, 6vw, 5.25rem); overflow-wrap: anywhere; }
+  .identity { display: flex; align-items: center; gap: .5rem; }
+  .el-dot { font-size: 1.6rem; }
+  .stars { color: var(--accent); letter-spacing: .12em; }
+  .region { margin-left: 2.1rem; }
+  .actions { display: flex; gap: .6rem; margin-top: 1rem; }
+  .time { display: grid; gap: .1rem; margin: 1.2rem 0 0; color: #c5c6ce; font-size: .85rem; }
+  .time b { color: #fff; font: 600 1.15rem var(--font-display); }
+  .controls { display: none; }
+  .ready .controls { display: contents; }
+  .arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; border: 0; background: none; color: #fff; font: 200 3rem var(--font); cursor: pointer; padding: .2rem .8rem; }
+  .prev { left: .4rem; } .next { right: .4rem; }
+  .dots { position: absolute; bottom: 1rem; left: 50%; translate: -50% 0; display: flex; gap: .45rem; z-index: 2; }
+  .dot { width: 18px; height: 4px; border: 0; border-radius: 99px; padding: 0; background: rgb(255 255 255 / .5); cursor: pointer; }
+  .dot.active { width: 42px; background: #fff; }
+  @media (max-width: 700px) {
+    .carousel { margin: -1.2rem -16px 2.5rem; }
+    .slide { min-height: 0; padding-top: 185px; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
+    .slide::after { background: linear-gradient(0deg, var(--bg-deep) 25%, transparent 75%); }
+    .splash-art { right: 0; top: -65px; width: 100%; height: 300px; opacity: .55; object-position: right top; }
+    .copy { padding: 0 1.4rem 3rem; }
+    .phase { font-size: 1.45rem; }
+    h1 { max-width: 100%; font-size: clamp(2.7rem, 11vw, 3.3rem); }
+    .arrow { top: 120px; }
+    .prev { left: 0; } .next { right: 0; }
+  }
+</style>

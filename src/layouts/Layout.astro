@@ -3,6 +3,7 @@ import '../styles/global.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import Splash from '../components/Splash.astro';
 import { ogPath } from '../lib/og';
+import { icons } from '../lib/nav-icons';
 import { useData, LANGS, prefixOf } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
 
@@ -34,24 +35,6 @@ const nav = [
   { group: 'В разработке', soon: true, items: [['Рейтинг', '/rating', 'chart']] },
 ] as const;
 
-// Простые контурные иконки навигации, 20×20
-const icons: Record<string, string> = {
-  home: 'M3 9.5 10 4l7 5.5V16a1 1 0 0 1-1 1h-3.5v-4.5h-5V17H4a1 1 0 0 1-1-1Z',
-  calendar: 'M4 5h12a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm2-2v4m8-4v4M3 9h14',
-  user: 'M10 10a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Zm-6 6.4c.6-2.8 3-4.4 6-4.4s5.4 1.6 6 4.4',
-  sword: 'M15.5 3.5 16.5 4.5 8 13l-1-1Zm-8.5 8.5-3 3 1 1 3-3M12 3h5v5',
-  flower: 'M10 10m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M10 3.5c1.6 1.4 1.6 3 0 4.5-1.6-1.5-1.6-3.1 0-4.5Zm0 9c1.6 1.4 1.6 3 0 4.5-1.6-1.5-1.6-3.1 0-4.5ZM3.5 10c1.4-1.6 3-1.6 4.5 0-1.5 1.6-3.1 1.6-4.5 0Zm9 0c1.4-1.6 3-1.6 4.5 0-1.5 1.6-3.1 1.6-4.5 0Z',
-  moon: 'M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z',
-  chart: 'M4 16V9m4 7V5m4 11v-5m4 5V7',
-  spiral: 'M10 10.5a1 1 0 1 1 1-1 2 2 0 0 1-2 2 3 3 0 0 1-3-3 4 4 0 0 1 4-4 5 5 0 0 1 5 5 6 6 0 0 1-6 6',
-  mask: 'M4 5h12v4.5a6 6 0 0 1-12 0Zm3 3.5h2m2 0h2M7.5 12.5c1.5 1 3.5 1 5 0',
-  flame: 'M10 3c.5 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1-3 2-4 0 1.5.8 2.5 1.8 2.5C9 8 9 5 10 3Z',
-  star: 'm10 3.5 1.9 4 4.3.5-3.2 3 .9 4.3L10 13.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5Z',
-  book: 'M4 4.5h4.5A1.5 1.5 0 0 1 10 6v10a1.5 1.5 0 0 0-1.5-1.5H4Zm12 0h-4.5A1.5 1.5 0 0 0 10 6v10a1.5 1.5 0 0 1 1.5-1.5H16Z',
-  check: 'M10 3 16 5.5v4.2c0 3.6-2.5 6.3-6 7.3-3.5-1-6-3.7-6-7.3V5.5Zm-2.7 7 2 2 3.7-4',
-  calc: 'M5 3h10a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm1.5 3h7v2.5h-7Zm0 5h1.5m2.25 0h1.5m2.25 0h1.5m-9 3h1.5m2.25 0h1.5m2.25 0h1.5',
-  tool: 'M12.5 3.5a3.5 3.5 0 0 0-3.3 4.6L4 13.3 6.7 16l5.2-5.2a3.5 3.5 0 0 0 4.6-3.3l-2 1.1-2-2 1.1-2Z',
-};
 // Колонки подвала
 const footerCols: [string, [string, string][]][] = [
   ['База', [['Персонажи', '/characters/'], ['Оружие', '/weapons/'], ['Артефакты', '/artifacts/'], ['Руководства', '/guides/']]],
@@ -97,13 +80,16 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     </script>
   </head>
   <body>
-    <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
-    <aside class="side" id="side" aria-label={t('Навигация')}>
-      <a class="logo" href={`${base}/`}>
-        <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
     <Splash />
-        <span>Genshin<b>Flex</b></span>
-      </a>
+    <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
+    <aside class="side" id="side" aria-label={t('Навигация')} aria-hidden="true" inert>
+      <div class="side-head">
+        <a class="logo" href={`${base}/`}>
+          <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+          <span>Genshin<b>Flex</b></span>
+        </a>
+        <button class="icon-btn side-close" type="button" aria-label={t('Закрыть меню')}>×</button>
+      </div>
       <nav>
         {nav.map(({ group, items, ...rest }) => (
           <div class:list={['group', { soon: 'soon' in rest }]}>
@@ -118,7 +104,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           </div>
         ))}
       </nav>
-      <a class="map-card" href="https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=ru-ru" target="_blank" rel="noopener">
+      <a class="map-card" href={`https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`} target="_blank" rel="noopener">
         <svg class="contours" viewBox="0 0 200 90" aria-hidden="true" preserveAspectRatio="none">
           <path d="M-10 70c30-18 55-8 80-22s45-30 80-18 40 6 60-4M-10 84c35-16 60-4 88-18s50-26 82-14 38 8 50 2M20 -4c10 18 30 24 52 20s40 6 48 22" />
         </svg>
@@ -144,31 +130,38 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
 
     <div class="shell">
       <header class="top">
-        <button class="icon-btn burger" id="burger" type="button" aria-label={t('Открыть меню')} aria-controls="side" aria-expanded="false">
+        <button class="icon-btn burger" id="burger" type="button" aria-label={t('Открыть меню')} data-close-label={t('Закрыть меню')} aria-controls="side" aria-expanded="false">
           <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" /></svg>
         </button>
-        <QuickSearch />
-        <div class="langs" role="group" aria-label={t('Язык')}>
-          {LANGS.map((l) => <a href={alt(l)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
+        <a class="top-logo" href={`${base}/`}>
+          <svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+          <span><strong>Genshin<b>Flex</b></strong><small>{t('Билды, команды и многое другое!')}</small></span>
+        </a>
+        <div class="top-actions">
+          <button class="search-pill" id="search-pill" type="button" aria-controls="search-panel" aria-expanded="false">{t('Поиск')}</button>
+          <button class="icon-btn" id="search-icon" type="button" aria-label={t('Открыть поиск')} aria-controls="search-panel" aria-expanded="false">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" /><path d="m13.2 13.2 3.3 3.3" /></svg>
+          </button>
+          <div class="language">
+            <button class="icon-btn" id="language-button" type="button" aria-label={t('Выбрать язык')} aria-controls="language-menu" aria-expanded="false">
+              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M3 10h14M10 3c-3 3.5-3 10.5 0 14m0-14c3 3.5 3 10.5 0 14" /></svg>
+            </button>
+            <div class="langs" id="language-menu" aria-label={t('Язык')} hidden>
+              {LANGS.map((l) => <a href={alt(l)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
+            </div>
+          </div>
+          <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
+          </button>
+          <a class="icon-btn tg" href="https://t.me/genshinflex" target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
+          </a>
         </div>
-        <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
-          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14Z" fill="currentColor"/><circle cx="10" cy="10" r="7" /></svg>
-        </button>
+        <div class="search-panel" id="search-panel" hidden><QuickSearch /></div>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
       <footer class="footer">
         <div class="f-grid">
-        <a class="icon-btn tg" href="https://t.me/genshinflex" target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
-          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
-        </a>
-          <div class="f-brand">
-            <a class="f-logo" href={`${base}/`}>
-              <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
-              <span>Genshin<b>Flex</b></span>
-            </a>
-            <p>{t('Билды, команды и инструменты для Genshin Impact. Без рекламы и регистрации.')}</p>
-            <a class="btn f-cta" href={`${base}/feedback/?from=${encodeURIComponent(path === '/' ? '/' : path + '/')}`}>{t('Сообщить об ошибке')}</a>
-          </div>
           {footerCols.map(([title, links]) => (
             <nav class="f-col" aria-label={t(title)}>
               <h2>{t(title)}</h2>
@@ -179,9 +172,19 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           ))}
         </div>
         <div class="f-bottom">
-          <p>{t('Данные')} — <a href="https://github.com/theBowja/genshin-db" rel="noopener">genshin-db</a>, {t('изображения')} — enka.network, {t('история баннеров')} — paimon.moe.
-            {t('Genshin Impact, персонажи и арты © HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.')}</p>
-          <p>© {new Date().getFullYear()} GenshinFlex · {t('обновлено')} {new Date().toLocaleDateString(OG_LOCALE[lang].replace('_', '-'))}</p>
+          <div class="f-brand">
+            <a class="f-logo" href={`${base}/`}>
+              <svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+              <span>Genshin<b>Flex</b></span>
+            </a>
+            <p>{t('Билды, команды и многое другое!')}</p>
+          </div>
+          <div class="f-meta">
+            <p>{t('Данные')} — <a href="https://github.com/theBowja/genshin-db" rel="noopener">genshin-db</a>, {t('изображения')} — enka.network, {t('история баннеров')} — paimon.moe.
+              {t('Genshin Impact, персонажи и арты © HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.')}</p>
+            <p>© {new Date().getFullYear()} GenshinFlex · {t('обновлено')} {new Date().toLocaleDateString(OG_LOCALE[lang].replace('_', '-'))}</p>
+            <a class="btn dark f-cta" href={`${base}/feedback/?from=${encodeURIComponent(path === '/' ? '/' : path + '/')}`}>{t('Сообщить об ошибке')}</a>
+          </div>
         </div>
       </footer>
     </div>
@@ -195,14 +198,87 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         try { localStorage.setItem('gf:theme', root.dataset.theme); } catch {}
       });
       const side = document.getElementById('side')!, scrim = document.getElementById('scrim')!, burger = document.getElementById('burger')!;
-      const toggle = (open: boolean) => {
+      const shell = document.querySelector<HTMLElement>('.shell')!;
+      const searchPanel = document.getElementById('search-panel')!;
+      const searchButtons = [document.getElementById('search-pill')!, document.getElementById('search-icon')!];
+      const languageButton = document.getElementById('language-button')!;
+      const languageMenu = document.getElementById('language-menu')!;
+      const openMenuLabel = burger.getAttribute('aria-label')!;
+      const closeMenuLabel = burger.dataset.closeLabel!;
+      let searchTrigger = searchButtons[0];
+      const closeSearch = (restore = false) => {
+        if (searchPanel.hidden) return;
+        searchPanel.hidden = true;
+        searchButtons.forEach((button) => button.setAttribute('aria-expanded', 'false'));
+        if (restore) searchTrigger.focus();
+      };
+      const closeLanguage = (restore = false) => {
+        if (languageMenu.hidden) return;
+        languageMenu.hidden = true;
+        languageButton.setAttribute('aria-expanded', 'false');
+        if (restore) languageButton.focus();
+      };
+      const toggle = (open: boolean, restore = false) => {
+        if (open) { closeSearch(); closeLanguage(); }
+        if (!open) shell.inert = false;
         side.classList.toggle('open', open);
+        side.inert = !open;
+        side.setAttribute('aria-hidden', String(!open));
         scrim.hidden = !open;
         burger.setAttribute('aria-expanded', String(open));
+        burger.setAttribute('aria-label', open ? closeMenuLabel : openMenuLabel);
+        if (open) {
+          shell.inert = true;
+          side.querySelector<HTMLElement>('.side-close')?.focus();
+        }
+        else if (restore) burger.focus();
       };
       burger.addEventListener('click', () => toggle(!side.classList.contains('open')));
-      scrim.addEventListener('click', () => toggle(false));
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggle(false); });
+      side.querySelector('.side-close')?.addEventListener('click', () => toggle(false, true));
+      scrim.addEventListener('click', () => toggle(false, true));
+      searchButtons.forEach((button) => button.addEventListener('click', () => {
+        const open = searchPanel.hidden;
+        closeLanguage();
+        if (open) {
+          searchTrigger = button;
+          searchPanel.hidden = false;
+          searchButtons.forEach((item) => item.setAttribute('aria-expanded', 'true'));
+          searchPanel.querySelector<HTMLInputElement>('input')?.focus();
+        } else closeSearch(true);
+      }));
+      languageButton.addEventListener('click', () => {
+        const open = languageMenu.hidden;
+        closeSearch();
+        languageMenu.hidden = !open;
+        languageButton.setAttribute('aria-expanded', String(open));
+        if (open) languageMenu.querySelector<HTMLAnchorElement>('a')?.focus();
+      });
+      document.addEventListener('pointerdown', (e) => {
+        const target = e.target as Node;
+        if (!searchPanel.contains(target) && !searchButtons.some((button) => button.contains(target))) closeSearch();
+        if (!languageMenu.contains(target) && !languageButton.contains(target)) closeLanguage();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (!side.classList.contains('open')) return;
+        if (e.key === '/') { e.preventDefault(); e.stopPropagation(); }
+        if (e.key !== 'Tab') return;
+        const items = [...side.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')];
+        const first = items[0], last = items.at(-1);
+        if (e.shiftKey && (document.activeElement === first || !side.contains(document.activeElement))) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !side.contains(document.activeElement))) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }, true);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (side.classList.contains('open')) toggle(false, true);
+          else if (!searchPanel.hidden) closeSearch(true);
+          else closeLanguage(true);
+        }
+      });
     </script>
   </body>
 </html>
@@ -210,9 +286,12 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
 <style>
   .side {
     position: fixed; inset: 0 auto 0 0; width: var(--side-w); background: var(--bg-deep); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; z-index: 40; overflow-y: auto;
+    display: flex; flex-direction: column; z-index: 60; overflow-y: auto; transform: translateX(-100%); transition: transform .2s ease;
   }
-  .logo { display: flex; align-items: center; gap: .6rem; height: var(--top-h); padding: 0 1.1rem; text-decoration: none; color: var(--accent); flex: none; }
+  .side.open { transform: none; }
+  .side-head { display: flex; align-items: center; flex: none; }
+  .logo { display: flex; align-items: center; gap: .6rem; height: var(--top-h); padding: 0 0 0 1.1rem; text-decoration: none; color: var(--accent); min-width: 0; flex: 1; }
+  .side-close { margin: 0 .6rem; font-size: 1.6rem; }
   .logo span { font: 600 1.05rem var(--font-display); color: var(--text); }
   .logo b { color: var(--accent); font-weight: 600; }
   nav { padding: .4rem .6rem 1rem; flex: 1; }
@@ -258,50 +337,79 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .side-foot { padding: 1rem 1.2rem 1.4rem; font-size: .8rem; color: var(--muted); border-top: 1px solid var(--border); }
   .side-foot p { margin: 0; }
 
-  .shell { margin-left: var(--side-w); min-height: 100vh; display: flex; flex-direction: column; overflow-x: clip; }
+  .shell { min-height: 100vh; display: flex; flex-direction: column; overflow-x: clip; }
   .top {
-    position: sticky; top: 0; z-index: 30; height: var(--top-h); display: flex; align-items: center; gap: .8rem;
-    padding: 0 24px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 50; height: var(--top-h); display: flex; align-items: center; gap: .8rem;
+    padding: 0 24px; background: var(--bg-deep);
     border-bottom: 1px solid var(--border);
   }
-  .icon-btn { display: grid; place-items: center; width: 38px; height: 38px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); cursor: pointer; flex: none; }
+  .top-logo { display: flex; align-items: center; gap: .6rem; min-width: 0; margin-right: auto; color: var(--accent); text-decoration: none; }
+  .top-logo svg { flex: none; }
+  .top-logo span { display: grid; line-height: 1.1; }
+  .top-logo strong { color: var(--text); font: 600 1.5rem var(--font-display); white-space: nowrap; }
+  .top-logo b { color: var(--accent); font-weight: 600; }
+  .top-logo small { color: var(--muted); font-size: .76rem; margin-top: .25rem; white-space: nowrap; }
+  .top-actions { display: flex; align-items: center; gap: .35rem; }
+  .search-pill { width: 200px; height: 40px; border: 2px solid var(--accent); border-radius: 999px; background: transparent; color: var(--muted); text-align: left; padding: 0 1rem; cursor: pointer; }
+  .icon-btn { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; flex: none; text-decoration: none; }
+  .icon-btn:hover { background: var(--surface-2); }
   .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
-  .langs { margin-left: auto; display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2px; }
-  .langs a { font-size: .78rem; font-weight: 600; padding: .35rem .5rem; border-radius: 7px; text-decoration: none; color: var(--muted); }
+  .language { position: relative; }
+  .langs { position: absolute; top: calc(100% + 12px); right: 0; display: grid; min-width: 90px; padding: .3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 32px rgb(0 0 0 / .3); }
+  .langs[hidden], .search-panel[hidden] { display: none; }
+  .langs a { font-size: .82rem; font-weight: 600; padding: .4rem .6rem; border-radius: 7px; text-decoration: none; color: var(--muted); }
   .langs a:hover { color: var(--text); }
   .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
+  .search-panel { position: absolute; top: calc(100% + 8px); right: 80px; display: flex; width: min(460px, calc(100vw - 32px)); padding: .7rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35); }
+  .search-panel :global(.qs) { width: 100%; max-width: none; }
+  .search-panel :global(.qs-input) { border-color: var(--accent); border-radius: 999px; }
   .tg { color: var(--muted); }
   .tg:hover { color: #2aabee; }
-  .burger { display: none; }
-  .content { width: 100%; max-width: 1180px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; }
+  .content { width: 100%; max-width: 1240px; margin: 0 auto; padding: 1.8rem 24px 3rem; flex: 1; }
   .content.wide { max-width: 1400px; }
-  /* Подвал в несколько колонок: бренд + разделы сайта + строка с правами */
-  .footer { background: var(--bg-deep); border-top: 1px solid var(--border); padding: 2.4rem 24px 1.6rem; margin-top: 2rem; }
-  .f-grid, .f-bottom { max-width: 1180px; margin: 0 auto; }
-  .f-grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 2rem 1.5rem; }
+  .footer { background: var(--bg-deep); border-top: 1px solid var(--border); padding: 1.8rem 24px 1.5rem; margin-top: 2rem; }
+  .f-grid, .f-bottom { max-width: 1240px; margin-left: auto; margin-right: auto; }
+  .f-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
   .f-logo { display: inline-flex; align-items: center; gap: .55rem; color: var(--accent); text-decoration: none; }
   .f-logo span { font: 600 1.1rem var(--font-display); color: var(--text); }
   .f-logo b { color: var(--accent); font-weight: 600; }
-  .f-brand p { color: var(--muted); font-size: .88rem; margin: .8rem 0 1rem; max-width: 34ch; }
-  .f-cta { font-size: .85rem; padding: .45rem .8rem; }
+  .f-brand p { color: var(--muted); font-size: .82rem; margin: .35rem 0 0; }
+  .f-cta { align-self: flex-end; font-size: .85rem; padding: .5rem 1rem; }
   .f-col h2 { font: 600 .82rem var(--font); color: var(--text); margin: .3rem 0 .8rem; letter-spacing: .02em; }
-  .f-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
-  .f-col a { color: var(--muted); text-decoration: none; font-size: .88rem; }
+  .f-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+  .f-col a { color: var(--muted); text-decoration: none; font-size: .82rem; }
   .f-col a:hover { color: var(--accent); }
-  .f-bottom { border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 1rem; display: grid; gap: .3rem; }
-  .f-bottom p { margin: 0; color: var(--muted); font-size: .78rem; max-width: 110ch; }
+  .f-bottom { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1.2rem; display: flex; justify-content: space-between; gap: 2rem; }
+  .f-bottom p { color: var(--muted); }
+  .f-meta { display: flex; flex-direction: column; align-items: flex-end; max-width: 70ch; text-align: right; }
+  .f-meta p { margin: 0 0 .4rem; font-size: .75rem; }
   .f-bottom a { color: var(--muted); }
-  @media (max-width: 900px) { .f-grid { grid-template-columns: 1fr 1fr; } .f-brand { grid-column: 1 / -1; } }
+  .f-bottom .f-logo { color: var(--accent); }
+  .f-bottom .f-cta { color: #f5f5f7; }
+  @media (max-width: 900px) { .f-grid { grid-template-columns: 1fr 1fr; } }
   .skip:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; clip: auto; padding: .5rem 1rem; background: var(--accent); color: var(--accent-ink); z-index: 100; border-radius: var(--radius); }
-  .scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .5); z-index: 35; }
+  .scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .5); z-index: 55; }
 
   @media (max-width: 900px) {
-    .side { transform: translateX(-100%); transition: transform .2s ease; }
-    .side.open { transform: none; }
-    .shell { margin-left: 0; }
-    .burger { display: grid; }
     .top { padding: 0 16px; gap: .5rem; }
+    .top-logo small, .search-pill { display: none; }
     .content { padding: 1.2rem 16px 2.5rem; }
     .footer { padding: 2rem 16px 1.4rem; }
+  }
+  @media (max-width: 700px) {
+    .search-panel { left: 16px; right: 16px; width: auto; }
+    .top-logo strong { font-size: 1rem; }
+    .top-logo svg { width: 32px; height: 32px; }
+    .top-actions { gap: 0; }
+    .f-bottom { flex-direction: column; gap: 1rem; }
+    .f-meta { align-items: flex-start; text-align: left; }
+    .f-cta { align-self: flex-start; }
+  }
+  @media (max-width: 400px) {
+    .top { padding: 0 8px; gap: .2rem; }
+    .top-logo { gap: .2rem; }
+    .top-logo strong { font-size: .82rem; }
+    .icon-btn { width: 34px; height: 34px; }
+    .search-panel { left: 8px; right: 8px; }
   }
 </style>
