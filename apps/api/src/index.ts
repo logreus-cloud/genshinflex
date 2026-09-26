@@ -2,12 +2,13 @@ import { createClient } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import { userIdFromToken } from './lib/auth.ts';
 import type { Env } from './lib/env.ts';
+import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
 import { telegramLogin } from './lib/telegram-login.ts';
 
 const app = new Hono<{ Bindings: Env }>();
-const version = '0.2.0';
+const version = '0.3.0';
 
 app.use('*', async (c, next) => {
   const origin = c.req.header('Origin');
@@ -76,7 +77,7 @@ app.post('/auth/telegram', async (c) => {
 });
 
 app.post('/hooks/sanity', async (c) => {
-  if (!c.env.SANITY_WEBHOOK_SECRET || !c.env.CF_DEPLOY_HOOK_URL) {
+  if (!c.env.SANITY_WEBHOOK_SECRET || !c.env.GITHUB_REPO || !c.env.GITHUB_DISPATCH_TOKEN) {
     return c.json({ error: 'Сервис недоступен' }, 503);
   }
   const body = await c.req.text();
@@ -85,18 +86,21 @@ app.post('/hooks/sanity', async (c) => {
   );
   if (!valid) return c.json({ error: 'Неверная подпись Sanity' }, 401);
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
+  let document: unknown;
   try {
-    const response = await fetch(c.env.CF_DEPLOY_HOOK_URL, {
-      method: 'POST',
-      signal: controller.signal,
+    document = JSON.parse(body);
+  } catch {
+    document = null;
+  }
+  const data = document && typeof document === 'object' && !Array.isArray(document)
+    ? document as Record<string, unknown> : {};
+  try {
+    await dispatchSanityPublish(c.env, {
+      ...(typeof data._type === 'string' ? { type: data._type } : {}),
+      ...(typeof data._id === 'string' ? { id: data._id } : {}),
     });
-    if (!response.ok) return c.json({ error: 'Не удалось запустить сборку' }, 502);
   } catch {
     return c.json({ error: 'Не удалось запустить сборку' }, 502);
-  } finally {
-    clearTimeout(timer);
   }
   return c.json({ ok: true });
 });

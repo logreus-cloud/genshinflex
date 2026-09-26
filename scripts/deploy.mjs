@@ -7,6 +7,10 @@ import { existsSync } from 'node:fs';
 if (process.argv.includes('--sanity')) {
   if (existsSync('.env')) process.loadEnvFile('.env');
   process.env.CONTENT_SOURCE = 'sanity';
+  if (!process.env.SANITY_READ_TOKEN) {
+    console.error('Для сборки из Sanity нужен SANITY_READ_TOKEN');
+    process.exit(1);
+  }
 }
 
 const MOON = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
@@ -51,7 +55,8 @@ function step(label, command) {
 // --branch=<имя> — своя ветка Pages с адресом <имя>.genshinflex.pages.dev (например, platform — чтобы не затирать тестовый дизайн)
 const branchArg = process.argv.find((arg) => arg.startsWith('--branch='))?.slice('--branch='.length);
 const branch = branchArg || (process.argv.includes('--test') ? 'test' : '');
-const test = Boolean(branch);
+// --branch=main — это основной сайт (так выкладывает CI), не тестовая версия
+const test = Boolean(branch) && branch !== 'main';
 const total = Date.now();
 try {
   const build = await step('Собираю сайт', 'npx astro build');
@@ -60,7 +65,8 @@ try {
   await step('Индексирую поиск', 'npx pagefind --site dist');
   const out = await step(test ? 'Выкладываю тестовую версию' : 'Выкладываю на Cloudflare', `npx wrangler pages deploy dist --project-name genshinflex${branch ? ` --branch ${branch}` : ''}`);
   const url = out.match(/https:\/\/\S+\.pages\.dev\S*/)?.[0];
-  if (!test) {
+  // Публикация новостей из Sanity в Discord — отдельная задача.
+  if (!test && !process.argv.includes('--no-discord')) {
     try {
       await step('Публикую новости в Discord', 'node scripts/discord-news.mjs');
     } catch {

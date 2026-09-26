@@ -12,6 +12,9 @@ SUPABASE_URL = "https://qhfufvdculphsqxuqxsw.supabase.co"
 SUPABASE_ANON_KEY = "sb_publishable_3IqstX40IpHaa2g9_o4wVg_n54We4l_"
 SANITY_PROJECT_ID = "6qrew4ya"
 SANITY_DATASET = "production"
+GITHUB_REPO = "logreus-cloud/genshinflex"
+DEPLOY_REF = "platform"
+DEPLOY_BRANCH = "platform"
 
 # Секреты задаются командой `npx wrangler secret put <ИМЯ>` из этой папки, НЕ в файле:
-# SUPABASE_SERVICE_ROLE_KEY, TELEGRAM_BOT_TOKEN, SANITY_WRITE_TOKEN, SANITY_WEBHOOK_SECRET, CF_DEPLOY_HOOK_URL
+# SUPABASE_SERVICE_ROLE_KEY, TELEGRAM_BOT_TOKEN, SANITY_WRITE_TOKEN, SANITY_WEBHOOK_SECRET, GITHUB_DISPATCH_TOKEN
