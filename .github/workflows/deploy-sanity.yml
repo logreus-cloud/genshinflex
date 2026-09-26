@@ -1,0 +1,85 @@
+name: Deploy from Sanity
+
+on:
+  repository_dispatch:
+    types: [sanity-publish]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref для сборки
+        required: false
+        default: platform
+        type: string
+      branch:
+        description: Ветка Pages; пусто для основного сайта
+        required: false
+        default: platform
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  # Основной сайт и превью — разные группы: сборка превью не отменяет сборку основного сайта
+  group: deploy-sanity-${{ (github.event_name == 'repository_dispatch' && github.event.client_payload.branch || inputs.branch) && format('preview-{0}', github.event_name == 'repository_dispatch' && github.event.client_payload.branch || inputs.branch) || 'main' }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_REF: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.ref || inputs.ref }}
+      DEPLOY_BRANCH: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.branch || inputs.branch }}
+    steps:
+      - name: Проверить параметры
+        id: parameters
+        shell: bash
+        run: |
+          if [[ ! "$DEPLOY_REF" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "Недопустимый ref" >&2
+            exit 1
+          fi
+          if [[ ! "$DEPLOY_BRANCH" =~ ^[a-z0-9-]*$ ]]; then
+            echo "Недопустимая ветка Pages" >&2
+            exit 1
+          fi
+          echo "ref=$DEPLOY_REF" >> "$GITHUB_OUTPUT"
+
+      - name: Подождать следующие публикации
+        run: sleep 30
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.parameters.outputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Собрать и выложить
+        env:
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          if [[ -n "$DEPLOY_BRANCH" ]]; then
+            node scripts/deploy.mjs --sanity --no-discord "--branch=$DEPLOY_BRANCH"
+          else
+            # Явно main (production-ветка Pages): без --branch wrangler взял бы имя ветки из git, т.е. превью
+            node scripts/deploy.mjs --sanity --no-discord --branch=main
+          fi
+
+      - name: Ссылка на сайт
+        shell: bash
+        run: |
+          if [[ -n "$DEPLOY_BRANCH" ]]; then
+            url="https://${DEPLOY_BRANCH}.genshinflex.pages.dev"
+          else
+            url="https://genshinflex.com"
+          fi
+          echo "Выкладка: [$url]($url)" >> "$GITHUB_STEP_SUMMARY"
