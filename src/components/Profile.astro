@@ -32,7 +32,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             </span>
           </div>
           <div class="identity">
-            <h1 id="profile-name">{t('Путешественник')}</h1>
+            <div class="name-row">
+              <h1 id="profile-name">{t('Путешественник')}</h1>
+              <span class="title-chip" id="profile-title" hidden></span>
+            </div>
             <p id="profile-about" hidden></p>
             <p class="muted" id="profile-meta" hidden></p>
           </div>
@@ -111,6 +114,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <label for="editor-about">{t('О себе')}</label>
             <textarea class="input" id="editor-about" maxlength="300" rows="4"></textarea>
             <small id="about-count"></small>
+          </div>
+          <!-- Титул хранится в аккаунте и меняется сразу, без «Готово» -->
+          <div class="editor-field" id="title-field" data-none={t('Без титула')} hidden>
+            <label for="profile-title-select">{t('Титул')}</label>
+            <select class="input" id="profile-title-select"></select>
+            <small id="title-hint">{t('Титулы выдаются за ивенты и участие в жизни сайта.')}</small>
           </div>
         </div>
         <div class="editor-panel" data-panel="avatar" hidden>
@@ -232,6 +241,95 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   </div>
   <script type="application/json" id="profile-chars" set:html={charsJson}></script>
 </Layout>
+
+<script>
+  // Титулы из аккаунта: чип рядом с ником и выбор активного титула. Работает только для вошедших.
+  import { onPage } from '../scripts/router';
+  import { pageLang } from '../i18n/client';
+  import { API_URL } from '../lib/platform';
+
+  type Title = { id: string; name_ru: string; name_en: string | null; name_es: string | null; color: string; description: string | null; note?: string | null };
+  const colorOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+
+  onPage((signal) => {
+    const chip = document.getElementById('profile-title');
+    const field = document.getElementById('title-field');
+    const select = document.getElementById('profile-title-select') as HTMLSelectElement | null;
+    if (!chip || !field || !select) return;
+    const lang = pageLang();
+    const nameOf = (title: Title) => (lang === 'en' ? title.name_en : lang === 'es' ? title.name_es : null) || title.name_ru;
+    let owned: Title[] = [];
+    let active: string | null = null;
+    let token = '';
+
+    const renderChip = () => {
+      const title = owned.find((item) => item.id === active);
+      chip.hidden = !title;
+      chip.replaceChildren();
+      if (!title) return;
+      chip.style.setProperty('--title-color', colorOk(title.color) ? title.color : '#e3b04b');
+      chip.append(Object.assign(document.createElement('span'), { className: 'title-mark', textContent: '◆' }), document.createTextNode(nameOf(title)));
+      chip.title = title.description || '';
+    };
+    const renderSelect = () => {
+      select.replaceChildren(new Option(select.dataset.none || '—', ''));
+      for (const title of owned) select.append(new Option(nameOf(title), title.id, false, title.id === active));
+      select.value = active ?? '';
+      select.disabled = !owned.length;
+    };
+
+    // Выход из аккаунта или сбой — титулы скрываются
+    const reset = () => { owned = []; active = null; token = ''; field.hidden = true; renderChip(); };
+    const load = async () => {
+      reset();
+      let stored = false;
+      try { stored = !!localStorage.getItem('gf:auth'); } catch {}
+      if (!stored) return;
+      try {
+        const { getSupabase } = await import('../scripts/auth');
+        const { data } = await getSupabase().auth.getSession();
+        token = data.session?.access_token || '';
+        if (!token || signal.aborted) return;
+        const response = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${token}` }, signal });
+        if (!response.ok) return;
+        const me = await response.json() as { titles?: Title[]; active_title?: string | null };
+        if (signal.aborted) return;
+        owned = Array.isArray(me.titles) ? me.titles.filter((item) => item && typeof item.id === 'string' && typeof item.name_ru === 'string') : [];
+        active = typeof me.active_title === 'string' && owned.some((item) => item.id === me.active_title) ? me.active_title : null;
+        field.hidden = false;
+        renderSelect();
+        renderChip();
+      } catch { /* Нет сети или API — профиль работает и без титулов */ }
+    };
+
+    select.dataset.none = select.dataset.none || document.getElementById('title-field')?.dataset.none || '';
+    select.addEventListener('change', async () => {
+      const next = select.value || null;
+      const previous = active;
+      active = next;
+      renderChip();
+      select.disabled = true;
+      try {
+        const response = await fetch(`${API_URL}/me/title`, {
+          method: 'POST', signal,
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: next }),
+        });
+        if (!response.ok) throw new Error();
+      } catch {
+        if (signal.aborted) return;
+        active = previous;
+        renderChip();
+        select.value = active ?? '';
+      } finally {
+        if (!signal.aborted) select.disabled = !owned.length;
+      }
+    }, { signal });
+
+    void load();
+    document.addEventListener('gf:auth', () => { void load(); }, { signal });
+  });
+</script>
 
 <script>
   import { favorites, recent, store, type Entry } from '../scripts/common';
@@ -1313,4 +1411,18 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     .dialog-body { padding: .9rem; }
     .dialog-foot { padding: .7rem; }
   }
+  /* Титул рядом с ником */
+  .name-row { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; }
+  .name-row h1 { margin: 0; }
+  .title-chip {
+    --title-color: #e3b04b;
+    display: inline-flex; align-items: center; gap: .35rem; padding: .2rem .65rem; border-radius: 999px;
+    border: 1px solid var(--title-color); background: color-mix(in srgb, var(--title-color) 18%, transparent);
+    color: var(--title-color); font: 600 .78rem var(--font-display); letter-spacing: .02em; white-space: nowrap;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--title-color) 30%, transparent);
+  }
+  .title-chip[hidden] { display: none; }
+  .title-mark { font-size: .7em; }
+  :global(:root[data-theme="light"]) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); }
+  @media (prefers-color-scheme: light) { :global(:root:not([data-theme])) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); } }
 </style>

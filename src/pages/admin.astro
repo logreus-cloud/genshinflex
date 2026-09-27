@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-// Админка: заявки гайдов и обратная связь. Страница и /api/admin закрыты Cloudflare Access (вход по почте),
+// Админка: заявки гайдов, обратная связь и титулы. Страница и /api/admin закрыты Cloudflare Access (вход по почте),
 // данные приходят из /api/admin/inbox. Публикация гайда — локально: npm run guide:md -- <номер>
 ---
 <Layout title="Админка" noindex wide>
@@ -13,6 +13,7 @@ import Layout from '../layouts/Layout.astro';
       <div class="tabs" role="tablist">
         <button type="button" role="tab" aria-selected="true" data-tab="guides">Гайды <b id="c-guides">…</b></button>
         <button type="button" role="tab" aria-selected="false" data-tab="feedback">Обратная связь <b id="c-feedback">…</b></button>
+        <button type="button" role="tab" aria-selected="false" data-tab="titles">Титулы</button>
       </div>
       <label class="small"><input type="checkbox" id="all" /> показать обработанные</label>
       <button type="button" class="btn small" id="reload">Обновить</button>
@@ -20,11 +21,45 @@ import Layout from '../layouts/Layout.astro';
     <p class="notice" id="error" hidden></p>
     <section id="guides" class="list"></section>
     <section id="feedback" class="list" hidden></section>
+    <section id="titles" class="list titles" hidden>
+      <p class="notice" id="titles-auth" hidden></p>
+      <div class="titles-content" id="titles-content" hidden>
+        <p class="notice" id="titles-error" hidden></p>
+        <div class="panel title-panel">
+          <h2>Титулы</h2>
+          <div class="list" id="titles-list"></div>
+        </div>
+        <form class="panel title-panel" id="title-form">
+          <h2>Новый титул</h2>
+          <div class="title-fields">
+            <label>ID <input name="id" required minlength="2" maxlength="32" pattern="[a-z0-9-]{2,32}" placeholder="event-snezhnaya" /></label>
+            <label>Название RU <input name="name_ru" required maxlength="32" /></label>
+            <label>Название EN <input name="name_en" maxlength="32" /></label>
+            <label>Название ES <input name="name_es" maxlength="32" /></label>
+            <label>Цвет <input type="color" id="title-color" value="#e3b04b" /></label>
+            <label>Hex <input id="title-hex" value="#e3b04b" required maxlength="7" pattern="#[0-9a-fA-F]{6}" /></label>
+          </div>
+          <p class="muted small">ID: 2–32 символа, строчные латинские буквы, цифры и дефис.</p>
+          <label>Описание <textarea name="description" maxlength="200" rows="2"></textarea></label>
+          <div class="row title-preview">Превью: <span id="title-preview"></span></div>
+          <p class="notice" id="title-form-error" hidden></p>
+          <button type="submit" class="btn small primary" id="title-create">Создать</button>
+        </form>
+        <div class="panel title-panel">
+          <h2>Выдать титул</h2>
+          <label>Поиск по нику <input id="title-user-query" placeholder="Минимум 2 символа" autocomplete="off" /></label>
+          <p class="notice" id="title-users-error" hidden></p>
+          <div class="list" id="title-users"></div>
+        </div>
+      </div>
+    </section>
   </div>
 </Layout>
 
 <script>
 import { makeLookup, renderGuide, esc } from '../lib/guide-markup';
+import { API_URL } from '../lib/platform';
+import { authUrl, getSupabase, pageBase } from '../scripts/auth';
 import { onPage, cleanup } from '../scripts/router';
 
 onPage(async (signal) => {
@@ -36,6 +71,8 @@ onPage(async (signal) => {
     payload: { kind?: string; target?: string; character?: string; lang?: string; role?: string; body: string; teams?: { name?: string; members: string[] }[];
       weapons?: { slug: string; note?: string }[]; artifacts?: { sets: string[]; note?: string }[]; external?: { title: string; url: string }[] };
   };
+  type Title = { id: string; name_ru: string; name_en: string | null; name_es: string | null; color: string; description: string | null; holders: number };
+  type TitleUser = { id: string; nickname: string; display_name: string | null; titles: string[]; roles: string[] };
   type Feedback = { id: number; created_at: string; kind: string; page: string | null; message: string; contact: string | null; status: string };
 
   const KIND = { data: 'Ошибка в данных', idea: 'Идея', bug: 'Баг', other: 'Другое' } as Record<string, string>;
@@ -49,6 +86,261 @@ onPage(async (signal) => {
     controller.abort();
     for (const timer of timers) clearTimeout(timer);
   });
+
+  let titleItems: Title[] = [];
+  let titleLoad = 0;
+  let userLoad = 0;
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
+  const make = <K extends keyof HTMLElementTagNameMap>(tag: K, value = '', className = '') => {
+    const el = document.createElement(tag);
+    el.textContent = value;
+    if (className) el.className = className;
+    return el;
+  };
+  const titleName = (t: Title) => {
+    const lang = document.documentElement.lang.slice(0, 2);
+    return (lang === 'en' ? t.name_en : lang === 'es' ? t.name_es : t.name_ru) || t.name_ru;
+  };
+  const titleChip = (t: Title) => {
+    const chip = make('span', `◆ ${titleName(t)}`, 'title-chip');
+    chip.style.setProperty('--title-color', /^#[0-9a-fA-F]{6}$/.test(t.color) ? t.color : '#e3b04b');
+    return chip;
+  };
+  const showTitleAccess = (kind: 'login' | 'forbidden' | null) => {
+    const notice = $('#titles-auth');
+    notice.hidden = !kind;
+    $('#titles-content').hidden = !!kind;
+    notice.replaceChildren();
+    if (kind === 'login') {
+      notice.append('Войдите в аккаунт на сайте, чтобы управлять титулами. ');
+      const link = make('a', 'Войти');
+      link.href = authUrl(pageBase(), 'login', '/admin/');
+      notice.append(link);
+    }
+    if (kind === 'forbidden') notice.textContent = 'У вашего аккаунта нет роли admin';
+  };
+  const titleError = (error: unknown, selector: string) => {
+    if (signal.aborted) return;
+    const value = error as Error & { status?: number };
+    if (value.status === 401) return showTitleAccess('login');
+    if (value.status === 403) return showTitleAccess('forbidden');
+    showTitleAccess(null);
+    const notice = $(selector);
+    notice.textContent = value.message || 'Не удалось выполнить запрос';
+    notice.hidden = false;
+  };
+  async function titleApi<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
+    const { data } = await getSupabase().auth.getSession();
+    if (signal.aborted) throw new DOMException('Запрос отменён', 'AbortError');
+    const token = data.session?.access_token;
+    if (!token) throw Object.assign(new Error('Требуется вход'), { status: 401 });
+    const res = await fetch(`${API_URL}${path}`, {
+      method, signal: controller.signal,
+      headers: { Authorization: `Bearer ${token}`, ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+    const out = await res.json().catch(() => ({})) as T & { error?: string };
+    if (!res.ok) throw Object.assign(new Error(out.error || `Ошибка ${res.status}`), { status: res.status });
+    return out;
+  }
+  function renderTitles() {
+    const list = $('#titles-list');
+    if (!titleItems.length) return list.replaceChildren(make('p', 'Титулов нет.', 'muted'));
+    list.replaceChildren(...titleItems.map((t) => {
+      const card = make('article', '', 'panel card title-card');
+      const header = make('header');
+      header.append(titleChip(t), make('code', t.id, 'small'), make('span', `Владельцев: ${t.holders}`, 'muted small'));
+      card.append(header, make('p', `RU: ${t.name_ru} · EN: ${t.name_en || '—'} · ES: ${t.name_es || '—'}`, 'small'));
+      if (t.description) card.append(make('p', t.description, 'muted small'));
+      if (t.id !== 'admin') {
+        const button = make('button', 'Удалить', 'btn small');
+        button.type = 'button';
+        button.dataset.titleAction = 'delete';
+        button.dataset.titleId = t.id;
+        card.append(button);
+      }
+      return card;
+    }));
+  }
+  async function loadTitles() {
+    const current = ++titleLoad;
+    $('#titles-error').hidden = true;
+    try {
+      const items = await titleApi<Title[]>('/admin/titles');
+      if (signal.aborted || current !== titleLoad) return;
+      titleItems = items;
+      showTitleAccess(null);
+      renderTitles();
+    } catch (error) {
+      if (current === titleLoad) titleError(error, '#titles-error');
+    }
+  }
+  function renderUsers(users: TitleUser[]) {
+    const list = $('#title-users');
+    if (!users.length) return list.replaceChildren(make('p', 'Пользователи не найдены.', 'muted'));
+    list.replaceChildren(...users.map((user) => {
+      const card = make('article', '', 'panel card title-user');
+      card.dataset.userId = user.id;
+      const header = make('header');
+      header.append(make('b', user.nickname));
+      if (user.display_name) header.append(make('span', user.display_name, 'muted small'));
+      card.append(header, make('p', `Роли: ${user.roles.join(', ') || 'нет'}`, 'muted small'));
+      const chips = make('div', '', 'row title-user-chips');
+      for (const id of user.titles) {
+        const t = titleItems.find((item) => item.id === id) ?? { id, name_ru: id, name_en: null, name_es: null, color: '#e3b04b', description: null, holders: 0 };
+        const chip = titleChip(t);
+        const revoke = make('button', '×', 'title-revoke');
+        revoke.type = 'button';
+        revoke.dataset.titleAction = 'revoke';
+        revoke.dataset.titleId = id;
+        revoke.setAttribute('aria-label', `Забрать титул ${titleName(t)} у ${user.nickname}`);
+        chip.append(revoke);
+        chips.append(chip);
+      }
+      if (!user.titles.length) chips.append(make('span', 'Титулов нет', 'muted small'));
+      card.append(chips);
+      const actions = make('div', '', 'row title-user-actions');
+      const select = make('select');
+      select.setAttribute('aria-label', `Титул для ${user.nickname}`);
+      const placeholder = make('option', 'Выберите титул');
+      placeholder.value = '';
+      select.append(placeholder);
+      for (const t of titleItems.filter((item) => !user.titles.includes(item.id))) {
+        const option = make('option', titleName(t));
+        option.value = t.id;
+        select.append(option);
+      }
+      const note = make('input');
+      note.placeholder = 'За что выдан (необязательно)';
+      note.maxLength = 200;
+      note.setAttribute('aria-label', `Причина выдачи титула для ${user.nickname}`);
+      const grant = make('button', 'Выдать', 'btn small primary');
+      grant.type = 'button';
+      grant.dataset.titleAction = 'grant';
+      grant.disabled = select.options.length === 1;
+      actions.append(select, note, grant);
+      card.append(actions);
+      return card;
+    }));
+  }
+  async function searchUsers() {
+    const query = $<HTMLInputElement>('#title-user-query').value.trim();
+    const current = ++userLoad;
+    $('#title-users-error').hidden = true;
+    if (query.length < 2) {
+      $('#title-users').replaceChildren(make('p', 'Введите минимум 2 символа.', 'muted'));
+      return;
+    }
+    try {
+      const users = await titleApi<TitleUser[]>(`/admin/users?q=${encodeURIComponent(query)}`);
+      if (signal.aborted || current !== userLoad) return;
+      renderUsers(users);
+    } catch (error) {
+      if (current === userLoad) titleError(error, '#title-users-error');
+    }
+  }
+  const form = $<HTMLFormElement>('#title-form');
+  const color = $<HTMLInputElement>('#title-color');
+  const hex = $<HTMLInputElement>('#title-hex');
+  const updatePreview = () => {
+    const ru = (form.elements.namedItem('name_ru') as HTMLInputElement).value.trim() || 'Название титула';
+    $('#title-preview').replaceChildren(titleChip({ id: '', name_ru: ru, name_en: null, name_es: null, color: hex.value, description: null, holders: 0 }));
+  };
+  form.addEventListener('input', updatePreview, { signal });
+  color.addEventListener('input', () => { hex.value = color.value; updatePreview(); }, { signal });
+  hex.addEventListener('input', () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) color.value = hex.value;
+    updatePreview();
+  }, { signal });
+  updatePreview();
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const button = $<HTMLButtonElement>('#title-create');
+    const error = $('#title-form-error');
+    error.hidden = true;
+    button.disabled = true;
+    const fields = new FormData(form);
+    try {
+      await titleApi('/admin/titles', 'POST', {
+        id: String(fields.get('id')).trim(), name_ru: String(fields.get('name_ru')).trim(),
+        name_en: String(fields.get('name_en')).trim(), name_es: String(fields.get('name_es')).trim(),
+        color: hex.value, description: String(fields.get('description')).trim(),
+      });
+      if (signal.aborted) return;
+      form.reset();
+      hex.value = color.value;
+      updatePreview();
+      await loadTitles();
+      await searchUsers();
+    } catch (cause) {
+      titleError(cause, '#title-form-error');
+    } finally {
+      if (!signal.aborted) button.disabled = false;
+    }
+  }, { signal });
+  $('#title-user-query').addEventListener('input', () => {
+    ++userLoad;
+    if (searchTimer) { clearTimeout(searchTimer); timers.delete(searchTimer); }
+    searchTimer = setTimeout(() => { timers.delete(searchTimer!); void searchUsers(); }, 300);
+    timers.add(searchTimer);
+  }, { signal });
+  $('#titles').addEventListener('click', async (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-title-action]');
+    if (!button) return;
+    const action = button.dataset.titleAction;
+    const userId = button.closest<HTMLElement>('[data-user-id]')?.dataset.userId;
+    const id = button.dataset.titleId;
+    // Подтверждение — повторным нажатием не раньше чем через 0,6 с (двойной щелчок не удаляет), через 5 с сбрасывается
+    if (action === 'delete' || action === 'revoke') {
+      const armedAt = Number(button.dataset.armedAt || 0);
+      const since = Date.now() - armedAt;
+      if (!armedAt || since > 5000) {
+        button.dataset.armedAt = String(Date.now());
+        button.dataset.label ??= button.textContent || '';
+        button.textContent = action === 'delete' ? 'Подтвердить удаление' : 'Подтвердить';
+        const reset = setTimeout(() => { timers.delete(reset); delete button.dataset.armedAt; button.textContent = button.dataset.label || ''; }, 5000);
+        timers.add(reset);
+        return;
+      }
+      if (since < 600) return;
+    }
+    const error = action === 'delete' ? '#titles-error' : '#title-users-error';
+    $(error).hidden = true;
+    button.disabled = true;
+    try {
+      if (action === 'delete' && id) await titleApi(`/admin/titles/${encodeURIComponent(id)}`, 'DELETE');
+      if (action === 'revoke' && userId && id) await titleApi(`/admin/users/${encodeURIComponent(userId)}/titles/${encodeURIComponent(id)}`, 'DELETE');
+      if (action === 'grant' && userId) {
+        const card = button.closest<HTMLElement>('[data-user-id]')!;
+        const title = card.querySelector<HTMLSelectElement>('select')!.value;
+        if (!title) { button.disabled = false; return; }
+        const note = card.querySelector<HTMLInputElement>('input')!.value.trim();
+        await titleApi(`/admin/users/${encodeURIComponent(userId)}/titles`, 'POST', { title, note });
+      }
+      if (signal.aborted) return;
+      await loadTitles();
+      await searchUsers();
+    } catch (cause) {
+      titleError(cause, error);
+    } finally {
+      if (!signal.aborted) button.disabled = false;
+    }
+  }, { signal });
+  root.querySelector('.tabs')!.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-tab]');
+    if (!button) return;
+    root.querySelectorAll('[data-tab]').forEach((tab) => tab.setAttribute('aria-selected', String(tab === button)));
+    $('#guides').hidden = button.dataset.tab !== 'guides';
+    $('#feedback').hidden = button.dataset.tab !== 'feedback';
+    $('#titles').hidden = button.dataset.tab !== 'titles';
+    $<HTMLInputElement>('#all').parentElement!.hidden = button.dataset.tab === 'titles';
+    if (button.dataset.tab === 'titles') void loadTitles();
+  }, { signal });
+  $('#reload').addEventListener('click', () => {
+    if (!$('#titles').hidden) void loadTitles().then(() => searchUsers());
+  }, { signal });
+
   const editor = await fetch('/data/editor.json', { signal: controller.signal }).then((r) => r.json()).catch(() => null);
   if (signal.aborted) return;
   if (!editor) {
@@ -141,11 +433,6 @@ onPage(async (signal) => {
   document.addEventListener('click', async (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!b || !root.contains(b)) return;
-    if (b.dataset.tab) {
-      root.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
-      $('#guides').hidden = b.dataset.tab !== 'guides';
-      $('#feedback').hidden = b.dataset.tab !== 'feedback';
-    }
     if (b.dataset.cmd) {
       await navigator.clipboard.writeText(b.dataset.cmd).catch(() => {});
       if (signal.aborted) return;
@@ -164,7 +451,7 @@ onPage(async (signal) => {
       if (signal.aborted) return;
       void load();
     }
-    if (b.id === 'reload') void load();
+    if (b.id === 'reload' && $('#titles').hidden) void load();
   }, { signal });
   $('#all').addEventListener('change', () => { void load(); }, { signal });
   void load();
@@ -189,4 +476,24 @@ onPage(async (signal) => {
   .list :global(pre) { overflow: auto; max-height: 320px; background: var(--surface-2); padding: .6rem; border-radius: var(--radius); }
   .list :global(details summary) { cursor: pointer; color: var(--accent-text); }
   .list :global(.prose) { margin: .5rem 0; }
+  .titles-content { display: grid; gap: 10px; }
+  .titles-content[hidden] { display: none; }
+  .title-panel { display: grid; gap: .7rem; }
+  .title-panel h2, .title-panel p { margin: 0; }
+  .title-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .7rem; }
+  .title-panel label { display: grid; gap: .25rem; }
+  .title-panel input, .title-panel textarea, .titles :global(select) { min-width: 0; padding: .45rem .6rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: inherit; font: inherit; }
+  .title-panel input[type="color"] { width: 4rem; height: 2.2rem; padding: .15rem; }
+  .title-preview { align-items: center; }
+  .titles :global(.title-chip) { display: inline-flex; align-items: center; gap: .35rem; width: fit-content; border: 1px solid var(--title-color); border-radius: 999px; background: color-mix(in srgb, var(--title-color) 18%, transparent); color: var(--title-color); font: 600 .78rem var(--font-display); padding: .2rem .6rem; }
+  .titles :global(.title-card), .titles :global(.title-user) { display: grid; gap: .5rem; }
+  .titles :global(.title-card header), .titles :global(.title-user header) { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+  .titles :global(.title-card > button) { justify-self: start; }
+  .titles :global(.title-user-chips), .titles :global(.title-user-actions) { align-items: center; flex-wrap: wrap; }
+  .titles :global(.title-user-actions input) { flex: 1 1 220px; }
+  .titles :global(.title-revoke) { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 0 .1rem; }
+  :global(:root[data-theme="light"]) .titles :global(.title-chip) { color: color-mix(in srgb, var(--title-color) 70%, #000); }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .titles :global(.title-chip) { color: color-mix(in srgb, var(--title-color) 70%, #000); }
+  }
 </style>
