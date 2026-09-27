@@ -13,4 +13,7 @@ T = [
 ("Сначала старые", "Oldest first", "Más antiguos primero"),
 ("Сортировка", "Sorting", "Orden"),
 ("Утечки и бета", "Leaks and beta", "Filtraciones y beta"),
+("Вид", "View", "Vista"),
+("Галерея", "Gallery", "Galería"),
+("Сетка", "Grid", "Cuadrícula"),
 ]
