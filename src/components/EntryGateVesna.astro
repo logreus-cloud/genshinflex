@@ -11,31 +11,63 @@ const { t } = useData(Astro.currentLocale);
     </div>
   </div>
   <div class="parallax">
-  <div class="scene">
-    <img src="/img/season/snezhnaya-bg.webp" alt="" width="1920" height="930" loading="eager" />
-    <div class="vignette" aria-hidden="true"></div>
-    <button class="light" type="button" aria-label={t('Войти на сайт')}>
-      <span class="glow" aria-hidden="true"></span>
-      <span class="bubble" aria-hidden="true"></span>
-      <span class="ring" aria-hidden="true"></span>
-      <span class="glints" aria-hidden="true"></span>
-      <span class="shake" aria-hidden="true">
-        <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-          <defs><radialGradient id="entry-star-gradient">
-            <stop offset="0" stop-color="#ffffff" />
-            <stop offset=".45" stop-color="#d9f6ff" />
-            <stop offset="1" stop-color="#8fe3ff" />
-          </radialGradient></defs>
-          <path d="M50 0 56 43 85 50 56 57 50 100 44 57 15 50 44 43Z" fill="url(#entry-star-gradient)" />
-          <path d="M50 27 52 48 64 50 52 52 50 73 48 52 36 50 48 48Z" transform="rotate(45 50 50)" fill="url(#entry-star-gradient)" />
-        </svg>
-      </span>
-    </button>
+    <div class="scene">
+      <img src="/img/season/snezhnaya-bg.webp" alt="" width="1920" height="930" loading="eager" />
+      <div class="tint" aria-hidden="true"></div>
+      <div class="swirl" aria-hidden="true"></div>
+      <div class="vignette" aria-hidden="true"></div>
+    </div>
   </div>
+  <div class="art-parallax">
+    <div class="art">
+      <img src="/img/season/vesna-entry.webp" alt="" width="2048" height="1024" loading="eager" />
+      <button class="light" type="button" aria-label={t('Войти на сайт')}>
+        <span class="glow" aria-hidden="true"></span>
+        <span class="bubble" aria-hidden="true"></span>
+        <span class="ring" aria-hidden="true"></span>
+        <span class="glints" aria-hidden="true"></span>
+        <span class="shake" aria-hidden="true">
+          <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="entry-butterfly-gradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff6c8" />
+                <stop offset=".5" stop-color="#ffd76a" />
+                <stop offset="1" stop-color="#7fe3d3" />
+              </linearGradient>
+            </defs>
+            <g class="wings" fill="url(#entry-butterfly-gradient)" stroke="#fff" stroke-width="1.4">
+              <path d="M48 47C37 21 20 11 10 22 0 34 20 53 47 53Z" />
+              <path d="M52 47C63 21 80 11 90 22 100 34 80 53 53 53Z" />
+              <path d="M47 54C20 51 15 64 22 76 29 89 43 77 49 59Z" />
+              <path d="M53 54C80 51 85 64 78 76 71 89 57 77 51 59Z" />
+            </g>
+            <path d="M50 39 57 50 50 63 43 50Z" fill="#efffff" stroke="#ffd76a" stroke-width="1.5" />
+          </svg>
+        </span>
+      </button>
+    </div>
   </div>
-  <button class="hint" type="button">{t('Коснитесь звезды, чтобы войти')} <span aria-hidden="true">◇</span></button>
+  <button class="hint" type="button">{t('Коснитесь палочки Весны, чтобы войти')} <span aria-hidden="true">◇</span></button>
   <small class="caption">{t('Версия 7.1 · Снежная')}</small>
   <div class="flash" aria-hidden="true"></div>
+  <div class="burst" aria-hidden="true">
+    <svg viewBox="0 0 100 100" focusable="false">
+      <defs>
+        <linearGradient id="entry-burst-gradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff6c8" />
+          <stop offset=".5" stop-color="#ffd76a" />
+          <stop offset="1" stop-color="#7fe3d3" />
+        </linearGradient>
+      </defs>
+      <g fill="url(#entry-burst-gradient)" stroke="#fff" stroke-width="1.4">
+        <path d="M48 47C37 21 20 11 10 22 0 34 20 53 47 53Z" />
+        <path d="M52 47C63 21 80 11 90 22 100 34 80 53 53 53Z" />
+        <path d="M47 54C20 51 15 64 22 76 29 89 43 77 49 59Z" />
+        <path d="M53 54C80 51 85 64 78 76 71 89 57 77 51 59Z" />
+      </g>
+      <path d="M50 39 57 50 50 63 43 50Z" fill="#efffff" stroke="#ffd76a" stroke-width="1.5" />
+    </svg>
+  </div>
 </div>
 <script is:inline>
   (function () {
@@ -55,6 +87,7 @@ const { t } = useData(Astro.currentLocale);
     document.documentElement.style.overflow = 'hidden';
     light.focus({ preventScroll: true });
     var stopParallax = window.gfParallax(gate.querySelector('.parallax'), 24, 16);
+    var stopArtParallax = window.gfParallax(gate.querySelector('.art-parallax'), 30, 18);
 
     function cleanupGate() {
       clearTimeout(timer);
@@ -63,6 +96,7 @@ const { t } = useData(Astro.currentLocale);
       document.removeEventListener('keydown', onKeydown, true);
       document.removeEventListener('focusin', keepFocus, true);
       stopParallax();
+      stopArtParallax();
       gate.remove();
       document.documentElement.style.overflow = previousOverflow;
     }
@@ -98,7 +132,7 @@ const { t } = useData(Astro.currentLocale);
       }
     }
     function onKeydown(event) {
-      // Фокус на звезде ставится программно при открытии — «клавиатурный» вид (пузырь, рамка, без вибрации) только после нажатия клавиши
+      // Фокус на бабочке ставится сразу; клавиатурный вид включается после нажатия клавиши
       gate.classList.add('kbd');
       if ((side && side.classList.contains('open'))) return;
       if (event.key === 'Escape') {
@@ -127,39 +161,38 @@ const { t } = useData(Astro.currentLocale);
   })();
 </script>
 <style>
-  /* Фокус переносится на основное содержимое только для скринридеров — рамку вокруг всей страницы не рисуем */
+  /* Фокус содержимого не обводим */
   :global(#content[tabindex="-1"]:focus) { outline: none; }
-  #gf-entry { position: fixed; inset: 0; z-index: 54; overflow: hidden; background: #0a0e1a; color: #fff; transition: opacity .5s ease; }
+  #gf-entry { position: fixed; inset: 0; z-index: 54; overflow: hidden; background: #b6e6d8; color: #fff; transition: opacity .5s ease; }
   #gf-entry[hidden] { display: none; }
   #gf-entry.fade { opacity: 0; }
-  /* Запас масштаба под смещение до 24×16px даже на низких окнах (от ~420px) */
   .parallax { position: absolute; inset: 0; transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.08); }
-  .scene {
-    /* Сцена прижата к верху, чтобы звезда оставалась в кадре */
-    --scene-w: max(100vw, calc(100vh * 1920 / 930));
-    --scene-h: max(100vh, calc(100vw * 930 / 1920));
-    position: absolute; top: 0; left: clamp(calc(100vw - var(--scene-w)), calc(50vw - var(--scene-w) * .719), 0px); width: var(--scene-w); height: var(--scene-h);
-    translate: none; transform-origin: 71.9% 26.9%; animation: entry-breathe 20s ease-in-out infinite alternate;
-  }
-  .scene img { display: block; width: 100%; height: 100%; object-fit: fill; }
-  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgb(8 12 24 / .55) 100%); }
-  .light { position: absolute; top: 26.9%; left: 71.9%; z-index: 2; width: clamp(84px, 10vw, 140px); aspect-ratio: 1; translate: -50% -50%; transform: scale(1); border: 0; border-radius: 50%; background: none; cursor: pointer; transition: transform var(--dur) var(--ease); }
+  .scene { position: absolute; inset: 0; overflow: hidden; }
+  .scene img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .tint { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 45% 55%, rgb(236 255 240 / .78), rgb(160 235 215 / .55) 45%, rgb(90 200 190 / .45) 100%); }
+  .swirl { position: absolute; inset: -50%; pointer-events: none; mix-blend-mode: soft-light; background: conic-gradient(transparent 0 12%, rgb(85 220 195 / .4) 16%, transparent 24% 35%, rgb(180 255 230 / .45) 42%, transparent 51% 64%, rgb(55 180 175 / .3) 71%, transparent 82% 100%); animation: entry-swirl 120s linear infinite; }
+  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgb(20 95 90 / .2) 100%); }
+  .art-parallax { position: absolute; inset: 0; z-index: 1; pointer-events: none; transform: translate3d(var(--px, 0px), var(--py, 0px), 0); }
+  .art { --art-h: min(100vh, 58vw); --art-w: calc(var(--art-h) * 2); position: absolute; top: 50%; left: 50%; width: var(--art-w); height: var(--art-h); translate: -50% -50%; animation: entry-float 6s ease-in-out infinite alternate; }
+  .art img { display: block; width: 100%; height: 100%; object-fit: fill; }
+  .light { position: absolute; top: 39.8%; left: 65.7%; z-index: 2; width: clamp(64px, 7vw, 110px); aspect-ratio: 1; translate: -50% -50%; transform: scale(1); border: 0; border-radius: 50%; background: none; cursor: pointer; pointer-events: auto; transition: transform var(--dur) var(--ease); }
   .light span { position: absolute; border-radius: 50%; pointer-events: none; }
-  .glow { inset: -30%; background: radial-gradient(circle, rgb(210 245 255 / .9) 0, rgb(120 220 255 / .45) 22%, rgb(90 200 240 / .15) 45%, transparent 68%); animation: entry-glow 2.8s ease-in-out infinite alternate; transition: filter var(--dur) var(--ease); }
-  .bubble { inset: 2%; z-index: 1; border: 1.5px solid rgb(225 247 255 / .7); background: radial-gradient(circle at 50% 55%, rgb(143 227 255 / .10) 0, rgb(143 227 255 / .06) 55%, rgb(190 238 255 / .28) 92%, rgb(255 255 255 / .45) 100%); box-shadow: inset 0 0 12px rgb(170 230 255 / .45), inset -4px -6px 14px rgb(255 200 240 / .18), 0 0 18px rgb(143 227 255 / .35); backdrop-filter: blur(1.5px) saturate(1.3); opacity: 0; transform: scale(.55); transition: opacity .45s cubic-bezier(.3, 1.6, .5, 1), transform .45s cubic-bezier(.3, 1.6, .5, 1); }
+  .glow { inset: -30%; background: radial-gradient(circle, rgb(255 255 255 / .95) 0, rgb(180 255 230 / .6) 22%, rgb(95 225 200 / .2) 45%, transparent 68%); animation: entry-glow 2.8s ease-in-out infinite alternate; transition: filter var(--dur) var(--ease); }
+  .bubble { inset: 2%; z-index: 1; border: 1.5px solid rgb(225 255 245 / .7); background: radial-gradient(circle at 50% 55%, rgb(143 240 215 / .1) 0, rgb(143 240 215 / .06) 55%, rgb(190 255 235 / .28) 92%, rgb(255 255 255 / .45) 100%); box-shadow: inset 0 0 12px rgb(170 245 225 / .45), inset -4px -6px 14px rgb(255 220 185 / .18), 0 0 18px rgb(143 240 215 / .35); backdrop-filter: blur(1.5px) saturate(1.3); opacity: 0; transform: scale(.55); transition: opacity .45s cubic-bezier(.3, 1.6, .5, 1), transform .45s cubic-bezier(.3, 1.6, .5, 1); }
   .bubble::before, .bubble::after { content: ''; position: absolute; border-radius: 50%; background: rgb(255 255 255 / .75); filter: blur(2px); }
   .bubble::before { top: 14%; left: 20%; width: 30%; height: 18%; rotate: -30deg; }
   .bubble::after { right: 18%; bottom: 17%; width: 18%; height: 10%; rotate: -30deg; opacity: .35; }
-  .ring { inset: 12%; border: 1px solid rgb(210 245 255 / .7); box-shadow: 0 0 12px rgb(143 227 255 / .6); opacity: .5; animation: entry-ring 2.6s ease-out infinite; transition: opacity .3s; }
-  .glints { inset: -45%; z-index: 2; mix-blend-mode: screen; background: conic-gradient(transparent 0 11%, rgb(217 246 255 / .6) 12%, transparent 13% 36%, rgb(217 246 255 / .6) 37%, transparent 38% 61%, rgb(217 246 255 / .6) 62%, transparent 63% 86%, rgb(217 246 255 / .6) 87%, transparent 88%); opacity: 0; transition: opacity var(--dur) var(--ease); }
+  .ring { inset: 12%; border: 1px solid rgb(225 255 245 / .7); box-shadow: 0 0 12px rgb(143 240 215 / .6); opacity: .5; animation: entry-ring 2.6s ease-out infinite; transition: opacity .3s; }
+  .glints { inset: -45%; z-index: 2; mix-blend-mode: screen; background: conic-gradient(transparent 0 11%, rgb(230 255 240 / .6) 12%, transparent 13% 36%, rgb(230 255 240 / .6) 37%, transparent 38% 61%, rgb(230 255 240 / .6) 62%, transparent 63% 86%, rgb(230 255 240 / .6) 87%, transparent 88%); opacity: 0; transition: opacity var(--dur) var(--ease); }
   .shake { inset: 15%; z-index: 3; animation: entry-shake 3.2s 1.2s infinite; transition: transform .35s var(--ease); }
-  .light svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(0 0 8px #8fe3ff); animation: entry-spark 2.8s ease-in-out infinite alternate; }
+  .light svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(0 0 8px #b9ffe9); animation: entry-spark 2.8s ease-in-out infinite alternate; }
+  .light .wings { transform-box: view-box; transform-origin: 50% 50%; animation: entry-wings 1.6s ease-in-out infinite; }
   .kbd .light:focus-visible .bubble { opacity: 1; transform: scale(1); animation: entry-bubble 2.4s .45s ease-in-out infinite; }
   .kbd .light:focus-visible .ring { animation: none; opacity: 0; }
   .kbd .light:focus-visible .shake { animation: none; transform: scale(1.12); }
   .kbd .light:focus-visible .glow { filter: brightness(1.3); }
   .kbd .light:focus-visible .glints { opacity: .6; }
-  /* Эффекты наведения — только для мыши: на тач-экранах касание эмулирует hover и показывало бы пузырь */
+  /* Наведение только для мыши */
   @media (hover: hover) and (pointer: fine) {
     .light:hover .bubble { opacity: 1; transform: scale(1); animation: entry-bubble 2.4s .45s ease-in-out infinite; }
     .light:hover .ring { animation: none; opacity: 0; }
@@ -168,24 +201,28 @@ const { t } = useData(Astro.currentLocale);
     .light:hover .glints { opacity: .6; }
   }
   .light:focus { outline: none; }
-  .kbd .light:focus-visible { outline: 2px solid #dff6ff; outline-offset: 6px; }
+  .kbd .light:focus-visible { outline: 2px solid #e6fff4; outline-offset: 6px; }
   .panel { position: absolute; top: 1.2rem; left: 2rem; z-index: 3; display: flex; align-items: center; gap: .7rem; }
-  /* Клики проходят сквозь плашку к звезде — ловит только кнопка меню */
   .panel { pointer-events: none; }
   .panel .menu { pointer-events: auto; }
   .menu { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; background: none; color: #fff; font: 2rem/1 var(--font); cursor: pointer; }
   .brand { display: flex; align-items: center; gap: .5rem; font: 600 1.15rem var(--font-display); white-space: nowrap; }
   .brand svg, .brand b { color: #f3d38a; }
   .brand b { font-weight: 600; }
-  .hint { position: absolute; bottom: 2.4rem; left: 50%; z-index: 3; translate: -50% 0; border: 0; padding: .5rem; background: none; color: #fff; font: 500 .9rem var(--font-display); white-space: nowrap; text-shadow: 0 2px 12px #081018; cursor: pointer; opacity: 0; animation: entry-hint .6s 1.2s ease both; }
+  .hint { position: absolute; bottom: 2.4rem; left: 50%; z-index: 3; translate: -50% 0; border: 0; padding: .5rem; background: none; color: #fff; font: 500 .9rem var(--font-display); white-space: nowrap; text-shadow: 0 2px 12px #164a46; cursor: pointer; opacity: 0; animation: entry-hint .6s 1.2s ease both; }
   .hint span { display: block; margin-top: .3rem; font-size: 1.1rem; animation: entry-chevron 1.4s ease-in-out infinite; }
-  .caption { position: absolute; bottom: 1.4rem; left: 2rem; z-index: 3; color: rgb(255 255 255 / .8); text-shadow: 0 2px 10px #081018; }
+  .caption { position: absolute; bottom: 1.4rem; left: 2rem; z-index: 3; color: rgb(255 255 255 / .8); text-shadow: 0 2px 10px #164a46; }
   .menu:focus-visible, .hint:focus-visible { outline: 2px solid #fff6d8; outline-offset: 4px; }
-  .flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at var(--flash-x) var(--flash-y), #ffffff 0, #e6f7ff 40%, #ffffff 70%); }
+  .flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at var(--flash-x) var(--flash-y), #ffffff 0, #e9fff6 40%, #bff3e6 70%); }
+  .burst { position: absolute; top: var(--flash-y); left: var(--flash-x); z-index: 5; width: 60vmin; aspect-ratio: 1; translate: -50% -50%; pointer-events: none; opacity: 0; }
+  .burst svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 0 18px #e9fff6); }
   .entering .flash { opacity: 1; animation: entry-flash .7s ease-out both; }
+  .entering .burst { animation: entry-burst .7s ease-out both; }
   .entering .shake { animation: none; }
-  @keyframes entry-breathe { to { transform: scale(1.04); } }
+  @keyframes entry-swirl { to { transform: rotate(360deg); } }
+  @keyframes entry-float { to { transform: translateY(-8px); } }
   @keyframes entry-spark { from { transform: scale(.92) rotate(-6deg); } to { transform: scale(1.06) rotate(6deg); } }
+  @keyframes entry-wings { 50% { transform: scaleX(.85); } }
   @keyframes entry-shake {
     0%, 16%, 100% { transform: none; }
     2% { transform: translate(2px, -1px) rotate(4deg); }
@@ -202,24 +239,28 @@ const { t } = useData(Astro.currentLocale);
   @keyframes entry-hint { to { opacity: 1; } }
   @keyframes entry-chevron { 50% { opacity: .35; translate: 0 4px; } }
   @keyframes entry-flash { from { clip-path: circle(0 at var(--flash-x) var(--flash-y)); } to { clip-path: circle(150% at var(--flash-x) var(--flash-y)); } }
+  @keyframes entry-burst { from { transform: scale(.12); opacity: 1; } to { transform: scale(1); opacity: 0; } }
+  @media (max-width: 700px) {
+    .art { --art-h: 78vh; top: 50%; left: clamp(calc(100vw - var(--art-w)), calc(50vw - var(--art-w) * .575), 0px); translate: 0 -50%; }
+  }
   @media (max-width: 480px) {
     .panel { top: 1rem; left: 1rem; }
-    /* На узком экране — только бургер: плашка с логотипом закрывала звезду по центру */
+    /* На узком экране оставляем бургер */
     .panel .brand { display: none; }
     .caption { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     @media (hover: hover) and (pointer: fine) {
-        .light:hover .bubble { transform: none; animation: none; }
-        .light:hover .shake { transform: none; }
+      .light:hover .bubble { transform: none; animation: none; }
+      .light:hover .shake { transform: none; }
     }
     #gf-entry { transition-duration: .3s; }
-    .scene, .glow, .ring, .shake, .light svg, .hint, .hint span { animation: none; }
+    .swirl, .art, .glow, .ring, .shake, .light svg, .light .wings, .hint, .hint span { animation: none; }
     .light, .glow, .glints { transition: none; }
     .bubble { transform: none; transition: opacity .3s ease; }
     .kbd .light:focus-visible .bubble { transform: none; animation: none; }
     .kbd .light:focus-visible .shake { transform: none; }
     .hint { opacity: 1; }
-    .entering .flash { display: none; }
+    .entering .flash, .entering .burst { display: none; }
   }
 </style>
