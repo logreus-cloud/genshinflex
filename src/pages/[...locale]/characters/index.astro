@@ -1,37 +1,146 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
-import CharacterCard from '../../../components/CharacterCard.astro';
+import CharacterTile from '../../../components/CharacterTile.astro';
 import FilterBar from '../../../components/FilterBar.astro';
 import { useData, LANGS } from '../../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { characters, t } = useData(Astro.currentLocale);
+const { characters, getWeapon, getArtifact, lang, t } = useData(Astro.currentLocale);
 
-const withBuild = new Set((await getCollection('builds')).map((b) => b.data.character));
+const builds = new Map((await getCollection('builds')).map((b) => [b.data.character, b.data]));
 const released = characters.filter((c) => !c.beta);
-const latest = Math.max(...released.map((c) => parseFloat(c.version)));
-// Утечки — в начале списка, чтобы их было видно сразу
-const ordered = [...characters.filter((c) => c.beta), ...released];
+const compareVersions = (a: string, b: string) => {
+  const left = a.split('.').map(Number);
+  const right = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(left.length, right.length); i++) {
+    const diff = (left[i] ?? 0) - (right[i] ?? 0);
+    if (diff) return diff;
+  }
+  return 0;
+};
+const latest = released.reduce((version, c) => compareVersions(c.version, version) > 0 ? c.version : version, '0');
+const byName = (a: typeof characters[number], b: typeof characters[number]) => a.name.localeCompare(b.name, lang);
+const byRarity = (a: typeof characters[number], b: typeof characters[number]) => b.rarity - a.rarity || byName(a, b);
+const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released.sort((a, b) => compareVersions(b.version, a.version) || byRarity(a, b))];
 ---
 <Layout title={t('Персонажи')} wide>
   <h1>{t('Персонажи')}</h1>
-  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.', { n: released.length })}</p>
+  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Наведите на карточку, чтобы увидеть роль, лучшее оружие и сеты.', { n: released.length })}</p>
 
-  <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} extra={{ key: 'build', label: t('Только с билдом') }} />
+  <div class="controls">
+    <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} />
+    <div class="sort" role="group" aria-label={t('Сортировка')}>
+      <button type="button" data-sort="new" aria-pressed="true">{t('Сначала новые')}</button>
+      <button type="button" data-sort="old" aria-pressed="false">{t('Сначала старые')}</button>
+      <button type="button" data-sort="name" aria-pressed="false">{t('По имени')}</button>
+    </div>
+  </div>
 
-  <div class="cards" id="chars">
-    {ordered.map((c) => (
-      <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-element={c.element} data-weapon={c.weapon}
-        data-rarity={String(c.rarity)} data-beta={c.beta ? '1' : undefined} data-build={withBuild.has(c.slug) ? '1' : ''}>
-        <CharacterCard slug={c.slug} badge={parseFloat(c.version) === latest ? t('новый') : withBuild.has(c.slug) ? t('билд') : undefined} />
-      </div>
-    ))}
+  <div class="cards" id="chars" lang={lang}>
+    {ordered.map((c, i) => {
+      const group = c.beta ? 'beta' : c.version;
+      const previous = ordered[i - 1];
+      const build = builds.get(c.slug);
+      return (
+        <Fragment>
+          {(i === 0 || group !== (previous.beta ? 'beta' : previous.version)) && (
+            <h2 class="version-heading" data-version-heading={group}>{c.beta ? t('Утечки и бета') : t('Версия {n}', { n: c.version })}</h2>
+          )}
+          <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={c.name} data-version={c.version}
+            data-element={c.element} data-weapon={c.weapon} data-rarity={String(c.rarity)} data-beta={c.beta ? '1' : undefined}>
+            <CharacterTile slug={c.slug} badge={!c.beta && c.version === latest ? t('новый') : undefined} role={build?.role}
+              weapons={build?.weapons.slice(0, 3).map(({ slug }) => getWeapon(slug)) ?? []}
+              artifacts={build?.artifacts.slice(0, 3).map(({ sets }) => sets.map((slug) => getArtifact(slug))) ?? []} />
+          </div>
+        </Fragment>
+      );
+    })}
   </div>
   <p class="empty muted" hidden>{t('Никого не нашлось. Сбросьте часть фильтров.')}</p>
 </Layout>
 
+<script>
+  import { onPage, cleanup } from '../../../scripts/router';
+  type Sort = 'new' | 'old' | 'name';
+  const compareVersions = (a: string, b: string) => {
+    const left = a.split('.').map(Number);
+    const right = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(left.length, right.length); i++) {
+      const diff = (left[i] ?? 0) - (right[i] ?? 0);
+      if (diff) return diff;
+    }
+    return 0;
+  };
+
+  onPage((signal) => {
+    const grid = document.querySelector<HTMLElement>('#chars');
+    const controls = document.querySelector<HTMLElement>('.sort');
+    if (!grid || !controls) return;
+    const cards = [...grid.querySelectorAll<HTMLElement>(':scope > [data-name]')];
+    const headings = [...grid.querySelectorAll<HTMLElement>(':scope > [data-version-heading]')];
+    const buttons = [...controls.querySelectorAll<HTMLButtonElement>('button[data-sort]')];
+    const locale = grid.lang;
+    const byName = (a: HTMLElement, b: HTMLElement) => (a.dataset.sortName ?? '').localeCompare(b.dataset.sortName ?? '', locale);
+    const byRarity = (a: HTMLElement, b: HTMLElement) => Number(b.dataset.rarity) - Number(a.dataset.rarity) || byName(a, b);
+    const beta = cards.filter((card) => card.dataset.beta === '1');
+    const released = cards.filter((card) => card.dataset.beta !== '1');
+    let activeSort: Sort = 'new';
+
+    const updateHeadings = () => {
+      for (const heading of headings) {
+        const group = heading.dataset.versionHeading;
+        heading.hidden = activeSort === 'name' || !cards.some((card) =>
+          !card.hidden && (group === 'beta' ? card.dataset.beta === '1' : card.dataset.beta !== '1' && card.dataset.version === group));
+      }
+    };
+    const observer = new MutationObserver((records) => {
+      if (records.some(({ target }) => (target as HTMLElement).hasAttribute('data-name'))) updateHeadings();
+    });
+    observer.observe(grid, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    cleanup(signal, () => observer.disconnect());
+
+    const render = (sort: Sort) => {
+      activeSort = sort;
+      const fragment = document.createDocumentFragment();
+      const betaHeading = headings.find((heading) => heading.dataset.versionHeading === 'beta');
+      if (betaHeading) fragment.append(betaHeading);
+      for (const card of [...beta].sort(sort === 'name' ? byName : byRarity)) fragment.append(card);
+      if (sort === 'name') {
+        for (const card of [...released].sort(byName)) fragment.append(card);
+        for (const heading of headings.filter((heading) => heading !== betaHeading)) fragment.append(heading);
+      } else {
+        const versions = [...new Set(released.map((card) => card.dataset.version ?? ''))]
+          .sort((a, b) => sort === 'new' ? compareVersions(b, a) : compareVersions(a, b));
+        for (const version of versions) {
+          const heading = headings.find((item) => item.dataset.versionHeading === version);
+          if (heading) fragment.append(heading);
+          for (const card of released.filter((item) => item.dataset.version === version).sort(byRarity)) fragment.append(card);
+        }
+      }
+      grid.append(fragment);
+      for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.sort === sort));
+      updateHeadings();
+      const url = new URL(location.href);
+      url.searchParams.set('sort', sort);
+      history.replaceState(history.state, '', url);
+    };
+    const requested = new URLSearchParams(location.search).get('sort');
+    render(requested === 'old' || requested === 'name' ? requested : 'new');
+    for (const button of buttons) button.addEventListener('click', () => render(button.dataset.sort as Sort), { signal });
+  });
+</script>
+
 <style>
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .75rem; margin-bottom: 1.2rem; }
+  .controls :global(.fb) { flex: 1 1 580px; min-width: 0; margin-bottom: 0; }
+  .sort { display: flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .sort button { border: 0; border-radius: 7px; padding: .35rem .6rem; background: none; color: var(--muted); font-size: .85rem; cursor: pointer; }
+  .sort button:hover { color: var(--text); background: var(--surface-2); }
+  .sort button[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .version-heading { grid-column: 1 / -1; margin: .7rem 0 0; font-size: 1.2rem; }
+  .version-heading[hidden] { display: none; }
   .empty { text-align: center; margin: 3rem 0; }
+  @media (max-width: 700px) { .cards { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); } }
 </style>

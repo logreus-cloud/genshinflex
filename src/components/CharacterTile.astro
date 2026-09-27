@@ -1,0 +1,93 @@
+---
+import cardArt from '../data/generated/char-cards.json';
+import { useData } from '../lib/data';
+const { getCharacter, base, t } = useData(Astro.currentLocale);
+
+interface Props {
+  slug: string; badge?: string; role?: string;
+  weapons: { name: string; icon: string; rarity: number }[];
+  artifacts: { name: string; icon: string }[][];
+}
+const { slug, badge, role, weapons, artifacts } = Astro.props;
+const c = getCharacter(slug);
+const hasArt = (cardArt as string[]).includes(c.slug);
+const roleText = role ? t(role) : '';
+---
+<a class:list={['tile', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element}>
+  <img class:list={['art', { fallback: !hasArt }]} src={hasArt ? `/img/chars/${c.slug}.webp` : c.icon} alt="" loading="lazy" decoding="async" width="256" height="512" />
+  {c.emblem && <img class="skill" src={c.emblem} alt="" loading="lazy" decoding="async" width="40" height="40" />}
+  {c.beta ? <span class="badge beta">BETA</span> : badge && <span class="badge">{badge}</span>}
+  <span class="name">{c.name}</span>
+  <span class="meta">
+    <span class="el-dot" title={c.elementText}></span>
+    <span class="weapon-mark" title={c.weaponText}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {c.weapon === 'sword' && <path d="M12 2 9.5 12l2.5 2 2.5-2L12 2ZM7 16h10M12 14v8" />}
+        {c.weapon === 'claymore' && <path d="M9 2h6l1 10-4 3-4-3L9 2ZM7 17h10M12 15v7" />}
+        {c.weapon === 'polearm' && <path d="m12 2-3 5 3 5 3-5-3-5ZM12 12v10M9 15h6" />}
+        {c.weapon === 'bow' && <path d="M7 2c12 4 12 16 0 20 4-6 4-14 0-20ZM7 2v20" />}
+        {c.weapon === 'catalyst' && <path d="M12 5c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1ZM12 5v14" />}
+      </svg>
+    </span>
+  </span>
+  <span class="preview" aria-hidden="true">
+    {role ? (
+      <span class="preview-content">
+        <span class="preview-name">{c.name}</span>
+        <span class="role" title={roleText}>{roleText}</span>
+        <span class="preview-label">{t('Оружие')}</span>
+        <span class="gear">
+          {weapons.map((weapon) => <img class={`r${weapon.rarity}`} src={weapon.icon} alt="" title={weapon.name} loading="lazy" decoding="async" width="28" height="28" />)}
+        </span>
+        <span class="preview-label">{t('Артефакты')}</span>
+        <span class="sets">
+          {artifacts.map((set) => (
+            <span class="set" title={set.map((item) => item.name).join(' + ')}>
+              {set.map((item) => <img src={item.icon} alt="" loading="lazy" decoding="async" width="24" height="24" />)}
+            </span>
+          ))}
+        </span>
+      </span>
+    ) : <span class="preview-content"><span class="preview-name">{c.name}</span><span class="no-build">{t('Билд скоро')}</span></span>}
+  </span>
+</a>
+
+<style>
+  .tile { position: relative; display: block; aspect-ratio: 1 / 2; overflow: hidden; border-radius: var(--radius); isolation: isolate; text-decoration: none; color: #fff; background: linear-gradient(180deg, #5b4b82, #9679c4); transition: transform .2s, box-shadow .2s; }
+  .tile.r5 { background: linear-gradient(180deg, #7a5226, #d1953f); }
+  .tile.emblem { background: linear-gradient(180deg, color-mix(in srgb, var(--el) 55%, #1c2033), color-mix(in srgb, var(--el) 85%, #fff)); }
+  .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -1; transition: transform .2s; }
+  .art.fallback { object-position: top; }
+  .tile::after { content: ""; position: absolute; inset: auto 0 0; height: 48%; background: linear-gradient(transparent, rgb(10 10 20 / .88)); z-index: -1; }
+  .skill { position: absolute; top: 6px; left: 6px; width: 30px; height: 30px; padding: 3px; border-radius: 50%; background: rgb(15 18 32 / .75); box-shadow: 0 0 0 2px var(--el); object-fit: contain; }
+  .badge { position: absolute; top: 6px; right: 6px; background: var(--accent); color: var(--accent-ink); font-size: .68rem; font-weight: 600; padding: .05rem .4rem; border-radius: 4px; }
+  .badge.beta { background: #e0457b; color: #fff; letter-spacing: .04em; }
+  .name { position: absolute; right: 7px; bottom: 32px; left: 7px; display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-align: center; font-family: var(--font-display); font-size: .9rem; line-height: 1.15; }
+  .meta { position: absolute; right: 0; bottom: 8px; left: 0; display: flex; align-items: center; justify-content: center; gap: 7px; }
+  .el-dot { width: 19px; height: 19px; border-radius: 50%; background: var(--el-icon) center / 84% no-repeat, rgb(12 14 24 / .7); }
+  .weapon-mark { display: flex; width: 19px; height: 19px; align-items: center; justify-content: center; }
+  .weapon-mark svg { width: 16px; height: 16px; }
+  .preview { position: absolute; inset: auto 0 0; display: flex; box-sizing: border-box; width: 100%; min-height: 54%; max-height: 100%; align-items: center; justify-content: center; padding: .55rem; background: rgb(9 12 25 / .86); backdrop-filter: blur(10px); opacity: 0; transform: translateY(8px); overflow: hidden; pointer-events: none; transition: opacity .2s, transform .2s; }
+  .preview-content { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 4px; }
+  .preview-name { font: 600 .9rem var(--font-display); color: #fff; }
+  .role { color: var(--accent-text); max-width: min(22ch, 100%); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .8rem; font-weight: 600; }
+  .preview-label { font-size: .7rem; color: #d5d9e5; }
+  .gear, .sets { display: flex; max-width: 100%; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 6px; }
+  .gear img { width: 28px; height: 28px; border-radius: 4px; background: #60739c; object-fit: contain; }
+  .gear img.r5 { background: linear-gradient(135deg, #7a5226, #d1953f); }
+  .gear img.r4 { background: linear-gradient(135deg, #5b4b82, #9679c4); }
+  .set { display: flex; gap: 1px; }
+  .set img { width: 22px; height: 22px; object-fit: contain; }
+  .no-build { text-align: center; font-size: .8rem; }
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-3px); box-shadow: 0 8px 20px rgb(0 0 0 / .22); }
+    .tile:hover .art, .tile:focus-visible .art { transform: scale(1.04); }
+    .tile:hover .preview, .tile:focus-visible .preview { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  }
+  @media (hover: none), (pointer: coarse) { .preview { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .tile, .art, .preview { transition: none; }
+    .tile:hover, .tile:focus-visible, .tile:hover .art, .tile:focus-visible .art { transform: none; }
+    .tile:hover .preview, .tile:focus-visible .preview { transform: none; }
+  }
+</style>
