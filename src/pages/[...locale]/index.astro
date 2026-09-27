@@ -141,6 +141,10 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
 </Layout>
 
 <script>
+import { onPage, cleanup } from '../../scripts/router';
+
+onPage((signal) => {
+  if (!document.querySelector('[data-gate-carousel]')) return;
   document.querySelectorAll<HTMLElement>('[data-gate-carousel]').forEach((root) => {
     const list = root.querySelector<HTMLElement>('.gate-list')!;
     const track = root.querySelector<HTMLElement>('.tile-track')!;
@@ -155,6 +159,7 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
       if (entries.some((entry) => entry.isIntersecting)) { loadTiles(); observer.disconnect(); }
     }, { rootMargin: '300px 0px' });
     observer.observe(root);
+    cleanup(signal, () => observer.disconnect());
     const maxScroll = () => list.scrollWidth - list.clientWidth;
     const page = () => {
       const card = track.querySelector<HTMLElement>('.tile');
@@ -183,15 +188,15 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
     [[prev, -1], [next, 1]].forEach(([button, direction]) => {
       const arrow = button as HTMLButtonElement;
       const sign = direction as number;
-      arrow.addEventListener('pointerenter', () => { loadTiles(); update(); });
-      arrow.addEventListener('pointerleave', update);
-      arrow.addEventListener('focus', () => { loadTiles(); update(); });
-      arrow.addEventListener('blur', update);
+      arrow.addEventListener('pointerenter', () => { loadTiles(); update(); }, { signal });
+      arrow.addEventListener('pointerleave', update, { signal });
+      arrow.addEventListener('focus', () => { loadTiles(); update(); }, { signal });
+      arrow.addEventListener('blur', update, { signal });
       arrow.addEventListener('click', () => {
         const { step, distance } = page();
         const target = Math.max(0, Math.min(maxScroll(), Math.round(list.scrollLeft / step) * step + sign * distance));
         list.scrollTo({ left: target, behavior: motion.matches ? 'auto' : 'smooth' });
-      });
+      }, { signal });
     });
     let frame = 0;
     list.addEventListener('scroll', () => {
@@ -200,10 +205,12 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
         frame = 0;
         update();
       });
-    }, { passive: true });
-    window.addEventListener('resize', update);
+    }, { passive: true, signal });
+    cleanup(signal, () => cancelAnimationFrame(frame));
+    window.addEventListener('resize', update, { signal });
     update();
   });
+});
 </script>
 
 <style>

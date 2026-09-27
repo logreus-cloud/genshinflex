@@ -234,7 +234,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 <script>
   import { favorites, recent, store, type Entry } from '../scripts/common';
   import { BASE, t } from '../scripts/search';
-  import { getMedia, commitMedia, deleteMedia, mediaUrl, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
+  import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
+  import { onPage, cleanup } from '../scripts/router';
 
   type Char = { id: number | null; s: string; n: string; i: string };
   type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
@@ -271,6 +272,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const colorOk = (value: unknown): value is string => typeof value === 'string' && (hexOk(value) || colors.some((color) => color === value) || extraColors.some(([key]) => key === value));
   const bounded = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max;
   const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
+
+  onPage((signal) => {
+  const root = document.querySelector<HTMLElement>('.profile-root');
+  if (!root) return;
   const rawChars: unknown = (() => { try { return JSON.parse($('profile-chars').textContent ?? '[]'); } catch { return []; } })();
   const pickerChars: PickerChar[] = Array.isArray(rawChars) ? rawChars.filter((item): item is PickerChar =>
     isRecord(item) && typeof item.slug === 'string' && /^[a-z0-9-]+$/.test(item.slug) && typeof item.name === 'string' &&
@@ -279,7 +284,6 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const charsById = new Map<number, Char>();
   const charsBySlug = new Map<string, Char>();
   let charsReady = false, currentProfile: Profile | null = null;
-  const root = document.querySelector<HTMLElement>('.profile-root')!;
   const avatar = $('profile-avatar'), previewAvatar = $('preview-avatar');
   const placeholder = avatar.firstElementChild!.cloneNode(true);
   const dialog = $<HTMLDialogElement>('profile-dialog');
@@ -288,6 +292,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   let saved = emptyCustom(), draft = emptyCustom(), avatarTab: Avatar['type'] = 'character';
   let pendingImport: ImportData | null = null, confirmedImport: ImportData | null = null, keepChanges = false;
   let editorSession = 0, importSelection = 0, saving = false, exporting = false;
+  const exportUrls = new Set<string>();
+  let exportTimer: number | undefined;
   const mediaOperations: Record<MediaKey, number> = { avatar: 0, cover: 0, background: 0 };
   const stagedMedia = new Map<MediaKey, StagedMedia>();
   const committedUrls = new Map<MediaKey, string>();
@@ -782,9 +788,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (key !== effectKey) { effectKey = key; canvas.hidden = false; sizeEffect(); effectLast = 0; }
     if (!document.hidden && !effectFrame) effectFrame = requestAnimationFrame(tickEffect);
   }
-  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(() => { if (!canvas.hidden) sizeEffect(); }, 120); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(effectFrame); effectFrame = 0; } else renderEffect(); });
-  reduced.addEventListener('change', renderEffect);
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(() => { if (!canvas.hidden) sizeEffect(); }, 120); }, { signal });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(effectFrame); effectFrame = 0; } else renderEffect(); }, { signal });
+  reduced.addEventListener('change', renderEffect, { signal });
 
   renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
   renderEntries('recent-list', entries(recent.list), '', true);
@@ -795,21 +801,26 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (isRecord(raw) && isRecord(raw.avatar) && raw.avatar.type === 'upload' && typeof raw.avatar.data === 'string') {
       try {
         const blob = await dataUrlToBlob(raw.avatar.data, 'avatar');
+        if (signal.aborted) return;
         const version = crypto.randomUUID();
         if (!blob || !await commitMedia({ avatar: blob }, version)) throw new Error();
+        if (signal.aborted) { await deleteMedia('avatar', version); return; }
         const migrated = { ...raw, avatar: { type: 'upload' }, media: { ...(isRecord(raw.media) ? raw.media : {}), avatar: version } };
         try { localStorage.setItem('gf:profile-custom', JSON.stringify(migrated)); raw = migrated; }
         catch { await deleteMedia('avatar', version); throw new Error(); }
         await deleteMedia('avatar');
-      } catch { status(t('Не удалось сохранить картинку в этом браузере'), true); }
+        if (signal.aborted) return;
+      } catch { if (signal.aborted) return; status(t('Не удалось сохранить картинку в этом браузере'), true); }
     }
     saved = validCustom(raw).value;
     draft = structuredClone(saved);
     for (const key of mediaKeys) {
       if (!usesMedia(saved, key)) continue;
-      const url = await mediaUrl(key, saved.media[key]);
-      if (url) committedUrls.set(key, url);
+      const blob = await getMedia(key, saved.media[key]);
+      if (signal.aborted) return;
+      if (blob) committedUrls.set(key, URL.createObjectURL(blob));
     }
+    if (signal.aborted) return;
     renderProfile();
     editButton.disabled = false;
   }
@@ -823,13 +834,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   else if (!uidCleared) for (const key of ['gf:sim-uid', 'gf:wish-uid']) { const value = read(key); if (uidOk(value)) { uidInput.value = value; break; } }
   currentProfile = cachedProfile?.uid === uidInput.value ? cachedProfile : null;
   renderProfile();
-  fetch(`${BASE}/data/checker.json`).then(async (response) => { if (!response.ok) throw new Error(); return response.json(); }).then((data: unknown) => {
+  const checkerController = new AbortController();
+  fetch(`${BASE}/data/checker.json`, { signal: checkerController.signal }).then(async (response) => { if (!response.ok) throw new Error(); return response.json(); }).then((data: unknown) => {
+    if (signal.aborted) return;
     if (!isRecord(data) || !Array.isArray(data.characters)) throw new Error();
     for (const value of data.characters) if (isRecord(value) && typeof value.id === 'number' && typeof value.s === 'string' && /^[a-z0-9-]+$/.test(value.s) && typeof value.n === 'string' && typeof value.i === 'string') {
       const char = value as Char; charsById.set(char.id!, char); charsBySlug.set(char.s, char);
     }
     charsReady = true; renderRoster(); renderProfile();
-  }).catch(() => { $('roster-list').textContent = t('Не удалось загрузить данные персонажей.'); });
+  }).catch(() => { if (!signal.aborted) $('roster-list').textContent = t('Не удалось загрузить данные персонажей.'); });
   $('showcase-form').addEventListener('submit', async (event) => {
     event.preventDefault();
     const uid = uidInput.value.trim();
@@ -838,7 +851,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const controller = new AbortController();
     showcaseController = controller;
     const turn = showcaseRequest;
-    const active = () => turn === showcaseRequest && !controller.signal.aborted;
+    const active = () => !signal.aborted && turn === showcaseRequest && !controller.signal.aborted;
     const button = $<HTMLButtonElement>('load-showcase');
     button.disabled = true;
     status(t('Загружаю витрину…'));
@@ -907,6 +920,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       }
       written = Object.keys(changes) as MediaKey[];
       if (!await commitMedia(changes, version)) throw new Error();
+      if (signal.aborted) throw new Error();
       if (!dialog.open || session !== editorSession) throw new Error();
       localStorage.setItem('gf:profile-custom', JSON.stringify(snapshot));
       switched = true;
@@ -937,15 +951,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       revokeStaged(urls.filter((url) => !activeUrls.has(url)));
       for (const [key, url] of previousUrls) if (committedUrls.get(key) !== url) URL.revokeObjectURL(url);
       for (const key of mediaKeys) if (usesMedia(previous, key) && (!usesMedia(snapshot, key) || previous.media[key] !== snapshot.media[key])) await deleteMedia(key, previous.media[key]);
+      if (signal.aborted) return;
       keepChanges = true;
       saving = false;
       closeEditor();
     } catch {
       if (!switched) for (const key of written) await deleteMedia(key, version);
-      $('import-status').textContent = t('Не удалось сохранить профиль в этом браузере');
-      setEditorTab('transfer');
+      if (!signal.aborted) { $('import-status').textContent = t('Не удалось сохранить профиль в этом браузере'); setEditorTab('transfer'); }
     } finally {
-      for (const [control, disabled] of controls) control.disabled = disabled;
+      if (!signal.aborted) for (const [control, disabled] of controls) control.disabled = disabled;
       saving = false;
     }
   });
@@ -976,7 +990,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     input.value = '';
     if (!file) return;
     const operation = ++mediaOperations[key], session = editorSession;
-    const active = () => dialog.open && operation === mediaOperations[key] && session === editorSession;
+    const active = () => !signal.aborted && dialog.open && operation === mediaOperations[key] && session === editorSession;
     const message = $(`${key}-status`);
     try {
       const blob = await prepareImage(file, key);
@@ -1018,9 +1032,13 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const used = usesMedia(custom, key);
       if (!used) continue;
       const blob = await getMedia(key, custom.media[key]);
+      if (signal.aborted) return;
       if (!blob) { $('import-status').textContent = t('Не удалось прочитать картинку в этом браузере'); return; }
-      try { media[key] = await blobToDataUrl(blob); }
-      catch { $('import-status').textContent = t('Не удалось прочитать картинку в этом браузере'); return; }
+      try {
+        const dataUrl = await blobToDataUrl(blob);
+        if (signal.aborted) return;
+        media[key] = dataUrl;
+      } catch { if (!signal.aborted) $('import-status').textContent = t('Не удалось прочитать картинку в этом браузере'); return; }
     }
     const data = {
       'gf:profile-custom': custom,
@@ -1029,12 +1047,14 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       'gf:roster': roster?.value ?? [],
       'gf:profile-uid': uidOk(rawUid) ? rawUid : null,
     };
+    if (signal.aborted) return;
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    exportUrls.add(url);
     const link = document.createElement('a');
     link.href = url;
     link.download = 'genshinflex-profile.json';
     link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportTimer = window.setTimeout(() => { URL.revokeObjectURL(url); exportUrls.delete(url); }, 1000);
   }
   $('export-profile').addEventListener('click', async () => {
     if (saving || exporting) return;
@@ -1042,11 +1062,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const saveButton = $<HTMLButtonElement>('save-editor');
     saveButton.disabled = true;
     try { await exportProfile(); }
-    catch { $('import-status').textContent = t('Не удалось прочитать картинку в этом браузере'); }
-    finally { saveButton.disabled = false; exporting = false; }
+    catch { if (!signal.aborted) $('import-status').textContent = t('Не удалось прочитать картинку в этом браузере'); }
+    finally { if (!signal.aborted) saveButton.disabled = false; exporting = false; }
   });
   $<HTMLInputElement>('import-file').addEventListener('change', async (event) => {
     const selection = ++importSelection, session = editorSession;
+    const active = () => !signal.aborted && dialog.open && selection === importSelection && session === editorSession;
     pendingImport = null;
     $('replace-profile').hidden = true;
     $('import-status').textContent = '';
@@ -1054,8 +1075,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (!file) return;
     (event.target as HTMLInputElement).value = '';
     try {
-      const raw: unknown = JSON.parse(await file.text());
-      if (!dialog.open || selection !== importSelection || session !== editorSession) return;
+      const text = await file.text();
+      if (!active()) return;
+      const raw: unknown = JSON.parse(text);
       if (!isRecord(raw) || !Object.prototype.hasOwnProperty.call(raw, 'gf:profile-custom') ||
         !Object.prototype.hasOwnProperty.call(raw, 'gf:favs') || !Object.prototype.hasOwnProperty.call(raw, 'gf:roster') ||
         !Object.prototype.hasOwnProperty.call(raw, 'gf:profile-uid')) throw new Error();
@@ -1072,15 +1094,16 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         if (used) {
           if (typeof data !== 'string') throw new Error();
           const blob = await dataUrlToBlob(data, key);
+          if (!active()) return;
           if (!blob) throw new Error();
           media[key] = blob;
         } else if (data !== undefined) throw new Error();
       }
-      if (!dialog.open || selection !== importSelection || session !== editorSession) return;
+      if (!active()) return;
       pendingImport = { custom: custom.value, favs: favs.value, roster: roster.value, uid: uid as string | null, media };
       $('import-status').textContent = favs.valid && roster.valid ? t('Файл готов к импорту.') : t('Файл готов к импорту. Некоторые повреждённые записи будут пропущены.');
       $('replace-profile').hidden = false;
-    } catch { if (dialog.open && selection === importSelection && session === editorSession) $('import-status').textContent = t('Неверный файл профиля.'); }
+    } catch { if (active()) $('import-status').textContent = t('Неверный файл профиля.'); }
   });
   $('replace-profile').addEventListener('click', () => {
     if (!pendingImport) return;
@@ -1114,6 +1137,23 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     renderPersonal(); renderPickers();
     revokeStaged(urls);
     $('confirm-reset').hidden = true;
+  });
+  cleanup(signal, () => {
+    editorSession++;
+    importSelection++;
+    for (const key of mediaKeys) mediaOperations[key]++;
+    checkerController.abort();
+    cancelShowcase();
+    stopEffect();
+    clearTimeout(resizeTimer);
+    revokeStaged(clearStaged());
+    for (const url of committedUrls.values()) URL.revokeObjectURL(url);
+    committedUrls.clear();
+    if (exportTimer !== undefined) clearTimeout(exportTimer);
+    for (const url of exportUrls) URL.revokeObjectURL(url);
+    exportUrls.clear();
+    document.documentElement.classList.remove('profile-custom-bg');
+  });
   });
 </script>
 

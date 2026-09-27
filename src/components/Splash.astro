@@ -28,17 +28,31 @@ const { season } = Astro.props;
     var seasonal = el.classList.contains('seasonal');
     var min = seasonal && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 2050 : 700;
     var start = Date.now(), done = false;
+    var delayTimer, removeTimer, fallbackTimer;
+    function stop() {
+      clearTimeout(delayTimer);
+      clearTimeout(removeTimer);
+      clearTimeout(fallbackTimer);
+      removeEventListener('load', hide);
+      el.remove();
+    }
+    document.addEventListener('astro:before-swap', stop, { once: true });
     function hide() {
       if (done) return;
       done = true;
+      removeEventListener('load', hide);
+      clearTimeout(fallbackTimer);
       // Дождаться логотипа, а при сниженной анимации — обычного минимума
-      setTimeout(function () {
+      delayTimer = setTimeout(function () {
         el.classList.add('out');
-        setTimeout(function () { el.remove(); }, seasonal ? 500 : 450);
+        removeTimer = setTimeout(function () {
+          document.removeEventListener('astro:before-swap', stop);
+          el.remove();
+        }, seasonal ? 500 : 450);
       }, Math.max(0, min - (Date.now() - start)));
     }
     if (document.readyState === 'complete') hide();
-    else { addEventListener('load', hide, { once: true }); setTimeout(hide, seasonal ? 2900 : 2500); /* сезонная: 2,9 с + 0,5 с растворения = не дольше 3,4 с */ }
+    else { addEventListener('load', hide, { once: true }); fallbackTimer = setTimeout(hide, seasonal ? 2900 : 2500); /* сезонная: 2,9 с + 0,5 с растворения = не дольше 3,4 с */ }
   })();
 </script>
 

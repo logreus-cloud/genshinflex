@@ -46,7 +46,6 @@
   }
 }
 
-@view-transition { navigation: auto; }
 ::view-transition-old(root) { animation: gf-fade-out .25s var(--ease) both; }
 ::view-transition-new(root) { animation: gf-fade-in .32s var(--ease) both; }
 ::view-transition-old(page) { animation: gf-fade-out .25s var(--ease) both; }
@@ -72,8 +71,6 @@ a, .btn, .icon-btn, .chip, .input, input, select, textarea, .panel {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
   ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
-  /* Без этого браузер всё равно плавно двигает группы с view-transition-name (шапку, контент) */
-  @view-transition { navigation: none; }
 }
 
 h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; font-weight: 600; letter-spacing: -.01em; }

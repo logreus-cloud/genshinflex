@@ -59,15 +59,18 @@ const { t } = useData(Astro.currentLocale);
   import { runSim, validateSim, warmUp, type SimResult } from '../../../scripts/gcsim';
   import { enkaToBuilds, applyBuilds, type SimBuild, type SimIds } from '../../../lib/enka-gcsim';
   import { BASE, LANG, t } from '../../../scripts/search';
+  import { onPage, cleanup } from '../../../scripts/router';
 
   type Preset = { config: string; members: { slug: string; alias: string }[]; dps: number; source: string; own?: boolean };
   type Presets = { gcsim: string; presets: Record<string, Preset>; ids: SimIds };
   type Named = { s: string; n: string; e: string; i: string };
   type Index = { characters: Named[]; weapons: Named[] };
-  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
   const fmt = (n: number) => Math.round(n).toLocaleString({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG]);
   const key = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+onPage((signal) => {
+  if (!document.getElementById('uid-form')) return;
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const uid = $<HTMLInputElement>('uid'), showcase = $('showcase'), members = $('members');
   const simulate = $<HTMLButtonElement>('simulate'), stop = $<HTMLButtonElement>('stop');
   const progress = $<HTMLProgressElement>('progress'), progressBox = $('progress-box');
@@ -79,6 +82,11 @@ const { t } = useData(Astro.currentLocale);
   let controller: AbortController | null = null;
   let generation = 0, importGeneration = 0;
   let importing = false;
+  cleanup(signal, () => {
+    importGeneration++;
+    generation++;
+    controller?.abort();
+  });
   const status = (message: string, bad = false) => {
     const node = $('status');
     node.textContent = message;
@@ -154,8 +162,8 @@ const { t } = useData(Astro.currentLocale);
   }
   async function getData() {
     if (!loading) loading = Promise.all([
-      fetch('/data/sim-presets.json').then((r) => { if (!r.ok) throw new Error(); return r.json() as Promise<Presets>; }),
-      fetch(`${BASE}/data/index.json`).then((r) => { if (!r.ok) throw new Error(); return r.json() as Promise<Index>; }),
+      fetch('/data/sim-presets.json', { signal }).then((r) => { if (!r.ok) throw new Error(); return r.json() as Promise<Presets>; }),
+      fetch(`${BASE}/data/index.json`, { signal }).then((r) => { if (!r.ok) throw new Error(); return r.json() as Promise<Index>; }),
     ]).then(([presets, index]) => ({ presets, index })).catch((error) => { loading = null; throw error; });
     return loading;
   }
@@ -170,7 +178,7 @@ const { t } = useData(Astro.currentLocale);
     $<HTMLButtonElement>('load-uid').disabled = true;
     status(t('Загружаю витрину…'));
     try {
-      const response = await fetch(`/api/enka/${value}`);
+      const response = await fetch(`/api/enka/${value}`, { signal });
       const body = await response.json();
       if (gen !== importGeneration) return;
       if (!response.ok) return status(t(body.error ?? 'Не удалось загрузить профиль.'), true);
@@ -196,7 +204,7 @@ const { t } = useData(Astro.currentLocale);
         simulate.disabled = !selected;
       }
     }
-  });
+  }, { signal });
   showcase.addEventListener('click', (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-slug]');
     if (importing || !button || button.disabled || button.dataset.slug === selected) return;
@@ -205,16 +213,16 @@ const { t } = useData(Astro.currentLocale);
     status('');
     renderShowcase();
     renderTeam();
-  });
-  simulate.addEventListener('pointerenter', warmUp);
-  simulate.addEventListener('focus', warmUp);
-  stop.addEventListener('click', () => cancel(t('Симуляция остановлена.')));
+  }, { signal });
+  simulate.addEventListener('pointerenter', warmUp, { signal });
+  simulate.addEventListener('focus', warmUp, { signal });
+  stop.addEventListener('click', () => cancel(t('Симуляция остановлена.')), { signal });
   simulate.addEventListener('click', async () => {
     if (importing) return;
     const preset = data?.presets.presets[selected];
     if (!preset) return;
-    const gen = ++generation, signal = new AbortController();
-    controller = signal;
+    const gen = ++generation, simController = new AbortController();
+    controller = simController;
     simulate.disabled = true;
     stop.hidden = false;
     progressBox.hidden = false;
@@ -229,7 +237,7 @@ const { t } = useData(Astro.currentLocale);
       if (gen !== generation) return;
       if (issue) return status(t('gcsim не принял конфиг: {message}', { message: issue }), true);
       const ours = await runSim(config, {
-        iterations: total, signal: signal.signal,
+        iterations: total, signal: simController.signal,
         onProgress(done, count) {
           if (gen !== generation) return;
           progress.value = done;
@@ -249,8 +257,9 @@ const { t } = useData(Astro.currentLocale);
         progressBox.hidden = true;
       }
     }
-  });
+  }, { signal });
   try { uid.value = localStorage.getItem('gf:sim-uid') ?? ''; } catch {}
+});
 </script>
 
 <style>

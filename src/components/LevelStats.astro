@@ -25,7 +25,12 @@ const fmt = (p: Point, k: keyof Point, pct: boolean) => fmtStat((p[k] as number 
 </div>
 
 <script>
-  for (const box of document.querySelectorAll<HTMLElement>('[data-level-stats]')) {
+  import { onPage } from '../scripts/router';
+
+  onPage((signal) => {
+    const boxes = document.querySelectorAll<HTMLElement>('[data-level-stats]');
+    if (!boxes.length) return;
+    for (const box of boxes) {
     const table: string[][] = JSON.parse(box.dataset.levelStats!);
     const range = box.querySelector('input')!;
     const labels: string[] = JSON.parse(range.dataset.labels!);
@@ -35,8 +40,9 @@ const fmt = (p: Point, k: keyof Point, pct: boolean) => fmtStat((p[k] as number 
       const i = Number(range.value);
       out.textContent = labels[i];
       dds.forEach((dd, j) => (dd.textContent = table[i][j]));
-    });
-  }
+    }, { signal });
+    }
+  });
 </script>
 
 <style>

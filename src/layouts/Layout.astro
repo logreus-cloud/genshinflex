@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import '../styles/season-snezhnaya.css';
 import QuickSearch from '../components/QuickSearch.astro';
+import { ClientRouter } from 'astro:transitions';
 import Splash from '../components/Splash.astro';
 import AmbientMusic from '../components/AmbientMusic.astro';
 import SnowDivider from '../components/SnowDivider.astro';
@@ -53,6 +54,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
 <!doctype html>
 <html lang={lang} data-season={season.theme ?? undefined}>
   <head>
+    <ClientRouter />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
@@ -81,7 +83,16 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet" />
     <title>{fullTitle}</title>
     <script is:inline>
-      try { const t = localStorage.getItem('gf:theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+      (() => {
+        const apply = () => {
+          try { const t = localStorage.getItem('gf:theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+        };
+        apply();
+        if (!window.gfThemeAfterSwap) {
+          window.gfThemeAfterSwap = true;
+          document.addEventListener('astro:after-swap', apply);
+        }
+      })();
     </script>
     <script is:inline>
       window.gfParallax = function (element, maxX, maxY) {
@@ -141,10 +152,16 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     </script>
   </head>
   <body>
-    {season.theme && <div class="season-scene" aria-hidden="true"></div>}
-    {season.theme && <div class="season-snow" aria-hidden="true"></div>}
+    {season.theme && <div class="season-scene" aria-hidden="true" transition:persist="season-scene"></div>}
+    {season.theme && <div class="season-snow" aria-hidden="true" transition:persist="season-snow"></div>}
     {season.theme && <script is:inline>
-      window.gfParallax(document.querySelector('.season-scene'), 14, 10);
+      (() => {
+        if (window.gfSeasonParallaxStarted) return;
+        const scene = document.querySelector('.season-scene');
+        if (!scene) return;
+        window.gfParallax(scene, 14, 10);
+        window.gfSeasonParallaxStarted = true;
+      })();
     </script>}
     <Splash season={season.theme} />
     <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
@@ -213,7 +230,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
               <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M3 10h14M10 3c-3 3.5-3 10.5 0 14m0-14c3 3.5 3 10.5 0 14" /></svg>
             </button>
             <div class="langs" id="language-menu" aria-label={t('Язык')} hidden>
-              {LANGS.map((l) => <a href={alt(l)} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
+              {LANGS.map((l) => <a href={new URL(alt(l)).pathname} hreflang={l} lang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</a>)}
             </div>
           </div>
           <AmbientMusic />
@@ -267,13 +284,17 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
 
     <script>
       import '../scripts/common';
+      import { onPage, cleanup } from '../scripts/router';
+      onPage((signal) => {
+      const side = document.getElementById('side');
+      if (!side) return;
       const root = document.documentElement;
       document.getElementById('theme')?.addEventListener('click', () => {
         const dark = root.dataset.theme ? root.dataset.theme === 'dark' : !matchMedia('(prefers-color-scheme: light)').matches;
         root.dataset.theme = dark ? 'light' : 'dark';
         try { localStorage.setItem('gf:theme', root.dataset.theme); } catch {}
-      });
-      const side = document.getElementById('side')!, scrim = document.getElementById('scrim')!, burger = document.getElementById('burger')!;
+      }, { signal });
+      const scrim = document.getElementById('scrim')!, burger = document.getElementById('burger')!;
       const shell = document.querySelector<HTMLElement>('.shell')!;
       const searchPanel = document.getElementById('search-panel')!;
       const searchButtons = [document.getElementById('search-pill')!, document.getElementById('search-icon')!];
@@ -309,9 +330,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         }
         else if (restore) burger.focus({ preventScroll: true });
       };
-      burger.addEventListener('click', () => toggle(!side.classList.contains('open')));
-      side.querySelector('.side-close')?.addEventListener('click', () => toggle(false, true));
-      scrim.addEventListener('click', () => toggle(false, true));
+      cleanup(signal, () => {
+        closeSearch();
+        closeLanguage();
+        toggle(false);
+      });
+      burger.addEventListener('click', () => toggle(!side.classList.contains('open')), { signal });
+      side.querySelector('.side-close')?.addEventListener('click', () => toggle(false, true), { signal });
+      scrim.addEventListener('click', () => toggle(false, true), { signal });
       searchButtons.forEach((button) => button.addEventListener('click', () => {
         const open = searchPanel.hidden;
         closeLanguage();
@@ -321,19 +347,19 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           searchButtons.forEach((item) => item.setAttribute('aria-expanded', 'true'));
           searchPanel.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true });
         } else closeSearch(true);
-      }));
+      }, { signal }));
       languageButton.addEventListener('click', () => {
         const open = languageMenu.hidden;
         closeSearch();
         languageMenu.hidden = !open;
         languageButton.setAttribute('aria-expanded', String(open));
         if (open) languageMenu.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
-      });
+      }, { signal });
       document.addEventListener('pointerdown', (e) => {
         const target = e.target as Node;
         if (!searchPanel.contains(target) && !searchButtons.some((button) => button.contains(target))) closeSearch();
         if (!languageMenu.contains(target) && !languageButton.contains(target)) closeLanguage();
-      });
+      }, { signal });
       document.addEventListener('keydown', (e) => {
         if (!side.classList.contains('open')) return;
         if (e.key === '/') { e.preventDefault(); e.stopPropagation(); }
@@ -347,13 +373,14 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           e.preventDefault();
           first?.focus({ preventScroll: true });
         }
-      }, true);
+      }, { capture: true, signal });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           if (side.classList.contains('open')) toggle(false, true);
           else if (!searchPanel.hidden) closeSearch(true);
           else closeLanguage(true);
         }
+      }, { signal });
       });
     </script>
   </body>

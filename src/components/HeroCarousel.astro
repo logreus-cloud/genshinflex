@@ -48,7 +48,12 @@ const { slides } = Astro.props;
   </section>
 )}
 <script>
-  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+  import { onPage, cleanup } from '../scripts/router';
+
+  onPage((signal) => {
+    const roots = document.querySelectorAll<HTMLElement>('[data-carousel]');
+    if (!roots.length) return;
+    roots.forEach((root) => {
     const slides = [...root.querySelectorAll<HTMLElement>('.slide')];
     const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
     if (slides.length < 2) return;
@@ -62,6 +67,7 @@ const { slides } = Astro.props;
     let pointerId: number | undefined;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const isPaused = () => document.hidden || root.matches(':focus-visible') || Boolean(root.querySelector(':focus-visible'));
+    const focusFrames = new Set<number>();
     const measureHeight = () => {
       root.style.height = `${root.offsetHeight}px`;
       const mobile = window.matchMedia('(max-width: 700px)').matches;
@@ -180,15 +186,26 @@ const { slides } = Astro.props;
     root.addEventListener('pointercancel', (e) => {
       if (e.pointerId === pointerId) pointerId = undefined;
     });
-    root.addEventListener('focusin', () => requestAnimationFrame(updatePause));
-    root.addEventListener('focusout', () => requestAnimationFrame(updatePause));
-    document.addEventListener('visibilitychange', updatePause);
-    motion.addEventListener('change', resetProgress);
+    const schedulePause = () => {
+      const frame = requestAnimationFrame(() => { focusFrames.delete(frame); updatePause(); });
+      focusFrames.add(frame);
+    };
+    root.addEventListener('focusin', schedulePause);
+    root.addEventListener('focusout', schedulePause);
+    document.addEventListener('visibilitychange', updatePause, { signal });
+    motion.addEventListener('change', resetProgress, { signal });
     measureHeight();
-    document.fonts?.ready.then(scheduleMeasure);
-    window.addEventListener('resize', scheduleMeasure);
+    document.fonts?.ready.then(() => { if (!signal.aborted) scheduleMeasure(); });
+    window.addEventListener('resize', scheduleMeasure, { signal });
     root.classList.add('ready');
     resetProgress();
+    cleanup(signal, () => {
+      if (timer !== undefined) clearTimeout(timer);
+      if (resizeFrame !== undefined) cancelAnimationFrame(resizeFrame);
+      for (const frame of focusFrames) cancelAnimationFrame(frame);
+      finishTransition?.();
+    });
+    });
   });
 </script>
 <style>

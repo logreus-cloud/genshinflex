@@ -76,5 +76,6 @@ function tick() {
   }
 }
 tick();
+document.addEventListener('astro:page-load', tick);
 setInterval(tick, 30_000);
 document.addEventListener('gf:region', tick);

@@ -43,7 +43,12 @@ const { target, placeholder, groups, rarities = [5, 4], extra, choices } = Astro
 
 <script>
   import { t } from '../scripts/search';
-  for (const form of document.querySelectorAll<HTMLFormElement>('[data-filter]')) {
+  import { onPage, cleanup } from '../scripts/router';
+
+  onPage((signal) => {
+    const forms = document.querySelectorAll<HTMLFormElement>('[data-filter]');
+    if (!forms.length) return;
+    for (const form of forms) {
     const items = [...document.querySelectorAll<HTMLElement>(`${form.dataset.filter} > [data-name]`)];
     const buttons = [...form.querySelectorAll<HTMLButtonElement>('button[data-key]')];
     const input = form.querySelector('input')!;
@@ -66,12 +71,15 @@ const { target, placeholder, groups, rarities = [5, 4], extra, choices } = Astro
     for (const b of buttons) b.addEventListener('click', () => { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); apply(); });
     input.addEventListener('input', apply);
     form.addEventListener('submit', (e) => e.preventDefault());
-    form.addEventListener('reset', () => { buttons.forEach((b) => b.setAttribute('aria-pressed', 'false')); setTimeout(apply); });
+    let resetTimer: number | undefined;
+    form.addEventListener('reset', () => { buttons.forEach((b) => b.setAttribute('aria-pressed', 'false')); resetTimer = window.setTimeout(apply); });
+    cleanup(signal, () => { if (resetTimer !== undefined) clearTimeout(resetTimer); });
 
     const params = new URLSearchParams(location.search);
     for (const b of buttons) if (params.getAll(b.dataset.key!).includes(b.dataset.value!)) b.setAttribute('aria-pressed', 'true');
     apply();
-  }
+    }
+  });
 </script>
 
 <style>

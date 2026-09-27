@@ -49,19 +49,25 @@ const { t } = useData(Astro.currentLocale);
     var side = document.getElementById('side');
     var previousOverflow = document.documentElement.style.overflow;
     var entering = false;
+    var timer;
     document.body.append(gate);
     gate.hidden = false;
     document.documentElement.style.overflow = 'hidden';
     light.focus({ preventScroll: true });
     var stopParallax = window.gfParallax(gate.querySelector('.parallax'), 24, 16);
 
-    function finish() {
+    function cleanupGate() {
+      clearTimeout(timer);
+      try { sessionStorage.setItem('gf:entered', '1'); } catch (e) {}
+      document.removeEventListener('astro:before-swap', cleanupGate);
       document.removeEventListener('keydown', onKeydown, true);
       document.removeEventListener('focusin', keepFocus, true);
       stopParallax();
       gate.remove();
       document.documentElement.style.overflow = previousOverflow;
-      try { sessionStorage.setItem('gf:entered', '1'); } catch (e) {}
+    }
+    function finish() {
+      cleanupGate();
       var content = document.getElementById('content');
       if (side && side.classList.contains('open')) return; // меню открыли во время вспышки — фокус остаётся в нём
       if (content) {
@@ -77,12 +83,12 @@ const { t } = useData(Astro.currentLocale);
       gate.style.setProperty('--flash-y', rect.top + rect.height / 2 + 'px');
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
         gate.classList.add('fade');
-        setTimeout(finish, 300);
+        timer = setTimeout(finish, 300);
       } else {
         gate.classList.add('entering');
-        setTimeout(function () {
+        timer = setTimeout(function () {
           gate.classList.add('fade');
-          setTimeout(finish, 500);
+          timer = setTimeout(finish, 500);
         }, 700);
       }
     }
@@ -117,6 +123,7 @@ const { t } = useData(Astro.currentLocale);
     hint.addEventListener('click', enter);
     document.addEventListener('keydown', onKeydown, true);
     document.addEventListener('focusin', keepFocus, true);
+    document.addEventListener('astro:before-swap', cleanupGate, { once: true });
   })();
 </script>
 <style>
