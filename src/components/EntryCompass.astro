@@ -1,11 +1,11 @@
 ---
-// Экран входа «Компас Весны»: зацикленный фрагмент внутриигрового экрана, войти — нажать на компас на посохе
+// Экран входа «Палочка Весны»: оживлённый арт (8 с, бесшовный цикл), войти — нажать на навершие палочки
 import { useData } from '../lib/data';
 const { t } = useData(Astro.currentLocale);
-// Траектория компаса в видео: [время, x %, y %] — компас «плавает» вместе с Весной, кнопка следует за ним
-const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.45],[1.2,27.34,55.53],[1.5,26.56,54.84],[1.8,26.09,54.38],[2.1,25.62,54.15],[2.4,25.16,53.92],[2.7,24.53,53.46],[3,23.91,53.23],[3.3,23.44,52.76],[3.6,22.97,52.53],[3.9,22.5,51.84],[4.2,21.88,51.61],[4.5,21.41,51.38],[4.8,20.94,50.92],[5.1,20.47,50.69],[5.4,20,50.23],[5.7,19.53,50],[6,19.22,49.77],[6.3,19.69,50],[6.6,20.16,50.46],[6.9,20.63,51.15],[7.2,21.09,51.38],[7.5,21.56,51.61],[7.8,22.03,51.61],[8.1,22.5,52.3],[8.4,22.97,52.3],[8.7,23.44,52.76],[9,23.91,53],[9.3,24.53,53.46],[9.6,25,53.92],[9.9,25.47,54.15],[10.2,26.09,54.61],[10.5,26.88,55.07],[10.8,27.34,55.76],[11.1,27.81,56.45],[11.4,28.59,57.83],[11.7,29.38,58.53],[11.9,29.69,58.76]];
-// Остальные бабочки в кадре: тоже ведут на сайт (size — диаметр кнопки в долях высоты сцены)
-const butterflies: Record<string, { size: number; track: number[][] }> = {"red":{"size":0.13,"track":[[0,8.59,28.8],[0.3,8.59,28.57],[0.6,8.59,27.19],[0.9,8.59,26.5],[1.2,8.91,26.27],[1.5,9.06,26.27],[1.8,9.06,26.04],[2.1,9.22,25.81],[2.4,9.38,25.12],[2.7,9.53,24.88],[3,9.53,24.88],[3.3,9.84,24.65],[3.6,9.84,24.19],[3.9,10.16,23.5],[4.2,10.31,23.5],[4.5,10.47,23.27],[4.8,10.78,23.04],[5.1,10.94,22.58],[5.4,11.09,22.12],[5.7,11.09,22.12],[6,11.41,21.89],[6.3,11.25,22.12],[6.6,11.09,22.12],[6.9,10.94,22.81],[7.2,10.78,23.27],[7.5,10.63,23.27],[7.8,10.31,23.5],[8.1,10.16,23.96],[8.4,10,24.42],[8.7,9.84,24.65],[9,9.69,24.65],[9.3,9.69,24.88],[9.6,9.53,25.58],[9.9,9.38,25.81],[10.2,9.22,26.04],[10.5,9.06,26.27],[10.8,8.91,26.5],[11.1,8.91,26.73],[11.4,8.91,27.88],[11.7,8.91,28.57],[11.9,8.59,28.8]]},"blue":{"size":0.1,"track":[[0,32.03,7.83],[0.3,32.5,7.83],[0.6,32.81,6.91],[0.9,33.13,6.91],[1.2,33.59,7.6],[1.5,33.91,7.6],[1.8,34.38,7.6],[2.1,34.69,7.6],[2.4,35.16,7.6],[2.7,35.47,7.37],[3,35.78,7.37],[3.3,36.25,7.37],[3.6,36.56,7.14],[3.9,37.03,7.14],[4.2,37.34,6.91],[4.5,37.81,6.91],[4.8,38.13,6.91],[5.1,38.44,6.68],[5.4,38.91,6.68],[5.7,39.38,6.68],[6,39.69,6.68],[6.3,39.22,6.68],[6.6,38.75,6.68],[6.9,38.28,6.68],[7.2,37.81,6.68],[7.5,37.34,6.68],[7.8,37.03,6.68],[8.1,36.72,6.91],[8.4,36.41,7.14],[8.7,35.94,7.14],[9,35.47,7.14],[9.3,35.31,7.37],[9.6,34.84,7.37],[9.9,34.53,7.6],[10.2,34.06,7.6],[10.5,33.75,7.6],[10.8,33.28,7.14],[11.1,32.97,7.14],[11.4,32.5,7.14],[11.7,32.19,7.6],[11.9,32.03,7.83]]},"teal":{"size":0.16,"track":[[0,91.41,65.67],[0.3,90.78,65.9],[0.6,90.16,66.59],[0.9,89.53,66.13],[1.2,89.06,65.44],[1.5,88.28,64.98],[1.8,87.66,64.98],[2.1,87.03,64.98],[2.4,86.25,64.98],[2.7,85.63,65.21],[3,85,65.21],[3.3,84.22,65.44],[3.6,83.59,65.44],[3.9,82.81,65.67],[4.2,82.19,65.67],[4.5,81.41,65.9],[4.8,80.63,65.9],[5.1,80,65.9],[5.4,79.22,66.13],[5.7,78.44,66.13],[6,77.97,66.13],[6.3,78.75,66.13],[6.6,79.38,66.13],[6.9,80.16,66.13],[7.2,80.94,66.13],[7.5,81.56,65.9],[7.8,82.34,65.67],[8.1,82.97,65.67],[8.4,83.75,65.67],[8.7,84.38,65.67],[9,85.16,65.44],[9.3,85.78,65.21],[9.6,86.56,65.21],[9.9,87.19,64.98],[10.2,87.97,64.98],[10.5,88.59,64.98],[10.8,89.06,65.67],[11.1,89.69,66.13],[11.4,90.31,66.36],[11.7,91.09,65.9],[11.9,91.41,65.67]]}};
+// Траектория навершия палочки в видео: [время, x %, y %] — Весна парит, кнопка следует за навершием
+const track = [[0.0,25.25,53.13],[0.25,25.24,53.33],[0.5,25.24,53.53],[0.75,25.24,53.7],[1.0,25.24,53.84],[1.25,25.24,53.95],[1.5,25.24,54.02],[1.75,25.24,54.05],[2.0,25.24,54.04],[2.25,25.24,53.98],[2.5,25.25,53.89],[2.75,25.25,53.76],[3.0,25.26,53.61],[3.25,25.26,53.42],[3.5,25.27,53.22],[3.75,25.27,53.01],[4.0,25.27,52.8],[4.25,25.28,52.59],[4.5,25.28,52.4],[4.75,25.28,52.23],[5.0,25.29,52.09],[5.25,25.29,51.98],[5.5,25.29,51.91],[5.75,25.28,51.88],[6.0,25.28,51.89],[6.25,25.28,51.94],[6.5,25.27,52.03],[6.75,25.27,52.16],[7.0,25.27,52.32],[7.25,25.26,52.5],[7.5,25.26,52.7],[7.75,25.25,52.91],[8.0,25.25,53.13]];
+// Дополнительные цели (бабочки) — в этом кадре их нет
+const butterflies: Record<string, { size: number; track: number[][] }> = {};
 ---
 <div id="gf-entry" data-track={JSON.stringify(track)} data-butterflies={JSON.stringify(butterflies)} role="dialog" aria-modal="true" aria-label={t('Вход на сайт')} hidden>
   <div class="panel">
@@ -22,11 +22,10 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
     <div class="scene">
       <!-- Источники проставляет скрипт при показе: если вход уже пройден, видео не качается -->
       <video muted loop playsinline preload="none" disablepictureinpicture aria-hidden="true"
-        data-poster="/img/season/vesna-compass-poster.webp" width="1280" height="868">
-        <source data-src="/img/season/vesna-compass.webm" type="video/webm" />
-        <source data-src="/img/season/vesna-compass.mp4" type="video/mp4" />
+        data-poster="/img/season/vesna-wand-poster.webp" width="1920" height="1080">
+        <source data-src="/img/season/vesna-wand.mp4" type="video/mp4" />
       </video>
-      <!-- Кнопка стоит на компасе из видео и движется вместе с ним -->
+      <!-- Кнопка стоит на навершии палочки из видео и движется вместе с ним -->
       <button class="light" type="button" aria-label={t('Войти на сайт')}>
         <span class="glow" aria-hidden="true"></span>
         <span class="bubble" aria-hidden="true"></span>
@@ -41,7 +40,7 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
       ))}
     </div>
   </div>
-  <button class="hint" type="button">{t('Коснитесь пузырька')} <span aria-hidden="true">◇</span></button>
+  <button class="hint" type="button">{t('Коснитесь палочки Весны, чтобы войти')} <span aria-hidden="true">◇</span></button>
   <small class="caption">{t('Версия 7.1 · Снежная')}</small>
   <div class="flash" aria-hidden="true"></div>
   <div class="burst" aria-hidden="true">
@@ -169,7 +168,7 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
       }
     }
     function onKeydown(event) {
-      // Фокус на компасе ставится сразу; клавиатурный вид включается после нажатия клавиши
+      // Фокус на палочке ставится сразу; клавиатурный вид включается после нажатия клавиши
       gate.classList.add('kbd');
       if (side && side.classList.contains('open')) return;
       if (event.key === 'Escape') {
@@ -201,22 +200,22 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
 <style>
   /* Фокус содержимого не обводим */
   :global(#content[tabindex="-1"]:focus) { outline: none; }
-  #gf-entry { position: fixed; inset: 0; z-index: 54; overflow: hidden; background: #bfe9dc; color: #fff; transition: opacity .5s ease; }
+  #gf-entry { position: fixed; inset: 0; z-index: 54; overflow: hidden; background: #5aa5e6; color: #fff; transition: opacity .5s ease; }
   #gf-entry[hidden] { display: none; }
   #gf-entry.fade { opacity: 0; }
   /* Запас масштаба под параллакс, чтобы не открывались края */
   .parallax { position: absolute; inset: 0; transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.05); }
-  /* Сцена покрывает экран с пропорциями видео; на узких экранах сдвигается так, чтобы компас (≈19–30%) был в кадре */
+  /* Сцена покрывает экран с пропорциями видео; на узких экранах сдвигается так, чтобы палочка (≈25%) была в кадре */
   .scene {
-    --scene-w: max(100vw, calc(100vh * 1280 / 868));
-    --scene-h: max(100vh, calc(100vw * 868 / 1280));
+    --scene-w: max(100vw, calc(100vh * 1920 / 1080));
+    --scene-h: max(100vh, calc(100vw * 1080 / 1920));
     position: absolute; top: 50%; width: var(--scene-w); height: var(--scene-h); translate: 0 -50%;
     left: clamp(calc(100vw - var(--scene-w)), calc(45vw - var(--scene-w) * .25), 0px);
   }
   .scene video { display: block; width: 100%; height: 100%; object-fit: fill; }
   .light {
-    position: absolute; top: 58.76%; left: 29.69%; z-index: 2;
-    width: max(64px, calc(var(--scene-h) * .2)); aspect-ratio: 1; translate: -50% -50%;
+    position: absolute; top: 53.13%; left: 25.25%; z-index: 2;
+    width: max(64px, calc(var(--scene-h) * .19)); aspect-ratio: 1; translate: -50% -50%;
     border: 0; border-radius: 50%; padding: 0; background: none; cursor: pointer;
   }
   /* Остальные бабочки: прозрачная зона нажатия, при наведении — мягкий свет */
@@ -229,7 +228,7 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
     .bfly:hover { background: radial-gradient(circle, rgb(255 250 220 / .35), transparent 70%); box-shadow: 0 0 0 1.5px rgb(255 240 190 / .7), 0 0 22px rgb(150 240 215 / .6); }
   }
   .light span { position: absolute; border-radius: 50%; pointer-events: none; }
-  /* Мягкий свет вокруг компаса — сам компас в видео */
+  /* Мягкий свет вокруг навершия — сама палочка в видео */
   .glow { inset: -12%; background: radial-gradient(circle, transparent 40%, rgb(255 236 170 / .35) 58%, rgb(150 240 215 / .22) 68%, transparent 78%); animation: entry-glow 1.8s ease-in-out infinite alternate; transition: filter var(--dur) var(--ease); }
   .bubble { inset: -4%; z-index: 1; border: 1.5px solid rgb(225 255 245 / .75); background: radial-gradient(circle at 50% 55%, rgb(143 240 215 / .06) 0, rgb(143 240 215 / .04) 55%, rgb(190 255 235 / .24) 92%, rgb(255 255 255 / .4) 100%); box-shadow: inset 0 0 12px rgb(170 245 225 / .45), inset -4px -6px 14px rgb(255 220 185 / .18), 0 0 18px rgb(143 240 215 / .35); backdrop-filter: saturate(1.2); opacity: 0; transform: scale(.7); transition: opacity .45s cubic-bezier(.3, 1.6, .5, 1), transform .45s cubic-bezier(.3, 1.6, .5, 1); }
   .bubble::before, .bubble::after { content: ''; position: absolute; border-radius: 50%; background: rgb(255 255 255 / .75); filter: blur(2px); }
@@ -237,7 +236,7 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
   .bubble::after { right: 16%; bottom: 15%; width: 16%; height: 9%; rotate: -30deg; opacity: .35; }
   .ring { inset: 4%; border: 1.5px solid rgb(255 240 190 / .8); box-shadow: 0 0 14px rgb(150 240 215 / .7); opacity: .5; animation: entry-ring 2.6s ease-out infinite; transition: opacity .3s; }
   .glints { inset: -25%; z-index: 2; mix-blend-mode: screen; background: conic-gradient(transparent 0 11%, rgb(255 250 220 / .55) 12%, transparent 13% 36%, rgb(255 250 220 / .55) 37%, transparent 38% 61%, rgb(255 250 220 / .55) 62%, transparent 63% 86%, rgb(255 250 220 / .55) 87%, transparent 88%); opacity: 0; transition: opacity var(--dur) var(--ease); }
-  /* Пульсирующее кольцо по контуру компаса; оно же «вибрирует», зазывая нажать */
+  /* Пульсирующее кольцо вокруг навершия; оно же «вибрирует», зазывая нажать */
   .shake { inset: 0; z-index: 3; border: 2.5px solid rgb(255 214 110 / .95); box-shadow: 0 0 0 1.5px rgb(30 110 100 / .45), 0 0 14px rgb(255 205 90 / .8), 0 0 30px rgb(60 190 170 / .6), inset 0 0 0 1.5px rgb(30 110 100 / .35), inset 0 0 16px rgb(150 240 215 / .5); animation: entry-pulse 1.8s ease-in-out infinite alternate, entry-shake 3.2s 1.2s infinite; transition: transform .35s var(--ease); }
   .kbd .light:focus-visible .bubble { opacity: 1; transform: scale(1); animation: entry-bubble 2.4s .45s ease-in-out infinite; }
   .kbd .light:focus-visible .ring { animation: none; opacity: 0; }
@@ -256,13 +255,13 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
   .kbd .light:focus-visible { outline: 2px solid #e6fff4; outline-offset: 6px; }
   .panel { position: absolute; top: 1.2rem; left: 2rem; z-index: 3; display: flex; align-items: center; gap: .7rem; pointer-events: none; }
   .panel .menu { pointer-events: auto; }
-  .menu { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 10px; background: rgb(20 60 60 / .35); color: #fff; font: 2rem/1 var(--font); cursor: pointer; }
-  .brand { display: flex; align-items: center; gap: .5rem; font: 600 1.15rem var(--font-display); white-space: nowrap; text-shadow: 0 2px 10px #164a46; }
+  .menu { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 10px; background: rgb(15 50 100 / .35); color: #fff; font: 2rem/1 var(--font); cursor: pointer; }
+  .brand { display: flex; align-items: center; gap: .5rem; font: 600 1.15rem var(--font-display); white-space: nowrap; text-shadow: 0 2px 10px #0f3564; }
   .brand svg, .brand b { color: #f3d38a; }
   .brand b { font-weight: 600; }
-  .hint { position: absolute; bottom: 2.4rem; left: 50%; z-index: 3; translate: -50% 0; border: 0; padding: .5rem; background: none; color: #fff; font: 500 .9rem var(--font-display); white-space: nowrap; text-shadow: 0 2px 12px #164a46, 0 0 4px #164a46; cursor: pointer; opacity: 0; animation: entry-hint .6s 1.2s ease both; }
+  .hint { position: absolute; bottom: 2.4rem; left: 50%; z-index: 3; translate: -50% 0; border: 0; padding: .5rem; background: none; color: #fff; font: 500 .9rem var(--font-display); white-space: nowrap; text-shadow: 0 2px 12px #0f3564, 0 0 4px #0f3564; cursor: pointer; opacity: 0; animation: entry-hint .6s 1.2s ease both; }
   .hint span { display: block; margin-top: .3rem; font-size: 1.1rem; animation: entry-chevron 1.4s ease-in-out infinite; }
-  .caption { position: absolute; bottom: 1.4rem; left: 2rem; z-index: 3; color: rgb(255 255 255 / .85); text-shadow: 0 2px 10px #164a46; }
+  .caption { position: absolute; bottom: 1.4rem; left: 2rem; z-index: 3; color: rgb(255 255 255 / .85); text-shadow: 0 2px 10px #0f3564; }
   .menu:focus-visible, .hint:focus-visible { outline: 2px solid #fff6d8; outline-offset: 4px; }
   .flash { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at var(--flash-x) var(--flash-y), #ffffff 0, #e9fff6 40%, #bff3e6 70%); }
   .burst { position: absolute; top: var(--flash-y); left: var(--flash-x); z-index: 5; width: 60vmin; aspect-ratio: 1; translate: -50% -50%; pointer-events: none; opacity: 0; }
@@ -293,6 +292,8 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {"red":
     /* На узком экране оставляем только бургер */
     .panel .brand { display: none; }
     .caption { display: none; }
+    /* Подсказка длинная — переносим, а не обрезаем */
+    .hint { width: calc(100% - 2rem); white-space: normal; text-align: center; }
   }
   @media (prefers-reduced-motion: reduce) {
     @media (hover: hover) and (pointer: fine) {
