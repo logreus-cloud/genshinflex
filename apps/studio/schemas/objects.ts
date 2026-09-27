@@ -4,6 +4,30 @@ const required = (Rule: any) => Rule.required();
 const elements = ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo']
   .map((value) => ({ title: value, value }));
 
+// Стандартный тип block, а не свой именованный: иначе конвертер HTML → Portable Text теряет ссылки (markDefs)
+export const bodyBlock = defineArrayMember({
+  title: 'Блок текста', type: 'block',
+  styles: [
+    { title: 'Обычный', value: 'normal' },
+    { title: 'Заголовок 2', value: 'h2' },
+    { title: 'Заголовок 3', value: 'h3' },
+    { title: 'Заголовок 4', value: 'h4' },
+    { title: 'Цитата', value: 'blockquote' },
+  ],
+  lists: [{ title: 'Список', value: 'bullet' }, { title: 'Нумерованный список', value: 'number' }],
+  marks: {
+    decorators: [
+      { title: 'Жирный', value: 'strong' },
+      { title: 'Курсив', value: 'em' },
+      { title: 'Код', value: 'code' },
+    ],
+    annotations: [{
+      name: 'link', title: 'Ссылка', type: 'object',
+      fields: [defineField({ name: 'href', title: 'Адрес', type: 'string', validation: required })],
+    }],
+  },
+});
+
 export const localeString = defineType({
   name: 'localeString', title: 'Текст по языкам', type: 'object',
   fields: [

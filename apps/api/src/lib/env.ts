@@ -9,7 +9,10 @@ export interface Env {
   SANITY_DATASET: string;
   SANITY_WRITE_TOKEN: string;
   SANITY_WEBHOOK_SECRET: string;
-  CF_DEPLOY_HOOK_URL: string;
+  GITHUB_REPO: string;
+  GITHUB_DISPATCH_TOKEN: string;
+  DEPLOY_REF: string;
+  DEPLOY_BRANCH: string;
   DISCORD_WEBHOOK_TEAM?: string;
   DISCORD_WEBHOOK_BUGS?: string;
   DISCORD_WEBHOOK_IDEAS?: string;

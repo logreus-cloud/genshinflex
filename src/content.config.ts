@@ -1,12 +1,15 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { sanityLoader } from './lib/sanity-loader';
+
+const fromSanity = process.env.CONTENT_SOURCE === 'sanity';
 
 const source = z.object({ title: z.string(), url: z.url() });
 
 // Билд персонажа: слаги ссылаются на src/data/generated/*.json
 const builds = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/builds' }),
+  loader: fromSanity ? sanityLoader('builds') : glob({ pattern: '**/*.md', base: './src/content/builds' }),
   schema: z.object({
     character: z.string(),
     role: z.string(),
@@ -32,7 +35,7 @@ const builds = defineCollection({
 
 // Ротация контента: Бездна, Театр воображариума, Натиск
 const rotations = defineCollection({
-  loader: glob({ pattern: '**/*.json', base: './src/content/rotations' }),
+  loader: fromSanity ? sanityLoader('rotations') : glob({ pattern: '**/*.json', base: './src/content/rotations' }),
   schema: z.object({
     mode: z.enum(['abyss', 'theater', 'onslaught']),
     cycle: z.string(),
@@ -81,7 +84,7 @@ const rotations = defineCollection({
 // Баннеры: время начала/конца — по времени сервера («2026-10-13T18:00»), таймеры пересчитываются под регион
 const serverTime = z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/);
 const banners = defineCollection({
-  loader: glob({ pattern: '**/*.json', base: './src/content/banners' }),
+  loader: fromSanity ? sanityLoader('banners') : glob({ pattern: '**/*.json', base: './src/content/banners' }),
   schema: z.object({
     version: z.string(),
     phase: z.number().int(),
@@ -96,7 +99,7 @@ const banners = defineCollection({
 
 // Переводы текстов разборов: src/content/builds-i18n/<язык>/<слаг>.md (id вида «en/vesna»)
 const buildsI18n = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/builds-i18n' }),
+  loader: fromSanity ? sanityLoader('buildsI18n') : glob({ pattern: '**/*.md', base: './src/content/builds-i18n' }),
   schema: z.object({}),
 });
 
@@ -106,20 +109,20 @@ const guideTeam = z.object({ name: z.string().optional(), members: z.array(z.str
 
 // Гайды на оружие: src/content/weapon-guides/<язык>/<слаг>.md
 const weaponGuides = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/weapon-guides' }),
+  loader: fromSanity ? sanityLoader('weaponGuides') : glob({ pattern: '**/*.md', base: './src/content/weapon-guides' }),
   schema: z.object({ updated: z.coerce.date(), authors: z.array(z.string()).default([]), external }),
 });
 
 // Гайды на эндгейм: src/content/endgame-guides/<язык>/<abyss-12 | theater | onslaught>.md.
 // cycle — дата начала цикла: гайд показывается, только пока идёт тот же цикл
 const endgameGuides = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/endgame-guides' }),
+  loader: fromSanity ? sanityLoader('endgameGuides') : glob({ pattern: '**/*.md', base: './src/content/endgame-guides' }),
   schema: z.object({ cycle: z.string(), updated: z.coerce.date(), teams: z.array(guideTeam).default([]), authors: z.array(z.string()).default([]), external }),
 });
 
 // Общий anchor сохраняется во всех переводах и в постоянных ссылках из баннера.
 const news = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/news' }),
+  loader: fromSanity ? sanityLoader('news') : glob({ pattern: '**/*.md', base: './src/content/news' }),
   schema: z.object({
     lang: z.enum(['ru', 'en', 'es']),
     anchor: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),

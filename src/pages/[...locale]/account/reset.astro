@@ -1,0 +1,85 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+const labels = {
+  general: t('Не удалось изменить пароль. Попробуйте ещё раз.'),
+  invalid_credentials: t('Неверный email или пароль.'),
+  email_not_confirmed: t('Сначала подтвердите email.'),
+  user_already_exists: t('Аккаунт уже существует.'),
+  weak_password: t('Пароль слишком слабый.'),
+  over_email_send_rate_limit: t('Слишком много попыток. Попробуйте позже.'),
+  captcha_failed: t('Проверка капчи не пройдена.'),
+  same_password: t('Новый пароль совпадает со старым.'),
+};
+---
+<Layout title={t('Сменить пароль')} noindex>
+  <div class="auth-page" id="reset" data-base={base} data-labels={JSON.stringify(labels)}
+    data-expired={t('Ссылка устарела.')} data-mismatch={t('Пароли не совпадают.')}
+    data-done={t('Пароль изменён.')} data-loading={t('Проверяем ссылку…')}>
+    <h1>{t('Сменить пароль')}</h1>
+    <div class="panel auth-panel">
+      <p class="status small" aria-live="polite">{t('Проверяем ссылку…')}</p>
+      <form class="auth-form" hidden>
+        <label>{t('Новый пароль')}<input class="input" name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <label>{t('Повторите пароль')}<input class="input" name="confirm" type="password" autocomplete="new-password" required /></label>
+        <button class="btn primary" type="submit">{t('Сохранить пароль')}</button>
+      </form>
+      <a data-page="forgot" href={`${base}/account/forgot/`} hidden>{t('Запросить новую ссылку')}</a>
+      <a data-page="account" href={`${base}/account/`} hidden>{t('Перейти в аккаунт')}</a>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { authUrl, errorText, getSupabase, labelsOf, onPage } from '../../../scripts/auth';
+  onPage('#reset', (root) => {
+    const base = root.dataset.base || '';
+    const form = root.querySelector('form')!;
+    const status = root.querySelector<HTMLElement>('.status')!;
+    const forgot = root.querySelector<HTMLAnchorElement>('[data-page="forgot"]')!;
+    const account = root.querySelector<HTMLAnchorElement>('[data-page="account"]')!;
+    forgot.href = authUrl(base, 'forgot');
+    account.href = authUrl(base, '');
+    const auth = getSupabase().auth;
+    let active = true;
+    const showSession = async () => {
+      const { data } = await auth.getSession();
+      if (!root.isConnected || !active) return;
+      form.hidden = !data.session;
+      forgot.hidden = !!data.session;
+      status.textContent = data.session ? '' : root.dataset.expired || '';
+      status.className = data.session ? 'status small' : 'status small bad';
+    };
+    const { data: listener } = auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') void showSession();
+    });
+    void showSession();
+    document.addEventListener('astro:before-swap', () => { active = false; listener.subscription.unsubscribe(); }, { once: true });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+      const confirm = (form.elements.namedItem('confirm') as HTMLInputElement).value;
+      if (password !== confirm) {
+        status.textContent = root.dataset.mismatch || '';
+        status.className = 'status small bad';
+        return;
+      }
+      const button = form.querySelector('button')!;
+      button.disabled = true;
+      try {
+        const { error } = await auth.updateUser({ password });
+        if (error) throw error;
+        form.hidden = true;
+        account.hidden = false;
+        status.textContent = root.dataset.done || '';
+        status.className = 'status small ok';
+      } catch (error) {
+        status.textContent = errorText(error, labelsOf(root));
+        status.className = 'status small bad';
+      } finally { button.disabled = false; }
+    });
+  });
+</script>

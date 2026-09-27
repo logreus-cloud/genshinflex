@@ -11,6 +11,7 @@ export async function verifyTelegram(
   data: unknown,
   botToken: string,
   now = Date.now(),
+  maxAge = 86_400_000,
 ): Promise<{ id: string; username?: string } | null> {
   if (!botToken || !data || typeof data !== 'object' || Array.isArray(data)) return null;
   const fields = data as Record<string, unknown>;
@@ -18,7 +19,7 @@ export async function verifyTelegram(
 
   const authDate = Number(fields.auth_date);
   const age = now - authDate * 1000;
-  if (!Number.isSafeInteger(authDate) || age < -300_000 || age > 86_400_000) return null;
+  if (!Number.isSafeInteger(authDate) || age < -300_000 || age > maxAge) return null;
 
   const pairs: string[] = [];
   for (const [name, value] of Object.entries(fields)) {

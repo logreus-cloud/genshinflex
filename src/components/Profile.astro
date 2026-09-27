@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AccountStrip from './AccountStrip.astro';
 import { useData } from '../lib/data';
 import namecards from '../data/generated/namecards.json';
 
@@ -13,6 +14,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   <div class="profile-root profile-page">
     <div class="profile-bg" id="profile-bg" aria-hidden="true"></div>
     <canvas class="profile-effect" id="profile-effect" aria-hidden="true" hidden></canvas>
+    <AccountStrip />
     <section class="profile-card hero">
       <div class="banner" id="profile-banner">
         <img id="profile-cover" alt="" hidden />

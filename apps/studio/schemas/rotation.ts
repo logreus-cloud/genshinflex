@@ -7,6 +7,10 @@ export const rotation = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'slug', title: 'Слаг файла', type: 'slug',
+      options: { source: 'cycle' }, validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'mode', title: 'Режим', type: 'string', validation: (Rule) => Rule.required(),
       options: { list: [
         { title: 'Бездна', value: 'abyss' },
@@ -15,8 +19,8 @@ export const rotation = defineType({
       ] },
     }),
     defineField({ name: 'cycle', title: 'Цикл', type: 'string', validation: (Rule) => Rule.required() }),
-    defineField({ name: 'start', title: 'Начало', type: 'datetime', validation: (Rule) => Rule.required() }),
-    defineField({ name: 'end', title: 'Конец', type: 'datetime', validation: (Rule) => Rule.required() }),
+    defineField({ name: 'start', title: 'Начало', type: 'string', validation: (Rule) => Rule.required() }),
+    defineField({ name: 'end', title: 'Конец', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'draft', title: 'Черновик', type: 'boolean', initialValue: false }),
     defineField({ name: 'note', title: 'Примечание', type: 'localeString' }),
     defineField({ name: 'tags', title: 'Метки карточки', type: 'array', of: [{ type: 'localeString' }], initialValue: [] }),

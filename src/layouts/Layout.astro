@@ -47,7 +47,7 @@ const footerCols: [string, [string, string][]][] = [
   ['Эндгейм', [['Календарь', '/calendar/'], ['Витая бездна', '/abyss/'], ['Театр воображариума', '/theater/'], ['Натиск', '/onslaught/'], ['Баннеры', '/banners/'], ['История баннеров', '/banners/#history'], ['Рейтинг', '/rating/']]],
   ['Инструменты', [['Симулятор команды', '/tools/simulator/'], ['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'], ['Калькулятор прокачки', '/tools/calculator/'],
     ['Карта Тейвата', `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`]]],
-  ['Сайт', [['Новости сайта', '/news/'], ['Telegram-канал', social.telegram], ...(social.discord ? [['Discord-сервер', social.discord] as [string, string]] : []), ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Sitemap', '/sitemap.xml']]],
+  ['Сайт', [['Новости сайта', '/news/'], ['Telegram-канал', social.telegram], ...(social.discord ? [['Discord-сервер', social.discord] as [string, string]] : []), ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Политика конфиденциальности', '/privacy/'], ['Sitemap', '/sitemap.xml']]],
 ];
 const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 ---
@@ -237,8 +237,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
-          <a class="icon-btn profile" href={`${base}/profile/`} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
+          <a class="icon-btn profile account-link" id="profile-link" href={`${base}/profile/`} data-profile={t('Мой профиль')} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" /><path d="M4 17c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2" /></svg>
+            <span class="account-letter" hidden></span>
           </a>
           <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
@@ -461,6 +462,9 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .icon-btn { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; flex: none; text-decoration: none; }
   .icon-btn:hover { background: var(--surface-2); }
   .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+  .account-link { position: relative; color: var(--muted); text-decoration: none; }
+  .account-link:hover { color: var(--accent); }
+  .account-letter:not([hidden]) { position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .65rem; font-weight: 700; }
   .language { position: relative; }
   .langs { position: absolute; top: calc(100% + 12px); right: 0; display: grid; min-width: 90px; padding: .3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 32px rgb(0 0 0 / .3); }
   .langs[hidden], .search-panel[hidden] { display: none; }
@@ -518,6 +522,25 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .skip:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; clip: auto; padding: .5rem 1rem; background: var(--accent); color: var(--accent-ink); z-index: 100; border-radius: var(--radius); }
   .scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .5); z-index: 55; opacity: 1; visibility: visible; transition: opacity .4s var(--ease), visibility .4s; }
   .scrim[hidden] { display: block; opacity: 0; visibility: hidden; }
+
+  :global(.auth-page) { max-width: 620px; margin: 0 auto; min-width: 0; }
+  :global(.auth-page h1) { margin-bottom: .5rem; }
+  :global(.auth-page .lead) { color: var(--muted); }
+  :global(.auth-panel) { display: grid; gap: 1.1rem; min-width: 0; }
+  :global(.auth-form) { display: grid; gap: .9rem; min-width: 0; }
+  :global(.auth-form label) { display: grid; gap: .35rem; min-width: 0; font-size: .9rem; }
+  :global(.auth-form .input) { width: 100%; min-width: 0; }
+  :global(.auth-form .btn) { justify-content: center; }
+  :global(.auth-form .status), :global(.auth-success .status) { margin: 0; }
+  :global(.auth-page .status.bad) { color: var(--bad); }
+  :global(.auth-page .status.ok) { color: var(--good); }
+  :global(.auth-row) { display: flex; justify-content: flex-end; }
+  :global(.auth-bottom) { text-align: center; }
+  :global(.auth-check) { display: flex !important; align-items: flex-start; gap: .5rem; }
+  :global(.auth-check input) { margin-top: .2rem; accent-color: var(--accent); flex: none; }
+  :global(.auth-actions) { display: flex; gap: .6rem; flex-wrap: wrap; }
+  :global(.account-details) { overflow-wrap: anywhere; }
+  :global(.auth-page [hidden]) { display: none !important; }
 
   @media (max-width: 900px) {
     .top { padding: 0 16px; gap: .5rem; }

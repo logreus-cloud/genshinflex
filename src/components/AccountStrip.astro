@@ -1,0 +1,84 @@
+---
+import { useData } from '../lib/data';
+import { authUrl } from '../scripts/auth';
+
+const { base, t } = useData(Astro.currentLocale);
+const profileUrl = `${base}/profile/`;
+---
+<section class="panel account-strip" id="account-strip" data-telegram={t('Telegram')} hidden>
+  <h2>{t('Аккаунт')}</h2>
+  <div class="account-state" data-guest hidden>
+    <p>{t('Профиль хранится в этом браузере. Войдите, чтобы сохранить его в аккаунте — синхронизация между устройствами скоро.')}</p>
+    <div class="account-actions">
+      <a class="btn" href={authUrl(base, 'login', profileUrl)}>{t('Войти')}</a>
+      <a class="btn" href={authUrl(base, 'register', profileUrl)}>{t('Регистрация')}</a>
+    </div>
+  </div>
+  <div class="account-state" data-signed hidden>
+    <p>{t('Вы вошли как')} <strong data-name></strong></p>
+    <small data-email></small>
+    <a class="btn" href={`${base}/account/`}>{t('Настройки аккаунта')}</a>
+  </div>
+</section>
+
+<script>
+  import { onPage } from '../scripts/router';
+
+  onPage((signal) => {
+    const root = document.getElementById('account-strip');
+    if (!root) return;
+    const guest = root.querySelector<HTMLElement>('[data-guest]')!;
+    const signed = root.querySelector<HTMLElement>('[data-signed]')!;
+    const name = root.querySelector<HTMLElement>('[data-name]')!;
+    const email = root.querySelector<HTMLElement>('[data-email]')!;
+    let request = 0;
+    const show = (state: HTMLElement) => {
+      guest.hidden = state !== guest;
+      signed.hidden = state !== signed;
+      root.hidden = false;
+    };
+    const load = async () => {
+      const turn = ++request;
+      root.hidden = true;
+      let stored = false;
+      try { stored = !!localStorage.getItem('gf:auth'); } catch {}
+      if (!stored) { if (!signal.aborted) show(guest); return; }
+      try {
+        const { getSupabase } = await import('../scripts/auth');
+        const supabase = getSupabase();
+        const { data } = await supabase.auth.getSession();
+        if (signal.aborted || turn !== request) return;
+        if (!data.session) { show(guest); return; }
+        const user = data.session.user;
+        let nickname = '';
+        try {
+          const { data: profile, error } = await supabase.from('profiles')
+            .select('nickname').eq('id', user.id).maybeSingle();
+          if (!error) nickname = String(profile?.nickname || '');
+        } catch { /* При сбое запроса показываем email. */ }
+        if (signal.aborted || turn !== request) return;
+        name.textContent = nickname || user.email || '';
+        const synthetic = /^tg\d+@telegram\.genshinflex\.com$/i.test(user.email || '');
+        email.textContent = synthetic
+          ? `${root.dataset.telegram} @${user.user_metadata?.telegram_username || user.app_metadata?.telegram_id || ''}`
+          : user.email || '';
+        email.hidden = !email.textContent;
+        show(signed);
+      } catch { if (!signal.aborted && turn === request) show(guest); }
+    };
+    void load();
+    document.addEventListener('gf:auth', () => { void load(); }, { signal });
+  });
+</script>
+
+<style>
+  .account-strip { position: relative; z-index: 1; display: flex; align-items: center; flex-wrap: wrap; gap: .7rem 1.2rem; min-width: 0; }
+  .account-strip[hidden] { display: none; }
+  .account-strip h2 { margin: 0; font-size: 1rem; }
+  .account-state { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; min-width: 0; flex: 1; }
+  .account-state p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .account-state small { color: var(--muted); overflow-wrap: anywhere; }
+  .account-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-left: auto; }
+  .account-state > .btn { margin-left: auto; }
+  .account-strip [hidden] { display: none !important; }
+</style>

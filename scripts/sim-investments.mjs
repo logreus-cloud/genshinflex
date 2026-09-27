@@ -12,7 +12,10 @@
 //   --dry — только скачать команды и сохранить конфиги в .cache/sims/, ничего не симулируя.
 // Нужен .cache/gcsim.exe — скачайте gcsim_windows_amd64.exe из github.com/genshinsim/gcsim/releases и переименуйте.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import matter from 'gray-matter';
+import YAML from 'yaml';
+import { store } from './cms/store.mjs';
 
 const GCSIM = '.cache/gcsim.exe';
 const OUT = 'src/data/investments.json';
@@ -31,16 +34,18 @@ const key = (name) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
 const keysOf = (c) => (c.slug.startsWith('traveler-') ? ['aether', 'lumine'].map((p) => p + c.slug.slice(9)) : [key(c.nameEn)]);
 
 // Оружие из гайда: первое 4★ — «доступная база», первое 5★ — «лучшее 5★»
-function guideWeapons(slug) {
-  const md = readFileSync(`src/content/builds/${slug}.md`, 'utf8');
-  const list = [...md.matchAll(/^\s+- slug: ([a-z0-9-]+)/gm)].map((m) => weaponBy.get(m[1])).filter(Boolean);
+async function guideWeapons(slug) {
+  const md = (await store.readEntry('builds', slug)).text;
+  const data = matter(md, { engines: { yaml: (source) => YAML.parse(source) } }).data;
+  const list = (data.weapons ?? []).map((w) => weaponBy.get(w.slug)).filter(Boolean);
   return { four: list.find((w) => w.rarity === 4), five: list.find((w) => w.rarity === 5) };
 }
 
 // Команды из гайда — в ключах gcsim
-function guideTeams(slug) {
-  const md = readFileSync(`src/content/builds/${slug}.md`, 'utf8');
-  return [...md.matchAll(/members: \[([^\]]+)\]/g)].map((m) => m[1].split(',').map((x) => chars.find((c) => c.slug === x.trim())).filter(Boolean).flatMap(keysOf));
+async function guideTeams(slug) {
+  const md = (await store.readEntry('builds', slug)).text;
+  const data = matter(md, { engines: { yaml: (source) => YAML.parse(source) } }).data;
+  return (data.teams ?? []).map((t) => t.members.map((slug) => chars.find((c) => c.slug === slug)).filter(Boolean).flatMap(keysOf));
 }
 
 // Свои команды — scripts/sim-teams/<слаг>.txt: полный конфиг gcsim с ротацией из открытого гайда (ссылка — в первой строке).
@@ -123,15 +128,15 @@ function sanitize(all) {
 }
 
 const result = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : {};
-const slugs = only.length ? only : readdirSync('src/content/builds').map((f) => f.replace(/\.md$/, ''));
+const slugs = only.length ? only : await store.listEntries('builds');
 for (const slug of slugs) {
   const c = chars.find((x) => x.slug === slug);
   // Уже посчитанных пропускаем, чтобы прерванный прогон продолжался с места остановки (--force — пересчитать)
   if (!c || (result[slug] && !only.length && !args.includes('--force'))) continue;
-  const { four, five } = guideWeapons(slug);
+  const { four, five } = await guideWeapons(slug);
   // Ошибку сети не выдаём за «нет команды» — иначе персонаж молча выпадает из расчёта
   let picked = ownTeam(slug, keysOf(c));
-  if (!picked) try { picked = await pickTeam(keysOf(c), guideTeams(slug)); } catch (e) { console.log(`✗ ${slug}: база gcsim недоступна (${e.message})`); continue; }
+  if (!picked) try { picked = await pickTeam(keysOf(c), await guideTeams(slug)); } catch (e) { console.log(`✗ ${slug}: база gcsim недоступна (${e.message})`); continue; }
   if (!picked) { console.log(`— ${slug}: нет команды в базе gcsim`); continue; }
   const { entry, ck } = picked;
   // В конфиге персонаж может быть записан сокращённо (raiden, yae, ayaka) — берём имя из строк «<имя> char»

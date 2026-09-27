@@ -79,3 +79,41 @@ tick();
 document.addEventListener('astro:page-load', tick);
 setInterval(tick, 30_000);
 document.addEventListener('gf:region', tick);
+
+let accountLinkRequest = 0;
+
+async function updateAccountLink() {
+  const link = document.getElementById('profile-link') as HTMLAnchorElement | null;
+  if (!link) return;
+  const label = link.dataset.profile || '';
+  link.setAttribute('aria-label', label);
+  link.title = label;
+  const letter = link.querySelector<HTMLElement>('.account-letter');
+  if (letter) { letter.textContent = ''; letter.hidden = true; }
+  const turn = ++accountLinkRequest;
+
+  try {
+    if (!localStorage.getItem('gf:auth')) return;
+    const { getSupabase } = await import('./auth');
+    const supabase = getSupabase();
+    const { data } = await supabase.auth.getSession();
+    if (!data.session || !link.isConnected || turn !== accountLinkRequest) return;
+    const user = data.session.user;
+    let nickname = '';
+    try {
+      const { data: profile, error } = await supabase.from('profiles')
+        .select('nickname').eq('id', user.id).maybeSingle();
+      if (!error) nickname = String(profile?.nickname || '');
+    } catch { /* При сбое запроса показываем email. */ }
+    if (!link.isConnected || turn !== accountLinkRequest) return;
+    const name = nickname || user.email || '';
+    const title = name ? `${label} · ${name}` : label;
+    link.setAttribute('aria-label', title);
+    link.title = title;
+    if (letter && name) { letter.textContent = Array.from(name)[0].toLocaleUpperCase(); letter.hidden = false; }
+  } catch { /* Хранилище и сеть могут быть недоступны. */ }
+}
+
+updateAccountLink();
+document.addEventListener('astro:page-load', updateAccountLink);
+document.addEventListener('gf:auth', updateAccountLink);

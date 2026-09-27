@@ -3,7 +3,17 @@ import type { Env } from './env.ts';
 
 const jwks = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
 
+export type TokenClaims = {
+  sub: string;
+  iat: number;
+  amr: { method?: string; timestamp: number }[];
+};
+
 export async function userIdFromToken(token: string, env: Env): Promise<string | null> {
+  return (await claimsFromToken(token, env))?.sub || null;
+}
+
+export async function claimsFromToken(token: string, env: Env): Promise<TokenClaims | null> {
   if (!env.SUPABASE_URL) return null;
   const issuer = `${env.SUPABASE_URL.replace(/\/$/, '')}/auth/v1`;
 
@@ -29,8 +39,16 @@ export async function userIdFromToken(token: string, env: Env): Promise<string |
       audience: 'authenticated',
       algorithms: [alg],
     });
-    return typeof payload.sub === 'string' && /^[0-9a-f-]{36}$/i.test(payload.sub)
-      ? payload.sub : null;
+    if (typeof payload.sub !== 'string' || !/^[0-9a-f-]{36}$/i.test(payload.sub)) return null;
+    const amr = Array.isArray(payload.amr)
+      ? payload.amr.filter((entry): entry is { method?: string; timestamp: number } =>
+        !!entry && typeof entry === 'object' && typeof entry.timestamp === 'number')
+      : [];
+    return {
+      sub: payload.sub,
+      iat: typeof payload.iat === 'number' ? payload.iat : 0,
+      amr,
+    };
   } catch {
     return null;
   }
