@@ -6,13 +6,26 @@ const { t } = useData(Astro.currentLocale);
 ---
 {season.theme === 'snezhnaya' && (
   <>
-    <button id="music-button" transition:persist="music-button" class="icon-btn music" type="button" aria-pressed="false" aria-label={t('Включить музыку')} title={t('Включить музыку')} aria-controls="music-panel" data-on-label={t('Выключить музыку')} data-off-label={t('Включить музыку')}>
+    <button
+      id="music-button" transition:persist="music-button" class="icon-btn music"
+      type="button" aria-pressed="false" aria-controls="music-panel"
+      aria-label={t('Включить музыку')} title={t('Включить музыку')}
+      data-on-label={t('Выключить музыку')}
+      data-off-label={t('Включить музыку')}
+    >
       <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
         <path d="M12 14.5V4.5l5-1v8.8M12 14.5c0 1.2-1.1 2-2.5 2S7 15.7 7 14.5s1.1-2 2.5-2c1 0 1.9.4 2.5 1Z" />
         <path class="waves" d="M4.4 7.1a4 4 0 0 0 0 5.8M2.2 5.2a7 7 0 0 0 0 9.6" />
       </svg>
     </button>
-    <section class="music-panel" id="music-panel" transition:persist="music-panel" role="region" aria-label={t('Музыка Снежной')} data-disc-label={t('Диск')} data-skip-label={t('Не удалось воспроизвести трек, пропускаем…')} data-error-label={t('Музыка недоступна в этом браузере или регионе')} hidden>
+    <section
+      class="music-panel" id="music-panel" transition:persist="music-panel"
+      role="region" aria-label={t('Музыка Снежной')}
+      data-disc-label={t('Диск')}
+      data-skip-label={t('Не удалось воспроизвести трек, пропускаем…')}
+      data-error-label={t('Музыка недоступна в этом браузере или регионе')}
+      hidden
+    >
       <div class="music-expanded">
         <div id="snezhnaya-ost-player"></div>
         <div class="music-body">
@@ -40,14 +53,37 @@ const { t } = useData(Astro.currentLocale);
           <p class="music-status" role="status" hidden></p>
         </div>
       </div>
-      <button class="music-compact" type="button" aria-label={t('Развернуть')} title={t('Развернуть')} hidden>
-        <span class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="compact-title">Snezhnaya</span>
-      </button>
+      <div class="music-mini">
+        <span class="music-mini-title">Snezhnaya</span>
+        <div class="music-mini-controls">
+          <button class="music-previous" type="button" aria-label={t('Предыдущий трек')} title={t('Предыдущий трек')}>⏮</button>
+          <button class="music-next" type="button" aria-label={t('Следующий трек')} title={t('Следующий трек')}>⏭</button>
+          <button class="music-expand" type="button" aria-label={t('Развернуть')} title={t('Развернуть')}>⛶</button>
+        </div>
+      </div>
+      <button class="music-mini-close" type="button" aria-label={t('Закрыть')} title={t('Закрыть')}>×</button>
     </section>
-    <template id="music-i18n" data-on-label={t('Выключить музыку')} data-off-label={t('Включить музыку')} data-panel-label={t('Музыка Снежной')} data-disc-label={t('Диск')} data-skip-label={t('Не удалось воспроизвести трек, пропускаем…')} data-error-label={t('Музыка недоступна в этом браузере или регионе')} data-previous-label={t('Предыдущий трек')} data-next-label={t('Следующий трек')} data-shuffle-label={t('Перемешать')} data-mute-label={t('Без звука')} data-unmute-label={t('Включить звук')} data-volume-label={t('Громкость')} data-collapse-label={t('Свернуть')} data-close-label={t('Закрыть')} data-compact-label={t('Развернуть')} data-credit-label={t('Музыка: HOYO-MiX — «Where Mercy Endures» · официальный канал Genshin Impact')}></template>
+    <template
+      id="music-i18n"
+      data-on-label={t('Выключить музыку')}
+      data-off-label={t('Включить музыку')}
+      data-panel-label={t('Музыка Снежной')}
+      data-disc-label={t('Диск')}
+      data-skip-label={t('Не удалось воспроизвести трек, пропускаем…')}
+      data-error-label={t('Музыка недоступна в этом браузере или регионе')}
+      data-previous-label={t('Предыдущий трек')}
+      data-next-label={t('Следующий трек')}
+      data-shuffle-label={t('Перемешать')}
+      data-mute-label={t('Без звука')}
+      data-unmute-label={t('Включить звук')}
+      data-volume-label={t('Громкость')}
+      data-collapse-label={t('Свернуть')}
+      data-close-label={t('Закрыть')}
+      data-expand-label={t('Развернуть')}
+      data-credit-label={t('Музыка: HOYO-MiX — «Where Mercy Endures» · официальный канал Genshin Impact')}
+    ></template>
     <script is:inline>
-      // В блоке: скрипт выполняется заново после каждого перехода, глобальный const дал бы SyntaxError
+      // Блок предотвращает повторное объявление после перехода.
       {
         const panel = document.getElementById('music-panel');
         if (panel && panel.parentElement !== document.body) document.body.append(panel);
@@ -67,7 +103,7 @@ const { t } = useData(Astro.currentLocale);
   if (button) {
     let panel = document.querySelector<HTMLElement>('.music-panel')!;
     let title = panel.querySelector<HTMLElement>('.music-title')!, disc = panel.querySelector<HTMLElement>('.music-disc')!;
-    let compact = panel.querySelector<HTMLButtonElement>('.music-compact')!, compactTitle = panel.querySelector<HTMLElement>('.compact-title')!;
+    let miniTitle = panel.querySelector<HTMLElement>('.music-mini-title')!;
     let status = panel.querySelector<HTMLElement>('.music-status')!, shuffleButton = panel.querySelector<HTMLButtonElement>('.music-shuffle')!;
     let muteButton = panel.querySelector<HTMLButtonElement>('.music-mute')!, volumeInput = panel.querySelector<HTMLInputElement>('.music-volume')!;
     const youtube = window as YouTubeWindow;
@@ -77,11 +113,18 @@ const { t } = useData(Astro.currentLocale);
     let enabled = false, armed = false, playing = false, loaded = false, collapsed = false, shuffle = false, playerReady = false;
     let player: Player | undefined, apiPromise: Promise<void> | undefined, playerPromise: Promise<Player> | undefined;
     let playerGeneration = 0;
-    let volumeTimer: ReturnType<typeof setInterval> | undefined, positionTimer: ReturnType<typeof setInterval> | undefined, trackTimer: ReturnType<typeof setInterval> | undefined, autoTimer: ReturnType<typeof setTimeout> | undefined;
+    let volumeTimer: ReturnType<typeof setInterval> | undefined;
+    let positionTimer: ReturnType<typeof setInterval> | undefined;
+    let trackTimer: ReturnType<typeof setInterval> | undefined;
+    let autoTimer: ReturnType<typeof setTimeout> | undefined;
     let volumeState = { target: 35, phase: 'idle' as 'idle' | 'waiting' | 'ramp-in' | 'fade-out', from: 0, began: 0, end: 0, rampTarget: 35, done: undefined as (() => void) | undefined };
     let previousVolume = 35, trackToken = 0, playingToken = 0, trackSettled = false, transitionAt = 0;
     let bindings = new AbortController();
     const savePreference = () => { try { localStorage.setItem('gf:music', enabled ? 'on' : 'off'); } catch {} };
+    const setCollapsed = (value: boolean) => {
+      collapsed = value; panel.classList.toggle('collapsed', value);
+      try { localStorage.setItem('gf:music-collapsed', value ? '1' : '0'); } catch {}
+    };
     const renderVolume = () => {
       volumeInput.value = String(volumeState.target);
       volumeInput.style.setProperty('--volume-percent', `${volumeState.target}%`);
@@ -95,7 +138,7 @@ const { t } = useData(Astro.currentLocale);
       button.setAttribute('aria-pressed', String(enabled)); button.setAttribute('aria-label', label); button.title = label;
       button.classList.toggle('armed', armed && !playing);
       const track = tracks[index];
-      title.textContent = compactTitle.textContent = track.title;
+      title.textContent = miniTitle.textContent = track.title;
       disc.textContent = `${panel.dataset.discLabel} ${track.disc} · ${track.discTitle}`;
       shuffleButton.setAttribute('aria-pressed', String(shuffle));
       renderVolume();
@@ -110,15 +153,16 @@ const { t } = useData(Astro.currentLocale);
       panel.dataset.skipLabel = labels.dataset.skipLabel;
       panel.dataset.errorLabel = labels.dataset.errorLabel;
       const setLabel = (selector: string, label: string) => {
-        const element = panel.querySelector<HTMLElement>(selector)!;
-        element.setAttribute('aria-label', label); element.title = label;
+        panel.querySelectorAll<HTMLElement>(selector).forEach((element) => {
+          element.setAttribute('aria-label', label); element.title = label;
+        });
       };
       setLabel('.music-previous', labels.dataset.previousLabel!);
       setLabel('.music-next', labels.dataset.nextLabel!);
       setLabel('.music-shuffle', labels.dataset.shuffleLabel!);
       setLabel('.music-collapse', labels.dataset.collapseLabel!);
-      setLabel('.music-close', labels.dataset.closeLabel!);
-      setLabel('.music-compact', labels.dataset.compactLabel!);
+      setLabel('.music-close, .music-mini-close', labels.dataset.closeLabel!);
+      setLabel('.music-expand', labels.dataset.expandLabel!);
       volumeInput.setAttribute('aria-label', labels.dataset.volumeLabel!);
       muteButton.dataset.muteLabel = labels.dataset.muteLabel;
       muteButton.dataset.unmuteLabel = labels.dataset.unmuteLabel;
@@ -191,7 +235,7 @@ const { t } = useData(Astro.currentLocale);
       startVolumeTimer();
     };
     const autoNext = (token: number, videoEnd = false) => {
-      if (token !== trackToken || playingToken !== token || !enabled || collapsed || !player) return;
+      if (token !== trackToken || playingToken !== token || !enabled || !player) return;
       const time = player.getCurrentTime(), track = tracks[index];
       if (!Number.isFinite(time)) return;
       if (time < track.end - 0.25) return;
@@ -203,7 +247,7 @@ const { t } = useData(Astro.currentLocale);
       next();
     };
     const checkTrack = (token: number) => {
-      if (token !== trackToken || !enabled || collapsed || !playing || !player) return;
+      if (token !== trackToken || !enabled || !playing || !player) return;
       const track = tracks[index], time = player.getCurrentTime();
       if (!Number.isFinite(time)) return;
       if (!trackSettled && time >= track.start - 1 && time < track.end) {
@@ -291,7 +335,7 @@ const { t } = useData(Astro.currentLocale);
                   clearInterval(positionTimer); positionTimer = undefined;
                   clearVolumeTimer(); volumeState.phase = 'idle';
                 }
-                if (!enabled || collapsed || !panel.isConnected) player.pauseVideo();
+                if (!enabled || !panel.isConnected) player.pauseVideo();
                 else if (returning) playTrack(resumeTime);
                 resolve(player);
               },
@@ -299,7 +343,7 @@ const { t } = useData(Astro.currentLocale);
                 if (generation !== playerGeneration || !playerReady) return;
                 if (event.data !== 1 && player?.getPlayerState() === 1) return;
                 if (event.data === 1) {
-                  if (!enabled || collapsed) { clearVolumeTimer(); clearInterval(trackTimer); clearInterval(positionTimer); playing = false; player?.pauseVideo(); return; }
+                  if (!enabled) { clearVolumeTimer(); clearInterval(trackTimer); clearInterval(positionTimer); playing = false; player?.pauseVideo(); return; }
                   playingToken = trackToken; playing = true; startTrackTimer(trackToken);
                 } else if (event.data === 0) {
                   clearInterval(trackTimer); trackTimer = undefined;
@@ -325,11 +369,11 @@ const { t } = useData(Astro.currentLocale);
     const start = async () => {
       if (!enabled) return;
       const turn = ++version;
-      armed = false; collapsed = false; panel.hidden = false; panel.classList.remove('collapsed'); compact.hidden = true;
+      armed = false; panel.hidden = false; panel.classList.toggle('collapsed', collapsed);
       clearVolumeTimer(); status.hidden = true; render();
       try {
         const target = await getPlayer();
-        if (turn !== version || !enabled || collapsed) return;
+        if (turn !== version || !enabled) return;
         if (loaded) {
           const token = ++trackToken; trackSettled = false; transitionAt = performance.now();
           playingToken = 0;
@@ -349,14 +393,18 @@ const { t } = useData(Astro.currentLocale);
       if (saved && Number.isInteger(saved.index) && saved.index >= 0 && saved.index < tracks.length) {
         index = saved.index; shuffle = saved.shuffle === true;
         resumeTime = tracks[index].start;
-        if (shuffle && Array.isArray(saved.order) && saved.order.length === tracks.length && new Set(saved.order).size === tracks.length && saved.order.every((i: number) => Number.isInteger(i) && i >= 0 && i < tracks.length)) order = saved.order;
+        if (shuffle && Array.isArray(saved.order) && saved.order.length === tracks.length &&
+          new Set(saved.order).size === tracks.length &&
+          saved.order.every((i: number) => Number.isInteger(i) && i >= 0 && i < tracks.length)) order = saved.order;
         else if (shuffle) order = [index, ...mix(natural.filter((i) => i !== index))];
         cursor = order.indexOf(index);
         const track = tracks[index];
         if (Number.isFinite(saved.time) && saved.time >= track.start && saved.time < track.end) resumeTime = saved.time;
       }
       armed = enabled = localStorage.getItem('gf:music') === 'on';
+      collapsed = localStorage.getItem('gf:music-collapsed') === '1';
     } catch {}
+    panel.classList.toggle('collapsed', collapsed);
     render();
     const bind = () => {
       bindings.abort(); bindings = new AbortController();
@@ -374,16 +422,13 @@ const { t } = useData(Astro.currentLocale);
         if (enabled) { stop(); return; }
         enabled = true; savePreference(); void start();
       }, { signal });
-      panel.querySelector('.music-previous')?.addEventListener('click', previous, { signal });
-      panel.querySelector('.music-next')?.addEventListener('click', next, { signal });
+      panel.querySelectorAll('.music-previous').forEach((control) => control.addEventListener('click', previous, { signal }));
+      panel.querySelectorAll('.music-next').forEach((control) => control.addEventListener('click', next, { signal }));
       shuffleButton.addEventListener('click', () => {
         shuffle = !shuffle; order = shuffle ? [index, ...mix(natural.filter((i) => i !== index))] : [...natural];
         cursor = order.indexOf(index); render(); savePosition();
       }, { signal });
-      panel.querySelector('.music-collapse')?.addEventListener('click', () => {
-        savePosition(); collapsed = true;
-        fadeOut(() => { if (enabled && collapsed) { panel.classList.add('collapsed'); compact.hidden = false; } });
-      }, { signal });
+      panel.querySelector('.music-collapse')?.addEventListener('click', () => setCollapsed(true), { signal });
       muteButton.addEventListener('click', () => setVolume(volumeState.target === 0 ? previousVolume || 35 : 0), { signal });
       volumeInput.addEventListener('input', () => setVolume(volumeInput.valueAsNumber), { signal });
       volumeInput.addEventListener('wheel', (event) => {
@@ -391,7 +436,8 @@ const { t } = useData(Astro.currentLocale);
         event.preventDefault();
         setVolume(volumeState.target + (event.deltaY < 0 ? 5 : -5));
       }, { passive: false, signal });
-      compact.addEventListener('click', () => { collapsed = false; panel.classList.remove('collapsed'); compact.hidden = true; void start(); }, { signal });
+      panel.querySelector('.music-expand')?.addEventListener('click', () => setCollapsed(false), { signal });
+      panel.querySelector('.music-mini-close')?.addEventListener('click', () => stop(), { signal });
       panel.querySelector('.music-close')?.addEventListener('click', () => stop(), { signal });
     };
     bind();
@@ -419,10 +465,10 @@ const { t } = useData(Astro.currentLocale);
         if (!nextButton || !nextPanel) return;
         button = nextButton; panel = nextPanel;
         title = panel.querySelector<HTMLElement>('.music-title')!; disc = panel.querySelector<HTMLElement>('.music-disc')!;
-        compact = panel.querySelector<HTMLButtonElement>('.music-compact')!; compactTitle = panel.querySelector<HTMLElement>('.compact-title')!;
+        miniTitle = panel.querySelector<HTMLElement>('.music-mini-title')!;
         status = panel.querySelector<HTMLElement>('.music-status')!; shuffleButton = panel.querySelector<HTMLButtonElement>('.music-shuffle')!;
         muteButton = panel.querySelector<HTMLButtonElement>('.music-mute')!; volumeInput = panel.querySelector<HTMLInputElement>('.music-volume')!;
-        armed = enabled; collapsed = false;
+        armed = enabled; panel.classList.toggle('collapsed', collapsed);
         bind();
       }
       updateLabels(); render();
@@ -439,7 +485,14 @@ const { t } = useData(Astro.currentLocale);
   .music[aria-pressed="true"] .waves { opacity: 1; }
   .music.armed { animation: music-pulse 2.4s ease-in-out infinite; }
   .music[hidden] { display: none; }
-  .music-panel { position: fixed; right: 16px; bottom: 16px; z-index: 45; width: 356px; max-width: calc(100vw - 32px); overflow: hidden; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35); }
+  .music-panel {
+    position: fixed; right: 16px; bottom: 16px; z-index: 45;
+    width: 356px; height: auto; max-width: calc(100vw - 32px); overflow: hidden;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: 0 16px 40px rgb(0 0 0 / .35);
+    interpolate-size: allow-keywords;
+    transition: width .25s, height .25s, opacity .25s;
+  }
   .music-panel[hidden] { display: none; }
   .music-panel :global(#snezhnaya-ost-player) { display: block; width: 100%; height: 200px; border: 0; }
   .music-body { padding: .7rem; }
@@ -453,7 +506,12 @@ const { t } = useData(Astro.currentLocale);
   .music-mute svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .music-mute .sound-muted, .music-mute[data-level="muted"] .sound-wave-one, .music-mute[data-level="muted"] .sound-wave-two, .music-mute[data-level="low"] .sound-wave-two { display: none; }
   .music-mute[data-level="muted"] .sound-muted { display: block; }
-  .music-volume { appearance: none; width: 96px; height: 6px; margin: 0 .25rem; border-radius: 999px; background: linear-gradient(to right, var(--accent) var(--volume-percent, 35%), var(--surface-2) var(--volume-percent, 35%)); accent-color: var(--accent); cursor: pointer; }
+  .music-volume {
+    appearance: none; width: 96px; height: 6px; margin: 0 .25rem;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--accent) var(--volume-percent, 35%), var(--surface-2) var(--volume-percent, 35%));
+    accent-color: var(--accent); cursor: pointer;
+  }
   .music-volume::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
   .music-volume::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--accent); }
   .music-shuffle[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
@@ -461,19 +519,34 @@ const { t } = useData(Astro.currentLocale);
   .music-credit a { color: var(--muted); }
   .music-status { margin: .5rem 0 0; color: var(--accent-text); font-size: .75rem; }
   .music-status[hidden] { display: none; }
-  .music-compact { display: flex; align-items: center; gap: .6rem; width: 100%; max-width: 356px; padding: .7rem; border: 0; background: transparent; color: var(--text); cursor: pointer; text-align: left; }
-  .music-compact[hidden] { display: none; }
-  .music-panel.collapsed { width: max-content; }
-  .music-panel.collapsed .music-expanded { display: none; }
-  .compact-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .music-eq { display: flex; align-items: end; gap: 2px; height: 16px; flex: none; }
-  .music-eq i { width: 3px; height: 12px; background: var(--accent); animation: music-eq .8s ease-in-out infinite alternate; }
-  .music-eq i:nth-child(2) { animation-delay: .2s; }
-  .music-eq i:nth-child(3) { animation-delay: .4s; }
+  .music-mini, .music-mini-close { position: absolute; z-index: 1; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s, visibility .25s; }
+  .music-mini {
+    box-sizing: border-box; right: 0; bottom: 0; left: 0;
+    display: flex; flex-direction: column; justify-content: end; height: 56px;
+    padding: 3px 8px 4px;
+    background: linear-gradient(transparent, rgb(0 0 0 / .78) 38%, rgb(0 0 0 / .88));
+    color: #fff;
+  }
+  .music-mini-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .72rem; line-height: 18px; }
+  .music-mini-controls { display: flex; justify-content: flex-end; gap: 4px; }
+  .music-mini-controls button, .music-mini-close {
+    display: grid; place-items: center; width: 28px; height: 28px; padding: 0;
+    border: 0; border-radius: var(--radius-sm); background: rgb(0 0 0 / .4);
+    color: #fff; cursor: pointer; font-size: 1rem;
+  }
+  .music-mini-controls button:hover, .music-mini-close:hover { background: rgb(0 0 0 / .7); }
+  .music-mini-close { top: 6px; right: 6px; width: 24px; height: 24px; }
+  .music-panel.collapsed { width: 200px; height: 200px; border: 0; }
+  .music-panel.collapsed .music-body { display: none; }
+  .music-panel.collapsed :global(#snezhnaya-ost-player) { width: 200px; height: 200px; min-height: 200px; aspect-ratio: auto; }
+  .music-panel.collapsed .music-mini, .music-panel.collapsed .music-mini-close { opacity: 1; visibility: visible; pointer-events: auto; }
   @keyframes music-pulse { 50% { background: var(--accent-soft); box-shadow: 0 0 0 5px var(--accent-soft); } }
-  @keyframes music-eq { to { height: 4px; } }
-  @media (prefers-reduced-motion: reduce) { .music.armed, .music-eq i { animation: none; } }
-  @media (max-width: 700px) { .music-panel, .music-panel.collapsed { left: 8px; right: 8px; width: auto; max-width: none; } .music-panel :global(#snezhnaya-ost-player) { height: auto; min-height: 200px; aspect-ratio: 16 / 9; } }
+  @media (prefers-reduced-motion: reduce) { .music.armed { animation: none; } .music-panel, .music-mini, .music-mini-close { transition: none; } }
+  @media (max-width: 700px) {
+    .music-panel { left: 8px; right: 8px; bottom: 8px; width: auto; max-width: none; }
+    .music-panel :global(#snezhnaya-ost-player) { height: auto; min-height: 200px; aspect-ratio: 16 / 9; }
+    .music-panel.collapsed { left: auto; right: 8px; width: 200px; }
+  }
   @media (max-width: 700px) { .music-volume { flex: 1; min-width: 0; } }
   @media (max-width: 400px) { .music { width: 34px; height: 34px; } }
 </style>

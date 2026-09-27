@@ -4,7 +4,7 @@ import '../styles/season-snezhnaya.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import { ClientRouter } from 'astro:transitions';
 import Splash from '../components/Splash.astro';
-import AmbientMusic from '../components/AmbientMusic.astro';
+import AmbientMusic from '../components/MusicPlayer.astro';
 import SnowDivider from '../components/SnowDivider.astro';
 import season from '../data/season.json';
 import social from '../data/social.json';
@@ -484,8 +484,18 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     --text: #f6f3ec; --muted: #b6bac6; --accent: #e3b04b; --accent-text: #f3cb79; --border: rgb(255 255 255 / .18);
     background: #0c0d12; color: var(--text); padding: 1.8rem 24px 1.5rem;
   }
-  :global(:root[data-theme="light"]) .footer { background: #2a2f3a; }
-  @media (prefers-color-scheme: light) { :global(:root:not([data-theme])) .footer { background: #2a2f3a; } }
+  :global(:root[data-theme="light"]) .footer {
+    --text: #20212a; --muted: #565966; --accent: #e3a51c; --accent-text: #8f6200; --border: rgb(20 30 50 / .12);
+    background: #e6ecf5;
+  }
+  :global(:root[data-theme="light"]) .f-cta { background: #2a2f3a; }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .footer {
+      --text: #20212a; --muted: #565966; --accent: #e3a51c; --accent-text: #8f6200; --border: rgb(20 30 50 / .12);
+      background: #e6ecf5;
+    }
+    :global(:root:not([data-theme])) .f-cta { background: #2a2f3a; }
+  }
   .f-grid, .f-bottom { max-width: 1240px; margin-left: auto; margin-right: auto; }
   .f-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
   .f-logo { display: inline-flex; align-items: center; gap: .55rem; color: var(--accent); text-decoration: none; }
