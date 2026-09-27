@@ -60,17 +60,21 @@ const presets = [
 
 <script>
   import { loadIndex, BASE, t } from '../../../scripts/search';
+  import { onPage } from '../../../scripts/router';
 
   type Member = { c: string; w?: string; a?: string; er?: number; k?: number };
   type Step = { m: number; a: string };
   type State = { t: string; m: Member[]; s: Step[] };
 
-  const ACTIONS: [string, string][] = [['E', t('Навык')], ['hE', t('Навык (удерж.)')], ['Q', t('Взрыв')], ['N', t('Обычная атака')], ['C', t('Заряж. атака')], ['P', t('Атака в падении')], ['D', t('Рывок')], ['J', t('Прыжок')]];
   const SHORT: Record<string, string> = { E: 'E', hE: 'hE', Q: 'Q', N: 'N', C: 'C', P: 'P', D: 'D', J: 'J' };
 
-  const root = document.querySelector<HTMLElement>('.builder')!;
+  async function init(signal: AbortSignal) {
+  const root = document.querySelector<HTMLElement>('.builder');
+  if (!root) return;
+  const ACTIONS: [string, string][] = [['E', t('Навык')], ['hE', t('Навык (удерж.)')], ['Q', t('Взрыв')], ['N', t('Обычная атака')], ['C', t('Заряж. атака')], ['P', t('Атака в падении')], ['D', t('Рывок')], ['J', t('Прыжок')]];
   const presets: { name: string; members: string[] }[] = JSON.parse(root.dataset.presets!);
   const idx = await loadIndex();
+  if (signal.aborted) return;
   // Персонажи из утечек (BETA) в конструкторе не участвуют
   const roster = idx.characters.filter((c) => !(c as { beta?: number }).beta);
   const chars = new Map(roster.map((c) => [c.s, c]));
@@ -185,8 +189,8 @@ const presets = [
       state = { t: p.name, m: p.members.filter((s) => chars.has(s)).map((c) => ({ c })), s: [] };
       actor = 0; t.value = ''; renderAll();
     }
-  });
-  teamInput.addEventListener('input', () => { state.t = teamInput.value; renderSteps(); save(); });
+  }, { signal });
+  teamInput.addEventListener('input', () => { state.t = teamInput.value; renderSteps(); save(); }, { signal });
 
   root.addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest('button');
@@ -202,14 +206,16 @@ const presets = [
       if (j >= 0 && j < state.s.length) { [state.s[i], state.s[j]] = [state.s[j], state.s[i]]; renderSteps(); save(); }
     } else if (b.id === 'copy') {
       navigator.clipboard?.writeText(location.href).then(
-        () => (document.getElementById('copied')!.textContent = t('Ссылка скопирована.')),
-        () => (document.getElementById('copied')!.textContent = t('Не удалось скопировать — выделите ссылку вручную.')),
+        () => { if (!signal.aborted) root.querySelector<HTMLElement>('#copied')!.textContent = t('Ссылка скопирована.'); },
+        () => { if (!signal.aborted) root.querySelector<HTMLElement>('#copied')!.textContent = t('Не удалось скопировать — выделите ссылку вручную.'); },
       );
     } else if (b.id === 'clear') { state = { t: '', m: [], s: [] }; actor = 0; renderAll(); }
-  });
+  }, { signal });
 
   renderAll();
   void BASE;
+  }
+  onPage(init);
 </script>
 
 <style>

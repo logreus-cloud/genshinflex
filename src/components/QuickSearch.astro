@@ -13,11 +13,16 @@ const { t } = useData(Astro.currentLocale);
 
 <script>
   import { searchNames, t } from '../scripts/search';
+  import { navigate } from 'astro:transitions/client';
+  import { onPage, cleanup } from '../scripts/router';
 
-  const root = document.querySelector<HTMLElement>('[data-qs]')!;
+  onPage((signal) => {
+  const root = document.querySelector<HTMLElement>('[data-qs]');
+  if (!root) return;
   const input = root.querySelector<HTMLInputElement>('input')!;
   const list = root.querySelector<HTMLUListElement>('ul')!;
   let active = -1;
+  let closeTimer: number | undefined;
 
   const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
   const highlight = () => [...list.children].forEach((li, i) => li.setAttribute('aria-selected', String(i === active)));
@@ -25,7 +30,7 @@ const { t } = useData(Astro.currentLocale);
   input.addEventListener('input', async () => {
     const q = input.value;
     const items = await searchNames(q);
-    if (q !== input.value) return;
+    if (signal.aborted || q !== input.value) return;
     list.replaceChildren(...items.map((it) => {
       const li = document.createElement('li');
       li.setAttribute('role', 'option');
@@ -43,13 +48,15 @@ const { t } = useData(Astro.currentLocale);
     else if (e.key === 'ArrowUp' && n) { e.preventDefault(); active = (active - 1 + n) % n; highlight(); }
     else if (e.key === 'Enter') {
       const a = list.querySelectorAll('a')[Math.max(active, 0)];
-      if (a) location.href = a.href;
+      if (a) { e.preventDefault(); navigate(a.href); }
     } else if (e.key === 'Escape') { close(); input.blur(); }
   });
-  input.addEventListener('blur', () => setTimeout(close, 150));
+  input.addEventListener('blur', () => { closeTimer = window.setTimeout(close, 150); });
+  cleanup(signal, () => { if (closeTimer !== undefined) clearTimeout(closeTimer); });
   document.addEventListener('keydown', (e) => {
     const t = e.target as HTMLElement;
     if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName)) { e.preventDefault(); input.focus(); }
+  }, { signal });
   });
 </script>
 

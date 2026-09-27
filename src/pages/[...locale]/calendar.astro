@@ -55,11 +55,15 @@ const items = await calendarItems(lang);
   import type { CalItem } from '../../lib/calendar';
   import { pageLang, translate } from '../../i18n/client';
   import { region, serverMoment, humanLeft, REGIONS, type Region } from '../../scripts/common';
+  import { onPage, cleanup } from '../../scripts/router';
 
   type Lane = 'version' | 'char-banner' | 'weapon-banner' | 'event' | 'endgame' | 'livestream';
   type Zoom = 'week' | 'month' | 'quarter';
   type View = 'timeline' | 'list';
   type Saved = { zoom?: Zoom; view?: View; filters?: Lane[] };
+
+onPage((signal) => {
+  if (!document.getElementById('cal-data')) return;
   const lang = pageLang();
   const t = translate(lang);
   const base = lang === 'ru' ? '' : `/${lang}`;
@@ -387,9 +391,11 @@ const items = await calendarItems(lang);
     });
     renderDetail();
     if (focusedHref) [...detail.querySelectorAll<HTMLAnchorElement>('a')].find((link) => link.getAttribute('href') === focusedHref)?.focus();
-  });
-  setInterval(refresh, 30_000);
+  }, { signal });
+  const interval = setInterval(refresh, 30_000);
+  cleanup(signal, () => clearInterval(interval));
   render(true);
+});
 </script>
 
 <style>

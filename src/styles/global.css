@@ -46,7 +46,6 @@
   }
 }
 
-@view-transition { navigation: auto; }
 ::view-transition-old(root) { animation: gf-fade-out .25s var(--ease) both; }
 ::view-transition-new(root) { animation: gf-fade-in .32s var(--ease) both; }
 ::view-transition-old(page) { animation: gf-fade-out .25s var(--ease) both; }
@@ -57,7 +56,10 @@
 @keyframes gf-pop-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top-h) + 64px); }
+html { -webkit-text-size-adjust: 100%; }
+/* Отступ под липкую шапку — только у якорей. scroll-padding у html заставлял браузер прокручивать страницу
+   вверх при каждом символе в поиске шапки: поле внутри шапки попадало в «перекрытую» зону */
+[id] { scroll-margin-top: calc(var(--top-h) + 64px); }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 var(--font); transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease); }
 a { color: inherit; }
 img { max-width: 100%; }
@@ -72,8 +74,6 @@ a, .btn, .icon-btn, .chip, .input, input, select, textarea, .panel {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
   ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
-  /* Без этого браузер всё равно плавно двигает группы с view-transition-name (шапку, контент) */
-  @view-transition { navigation: none; }
 }
 
 h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; font-weight: 600; letter-spacing: -.01em; }

@@ -24,7 +24,12 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { makeLookup, renderGuide, esc } from '../lib/guide-markup';
+import { makeLookup, renderGuide, esc } from '../lib/guide-markup';
+import { onPage, cleanup } from '../scripts/router';
+
+onPage(async (signal) => {
+  const root = document.querySelector<HTMLElement>('.adm');
+  if (!root) return;
 
   type Guide = {
     id: number; created_at: string; character: string; mode: string; author: string; contact: string | null; comment: string | null; status: string;
@@ -35,10 +40,23 @@ import Layout from '../layouts/Layout.astro';
 
   const KIND = { data: 'Ошибка в данных', idea: 'Идея', bug: 'Баг', other: 'Другое' } as Record<string, string>;
   const STATUS = { pending: 'ждёт', approved: 'одобрен', rejected: 'отклонён', new: 'новое', done: 'прочитано' } as Record<string, string>;
-  const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s)!;
+  const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
   const when = (s: string) => new Date(`${s.replace(' ', 'T')}Z`).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-  const editor = await fetch('/data/editor.json').then((r) => r.json());
+  const controller = new AbortController();
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  cleanup(signal, () => {
+    controller.abort();
+    for (const timer of timers) clearTimeout(timer);
+  });
+  const editor = await fetch('/data/editor.json', { signal: controller.signal }).then((r) => r.json()).catch(() => null);
+  if (signal.aborted) return;
+  if (!editor) {
+    const err = $('#error');
+    err.hidden = false;
+    err.textContent = 'Не удалось загрузить данные редактора';
+    return;
+  }
   const lookup = makeLookup(editor, '');
   const names = new Map<string, string>([...editor.characters, ...editor.weapons].map((x: { slug: string; name: string }) => [x.slug, x.name]));
 
@@ -97,44 +115,60 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </article>`;
 
+  let latest = 0;
   async function load() {
-    const res = await fetch(`/api/admin/inbox${$<HTMLInputElement>('#all').checked ? '?status=all' : ''}`);
-    const out = await res.json().catch(() => ({ error: 'Не удалось прочитать ответ' }));
+    if (signal.aborted) return;
+    const current = ++latest;
     const err = $('#error');
-    if (!res.ok) { err.hidden = false; err.textContent = out.error ?? `Ошибка ${res.status}`; return; }
-    err.hidden = true;
-    $('#who').textContent = out.admin === 'dev' ? 'локальный режим' : out.admin;
-    $('#c-guides').textContent = String(out.counts.guides);
-    $('#c-feedback').textContent = String(out.counts.feedback);
-    $('#guides').innerHTML = out.guides.length ? out.guides.map(guideCard).join('') : '<p class="muted">Заявок нет.</p>';
-    $('#feedback').innerHTML = out.feedback.length ? out.feedback.map(feedbackCard).join('') : '<p class="muted">Сообщений нет.</p>';
+    try {
+      const res = await fetch(`/api/admin/inbox${$<HTMLInputElement>('#all').checked ? '?status=all' : ''}`, { signal: controller.signal });
+      const out = await res.json().catch(() => ({ error: 'Не удалось прочитать ответ' }));
+      if (signal.aborted || current !== latest) return;
+      if (!res.ok) { err.hidden = false; err.textContent = out.error ?? `Ошибка ${res.status}`; return; }
+      err.hidden = true;
+      $('#who').textContent = out.admin === 'dev' ? 'локальный режим' : out.admin;
+      $('#c-guides').textContent = String(out.counts.guides);
+      $('#c-feedback').textContent = String(out.counts.feedback);
+      $('#guides').innerHTML = out.guides.length ? out.guides.map(guideCard).join('') : '<p class="muted">Заявок нет.</p>';
+      $('#feedback').innerHTML = out.feedback.length ? out.feedback.map(feedbackCard).join('') : '<p class="muted">Сообщений нет.</p>';
+    } catch {
+      if (signal.aborted || current !== latest) return;
+      err.hidden = false;
+      err.textContent = 'Не удалось загрузить заявки';
+    }
   }
 
   document.addEventListener('click', async (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
-    if (!b) return;
+    if (!b || !root.contains(b)) return;
     if (b.dataset.tab) {
-      document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+      root.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
       $('#guides').hidden = b.dataset.tab !== 'guides';
       $('#feedback').hidden = b.dataset.tab !== 'feedback';
     }
     if (b.dataset.cmd) {
       await navigator.clipboard.writeText(b.dataset.cmd).catch(() => {});
-      const text = b.textContent; b.textContent = `Скопировано: ${b.dataset.cmd}`; setTimeout(() => { b.textContent = text; }, 2500);
+      if (signal.aborted) return;
+      const text = b.textContent;
+      b.textContent = `Скопировано: ${b.dataset.cmd}`;
+      const timer = setTimeout(() => { b.textContent = text; timers.delete(timer); }, 2500);
+      timers.add(timer);
     }
     if (b.dataset.set) {
       const card = b.closest<HTMLElement>('[data-id]')!;
       b.disabled = true;
       await fetch('/api/admin/inbox', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
         body: JSON.stringify({ type: card.closest('#guides') ? 'guide' : 'feedback', id: Number(card.dataset.id), status: b.dataset.set }),
-      });
-      load();
+      }).catch(() => {});
+      if (signal.aborted) return;
+      void load();
     }
-    if (b.id === 'reload') load();
-  });
-  $('#all').addEventListener('change', load);
-  load();
+    if (b.id === 'reload') void load();
+  }, { signal });
+  $('#all').addEventListener('change', () => { void load(); }, { signal });
+  void load();
+});
 </script>
 
 <style>

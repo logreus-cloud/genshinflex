@@ -63,6 +63,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   import { store } from '../../../scripts/common';
   import { BASE, t, LANG } from '../../../scripts/search';
   import { combobox, norm } from '../../../scripts/combobox';
+  import { onPage, cleanup } from '../../../scripts/router';
 
   // ---------- Данные ----------
   type Build = { role: string; healer: boolean; cls: 'dps' | 'sub' | 'support'; weapons: string[]; sets: string[][]; main: Record<'sands' | 'goblet' | 'circlet', string[]>; subs: string[] };
@@ -78,7 +79,10 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     sands: string; goblet: string; circlet: string; stats: Partial<Stats>;
   };
 
-  const data: Data = await fetch(`${BASE}/data/checker.json`).then((r) => r.json());
+  onPage((signal) => {
+    if (!document.querySelector('.tc')) return;
+    void fetch(`${BASE}/data/checker.json`, { signal }).then((r) => r.json()).then((data: Data) => {
+      if (signal.aborted) return;
   const chars = new Map(data.characters.map((c) => [c.s, c]));
   const normName = (s: string) => typeof norm === 'function' ? norm(s) : s.toLowerCase().replace(/ё/g, 'е').trim();
   const byName = new Map(data.characters.map((c) => [normName(c.n), c.s]));
@@ -196,10 +200,10 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     const startRev = rosterRev;
     status(t('Загружаю витрину…'));
     try {
-      const res = await fetch(`/api/enka/${uid}`);
-      if (gen !== importGen) return;
+      const res = await fetch(`/api/enka/${uid}`, { signal });
+      if (signal.aborted || gen !== importGen) return;
       const body = await res.json();
-      if (gen !== importGen) return;
+      if (signal.aborted || gen !== importGen) return;
       if (!res.ok) return status(t(body.error ?? 'Не удалось загрузить профиль.'), true);
       const list: any[] = body.avatarInfoList ?? [];
       if (!list.length) return status(t('На витрине нет персонажей или скрыты подробности. Включите «Показывать подробности» в профиле игры.'), true);
@@ -276,7 +280,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       renderTeams();
       status(t('Загружено персонажей: {n}.', { n: added }) + (skipped.length ? ' ' + t('Пропущены: {list} — добавьте вручную.', { list: skipped.join(', ') }) : ''));
     } catch {
-      if (gen !== importGen) return;
+      if (signal.aborted || gen !== importGen) return;
       status(t('Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз.'), true);
     }
   });
@@ -363,6 +367,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   $<HTMLInputElement>('picker-search').addEventListener('input', renderPicker);
   let clearArmed = false;
   let clearTimer: ReturnType<typeof setTimeout> | undefined;
+  cleanup(signal, () => clearTimeout(clearTimer));
   $('clear-roster').addEventListener('click', () => {
     if (!roster.length) return;
     if (!clearArmed) {
@@ -444,7 +449,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     else if (t.dataset.s) e.stats[t.dataset.s as keyof Stats] = t.value === '' ? undefined : validStat(Number(t.value), t.dataset.s as keyof Stats);
     markEdited(e);
     persist(); renderRoster();
-  });
+  }, { signal });
   document.addEventListener('click', (ev) => {
     const b = (ev.target as HTMLElement).closest('button');
     if (!b) return;
@@ -502,7 +507,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
       for (const h of [1, 2]) teams[h] = teams[h].filter((k) => k !== editing);
       persist(); openEditor(null); renderTeams();
     }
-  });
+  }, { signal });
 
   // ---------- Команды ----------
   function renderTeams() {
@@ -543,7 +548,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     arr[i] = t.value;
     teams[h] = arr.filter(Boolean);
     persist(); renderTeams();
-  });
+  }, { signal });
 
   $('reset-teams').addEventListener('click', () => {
     teams = { 1: [], 2: [] };
@@ -745,6 +750,8 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   $('check').addEventListener('click', () => { checked = true; renderResult(true); });
 
   renderRoster(); renderTeams();
+    }).catch((error) => { if (!signal.aborted) console.error(error); });
+  });
 </script>
 
 <style>

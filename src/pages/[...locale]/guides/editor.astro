@@ -188,6 +188,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   import { makeLookup, renderGuide, esc } from '../../../lib/guide-markup';
   import { store } from '../../../scripts/common';
   import { BASE, LANG, t } from '../../../scripts/search';
+  import { onPage, cleanup } from '../../../scripts/router';
 
   type Item = { slug: string; name: string; icon: string | null; element?: string; weapon?: string; rarity?: number; splash?: string | null; title?: string };
   type Kind = 'char' | 'weapon' | 'endgame';
@@ -209,28 +210,36 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   type Drafts = Record<string, { guide: Guide; ts: number }>;
   type PickKind = 'char' | 'weapon' | 'set';
 
-  // Черновики — отдельно для каждого языка: гайд пишется на языке страницы
-  const DRAFTS = LANG === 'ru' ? 'gf:guide-drafts' : `gf:guide-drafts:${LANG}`;
-  const ME = 'gf:guide-author';
-  const LOCALE = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG];
-  const CALLOUTS = { tip: t('Совет'), warn: t('Важно'), info: t('На заметку') };
-  const form = document.querySelector<HTMLFormElement>('#ed')!;
-  const pv = document.querySelector<HTMLElement>('#pv')!;
-  const ta = form.elements.namedItem('body') as HTMLTextAreaElement;
-  const charInput = document.querySelector<HTMLInputElement>('#char')!;
-  const weapInput = document.querySelector<HTMLInputElement>('#weap')!;
-  const egSelect = document.querySelector<HTMLSelectElement>('#eg')!;
-  const notice = document.querySelector<HTMLElement>('#notice')!;
-  const modeChip = document.querySelector<HTMLElement>('#mode')!;
-  const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
-  const norm = (s: string) => s.trim().toLowerCase().replace(/ё/g, 'е');
-  const debounce = (fn: () => void, ms: number) => { let id = 0; return () => { clearTimeout(id); id = window.setTimeout(fn, ms); }; };
-  const date = (d: Date | number | string) => new Date(d).toLocaleDateString(LOCALE);
+  onPage(init);
 
-  init();
-
-  async function init() {
-    const data: Data = await fetch(`${BASE}/data/editor.json`).then((r) => r.json());
+  async function init(signal: AbortSignal) {
+    if (!document.querySelector('.ge')) return;
+    // Черновики — отдельно для каждого языка: гайд пишется на языке страницы
+    const DRAFTS = LANG === 'ru' ? 'gf:guide-drafts' : `gf:guide-drafts:${LANG}`;
+    const ME = 'gf:guide-author';
+    const LOCALE = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG];
+    const CALLOUTS = { tip: t('Совет'), warn: t('Важно'), info: t('На заметку') };
+    const form = document.querySelector<HTMLFormElement>('#ed')!;
+    const pv = document.querySelector<HTMLElement>('#pv')!;
+    const ta = form.elements.namedItem('body') as HTMLTextAreaElement;
+    const charInput = document.querySelector<HTMLInputElement>('#char')!;
+    const weapInput = document.querySelector<HTMLInputElement>('#weap')!;
+    const egSelect = document.querySelector<HTMLSelectElement>('#eg')!;
+    const notice = document.querySelector<HTMLElement>('#notice')!;
+    const modeChip = document.querySelector<HTMLElement>('#mode')!;
+    const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
+    const norm = (s: string) => s.trim().toLowerCase().replace(/ё/g, 'е');
+    const debounce = (fn: () => void, ms: number) => { let id = 0; cleanup(signal, () => clearTimeout(id)); return () => { clearTimeout(id); id = window.setTimeout(fn, ms); }; };
+    const date = (d: Date | number | string) => new Date(d).toLocaleDateString(LOCALE);
+    let data: Data;
+    try {
+      const res = await fetch(`${BASE}/data/editor.json`, { signal });
+      data = await res.json();
+    } catch (err) {
+      if (signal.aborted) return;
+      throw err;
+    }
+    if (signal.aborted) return;
     const lookup = makeLookup(data, BASE);
     const render = (src: string) => renderGuide(src, lookup, CALLOUTS);
     const index = (list: Item[]) => {
@@ -676,6 +685,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       status.textContent = t('Отправляем…');
       try {
         const res = await fetch('/api/guides', {
+          signal,
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             guide: g, lang: LANG,
@@ -684,6 +694,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
           }),
         });
         const out = await res.json().catch(() => ({}));
+        if (signal.aborted) return;
         // Сервер отвечает по-русски — переводим сообщение здесь
         if (!res.ok) throw new Error(t(out.error ?? 'Не удалось отправить — попробуйте позже'));
         dropDraft(dk());
@@ -693,10 +704,11 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
           : t('Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации он появится на сайте.');
         (form.elements.namedItem('comment') as HTMLTextAreaElement).value = '';
       } catch (err) {
+        if (signal.aborted) return;
         status.className = 'status small err';
         status.textContent = err instanceof Error && err.message !== 'Failed to fetch' ? err.message : t('Нет связи с сервером — черновик сохранён, попробуйте позже');
       } finally {
-        btn.disabled = false;
+        if (!signal.aborted) btn.disabled = false;
       }
     });
 

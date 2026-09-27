@@ -45,30 +45,40 @@ const { base, t } = useData(Astro.currentLocale);
 
 <script>
   import { t } from '../../scripts/search';
-  const form = document.getElementById('feedback') as HTMLFormElement;
-  const status = document.getElementById('status')!;
-  const params = new URLSearchParams(location.search);
-  if (params.get('from')) (form.elements.namedItem('page') as HTMLInputElement).value = params.get('from')!;
-  if (params.get('kind')) form.querySelector<HTMLInputElement>(`input[name="kind"][value="${params.get('kind')}"]`)?.click();
+  import { onPage, cleanup } from '../../scripts/router';
 
-  const msg = form.elements.namedItem('message') as HTMLTextAreaElement;
-  msg.addEventListener('input', () => { document.getElementById('count')!.textContent = `${msg.value.length} / 3000`; });
+  onPage((signal) => {
+    const form = document.getElementById('feedback') as HTMLFormElement | null;
+    if (!form) return;
+    const status = document.getElementById('status')!;
+    const controller = new AbortController();
+    cleanup(signal, () => controller.abort());
+    const params = new URLSearchParams(location.search);
+    if (params.get('from')) (form.elements.namedItem('page') as HTMLInputElement).value = params.get('from')!;
+    const kind = params.get('kind');
+    if (kind) [...form.querySelectorAll<HTMLInputElement>('input[name="kind"]')].find((input) => input.value === kind)?.click();
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    if (String(data.message).trim().length < 10) { status.textContent = t('Напишите хотя бы пару предложений — от 10 символов.'); status.className = 'status small bad'; return; }
-    const btn = form.querySelector('button')!;
-    btn.disabled = true; status.textContent = t('Отправляю…'); status.className = 'status small';
-    try {
-      const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(t(body.error ?? 'Не удалось отправить. Попробуйте ещё раз.'));
-      form.reset(); msg.dispatchEvent(new Event('input'));
-      status.textContent = t('Спасибо! Сообщение отправлено.'); status.className = 'status small ok';
-    } catch (err) {
-      status.textContent = (err as Error).message; status.className = 'status small bad';
-    } finally { btn.disabled = false; }
+    const msg = form.elements.namedItem('message') as HTMLTextAreaElement;
+    msg.addEventListener('input', () => { document.getElementById('count')!.textContent = `${msg.value.length} / 3000`; }, { signal });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      if (String(data.message).trim().length < 10) { status.textContent = t('Напишите хотя бы пару предложений — от 10 символов.'); status.className = 'status small bad'; return; }
+      const btn = form.querySelector('button')!;
+      btn.disabled = true; status.textContent = t('Отправляю…'); status.className = 'status small';
+      try {
+        const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), signal: controller.signal });
+        const body = await res.json().catch(() => ({}));
+        if (signal.aborted) return;
+        if (!res.ok) throw new Error(t(body.error ?? 'Не удалось отправить. Попробуйте ещё раз.'));
+        form.reset(); msg.dispatchEvent(new Event('input'));
+        status.textContent = t('Спасибо! Сообщение отправлено.'); status.className = 'status small ok';
+      } catch (err) {
+        if (signal.aborted) return;
+        status.textContent = (err as Error).message; status.className = 'status small bad';
+      } finally { if (!signal.aborted) btn.disabled = false; }
+    }, { signal });
   });
 </script>
 

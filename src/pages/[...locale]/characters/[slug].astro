@@ -90,7 +90,7 @@ const jsonLd = b && {
 };
 ---
 <Layout title={seoTitle} description={seoDescription} image={c.splash ?? c.icon} type={b ? 'article' : 'website'} jsonLd={jsonLd} noindex={c.beta} wide>
-  <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/characters/${c.slug}`, name: c.name, icon: c.icon, kind: t('Персонаж') })}>
+  <article data-character-page data-pagefind-body data-visit={JSON.stringify({ href: `${base}/characters/${c.slug}`, name: c.name, icon: c.icon, kind: t('Персонаж') })}>
     <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/characters`}>{t('Персонажи')}</a> / {c.name}</nav>
 
     <header class="head" data-el={c.element}>
@@ -344,31 +344,36 @@ const jsonLd = b && {
 <script>
   import { recent, favorites } from '../../../scripts/common';
   import { t } from '../../../scripts/search';
+  import { onPage, cleanup } from '../../../scripts/router';
 
-  const art = document.querySelector<HTMLElement>('[data-visit]')!;
-  const entry = JSON.parse(art.dataset.visit!);
-  recent.push(entry);
+  onPage((signal) => {
+    const art = document.querySelector<HTMLElement>('[data-character-page]');
+    if (!art) return;
+    const entry = JSON.parse(art.dataset.visit!);
+    recent.push(entry);
 
-  const fav = document.querySelector<HTMLButtonElement>('.fav')!;
-  const paint = (on: boolean) => { fav.setAttribute('aria-pressed', String(on)); fav.querySelector('span')!.textContent = on ? t('В избранном') : t('В избранное'); };
-  paint(favorites.has(entry.href));
-  fav.addEventListener('click', () => paint(favorites.toggle(entry)));
+    const fav = art.querySelector<HTMLButtonElement>('.fav')!;
+    const paint = (on: boolean) => { fav.setAttribute('aria-pressed', String(on)); fav.querySelector('span')!.textContent = on ? t('В избранном') : t('В избранное'); };
+    paint(favorites.has(entry.href));
+    fav.addEventListener('click', () => paint(favorites.toggle(entry)), { signal });
 
-  // Один ползунок уровня для всех таблиц множителей
-  const range = document.querySelector<HTMLInputElement>('[data-talent-level]');
-  const cells = [...document.querySelectorAll<HTMLElement>('[data-values]')].map((el) => [el, JSON.parse(el.dataset.values!)] as const);
-  range?.addEventListener('input', () => {
-    const i = Number(range.value) - 1;
-    range.closest('label')!.querySelector('output')!.textContent = range.value;
-    for (const [el, values] of cells) el.textContent = values[Math.min(i, values.length - 1)];
+    // Один ползунок уровня для всех таблиц множителей
+    const range = art.querySelector<HTMLInputElement>('[data-talent-level]');
+    const cells = [...art.querySelectorAll<HTMLElement>('[data-values]')].map((el) => [el, JSON.parse(el.dataset.values!)] as const);
+    range?.addEventListener('input', () => {
+      const i = Number(range.value) - 1;
+      range.closest('label')!.querySelector('output')!.textContent = range.value;
+      for (const [el, values] of cells) el.textContent = values[Math.min(i, values.length - 1)];
+    }, { signal });
+
+    // Подсветка текущего раздела во вкладках
+    const links = [...art.querySelectorAll<HTMLAnchorElement>('.tabs a')];
+    const obs = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) links.forEach((a) => a.toggleAttribute('aria-current', a.hash === `#${e.target.id}`));
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    cleanup(signal, () => obs.disconnect());
+    links.forEach((a) => { const s = art.querySelector(a.hash); if (s) obs.observe(s); });
   });
-
-  // Подсветка текущего раздела во вкладках
-  const links = [...document.querySelectorAll<HTMLAnchorElement>('.tabs a')];
-  const obs = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) links.forEach((a) => a.toggleAttribute('aria-current', a.hash === `#${e.target.id}`));
-  }, { rootMargin: '-45% 0px -50% 0px' });
-  links.forEach((a) => { const s = document.querySelector(a.hash); if (s) obs.observe(s); });
 </script>
 
 <style>

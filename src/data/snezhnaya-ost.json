@@ -1,0 +1,582 @@
+{
+ "album": "Where Mercy Endures",
+ "source": "https://genshin.hoyoverse.com/en/news/detail/166142",
+ "discs": [
+  {
+   "disc": 1,
+   "video": "KA8Z0SYYJWU",
+   "title": "Swept in Frost",
+   "tracks": [
+    {
+     "title": "Snezhnaya",
+     "start": 0.0,
+     "end": 300.6,
+     "battle": false
+    },
+    {
+     "title": "A Day Filled With Frigid Light",
+     "start": 300.6,
+     "end": 421.2,
+     "battle": false
+    },
+    {
+     "title": "Night Fades, Dawn Breaks",
+     "start": 421.2,
+     "end": 531.7,
+     "battle": false
+    },
+    {
+     "title": "Heavy Is the Dew",
+     "start": 531.7,
+     "end": 710.2,
+     "battle": false
+    },
+    {
+     "title": "Light Glimmers as Shadows Shift",
+     "start": 710.2,
+     "end": 819.9,
+     "battle": false
+    },
+    {
+     "title": "Dream of the Black Snow Swan",
+     "start": 819.9,
+     "end": 969.3,
+     "battle": false
+    },
+    {
+     "title": "Of Slumber Bereft",
+     "start": 969.3,
+     "end": 1152.3,
+     "battle": false
+    },
+    {
+     "title": "O Strings, My Strings",
+     "start": 1152.3,
+     "end": 1332.9,
+     "battle": false
+    },
+    {
+     "title": "The Snowy Beehive",
+     "start": 1332.9,
+     "end": 1444.9,
+     "battle": false
+    },
+    {
+     "title": "Ode to Liberty (Bayan Version)",
+     "start": 1444.9,
+     "end": 1632.1,
+     "battle": false
+    },
+    {
+     "title": "Be Not Parted From Your Beloved",
+     "start": 1632.1,
+     "end": 1751.2,
+     "battle": false
+    },
+    {
+     "title": "The Irony of Fate",
+     "start": 1751.2,
+     "end": 1867.1,
+     "battle": false
+    },
+    {
+     "title": "Traincar Dialogues",
+     "start": 1867.1,
+     "end": 1974.8,
+     "battle": false
+    },
+    {
+     "title": "The Song of the Falcon",
+     "start": 1974.8,
+     "end": 2092.0,
+     "battle": false
+    },
+    {
+     "title": "Manechka's Sentry Song",
+     "start": 2092.0,
+     "end": 2233.5,
+     "battle": false
+    },
+    {
+     "title": "Ashes and Diamonds",
+     "start": 2233.5,
+     "end": 2345.3,
+     "battle": false
+    },
+    {
+     "title": "Hearthside Reflections",
+     "start": 2345.3,
+     "end": 2491.9,
+     "battle": false
+    },
+    {
+     "title": "I Loved You - Orchestral Version",
+     "start": 2491.9,
+     "end": 2653.8,
+     "battle": false
+    },
+    {
+     "title": "Ode to Liberty",
+     "start": 2653.8,
+     "end": 2841.0,
+     "battle": false
+    },
+    {
+     "title": "To Draw the Moon From Water",
+     "start": 2841.0,
+     "end": 2966.3,
+     "battle": false
+    },
+    {
+     "title": "I Loved You",
+     "start": 2966.3,
+     "end": 3048.4,
+     "battle": false
+    },
+    {
+     "title": "A Feast of Bread and Salt",
+     "start": 3048.4,
+     "end": 3147.3,
+     "battle": false
+    },
+    {
+     "title": "Whither, Troika",
+     "start": 3147.3,
+     "end": 3274.2,
+     "battle": false
+    },
+    {
+     "title": "Glorious Triumph",
+     "start": 3274.2,
+     "end": 3406.8,
+     "battle": true
+    },
+    {
+     "title": "Midsummer's Soaring Flame",
+     "start": 3406.8,
+     "end": 3528.9,
+     "battle": true
+    },
+    {
+     "title": "Argent Arrows Resplendent",
+     "start": 3528.9,
+     "end": 3682.0,
+     "battle": true
+    }
+   ],
+   "length": 3682
+  },
+  {
+   "disc": 2,
+   "video": "VeLpLGey0_Y",
+   "title": "The Endless Road",
+   "tracks": [
+    {
+     "title": "Rising Smoke, Crowded Streets",
+     "start": 0.0,
+     "end": 98.5,
+     "battle": false
+    },
+    {
+     "title": "The Ceaseless Bustle",
+     "start": 98.5,
+     "end": 200.7,
+     "battle": false
+    },
+    {
+     "title": "A Night, a Street, a Lamp, a Drugstore",
+     "start": 200.7,
+     "end": 313.5,
+     "battle": false
+    },
+    {
+     "title": "A Candle Burning",
+     "start": 313.5,
+     "end": 431.1,
+     "battle": false
+    },
+    {
+     "title": "The Wandering Postman",
+     "start": 431.1,
+     "end": 530.4,
+     "battle": false
+    },
+    {
+     "title": "As Dawn and Dusk Merge",
+     "start": 530.4,
+     "end": 636.4,
+     "battle": false
+    },
+    {
+     "title": "Falling Leaves and Even-Stars",
+     "start": 636.4,
+     "end": 700.6,
+     "battle": false
+    },
+    {
+     "title": "As Lamps Light the Harbor at Night",
+     "start": 700.6,
+     "end": 825.8,
+     "battle": false
+    },
+    {
+     "title": "Above Frost",
+     "start": 825.8,
+     "end": 908.0,
+     "battle": false
+    },
+    {
+     "title": "Skazka Skazok",
+     "start": 908.0,
+     "end": 1087.4,
+     "battle": false
+    },
+    {
+     "title": "Amidst Dappled Shadows",
+     "start": 1087.4,
+     "end": 1174.5,
+     "battle": false
+    },
+    {
+     "title": "Roly-Poly Adventure",
+     "start": 1174.5,
+     "end": 1239.1,
+     "battle": false
+    },
+    {
+     "title": "When Cranes Fly By",
+     "start": 1239.1,
+     "end": 1379.8,
+     "battle": false
+    },
+    {
+     "title": "Ring Out, Ye Bells of Yore",
+     "start": 1379.8,
+     "end": 1468.2,
+     "battle": false
+    },
+    {
+     "title": "Penthimos Kodonokrousia",
+     "start": 1468.2,
+     "end": 1594.6,
+     "battle": false
+    },
+    {
+     "title": "Poem Without a Hero",
+     "start": 1594.6,
+     "end": 1721.0,
+     "battle": false
+    },
+    {
+     "title": "High Court of Enduring Ice",
+     "start": 1721.0,
+     "end": 1823.0,
+     "battle": false
+    },
+    {
+     "title": "In the Wild North",
+     "start": 1823.0,
+     "end": 1942.3,
+     "battle": false
+    },
+    {
+     "title": "On Snow-Clad Heights",
+     "start": 1942.3,
+     "end": 2042.6,
+     "battle": false
+    },
+    {
+     "title": "In Dreamland to Slumber",
+     "start": 2042.6,
+     "end": 2133.4,
+     "battle": false
+    },
+    {
+     "title": "Pathos of Pavlina's Pathetique",
+     "start": 2133.4,
+     "end": 2234.0,
+     "battle": false
+    },
+    {
+     "title": "Ice Like Thorns",
+     "start": 2234.0,
+     "end": 2359.7,
+     "battle": false
+    },
+    {
+     "title": "Like Mists, Like Rain",
+     "start": 2359.7,
+     "end": 2497.6,
+     "battle": false
+    },
+    {
+     "title": "The Little Branch Yearns for Home",
+     "start": 2497.6,
+     "end": 2608.1,
+     "battle": false
+    },
+    {
+     "title": "Day on the Bald Mountain",
+     "start": 2608.1,
+     "end": 2718.2,
+     "battle": false
+    },
+    {
+     "title": "The Grain of the Flesh",
+     "start": 2718.2,
+     "end": 2817.6,
+     "battle": false
+    },
+    {
+     "title": "The Bitter Wine of Thought",
+     "start": 2817.6,
+     "end": 2916.9,
+     "battle": false
+    },
+    {
+     "title": "Sigh for Sigh",
+     "start": 2916.9,
+     "end": 2986.7,
+     "battle": false
+    },
+    {
+     "title": "Love's Labour's Won",
+     "start": 2986.7,
+     "end": 3056.6,
+     "battle": false
+    },
+    {
+     "title": "The Little Jack Frost Clan",
+     "start": 3056.6,
+     "end": 3167.7,
+     "battle": false
+    },
+    {
+     "title": "The Swirling Wave",
+     "start": 3167.7,
+     "end": 3280.4,
+     "battle": false
+    },
+    {
+     "title": "Unyielding Icy Wind",
+     "start": 3280.4,
+     "end": 3403.8,
+     "battle": true
+    },
+    {
+     "title": "Swift Advance",
+     "start": 3403.8,
+     "end": 3500.7,
+     "battle": true
+    },
+    {
+     "title": "To Hone Mind and Thought",
+     "start": 3500.7,
+     "end": 3631.0,
+     "battle": true
+    }
+   ],
+   "length": 3631
+  },
+  {
+   "disc": 3,
+   "video": "nBWPbEK1fYE",
+   "title": "Untroubled Bliss",
+   "tracks": [
+    {
+     "title": "A Gentle Wind Blows Softly",
+     "start": 0.0,
+     "end": 128.2,
+     "battle": false
+    },
+    {
+     "title": "Snowy Reunion",
+     "start": 128.2,
+     "end": 249.4,
+     "battle": false
+    },
+    {
+     "title": "Whispers Woven in Mist",
+     "start": 249.4,
+     "end": 384.6,
+     "battle": false
+    },
+    {
+     "title": "Spine Flute",
+     "start": 384.6,
+     "end": 485.3,
+     "battle": false
+    },
+    {
+     "title": "Ode to the Pine Needle",
+     "start": 485.3,
+     "end": 625.9,
+     "battle": false
+    },
+    {
+     "title": "Snow Falls Soundlessly",
+     "start": 625.9,
+     "end": 738.2,
+     "battle": false
+    },
+    {
+     "title": "The Sinking Day",
+     "start": 738.2,
+     "end": 886.1,
+     "battle": false
+    },
+    {
+     "title": "As if Drenched in Moonlight",
+     "start": 886.1,
+     "end": 956.0,
+     "battle": false
+    },
+    {
+     "title": "Unfulfilled Aurora",
+     "start": 956.0,
+     "end": 1017.1,
+     "battle": false
+    },
+    {
+     "title": "Whispers to the Midnight Frost",
+     "start": 1017.1,
+     "end": 1138.0,
+     "battle": false
+    },
+    {
+     "title": "In the Moonlight",
+     "start": 1138.0,
+     "end": 1246.1,
+     "battle": false
+    },
+    {
+     "title": "Reclaim Not Bygone Joy",
+     "start": 1246.1,
+     "end": 1354.7,
+     "battle": false
+    },
+    {
+     "title": "Skein-Song of Stars and Sails",
+     "start": 1354.7,
+     "end": 1455.5,
+     "battle": false
+    },
+    {
+     "title": "Nocturne of the Birch Forest",
+     "start": 1455.5,
+     "end": 1563.1,
+     "battle": false
+    },
+    {
+     "title": "When Sunset's Blush Dyes the Branches",
+     "start": 1563.1,
+     "end": 1659.3,
+     "battle": false
+    },
+    {
+     "title": "The Empty Echo",
+     "start": 1659.3,
+     "end": 1760.9,
+     "battle": false
+    },
+    {
+     "title": "Through a Glass Darkly",
+     "start": 1760.9,
+     "end": 1797.1,
+     "battle": false
+    },
+    {
+     "title": "Abiding Nowhere",
+     "start": 1797.1,
+     "end": 1838.6,
+     "battle": false
+    },
+    {
+     "title": "Where the Moon Kisses the Water",
+     "start": 1838.6,
+     "end": 1947.8,
+     "battle": false
+    },
+    {
+     "title": "Song of the Tidal Algae",
+     "start": 1947.8,
+     "end": 2057.0,
+     "battle": false
+    },
+    {
+     "title": "Forms Arise From Deluded Thoughts",
+     "start": 2057.0,
+     "end": 2135.0,
+     "battle": false
+    },
+    {
+     "title": "Dear Odette, Come and Build a Snowman With Me - Chinese Version",
+     "start": 2135.0,
+     "end": 2217.4,
+     "battle": false
+    },
+    {
+     "title": "Dear Odette, Come and Build a Snowman With Me - Japanese Version",
+     "start": 2217.4,
+     "end": 2299.4,
+     "battle": false
+    },
+    {
+     "title": "Dear Odette, Come and Build a Snowman With Me - English Version",
+     "start": 2299.4,
+     "end": 2381.2,
+     "battle": false
+    },
+    {
+     "title": "Dear Odette, Come and Build a Snowman With Me - Korean Version",
+     "start": 2381.2,
+     "end": 2462.9,
+     "battle": false
+    },
+    {
+     "title": "Faults and Fallacies",
+     "start": 2462.9,
+     "end": 2553.2,
+     "battle": false
+    },
+    {
+     "title": "Caught Betwixt Possibilities",
+     "start": 2553.2,
+     "end": 2663.4,
+     "battle": false
+    },
+    {
+     "title": "Acrossing the River of Smorodina",
+     "start": 2663.4,
+     "end": 2773.6,
+     "battle": false
+    },
+    {
+     "title": "The Parties Debate",
+     "start": 2773.6,
+     "end": 2870.8,
+     "battle": false
+    },
+    {
+     "title": "The Ferry of Lost Souls",
+     "start": 2870.8,
+     "end": 2981.0,
+     "battle": false
+    },
+    {
+     "title": "Verse of the Verseless One",
+     "start": 2981.0,
+     "end": 3075.9,
+     "battle": true
+    },
+    {
+     "title": "O Mors",
+     "start": 3075.9,
+     "end": 3312.0,
+     "battle": true
+    }
+   ],
+   "length": 3312
+  }
+ ]
+}

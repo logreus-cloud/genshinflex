@@ -84,12 +84,19 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
 
 <script>
   import { store } from '../../../scripts/common';
-  import { BASE, t, LANG } from '../../../scripts/search';
+  import { t } from '../../../scripts/search';
+  import { pageLang } from '../../../i18n/client';
+  import { onPage, cleanup } from '../../../scripts/router';
 
   type Wish = { id: string; uid: string; gacha_type: string; time: string; name: string; item_type: string; rank_type: string; item_id?: string };
   type Idx = { characters: { id: number | null; s: string; n: string; i: string | null; r: number }[]; weapons: { id: number; s: string; n: string; i: string | null; r: number }[] };
 
-  const root = document.querySelector<HTMLElement>('.wt')!;
+  onPage((signal) => {
+  const root = document.querySelector<HTMLElement>('.wt');
+  if (!root) return;
+  const LANG = pageLang();
+  const BASE = LANG === 'ru' ? '' : `/${LANG}`;
+  void (async () => {
   const STANDARD = new Set<string>(JSON.parse(root.dataset.standard!));
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const status = (t: string, bad = false) => { const s = $('status'); s.textContent = t; s.classList.toggle('bad', bad); };
@@ -103,12 +110,14 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
     { key: 'chronicled', title: t('Хроники'), types: ['500'], pity: 90, soft: 74, fiftyFifty: false },
   ];
   const TYPE_NAME: Record<string, string> = { '301': t('Событие'), '400': t('Событие 2'), '302': t('Оружие'), '200': t('Стандарт'), '500': t('Хроники'), '100': t('Новичка') };
+  const RANK_TYPES = new Set(['3', '4', '5']);
+  const GACHA_TYPES = new Set(Object.keys(TYPE_NAME));
 
-  const idx: Idx = await fetch(`${BASE}/data/checker.json`).then((r) => r.json());
+  const idx: Idx = await fetch(`${BASE}/data/checker.json`, { signal }).then((r) => r.json());
   const byName = new Map<string, { i: string | null; kind: 'c' | 'w'; s: string; r?: number }>();
   const byId = new Map<string, { n: string; kind: 'c' | 'w'; r?: number }>();
   // История хранится с русскими именами — для показа переводим через слаг
-  const ruIdx: Idx = LANG === 'ru' ? idx : await fetch('/data/checker.json').then((r) => r.json());
+  const ruIdx: Idx = LANG === 'ru' ? idx : await fetch('/data/checker.json', { signal }).then((r) => r.json());
   const ruNameBySlug = new Map([...ruIdx.characters, ...ruIdx.weapons].map((x) => [x.s, x.n]));
   const slugByRuName = new Map([...ruIdx.characters, ...ruIdx.weapons].map((x) => [x.n.toLowerCase(), x.s]));
   const bySlug = new Map<string, { n: string; i: string | null; kind: 'c' | 'w' }>([
@@ -118,7 +127,8 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   // История может прийти на любом языке: из игры по ссылке, из UIGF другого трекера (часто en-us) или вручную.
   // Поэтому предмет узнаём по игровому ID, а если его нет — по имени на русском, английском или испанском.
   const namesByLang = await Promise.all(['', '/en', '/es'].map((p) =>
-    fetch(`${p}/data/index.json`).then((r) => r.json()).catch(() => ({ characters: [], weapons: [] }))));
+    fetch(`${p}/data/index.json`, { signal }).then((r) => r.json()).catch(() => ({ characters: [], weapons: [] }))));
+  if (signal.aborted) return;
   const slugOfName = new Map<string, string>(slugByRuName);
   for (const n of namesByLang) for (const x of [...n.characters, ...n.weapons]) slugOfName.set(x.n.toLowerCase(), x.s);
   const slugOfId = new Map([...ruIdx.characters, ...ruIdx.weapons].filter((x) => x.id).map((x) => [String(x.id), x.s]));
@@ -133,26 +143,47 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   $('m-items').innerHTML = [...idx.characters.map((c) => c.n), ...idx.weapons.filter((w) => w.r >= 4).map((w) => w.n)].map((n) => `<option value="${esc(n)}">`).join('');
 
   // Хранилище: по аккаунту, записи отсортированы по id (в игре id растут со временем)
-  const load = (uid: string) => store.get<Wish[]>(`gf:wishes:${uid}`, []);
+  const loadUids = () => {
+    const uids = store.get<string[]>('gf:wish-uids', []);
+    return Array.isArray(uids) ? uids.filter((u): u is string => typeof u === 'string') : [];
+  };
+  const load = (uid: string) => {
+    const list = store.get<Wish[]>(`gf:wishes:${uid}`, []);
+    return Array.isArray(list) ? list.filter((w) => w && RANK_TYPES.has(w.rank_type) && GACHA_TYPES.has(w.gacha_type))
+      .map((w) => ({ ...w, id: String(w.id ?? ''), uid, time: String(w.time ?? ''), name: String(w.name ?? ''), item_type: String(w.item_type ?? ''), item_id: w.item_id == null ? undefined : String(w.item_id) })) : [];
+  };
   const save = (uid: string, list: Wish[]) => {
     store.set(`gf:wishes:${uid}`, list);
-    store.set('gf:wish-uids', [...new Set([...store.get<string[]>('gf:wish-uids', []), uid])]);
+    store.set('gf:wish-uids', [...new Set([...loadUids(), uid])]);
   };
   const cmpId = (a: Wish, b: Wish) => (a.id.length - b.id.length) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
   function merge(uid: string, incoming: Wish[]) {
     const map = new Map(load(uid).map((w) => [w.id, w]));
     let added = 0;
-    for (const w of incoming) if (!map.has(w.id)) { map.set(w.id, { ...w, uid }); added++; }
+    for (const w of incoming) if (RANK_TYPES.has(w.rank_type) && GACHA_TYPES.has(w.gacha_type) && !map.has(w.id)) { map.set(w.id, { ...w, uid }); added++; }
     save(uid, [...map.values()].sort(cmpId));
     return added;
   }
-  let uid = store.get<string>('gf:wish-uid', '') || store.get<string[]>('gf:wish-uids', [])[0] || '';
+  const savedUid = store.get<string>('gf:wish-uid', '');
+  const uids = loadUids();
+  let uid = uids.includes(savedUid) ? savedUid : uids[0] ?? '';
+  if (uid !== savedUid) store.set('gf:wish-uid', uid);
+
+  let wipeArmedUid = '';
+  let wipeTimer: ReturnType<typeof setTimeout> | undefined;
+  const resetWipe = () => { clearTimeout(wipeTimer); wipeArmedUid = ''; $('wipe').textContent = t('Удалить историю аккаунта'); };
+  cleanup(signal, () => clearTimeout(wipeTimer));
 
   // ---------- Импорт по ссылке ----------
   $('ps-cmd').textContent = `iex (irm "${location.origin}/wish-url.ps1")`;
-  $('copy-cmd').addEventListener('click', () => navigator.clipboard?.writeText($('ps-cmd').textContent!).then(() => status(t('Команда скопирована.'))));
+  $('copy-cmd').addEventListener('click', () => navigator.clipboard?.writeText($('ps-cmd').textContent!).then(() => { if (!signal.aborted) status(t('Команда скопирована.')); }), { signal });
 
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const sleep = (ms: number) => new Promise<void>((resolve) => {
+    const done = () => { clearTimeout(timer); signal.removeEventListener('abort', done); resolve(); };
+    const timer = setTimeout(done, ms);
+    signal.addEventListener('abort', done, { once: true });
+    if (signal.aborted) done();
+  });
   $('import-link').addEventListener('click', async () => {
     const raw = $<HTMLInputElement>('wish-url').value.trim();
     let params: URLSearchParams;
@@ -171,10 +202,11 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
           status(t('Загружаю «{type}», страница {page}…', { type: TYPE_NAME[type], page }));
           const q = new URLSearchParams({ authkey: params.get('authkey')!, authkey_ver: params.get('authkey_ver') ?? '1', sign_type: params.get('sign_type') ?? '2',
             lang: 'ru', gacha_type: type, page: String(page), end_id: endId, game_biz: params.get('game_biz') ?? 'hk4e_global', region: params.get('region') ?? '' });
-          const res = await fetch(`/api/gacha?${q}`);
+          const res = await fetch(`/api/gacha?${q}`, { signal });
           const body = await res.json().catch(() => null);
+          if (signal.aborted) return;
           if (!body) throw new Error(t('Сервер не ответил. Попробуйте ещё раз через минуту.'));
-          if (body.retcode === -110) { await sleep(1500); page--; continue; }
+          if (body.retcode === -110) { await sleep(1500); if (signal.aborted) return; page--; continue; }
           if (body.retcode === -101) throw new Error(t('Ссылка устарела (живёт сутки). Откройте историю в игре и получите новую.'));
           if (body.retcode !== 0) throw new Error(t(body.error ?? body.message ?? 'Не удалось загрузить историю.'));
           const list: Wish[] = body.data?.list ?? [];
@@ -185,17 +217,19 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
           if (fresh.length < list.length) break; // дошли до уже сохранённых
           endId = list.at(-1)!.id;
           await sleep(350);
+          if (signal.aborted) return;
         }
         if (foundUid && got.length) total += merge(foundUid, got);
       }
       if (!foundUid) return status(t('История пуста: на этом аккаунте ещё не было молитв за последние 6 месяцев.'));
+      if (uid !== foundUid) resetWipe();
       uid = foundUid; store.set('gf:wish-uid', uid);
       status(t('Готово: добавлено {n} новых молитв.', { n: total }));
       render();
     } catch (e) {
-      status((e as Error).message, true);
-    } finally { btn.disabled = false; }
-  });
+      if (!signal.aborted) status((e as Error).message, true);
+    } finally { if (!signal.aborted) btn.disabled = false; }
+  }, { signal });
 
   // ---------- UIGF ----------
   $<HTMLInputElement>('uigf-file').addEventListener('change', async (e) => {
@@ -203,6 +237,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
     if (!file) return;
     try {
       const data = JSON.parse(await file.text());
+      if (signal.aborted) return;
       const accounts: { uid: string; list: Partial<Wish>[] }[] = data.hk4e
         ? data.hk4e.map((a: { uid: string | number; list: Partial<Wish>[] }) => ({ uid: String(a.uid), list: a.list }))
         : [{ uid: String(data.info?.uid ?? ''), list: data.list ?? [] }];
@@ -213,20 +248,21 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
           const known = w.item_id ? byId.get(String(w.item_id)) : undefined;
           return {
             id: String(w.id), uid: a.uid, gacha_type: String(w.gacha_type), time: String(w.time ?? ''),
-            name: w.name ?? known?.n ?? '?', item_type: w.item_type ?? (known?.kind === 'c' ? 'Персонаж' : 'Оружие'),
+            name: String(w.name ?? known?.n ?? '?'), item_type: String(w.item_type ?? (known?.kind === 'c' ? 'Персонаж' : 'Оружие')),
             rank_type: String(w.rank_type ?? known?.r ?? 3), item_id: w.item_id ? String(w.item_id) : undefined,
           } as Wish;
         }).filter((w) => w.id !== 'undefined');
         total += merge(a.uid, list);
+        if (uid !== a.uid) resetWipe();
         uid = a.uid;
       }
       store.set('gf:wish-uid', uid);
       status(t('Файл загружен: добавлено {n} новых молитв.', { n: total }));
       render();
     } catch {
-      status(t('Не получилось прочитать файл. Нужен JSON в формате UIGF.'), true);
+      if (!signal.aborted) status(t('Не получилось прочитать файл. Нужен JSON в формате UIGF.'), true);
     }
-  });
+  }, { signal });
   $('export').addEventListener('click', () => {
     if (!uid) return;
     const list = load(uid);
@@ -235,24 +271,28 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
       hk4e: [{ uid, timezone: 8, lang: 'ru-ru', list: list.map((w) => ({ ...w, uigf_gacha_type: w.gacha_type === '400' ? '301' : w.gacha_type, count: '1' })) }],
     };
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' }));
+    const url = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' }));
+    const revoke = () => URL.revokeObjectURL(url);
+    cleanup(signal, revoke);
+    a.href = url;
     a.download = `genshinflex-wishes-${uid}.json`;
     a.click();
-    URL.revokeObjectURL(a.href);
-  });
+    revoke();
+    signal.removeEventListener('abort', revoke);
+  }, { signal });
 
   // Удаление — в два нажатия, без системных диалогов
-  let wipeArmed = false;
   $('wipe').addEventListener('click', () => {
     if (!uid) return;
-    if (!wipeArmed) { wipeArmed = true; $('wipe').textContent = t('Точно удалить? Нажмите ещё раз'); setTimeout(() => { wipeArmed = false; $('wipe').textContent = t('Удалить историю аккаунта'); }, 4000); return; }
+    if (wipeArmedUid !== uid) { resetWipe(); wipeArmedUid = uid; $('wipe').textContent = t('Точно удалить? Нажмите ещё раз'); wipeTimer = setTimeout(resetWipe, 4000); return; }
     store.set(`gf:wishes:${uid}`, []);
-    store.set('gf:wish-uids', store.get<string[]>('gf:wish-uids', []).filter((u) => u !== uid));
-    uid = store.get<string[]>('gf:wish-uids', [])[0] ?? '';
-    wipeArmed = false; $('wipe').textContent = t('Удалить историю аккаунта');
+    store.set('gf:wish-uids', loadUids().filter((u) => u !== uid));
+    uid = loadUids()[0] ?? '';
+    store.set('gf:wish-uid', uid);
+    resetWipe();
     status(t('История аккаунта удалена из браузера.'));
     render();
-  });
+  }, { signal });
 
   // ---------- Ручной ввод ----------
   const manualUid = () => { if (!uid) { uid = 'manual'; store.set('gf:wish-uid', uid); } return uid; };
@@ -266,7 +306,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
     const type = $<HTMLSelectElement>('m-banner').value;
     merge(manualUid(), Array.from({ length: n }, () => mk(type, 'Оружие 3★', 'Оружие', '3')));
     status(t('Добавлено молитв: {n}.', { n })); render();
-  });
+  }, { signal });
   $('m-add-item').addEventListener('click', () => {
     const name = $<HTMLInputElement>('m-item').value.trim();
     const hit = byName.get(name.toLowerCase());
@@ -275,7 +315,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
     merge(manualUid(), [mk($<HTMLSelectElement>('m-banner').value, ruNameBySlug.get(hit.s) ?? name, hit.kind === 'c' ? 'Персонаж' : 'Оружие', rank)]);
     $<HTMLInputElement>('m-item').value = '';
     status(t('Добавлено: {name}.', { name })); render();
-  });
+  }, { signal });
 
   // ---------- Подсчёт ----------
   type Five = { name: string; pity: number; outcome: 'win' | 'lose' | 'guar' | null; time: string };
@@ -314,9 +354,9 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   const OUT: Record<string, string> = { win: t('выиграл 50/50'), lose: t('проиграл 50/50'), guar: t('по гаранту') };
 
   function render() {
-    const uids = store.get<string[]>('gf:wish-uids', []);
+    const uids = loadUids();
     const sel = $<HTMLSelectElement>('uid-select');
-    sel.innerHTML = uids.map((u) => `<option value="${u}" ${u === uid ? 'selected' : ''}>${u === 'manual' ? t('Ручной ввод') : `UID ${u}`}</option>`).join('');
+    sel.innerHTML = uids.map((u) => `<option value="${esc(u)}" ${u === uid ? 'selected' : ''}>${u === 'manual' ? t('Ручной ввод') : `UID ${esc(u)}`}</option>`).join('');
     const list = uid ? load(uid) : [];
     $('empty').hidden = list.length > 0;
     document.querySelector<HTMLElement>('.toolbar')!.hidden = !uids.length;
@@ -356,7 +396,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
       const i = icon(w.name);
       const o = all.get(w.id);
       return `<tr class="r${w.rank_type}"><td class="muted">${esc(w.time)}</td><td><span class="it">${i ? `<img src="${i}" alt="" width="28" height="28" loading="lazy">` : ''}${esc(label(w.name))}</span></td>
-        <td class="muted">${TYPE_NAME[w.gacha_type] ?? w.gacha_type}</td><td class="muted">${o ? OUT[o] : ''}</td></tr>`;
+        <td class="muted">${esc(TYPE_NAME[w.gacha_type] ?? w.gacha_type)}</td><td class="muted">${o ? OUT[o] : ''}</td></tr>`;
     }).join('');
   }
 
@@ -365,10 +405,16 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   itabs.forEach((t) => t.addEventListener('click', () => {
     itabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
     document.querySelectorAll<HTMLElement>('[data-ipanel]').forEach((p) => (p.hidden = p.dataset.ipanel !== t.dataset.itab));
-  }));
-  $<HTMLSelectElement>('uid-select').addEventListener('change', (e) => { uid = (e.target as HTMLSelectElement).value; store.set('gf:wish-uid', uid); render(); });
-  $('only-rare').addEventListener('change', render);
+  }, { signal }));
+  $<HTMLSelectElement>('uid-select').addEventListener('change', (e) => {
+    const nextUid = (e.target as HTMLSelectElement).value;
+    if (uid !== nextUid) resetWipe();
+    uid = nextUid; store.set('gf:wish-uid', uid); render();
+  }, { signal });
+  $('only-rare').addEventListener('change', render, { signal });
   render();
+  })().catch((error) => { if (!signal.aborted) console.error(error); });
+  });
 </script>
 
 <style>

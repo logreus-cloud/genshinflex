@@ -3,35 +3,40 @@
   --snow: #f4f8ff; --aurora-a: #2fd3c5; --aurora-b: #5a7dff; --royal: #9b2335;
   --bg: #1f2330; --bg-deep: #171a24; --surface: #141722; --surface-2: #272c3b; --surface-3: #323849; --border: #313a4d;
   --scene-shade: linear-gradient(180deg, rgb(13 18 32 / .5) 0, rgb(15 20 34 / .55) 55vh, rgb(20 24 36 / .68) 100%);
-  --top-glass: rgb(20 24 36 / .72); --feature-glass: rgb(31 35 48 / .62); --collection-glass: rgb(13 21 38 / .72);
+  --top-glass: rgb(20 24 36 / .72); --feature-glass: linear-gradient(115deg, rgb(31 38 54 / .82) 0%, rgb(26 42 65 / .78) 45%, rgb(45 38 68 / .8) 100%); --collection-glass: linear-gradient(115deg, rgb(13 26 48 / .85) 0%, rgb(14 42 62 / .8) 50%, rgb(30 29 66 / .85) 100%);
 }
 :root[data-season="snezhnaya"][data-theme="light"] {
   --bg: #eef3f9; --bg-deep: #e2eaf4; --surface: #fff; --surface-2: #e4ebf5; --surface-3: #d8e1ec; --border: #cdd8e6; --frost: #2f7fc9;
   --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .6) 0, rgb(238 243 249 / .65) 55vh, rgb(238 243 249 / .78) 100%);
-  --top-glass: rgb(244 247 251 / .75); --feature-glass: rgb(238 243 249 / .82); --collection-glass: rgb(221 232 245 / .88);
+  --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .85) 0%, rgb(225 237 248 / .8) 45%, rgb(235 232 248 / .85) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .88) 0%, rgb(211 235 244 / .85) 50%, rgb(227 228 247 / .88) 100%);
 }
 @media (prefers-color-scheme: light) {
   :root[data-season="snezhnaya"]:not([data-theme]) {
     --bg: #eef3f9; --bg-deep: #e2eaf4; --surface: #fff; --surface-2: #e4ebf5; --surface-3: #d8e1ec; --border: #cdd8e6; --frost: #2f7fc9;
     --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .6) 0, rgb(238 243 249 / .65) 55vh, rgb(238 243 249 / .78) 100%);
-    --top-glass: rgb(244 247 251 / .75); --feature-glass: rgb(238 243 249 / .82); --collection-glass: rgb(221 232 245 / .88);
+    --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .85) 0%, rgb(225 237 248 / .8) 45%, rgb(235 232 248 / .85) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .88) 0%, rgb(211 235 244 / .85) 50%, rgb(227 228 247 / .88) 100%);
   }
+}
+:root[data-season="snezhnaya"] .snow-divider { --snow-shadow: rgb(30 74 145 / .42); }
+:root[data-season="snezhnaya"][data-theme="light"] .snow-divider { --snow-shadow: rgb(30 74 145 / .2); }
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .snow-divider { --snow-shadow: rgb(30 74 145 / .2); }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   :root[data-season="snezhnaya"] {
     --scene-shade: linear-gradient(180deg, rgb(13 18 32 / .95), rgb(15 20 34 / .95) 55vh, rgb(20 24 36 / .95));
-    --top-glass: rgb(20 24 36 / .95); --feature-glass: rgb(31 35 48 / .95); --collection-glass: rgb(13 21 38 / .95);
+    --top-glass: rgb(20 24 36 / .95); --feature-glass: linear-gradient(115deg, rgb(31 38 54 / .95), rgb(26 42 65 / .95) 45%, rgb(45 38 68 / .95)); --collection-glass: linear-gradient(115deg, rgb(13 26 48 / .95), rgb(14 42 62 / .95) 50%, rgb(30 29 66 / .95));
   }
   :root[data-season="snezhnaya"][data-theme="light"] {
     --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .95), rgb(238 243 249 / .95) 55vh, rgb(238 243 249 / .95));
-    --top-glass: rgb(244 247 251 / .95); --feature-glass: rgb(238 243 249 / .95); --collection-glass: rgb(221 232 245 / .95);
+    --top-glass: rgb(244 247 251 / .95); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .95), rgb(225 237 248 / .95) 45%, rgb(235 232 248 / .95)); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .95), rgb(211 235 244 / .95) 50%, rgb(227 228 247 / .95));
   }
 }
 @media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) {
   :root[data-season="snezhnaya"]:not([data-theme]) {
     --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .95), rgb(238 243 249 / .95) 55vh, rgb(238 243 249 / .95));
-    --top-glass: rgb(244 247 251 / .95); --feature-glass: rgb(238 243 249 / .95); --collection-glass: rgb(221 232 245 / .95);
+    --top-glass: rgb(244 247 251 / .95); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .95), rgb(225 237 248 / .95) 45%, rgb(235 232 248 / .95)); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .95), rgb(211 235 244 / .95) 50%, rgb(227 228 247 / .95));
   }
 }
 
@@ -103,20 +108,32 @@
   background: rgb(169 220 255 / .08); border: 1px solid rgb(169 220 255 / .25); backdrop-filter: blur(6px);
 }
 :root[data-season="snezhnaya"] .feature-band {
-  background-color: var(--feature-glass);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-size: 140px 140px;
-  backdrop-filter: blur(8px);
+  background: transparent;
 }
-:root[data-season="snezhnaya"] .collection-band {
+:root[data-season="snezhnaya"] .feature-band::before {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"), var(--feature-glass);
+  background-size: 140px 140px, auto; backdrop-filter: blur(8px);
+}
+/* Светлая тема: базовое правило index.astro специфичнее — повторяем сезонный фон с явным селектором темы */
+:root[data-season="snezhnaya"][data-theme="light"] .feature-band::before {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"), var(--feature-glass);
+  background-size: 140px 140px, auto; backdrop-filter: blur(8px);
+}
+@media (prefers-color-scheme: light) {
+  :root[data-season="snezhnaya"]:not([data-theme]) .feature-band::before {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"), var(--feature-glass);
+    background-size: 140px 140px, auto; backdrop-filter: blur(8px);
+  }
+}
+:root[data-season="snezhnaya"] .collection-band::before {
   background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .22), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .25), transparent 50%), var(--collection-glass);
   backdrop-filter: blur(8px);
 }
-:root[data-season="snezhnaya"][data-theme="light"] .collection-band {
+:root[data-season="snezhnaya"][data-theme="light"] .collection-band::before {
   background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .12), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .14), transparent 50%), var(--collection-glass);
 }
 @media (prefers-color-scheme: light) {
-  :root[data-season="snezhnaya"]:not([data-theme]) .collection-band {
+  :root[data-season="snezhnaya"]:not([data-theme]) .collection-band::before {
     background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .12), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .14), transparent 50%), var(--collection-glass);
   }
 }

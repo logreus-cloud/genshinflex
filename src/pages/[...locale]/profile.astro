@@ -1,0 +1,7 @@
+---
+// Страница «Мой профиль»: вся реализация — в компоненте Profile (данные браузера + персонализация)
+import Profile from '../../components/Profile.astro';
+import { LANGS } from '../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+---
+<Profile />
