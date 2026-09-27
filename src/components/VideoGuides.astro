@@ -22,9 +22,13 @@ const { t } = useData(Astro.currentLocale);
 </div>
 
 <script>
-  document.addEventListener('click', (e) => {
+  import { onPage } from '../scripts/router';
+
+  onPage((signal) => {
+    if (!document.querySelector('.videos')) return;
+    document.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-yt]');
-    if (!btn) return;
+    if (!btn?.closest('.videos')) return;
     const frame = document.createElement('iframe');
     frame.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.yt}?autoplay=1&rel=0`;
     frame.title = btn.getAttribute('aria-label') ?? 'Video';
@@ -32,6 +36,7 @@ const { t } = useData(Astro.currentLocale);
     frame.allowFullscreen = true;
     frame.className = 'yt-frame';
     btn.replaceWith(frame);
+    }, { signal });
   });
 </script>
 

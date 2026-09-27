@@ -23,7 +23,7 @@ const users = (await getCollection('builds'))
   .sort((a, b) => a.place - b.place);
 ---
 <Layout title={t('{name}: статы, эффект и кому подходит — Genshin Impact', { name: w.name })} description={t('{name} ({stars}, {type}): статы на каждом уровне, эффект на всех пробуждениях R1–R5 и персонажи, которым оружие подходит лучше всего.', { name: w.name, stars: stars(w.rarity), type: w.weaponText.toLowerCase() })} image={w.icon}>
-  <article data-pagefind-body data-visit={JSON.stringify({ href: `${base}/weapons/${w.slug}`, name: w.name, icon: w.icon, kind: t('Оружие') })}>
+  <article data-weapon-page data-pagefind-body data-visit={JSON.stringify({ href: `${base}/weapons/${w.slug}`, name: w.name, icon: w.icon, kind: t('Оружие') })}>
     <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/weapons`}>{t('Оружие')}</a> / {w.name}</nav>
     <header class:list={['head', `r${w.rarity}`]}>
       <div class="pic">
@@ -86,17 +86,23 @@ const users = (await getCollection('builds'))
 
 <script>
   import { recent } from '../../../scripts/common';
-  recent.push(JSON.parse(document.querySelector<HTMLElement>('[data-visit]')!.dataset.visit!));
+  import { onPage } from '../../../scripts/router';
 
-  const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-r]')];
-  const texts = [...document.querySelectorAll<HTMLElement>('[data-r-text]')];
-  btns.forEach((b) => b.addEventListener('click', () => {
-    btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    texts.forEach((t) => (t.hidden = t.dataset.rText !== b.dataset.r));
-  }));
-  const img = document.querySelector<HTMLImageElement>('[data-base]')!;
-  document.querySelector<HTMLInputElement>('.aw input')?.addEventListener('change', (e) => {
-    img.src = (e.target as HTMLInputElement).checked ? img.dataset.awaken! : img.dataset.base!;
+  onPage((signal) => {
+    const article = document.querySelector<HTMLElement>('article[data-weapon-page]');
+    if (!article) return;
+    recent.push(JSON.parse(article.dataset.visit!));
+
+    const btns = [...article.querySelectorAll<HTMLButtonElement>('[data-r]')];
+    const texts = [...article.querySelectorAll<HTMLElement>('[data-r-text]')];
+    btns.forEach((b) => b.addEventListener('click', () => {
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      texts.forEach((t) => (t.hidden = t.dataset.rText !== b.dataset.r));
+    }, { signal }));
+    const img = article.querySelector<HTMLImageElement>('[data-base]')!;
+    article.querySelector<HTMLInputElement>('.aw input')?.addEventListener('change', (e) => {
+      img.src = (e.target as HTMLInputElement).checked ? img.dataset.awaken! : img.dataset.base!;
+    }, { signal });
   });
 </script>
 

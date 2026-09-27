@@ -43,8 +43,11 @@ const shown = (await calendarItems(lang)).filter((item) =>
 )}
 <script>
   import { humanLeft, region, serverMoment } from '../scripts/common';
+  import { onPage, cleanup } from '../scripts/router';
 
-  const refresh = () => {
+  onPage((signal) => {
+    if (!document.querySelector('.calendar-widget')) return;
+    const refresh = () => {
     document.querySelectorAll<HTMLElement>('.calendar-widget').forEach((widget) => {
       const cards = widget.querySelector<HTMLElement>('.calendar-cards')!;
       const now = Date.now();
@@ -78,10 +81,12 @@ const shown = (await calendarItems(lang)).filter((item) =>
         if (focused && focused.closest<HTMLAnchorElement>('.calendar-card')?.hidden === false) focused.focus();
       }
     });
-  };
-  refresh();
-  setInterval(refresh, 30_000);
-  document.addEventListener('gf:region', refresh);
+    };
+    refresh();
+    const timer = setInterval(refresh, 30_000);
+    cleanup(signal, () => clearInterval(timer));
+    document.addEventListener('gf:region', refresh, { signal });
+  });
 </script>
 
 <style>

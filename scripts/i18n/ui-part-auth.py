@@ -40,7 +40,7 @@ T = [
 ("Подтверждение входа", "Confirm sign-in", "Confirmar acceso"),
 ("Подтверждаем вход…", "Confirming sign-in…", "Confirmando acceso…"),
 ("Почта подтверждена.", "Email confirmed.", "Correo confirmado."),
-("Ник", "Username", "Nombre de usuario"),
+("Ник", "Nickname", "Apodo"),
 ("Отображаемое имя", "Display name", "Nombre público"),
 ("Способы входа", "Sign-in methods", "Métodos de acceso"),
 ("Профиль и синхронизация — скоро.", "Profiles and syncing are coming soon.", "Los perfiles y la sincronización llegarán pronto."),
@@ -79,4 +79,7 @@ T = [
 ("Аккаунт удалён", "Account deleted", "Cuenta eliminada"),
 ("Ваш аккаунт и связанные данные удалены.", "Your account and its data have been deleted.", "Se han eliminado tu cuenta y sus datos."),
 ("На главную", "Go to home page", "Ir al inicio"),
+("Профиль хранится в этом браузере. Войдите, чтобы сохранить его в аккаунте — синхронизация между устройствами скоро.", "Your profile is stored in this browser. Sign in to save it to your account — syncing across devices is coming soon.", "Tu perfil se guarda en este navegador. Inicia sesión para guardarlo en tu cuenta; la sincronización entre dispositivos llegará pronto."),
+("Вы вошли как", "Signed in as", "Has iniciado sesión como"),
+("Настройки аккаунта", "Account settings", "Configuración de la cuenta"),
 ]

@@ -155,32 +155,38 @@ const sections = [
 
 <script>
   import { region, type Region } from '../../scripts/common';
-  const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-region]')];
-  const paint = () => btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
-  btns.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); }));
-  paint();
+  import { onPage } from '../../scripts/router';
 
-  // Вкладки: состояние в адресе (#all, #history), чтобы можно было поделиться ссылкой
-  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-btab]')];
-  const panels = [...document.querySelectorAll<HTMLElement>('[data-bpanel]')];
-  const show = (id: string) => {
-    if (!panels.some((p) => p.dataset.bpanel === id)) id = 'now';
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.btab === id)));
-    panels.forEach((p) => (p.hidden = p.dataset.bpanel !== id));
-  };
-  tabs.forEach((t) => t.addEventListener('click', () => { history.replaceState(null, '', t.dataset.btab === 'now' ? location.pathname : `#${t.dataset.btab}`); show(t.dataset.btab!); }));
-  show(location.hash.slice(1));
+  onPage((signal) => {
+    if (!document.querySelector('.btabs')) return;
 
-  const select = document.getElementById('version-select') as HTMLSelectElement;
-  const pick = (v: string) => {
-    select.value = v;
-    document.querySelectorAll<HTMLElement>('[data-version]').forEach((el) => (el.hidden = el.dataset.version !== v));
-  };
-  select.addEventListener('change', () => pick(select.value));
-  document.querySelectorAll<HTMLButtonElement>('[data-major]').forEach((b) => b.addEventListener('click', () => {
-    const first = [...select.options].map((o) => o.value).filter((v) => v.startsWith(`${b.dataset.major}.`)).pop();
-    if (first) pick(first);
-  }));
+    const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-region]')];
+    const paint = () => btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
+    btns.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); }, { signal }));
+    paint();
+
+    // Вкладки: состояние в адресе (#all, #history), чтобы можно было поделиться ссылкой
+    const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-btab]')];
+    const panels = [...document.querySelectorAll<HTMLElement>('[data-bpanel]')];
+    const show = (id: string) => {
+      if (!panels.some((p) => p.dataset.bpanel === id)) id = 'now';
+      tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.btab === id)));
+      panels.forEach((p) => (p.hidden = p.dataset.bpanel !== id));
+    };
+    tabs.forEach((t) => t.addEventListener('click', () => { history.replaceState(null, '', t.dataset.btab === 'now' ? location.pathname : `#${t.dataset.btab}`); show(t.dataset.btab!); }, { signal }));
+    show(location.hash.slice(1));
+
+    const select = document.getElementById('version-select') as HTMLSelectElement;
+    const pick = (v: string) => {
+      select.value = v;
+      document.querySelectorAll<HTMLElement>('[data-version]').forEach((el) => (el.hidden = el.dataset.version !== v));
+    };
+    select.addEventListener('change', () => pick(select.value), { signal });
+    document.querySelectorAll<HTMLButtonElement>('[data-major]').forEach((b) => b.addEventListener('click', () => {
+      const first = [...select.options].map((o) => o.value).filter((v) => v.startsWith(`${b.dataset.major}.`)).pop();
+      if (first) pick(first);
+    }, { signal }));
+  });
 </script>
 
 <style>

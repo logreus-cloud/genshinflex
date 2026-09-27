@@ -76,33 +76,41 @@ function tick() {
   }
 }
 tick();
+document.addEventListener('astro:page-load', tick);
 setInterval(tick, 30_000);
 document.addEventListener('gf:region', tick);
 
+let accountLinkRequest = 0;
+
 async function updateAccountLink() {
-  const link = document.getElementById('account-link') as HTMLAnchorElement | null;
+  const link = document.getElementById('profile-link') as HTMLAnchorElement | null;
   if (!link) return;
-  const base = link.dataset.base || '';
-  const login = link.dataset.login || '';
-  const account = link.dataset.account || '';
-  const path = location.pathname + location.search;
-  link.href = `${base}/account/login/?next=${encodeURIComponent(path)}`;
-  link.setAttribute('aria-label', login);
-  link.title = login;
+  const label = link.dataset.profile || '';
+  link.setAttribute('aria-label', label);
+  link.title = label;
   const letter = link.querySelector<HTMLElement>('.account-letter');
   if (letter) { letter.textContent = ''; letter.hidden = true; }
+  const turn = ++accountLinkRequest;
 
   try {
     if (!localStorage.getItem('gf:auth')) return;
     const { getSupabase } = await import('./auth');
-    const { data } = await getSupabase().auth.getSession();
-    if (!data.session || !link.isConnected) return;
-    link.href = `${base}/account/`;
-    link.setAttribute('aria-label', account);
-    link.title = account;
+    const supabase = getSupabase();
+    const { data } = await supabase.auth.getSession();
+    if (!data.session || !link.isConnected || turn !== accountLinkRequest) return;
     const user = data.session.user;
-    const name = String(user.user_metadata?.username || user.user_metadata?.display_name || user.email || '');
-    if (letter && name) { letter.textContent = name[0].toUpperCase(); letter.hidden = false; }
+    let nickname = '';
+    try {
+      const { data: profile, error } = await supabase.from('profiles')
+        .select('nickname').eq('id', user.id).maybeSingle();
+      if (!error) nickname = String(profile?.nickname || '');
+    } catch { /* При сбое запроса показываем email. */ }
+    if (!link.isConnected || turn !== accountLinkRequest) return;
+    const name = nickname || user.email || '';
+    const title = name ? `${label} · ${name}` : label;
+    link.setAttribute('aria-label', title);
+    link.title = title;
+    if (letter && name) { letter.textContent = Array.from(name)[0].toLocaleUpperCase(); letter.hidden = false; }
   } catch { /* Хранилище и сеть могут быть недоступны. */ }
 }
 

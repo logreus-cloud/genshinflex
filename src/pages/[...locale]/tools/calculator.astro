@@ -64,6 +64,7 @@ const { t, TALENTS } = useData(Astro.currentLocale);
   import { store } from '../../../scripts/common';
   import { BASE, LANG, t } from '../../../scripts/search';
   import { combobox } from '../../../scripts/combobox';
+  import { onPage, cleanup } from '../../../scripts/router';
 
   type Cost = [number, number][];
   type Data = {
@@ -78,19 +79,26 @@ const { t, TALENTS } = useData(Astro.currentLocale);
   // Ступени прокачки: [уровень, число возвышений]; «80★» — возвышенный 80-й, лимит поднят до 90
   const STATES: [number, number][] = [[1, 0], [20, 0], [20, 1], [40, 1], [40, 2], [50, 2], [50, 3], [60, 3], [60, 4], [70, 4], [70, 5], [80, 5], [80, 6], [90, 6]];
   const label = ([lvl]: [number, number], i: number) => (i > 0 && STATES[i - 1][0] === lvl ? `${lvl}★` : String(lvl));
-  const LOCALE = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG];
-  const fmt = (n: number) => n.toLocaleString(LOCALE);
-  const form = document.querySelector<HTMLFormElement>('#calc')!;
-  const el = (name: string) => form.elements.namedItem(name) as HTMLInputElement & HTMLSelectElement;
   const norm = (s: string) => s.trim().toLowerCase().replace(/ё/g, 'е');
 
-  init();
+  onPage(async (signal) => {
+    const form = document.querySelector<HTMLFormElement>('#calc');
+    if (!form) return;
+    const el = (name: string) => form.elements.namedItem(name) as HTMLInputElement & HTMLSelectElement;
+    const LOCALE = { ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[LANG];
+    const fmt = (n: number) => n.toLocaleString(LOCALE);
+    const controller = new AbortController();
+    cleanup(signal, () => controller.abort());
 
-  async function init() {
-    const [data, index]: [Data, { characters: Named[]; weapons: Named[] }] = await Promise.all([
-      fetch('/data/levelup.json').then((r) => r.json()),
-      fetch(`${BASE}/data/index.json`).then((r) => r.json()),
-    ]);
+    const loaded = await Promise.all([
+      fetch('/data/levelup.json', { signal: controller.signal }).then((r) => r.json()),
+      fetch(`${BASE}/data/index.json`, { signal: controller.signal }).then((r) => r.json()),
+    ]).catch((error) => {
+      if (!signal.aborted) console.error(error);
+      return null;
+    });
+    if (!loaded || signal.aborted) return;
+    const [data, index]: [Data, { characters: Named[]; weapons: Named[] }] = loaded;
     const chars = index.characters.filter((c) => data.characters[c.s]);
     const weapons = index.weapons.filter((w) => data.weapons[w.s]);
     typeof combobox === 'function' && combobox(el('char'), () => chars.map((c) => ({
@@ -110,7 +118,7 @@ const { t, TALENTS } = useData(Astro.currentLocale);
     const find = (list: Named[], v: string) => list.find((x) => norm(x.n) === norm(v) || x.s === v.trim());
 
     // Оружию 1–2★ доступно только 70 уровней и 4 возвышения
-    const statesFor = (max: number) => STATES.filter(([lvl]) => lvl <= max);
+    const statesFor = (max: number) => STATES.filter(([lvl, asc]) => lvl <= max && asc <= (max === 70 ? 4 : 6));
     const fillStates = (sel: HTMLSelectElement, states: [number, number][], value: number) => {
       sel.innerHTML = states.map((s, i) => `<option value="${i}">${label(s, i)}</option>`).join('');
       sel.value = String(Math.min(value, states.length - 1));
@@ -203,8 +211,8 @@ const { t, TALENTS } = useData(Astro.currentLocale);
       if (target.name === 'char') pick(target, find(chars, target.value));
       if (target.name === 'weapon') { const w = find(weapons, target.value); pick(target, w); if (w) weaponLimit(w); }
       compute();
-    });
-    form.addEventListener('change', compute);
+    }, { signal });
+    form.addEventListener('change', compute, { signal });
     const PRESETS: Record<string, [number, number[]]> = { max: [13, [10, 10, 10]], main: [13, [9, 9, 9]], sup: [11, [1, 9, 9]] };
     form.addEventListener('click', (e) => {
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-preset]');
@@ -213,15 +221,20 @@ const { t, TALENTS } = useData(Astro.currentLocale);
       el('cTo').value = String(lvl);
       tl.forEach((v, i) => { el(`t${i}To`).value = String(Math.max(v, Number(el(`t${i}From`).value))); });
       compute();
-    });
+    }, { signal });
     const share = document.querySelector<HTMLButtonElement>('#share')!;
+    let shareTimer: ReturnType<typeof setTimeout> | undefined;
+    cleanup(signal, () => clearTimeout(shareTimer));
     share.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(location.href); share.textContent = t('Ссылка скопирована'); } catch { share.textContent = location.href; }
-      setTimeout(() => { share.textContent = t('Скопировать ссылку'); }, 2500);
-    });
+      const href = location.href;
+      try { await navigator.clipboard.writeText(href); if (signal.aborted) return; share.textContent = t('Ссылка скопирована'); }
+      catch { if (signal.aborted) return; share.textContent = href; }
+      clearTimeout(shareTimer);
+      shareTimer = setTimeout(() => { share.textContent = t('Скопировать ссылку'); }, 2500);
+    }, { signal });
     load();
     compute();
-  }
+  });
 </script>
 
 <style>

@@ -131,6 +131,7 @@ export const combobox = (
   document.addEventListener('mousedown', onDocumentMousedown);
   const destroy = () => {
     close();
+    document.removeEventListener('astro:before-swap', destroy);
     input.removeEventListener('focus', refresh);
     input.removeEventListener('click', refresh);
     input.removeEventListener('input', onInput);
@@ -144,5 +145,6 @@ export const combobox = (
       else input.setAttribute(name, value);
     });
   };
+  document.addEventListener('astro:before-swap', destroy, { once: true });
   return { close, refresh, destroy };
 };
