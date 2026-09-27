@@ -6,7 +6,7 @@ compatibility_date = "2026-09-01"
 routes = [{ pattern = "api.genshinflex.com", custom_domain = true }]
 
 [vars]
-SITE_ORIGINS = "https://genshinflex.com,https://test.genshinflex.pages.dev,http://localhost:4321"
+SITE_ORIGINS = "https://genshinflex.com,https://test.genshinflex.pages.dev,https://platform.genshinflex.pages.dev,http://localhost:4321"
 SUPABASE_URL = "https://qhfufvdculphsqxuqxsw.supabase.co"
 # Публичный (publishable) ключ Supabase: стоит в коде любого клиента, доступ ограничивают правила RLS
 SUPABASE_ANON_KEY = "sb_publishable_3IqstX40IpHaa2g9_o4wVg_n54We4l_"
