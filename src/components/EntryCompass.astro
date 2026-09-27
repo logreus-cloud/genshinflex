@@ -4,8 +4,10 @@ import { useData } from '../lib/data';
 const { t } = useData(Astro.currentLocale);
 // Траектория компаса в видео: [время, x %, y %] — компас «плавает» вместе с Весной, кнопка следует за ним
 const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.45],[1.2,27.34,55.53],[1.5,26.56,54.84],[1.8,26.09,54.38],[2.1,25.62,54.15],[2.4,25.16,53.92],[2.7,24.53,53.46],[3,23.91,53.23],[3.3,23.44,52.76],[3.6,22.97,52.53],[3.9,22.5,51.84],[4.2,21.88,51.61],[4.5,21.41,51.38],[4.8,20.94,50.92],[5.1,20.47,50.69],[5.4,20,50.23],[5.7,19.53,50],[6,19.22,49.77],[6.3,19.69,50],[6.6,20.16,50.46],[6.9,20.63,51.15],[7.2,21.09,51.38],[7.5,21.56,51.61],[7.8,22.03,51.61],[8.1,22.5,52.3],[8.4,22.97,52.3],[8.7,23.44,52.76],[9,23.91,53],[9.3,24.53,53.46],[9.6,25,53.92],[9.9,25.47,54.15],[10.2,26.09,54.61],[10.5,26.88,55.07],[10.8,27.34,55.76],[11.1,27.81,56.45],[11.4,28.59,57.83],[11.7,29.38,58.53],[11.9,29.69,58.76]];
+// Остальные бабочки в кадре: тоже ведут на сайт (size — диаметр кнопки в долях высоты сцены)
+const butterflies: Record<string, { size: number; track: number[][] }> = {"red":{"size":0.13,"track":[[0,8.59,28.8],[0.3,8.59,28.57],[0.6,8.59,27.19],[0.9,8.59,26.5],[1.2,8.91,26.27],[1.5,9.06,26.27],[1.8,9.06,26.04],[2.1,9.22,25.81],[2.4,9.38,25.12],[2.7,9.53,24.88],[3,9.53,24.88],[3.3,9.84,24.65],[3.6,9.84,24.19],[3.9,10.16,23.5],[4.2,10.31,23.5],[4.5,10.47,23.27],[4.8,10.78,23.04],[5.1,10.94,22.58],[5.4,11.09,22.12],[5.7,11.09,22.12],[6,11.41,21.89],[6.3,11.25,22.12],[6.6,11.09,22.12],[6.9,10.94,22.81],[7.2,10.78,23.27],[7.5,10.63,23.27],[7.8,10.31,23.5],[8.1,10.16,23.96],[8.4,10,24.42],[8.7,9.84,24.65],[9,9.69,24.65],[9.3,9.69,24.88],[9.6,9.53,25.58],[9.9,9.38,25.81],[10.2,9.22,26.04],[10.5,9.06,26.27],[10.8,8.91,26.5],[11.1,8.91,26.73],[11.4,8.91,27.88],[11.7,8.91,28.57],[11.9,8.59,28.8]]},"blue":{"size":0.1,"track":[[0,32.03,7.83],[0.3,32.5,7.83],[0.6,32.81,6.91],[0.9,33.13,6.91],[1.2,33.59,7.6],[1.5,33.91,7.6],[1.8,34.38,7.6],[2.1,34.69,7.6],[2.4,35.16,7.6],[2.7,35.47,7.37],[3,35.78,7.37],[3.3,36.25,7.37],[3.6,36.56,7.14],[3.9,37.03,7.14],[4.2,37.34,6.91],[4.5,37.81,6.91],[4.8,38.13,6.91],[5.1,38.44,6.68],[5.4,38.91,6.68],[5.7,39.38,6.68],[6,39.69,6.68],[6.3,39.22,6.68],[6.6,38.75,6.68],[6.9,38.28,6.68],[7.2,37.81,6.68],[7.5,37.34,6.68],[7.8,37.03,6.68],[8.1,36.72,6.91],[8.4,36.41,7.14],[8.7,35.94,7.14],[9,35.47,7.14],[9.3,35.31,7.37],[9.6,34.84,7.37],[9.9,34.53,7.6],[10.2,34.06,7.6],[10.5,33.75,7.6],[10.8,33.28,7.14],[11.1,32.97,7.14],[11.4,32.5,7.14],[11.7,32.19,7.6],[11.9,32.03,7.83]]},"teal":{"size":0.16,"track":[[0,91.41,65.67],[0.3,90.78,65.9],[0.6,90.16,66.59],[0.9,89.53,66.13],[1.2,89.06,65.44],[1.5,88.28,64.98],[1.8,87.66,64.98],[2.1,87.03,64.98],[2.4,86.25,64.98],[2.7,85.63,65.21],[3,85,65.21],[3.3,84.22,65.44],[3.6,83.59,65.44],[3.9,82.81,65.67],[4.2,82.19,65.67],[4.5,81.41,65.9],[4.8,80.63,65.9],[5.1,80,65.9],[5.4,79.22,66.13],[5.7,78.44,66.13],[6,77.97,66.13],[6.3,78.75,66.13],[6.6,79.38,66.13],[6.9,80.16,66.13],[7.2,80.94,66.13],[7.5,81.56,65.9],[7.8,82.34,65.67],[8.1,82.97,65.67],[8.4,83.75,65.67],[8.7,84.38,65.67],[9,85.16,65.44],[9.3,85.78,65.21],[9.6,86.56,65.21],[9.9,87.19,64.98],[10.2,87.97,64.98],[10.5,88.59,64.98],[10.8,89.06,65.67],[11.1,89.69,66.13],[11.4,90.31,66.36],[11.7,91.09,65.9],[11.9,91.41,65.67]]}};
 ---
-<div id="gf-entry" data-track={JSON.stringify(track)} role="dialog" aria-modal="true" aria-label={t('Вход на сайт')} hidden>
+<div id="gf-entry" data-track={JSON.stringify(track)} data-butterflies={JSON.stringify(butterflies)} role="dialog" aria-modal="true" aria-label={t('Вход на сайт')} hidden>
   <div class="panel">
     <button class="menu" type="button" aria-label={t('Открыть меню')}>☰</button>
     <div class="brand">
@@ -32,6 +34,11 @@ const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.
         <span class="glints" aria-hidden="true"></span>
         <span class="shake" aria-hidden="true"></span>
       </button>
+      <!-- Дубли входа для мыши/касания: с клавиатуры достаточно основной кнопки -->
+      {Object.entries(butterflies).map(([key, b]) => (
+        <button class="bfly" type="button" tabindex="-1" aria-hidden="true" data-key={key}
+          style={`left: ${b.track[0][1]}%; top: ${b.track[0][2]}%; --size: ${b.size}`}></button>
+      ))}
     </div>
   </div>
   <button class="hint" type="button">{t('Коснитесь компаса Весны, чтобы войти')} <span aria-hidden="true">◇</span></button>
@@ -86,15 +93,25 @@ const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.
     }
     var track = [];
     try { track = JSON.parse(gate.dataset.track || '[]'); } catch (e) {}
+    var extra = {};
+    try { extra = JSON.parse(gate.dataset.butterflies || '{}'); } catch (e) {}
+    var targets = [{ el: light, track: track }];
+    gate.querySelectorAll('.bfly').forEach(function (el) {
+      var item = extra[el.dataset.key];
+      if (item) targets.push({ el: el, track: item.track });
+    });
     var frame = 0;
-    function place(time) {
-      if (!track.length) return;
+    function placeOne(el, points, time) {
+      if (!points.length) return;
       var i = 0;
-      while (i < track.length - 2 && track[i + 1][0] <= time) i++;
-      var a = track[i], b = track[i + 1] || a;
+      while (i < points.length - 2 && points[i + 1][0] <= time) i++;
+      var a = points[i], b = points[i + 1] || a;
       var k = b[0] > a[0] ? Math.min(1, Math.max(0, (time - a[0]) / (b[0] - a[0]))) : 0;
-      light.style.left = (a[1] + (b[1] - a[1]) * k) + '%';
-      light.style.top = (a[2] + (b[2] - a[2]) * k) + '%';
+      el.style.left = (a[1] + (b[1] - a[1]) * k) + '%';
+      el.style.top = (a[2] + (b[2] - a[2]) * k) + '%';
+    }
+    function place(time) {
+      targets.forEach(function (target) { placeOne(target.el, target.track, time); });
     }
     function follow() {
       place(video.currentTime || 0);
@@ -128,10 +145,11 @@ const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.
         content.focus({ preventScroll: true });
       } else document.body.focus();
     }
-    function enter() {
+    function enter(event) {
       if (entering) return;
       entering = true;
-      var rect = light.getBoundingClientRect();
+      var origin = event && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('bfly') ? event.currentTarget : light;
+      var rect = origin.getBoundingClientRect();
       gate.style.setProperty('--flash-x', rect.left + rect.width / 2 + 'px');
       gate.style.setProperty('--flash-y', rect.top + rect.height / 2 + 'px');
       if (reduced) {
@@ -173,6 +191,7 @@ const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.
     }
     menu.addEventListener('click', function () { var burger = document.getElementById('burger'); if (burger) burger.click(); });
     light.addEventListener('click', enter);
+    gate.querySelectorAll('.bfly').forEach(function (el) { el.addEventListener('click', enter); });
     hint.addEventListener('click', enter);
     document.addEventListener('keydown', onKeydown, true);
     document.addEventListener('focusin', keepFocus, true);
@@ -199,6 +218,15 @@ const track = [[0,29.69,58.76],[0.3,29.06,58.53],[0.6,28.59,57.6],[0.9,27.97,56.
     position: absolute; top: 58.76%; left: 29.69%; z-index: 2;
     width: max(64px, calc(var(--scene-h) * .2)); aspect-ratio: 1; translate: -50% -50%;
     border: 0; border-radius: 50%; padding: 0; background: none; cursor: pointer;
+  }
+  /* Остальные бабочки: прозрачная зона нажатия, при наведении — мягкий свет */
+  .bfly {
+    position: absolute; z-index: 2; width: max(44px, calc(var(--scene-h) * var(--size))); aspect-ratio: 1; translate: -50% -50%;
+    border: 0; border-radius: 50%; padding: 0; background: none; cursor: pointer;
+    transition: background-color .3s ease, box-shadow .3s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .bfly:hover { background: radial-gradient(circle, rgb(255 250 220 / .35), transparent 70%); box-shadow: 0 0 0 1.5px rgb(255 240 190 / .7), 0 0 22px rgb(150 240 215 / .6); }
   }
   .light span { position: absolute; border-radius: 50%; pointer-events: none; }
   /* Мягкий свет вокруг компаса — сам компас в видео */
