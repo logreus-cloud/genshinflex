@@ -1,9 +1,17 @@
 ---
 // Заставка при первом заходе: луна меняет фазы, пока грузится страница.
 // Только первый показ за сессию вкладки, только с JS; скрывается по load, но не позже чем через 2,5 с.
+interface Props { season?: string | null; }
+const { season } = Astro.props;
 ---
-<div id="gf-splash" hidden aria-hidden="true">
+<div id="gf-splash" class:list={{ seasonal: season === 'snezhnaya' }} hidden aria-hidden="true">
   <div class="moon"></div>
+  {season === 'snezhnaya' && (
+    <div class="elements">
+      {['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'].map((element, i) =>
+        <img src={`/elements/${element}.png`} alt="" width="28" height="28" loading="eager" decoding="async" style={`--i: ${i}`} />)}
+    </div>
+  )}
   <div class="brand">
     <svg viewBox="0 0 32 32" width="30" height="30"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
     <span>Genshin<b>Flex</b></span>
@@ -17,18 +25,20 @@
       sessionStorage.setItem('gf:splash', '1');
     } catch (e) { el.remove(); return; }
     el.hidden = false;
+    var seasonal = el.classList.contains('seasonal');
+    var min = seasonal && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 2050 : 700;
     var start = Date.now(), done = false;
     function hide() {
       if (done) return;
       done = true;
-      // Не меньше 0,7 с, иначе на быстрой сети заставка просто мигнёт
+      // Дождаться логотипа, а при сниженной анимации — обычного минимума
       setTimeout(function () {
         el.classList.add('out');
-        setTimeout(function () { el.remove(); }, 450);
-      }, Math.max(0, 700 - (Date.now() - start)));
+        setTimeout(function () { el.remove(); }, seasonal ? 500 : 450);
+      }, Math.max(0, min - (Date.now() - start)));
     }
     if (document.readyState === 'complete') hide();
-    else { addEventListener('load', hide, { once: true }); setTimeout(hide, 2500); }
+    else { addEventListener('load', hide, { once: true }); setTimeout(hide, seasonal ? 2900 : 2500); /* сезонная: 2,9 с + 0,5 с растворения = не дольше 3,4 с */ }
   })();
 </script>
 
@@ -53,8 +63,30 @@
   .brand { display: flex; align-items: center; gap: .55rem; font: 600 1.15rem var(--font-display); letter-spacing: .01em; }
   .brand svg { color: var(--accent); }
   .brand b { color: var(--accent); font-weight: 600; }
+  #gf-splash.seasonal {
+    gap: 0; color: #3b3f4a;
+    background: radial-gradient(circle at 50% 45%, #ffffff 0, #eef4fb 45%, #dde8f4 100%);
+    transition: opacity .5s ease, filter .5s ease, visibility .5s;
+  }
+  #gf-splash.seasonal.out { filter: blur(6px); }
+  .seasonal .moon { display: none; }
+  .seasonal .elements, .seasonal .brand { grid-area: 1 / 1; }
+  .elements { display: flex; align-items: center; gap: 14px; animation: gf-elements-out .35s 1.26s both; }
+  .elements img {
+    width: 28px; height: 28px; filter: grayscale(1) brightness(.35);
+    animation: gf-element-in .35s calc(var(--i) * 110ms) ease-out both;
+  }
+  .seasonal .brand { font-size: 1.6rem; animation: gf-brand-in .45s 1.6s ease-out both; }
+  .seasonal .brand svg { color: #3b3f4a; }
+  .seasonal .brand b { color: #c9922a; }
+  @keyframes gf-element-in { from { opacity: 0; transform: translateY(6px); } to { opacity: .75; transform: none; } }
+  @keyframes gf-elements-out { to { opacity: 0; } }
+  @keyframes gf-brand-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) {
     .moon::after { animation: none; transform: translateX(45%); }
-    #gf-splash { transition: none; }
+    .seasonal .elements { display: none; }
+    .seasonal .brand { animation: none; }
+    #gf-splash, #gf-splash.seasonal { transition: none; }
+    #gf-splash.seasonal.out { filter: none; }
   }
 </style>

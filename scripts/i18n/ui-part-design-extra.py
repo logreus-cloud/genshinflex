@@ -1,0 +1,20 @@
+# Перевод интерфейса: строки дизайна v2, пришедшие в main без перевода (главная, экран входа, ленты)
+T = [
+("Баннеры, ивенты, обновления и сбросы эндгейма на одной шкале",
+ "Banners, events, updates and endgame resets on one timeline",
+ "Banners, eventos, actualizaciones y reinicios del endgame en una sola línea de tiempo"),
+("Версия 7.1 · Снежная", "Version 7.1 · Snezhnaya", "Versión 7.1 · Snezhnaya"),
+("Войти на сайт", "Enter the site", "Entrar al sitio"),
+("Время — по серверу выбранного региона.", "Times follow the server of the selected region.", "Las horas siguen el servidor de la región elegida."),
+("Вход на сайт", "Site entrance", "Entrada al sitio"),
+("Календарь событий", "Event calendar", "Calendario de eventos"),
+("Коснитесь звезды, чтобы войти", "Touch the star to enter", "Toca la estrella para entrar"),
+("Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.",
+ "A short build based on community data: role — {role}, options go from best to fallback. A detailed breakdown hasn't been written yet.",
+ "Build breve según datos de la comunidad: rol — {role}, las opciones van de la mejor a la alternativa. Aún no hay un análisis detallado."),
+("Обновлено {date}", "Updated {date}", "Actualizado {date}"),
+("Открыть полный календарь", "Open the full calendar", "Abrir el calendario completo"),
+("Предыдущее оружие", "Previous weapon", "Arma anterior"),
+("Следующее оружие", "Next weapon", "Arma siguiente"),
+("Сменить язык", "Change language", "Cambiar idioma"),
+]

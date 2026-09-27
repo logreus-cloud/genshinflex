@@ -400,7 +400,7 @@ const items = await calendarItems(lang);
   .cal-controls .btn, .cal-region .btn { padding: .4rem .7rem; }
   .cal-filters { flex-basis: 100%; }
   .cal-filters button { border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); color: var(--muted); padding: .35rem .7rem; cursor: pointer; }
-  .cal-filters button[aria-pressed="true"], .cal-buttons button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .cal-filters button[aria-pressed="true"], .cal-buttons button[aria-pressed="true"] { color: var(--accent-text); border-color: var(--accent); background: var(--accent-soft); }
   .cal-timeline { overflow: auto; max-height: 70vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
   .cal-timeline[hidden], .cal-list[hidden], .cal-detail[hidden] { display: none; }
   :global(.cal-board) { position: relative; }
@@ -439,7 +439,7 @@ const items = await calendarItems(lang);
   :global(.cal-card-body) { position: relative; display: grid; gap: .35rem; height: 100%; padding: .8rem; background: linear-gradient(90deg, var(--surface-2) 25%, color-mix(in srgb, var(--surface-2) 75%, transparent)); }
   :global(.cal-card-category), :global(.cal-card-dates) { color: var(--muted); font-size: .78rem; }
   :global(.cal-card-title) { display: flex; align-items: center; gap: .35rem; }
-  :global(.cal-countdown) { color: var(--accent); font-size: .85rem; font-weight: 600; }
+  :global(.cal-countdown) { color: var(--accent-text); font-size: .85rem; font-weight: 600; }
   .cal-detail { position: relative; overflow: hidden; margin-top: 1rem; }
   .cal-detail :global(.cal-detail-body) { position: relative; }
   .cal-detail :global(h2) { margin: .3rem 0 .7rem; }

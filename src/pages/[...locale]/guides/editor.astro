@@ -738,7 +738,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .who-pick { display: grid; gap: .25rem; flex: 1 1 320px; max-width: 460px; }
   .ge #notice { flex: 1 1 100%; margin: 0; }
   .ge #notice:empty { display: none; }
-  .ge button.link { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; }
+  .ge button.link { background: none; border: 0; padding: 0; color: var(--accent-text); cursor: pointer; text-decoration: underline; }
 
   .ge .pick { position: relative; display: flex; align-items: center; min-width: 0; }
   .ge .pick img { position: absolute; left: .35rem; border-radius: 6px; background: var(--surface-3); pointer-events: none; }
@@ -778,7 +778,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .tb { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--border); border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0; background: var(--surface-2); }
   .ge .tb button { border: 1px solid transparent; background: none; border-radius: var(--radius-sm); padding: .3rem .55rem; cursor: pointer; font-size: .85rem; color: var(--text); }
   .ge .tb button:hover { background: var(--surface); border-color: var(--border); }
-  .ge .tb mark { background: var(--accent-soft); color: var(--accent); border-radius: 3px; padding: 0 .15em; }
+  .ge .tb mark { background: var(--accent-soft); color: var(--accent-text); border-radius: 3px; padding: 0 .15em; }
   .ge .tb .sep { width: 1px; background: var(--border); margin: 2px 4px; }
   .ge .body { border-radius: 0 0 var(--radius) var(--radius); resize: vertical; min-height: 280px; line-height: 1.55; font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: .88rem; }
   .ge .pop { display: grid; gap: .5rem; margin-bottom: .5rem; padding: .8rem; background: var(--surface-2); }
@@ -787,11 +787,11 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .pop .input { background: var(--surface); }
   .ge .seg { display: flex; flex-wrap: wrap; gap: 4px; }
   .ge .seg button { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: .25rem .7rem; cursor: pointer; font-size: .82rem; color: var(--muted); }
-  .ge .seg [aria-checked="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .ge .seg [aria-checked="true"] { color: var(--accent-text); border-color: var(--accent); background: var(--accent-soft); }
   .ge .bubble-demo { margin: 0; }
   .ge .between { justify-content: space-between; margin-top: .3rem; }
   .ge .cheat { margin-top: .5rem; }
-  .ge .cheat summary { cursor: pointer; color: var(--accent); }
+  .ge .cheat summary { cursor: pointer; color: var(--accent-text); }
   .ge .cheat table { margin-top: .5rem; }
   .ge .cheat td { padding: .3rem .5rem; vertical-align: top; }
   .ge .cheat code { white-space: nowrap; }
@@ -808,7 +808,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   /* Превью: повторяет вид страницы персонажа */
   .ge .preview { position: sticky; top: calc(var(--top-h) + 12px); max-height: calc(100vh - var(--top-h) - 24px); overflow: auto; border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--bg); overscroll-behavior: contain; }
   .ge .pv-bar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 1rem; padding: .5rem .9rem; background: var(--bg-deep); border-bottom: 1px solid var(--border); }
-  .ge .pv-bar span:first-child { color: var(--accent); font-weight: 600; }
+  .ge .pv-bar span:first-child { color: var(--accent-text); font-weight: 600; }
   .ge .pv { padding: 12px; container-type: inline-size; }
   .ge .pv .h-sec { margin: 1.3rem 0 .6rem; }
   .ge .pv-head { position: relative; overflow: hidden; isolation: isolate; min-height: 170px; display: flex; align-items: center; border-radius: var(--radius-lg); border: 1px solid var(--border);
@@ -822,7 +822,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   .ge .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }
   .ge .rank li { display: flex; gap: .7rem; align-items: center; }
   .ge .rank .n { width: 1.4rem; text-align: center; color: var(--muted); font: 600 .85rem var(--font-display); flex: none; }
-  .ge .rank li:first-child .n { color: var(--accent); }
+  .ge .rank li:first-child .n { color: var(--accent-text); }
   .ge .rank img { width: 40px; height: 40px; border-radius: 8px; background: var(--surface-3); flex: none; }
   .ge .rank img.r5 { background: linear-gradient(160deg, #7a5226, #d1953f); }
   .ge .rank img.r4 { background: linear-gradient(160deg, #5b4b82, #9679c4); }
@@ -848,7 +848,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
   @media (max-width: 1100px) {
     .ge .view-switch { display: flex; gap: 4px; position: sticky; top: var(--top-h); z-index: 4; padding: 6px 0; background: var(--bg); margin-bottom: 8px; }
     .ge .view-switch button { flex: 1; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: .5rem; cursor: pointer; color: var(--muted); }
-    .ge .view-switch [aria-selected="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+    .ge .view-switch [aria-selected="true"] { color: var(--accent-text); border-color: var(--accent); background: var(--accent-soft); }
     .ge .split { grid-template-columns: minmax(0, 1fr); }
     .ge .split[data-view="edit"] .preview, .ge .split[data-view="preview"] .editor { display: none; }
     .ge .preview { position: static; max-height: none; }

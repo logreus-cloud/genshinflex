@@ -1,0 +1,247 @@
+---
+import { useData } from '../lib/data';
+const { base, t } = useData(Astro.currentLocale);
+interface Slide {
+  banner: { version: string; phase: number; start: string; end: string };
+  hero: { slug: string; name: string; splash?: string | null; namecard?: string; element: string; title?: string; region?: string };
+  upcoming: boolean;
+}
+interface Props { slides: Slide[]; }
+const { slides } = Astro.props;
+---
+{slides.length > 0 && (
+  <section class="carousel" aria-label={t('Баннеры')} aria-roledescription="carousel" tabindex="0" data-carousel>
+    {slides.map(({ banner, hero, upcoming }, i) => (
+      <div class="slide" role="group" aria-roledescription="slide" aria-label={t('{n} из {total}', { n: i + 1, total: slides.length })}
+        data-el={hero.element} hidden={i !== 0} inert={i !== 0} aria-hidden={i !== 0 ? 'true' : undefined}>
+        {hero.splash && <img class="splash-art" src={hero.splash} alt="" fetchpriority={i === 0 ? 'high' : 'auto'} />}
+        {hero.namecard ? <img class="namecard" src={hero.namecard} alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" /> :
+          <div class="namecard pattern" aria-hidden="true"></div>}
+        <div class="copy">
+          <p class="phase">{t('Баннер {v} фаза {p}', { v: banner.version, p: banner.phase })}</p>
+          {hero.title && <p class="title">{hero.title}</p>}
+          <h1>{hero.name}</h1>
+          <div class="identity">
+            <span class="el-dot" aria-hidden="true"></span>
+            <span class="stars" aria-label="5 ★">★★★★★</span>
+          </div>
+          {hero.region && <p class="region">{hero.region}</p>}
+          <div class="actions">
+            <a class="btn dark" href={`${base}/characters/${hero.slug}`}>{t('Гайд')}</a>
+            <a class="btn dark" href={`${base}/banners`}>{t('Все баннеры')}</a>
+          </div>
+          <p class="time"><span>{upcoming ? t('До начала') : t('Оставшееся время')}</span>
+            <b data-until={upcoming ? banner.start : banner.end} data-full data-done={upcoming ? t('Идёт сейчас') : t('уже закончился')}>…</b>
+          </p>
+        </div>
+      </div>
+    ))}
+    {slides.length > 1 && (
+      <div class="controls">
+        <button class="arrow prev" type="button" aria-label={t('Предыдущий баннер')}>‹</button>
+        <button class="arrow next" type="button" aria-label={t('Следующий баннер')}>›</button>
+        <div class="dots" aria-label={t('Баннеры')}>
+          {slides.map((_, i) => <button type="button" class:list={['dot', { active: i === 0 }]} aria-label={t('{n} из {total}', { n: i + 1, total: slides.length })} aria-current={i === 0 ? 'true' : undefined} data-index={i}><span class="fill"></span></button>)}
+        </div>
+      </div>
+    )}
+  </section>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    const slides = [...root.querySelectorAll<HTMLElement>('.slide')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
+    if (slides.length < 2) return;
+    let current = 0;
+    let finishTransition: ((keepHeight?: boolean) => void) | undefined;
+    let timer: number | undefined;
+    let remaining = 7000;
+    let started = 0;
+    let startX = 0;
+    let startY = 0;
+    let pointerId: number | undefined;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const isPaused = () => document.hidden || root.matches(':focus-visible') || Boolean(root.querySelector(':focus-visible'));
+    const updatePause = () => {
+      const paused = isPaused();
+      root.classList.toggle('paused', paused);
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        remaining = Math.max(0, remaining - (performance.now() - started));
+        timer = undefined;
+      }
+      if (!paused && remaining <= 0) {
+        show(current + 1);
+      } else if (!paused) {
+        started = performance.now();
+        timer = window.setTimeout(updatePause, remaining);
+      }
+    };
+    const resetProgress = () => {
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
+      remaining = 7000;
+      const fill = dots[current].querySelector<HTMLElement>('.fill')!;
+      fill.style.animation = 'none';
+      void fill.offsetWidth;
+      fill.style.removeProperty('animation');
+      updatePause();
+    };
+    const show = (index: number) => {
+      const target = (index + slides.length) % slides.length;
+      if (target === current) {
+        finishTransition?.();
+        resetProgress();
+        return;
+      }
+      finishTransition?.(true);
+      const forward = index > current;
+      const old = slides[current];
+      const next = slides[target];
+      const fromHeight = root.getBoundingClientRect().height;
+      next.hidden = false;
+      next.inert = false;
+      next.setAttribute('aria-hidden', 'false');
+      const toHeight = next.offsetHeight;
+      old.inert = true;
+      old.setAttribute('aria-hidden', 'true');
+      root.style.height = `${fromHeight}px`;
+      old.classList.add('moving', forward ? 'leave-forward' : 'leave-backward');
+      next.classList.add('moving', forward ? 'enter-forward' : 'enter-backward');
+      void root.offsetHeight;
+      root.style.height = `${toHeight}px`;
+      current = target;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === current);
+        if (i === current) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+      const onEnd = (event: AnimationEvent) => {
+        if (event.target === next) finish();
+      };
+      const finish = (keepHeight = false) => {
+        next.removeEventListener('animationend', onEnd);
+        if (keepHeight) root.style.height = `${root.getBoundingClientRect().height}px`;
+        else root.style.removeProperty('height');
+        old.hidden = true;
+        old.classList.remove('moving', 'leave-forward', 'leave-backward');
+        next.classList.remove('moving', 'enter-forward', 'enter-backward');
+        finishTransition = undefined;
+      };
+      finishTransition = finish;
+      next.addEventListener('animationend', onEnd);
+      if (motion.matches) finish();
+      resetProgress();
+    };
+    root.querySelector('.prev')?.addEventListener('click', () => show(current - 1));
+    root.querySelector('.next')?.addEventListener('click', () => show(current + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        show(current + (e.key === 'ArrowRight' ? 1 : -1));
+      }
+    });
+    root.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+    });
+    root.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'mouse' || e.pointerId !== pointerId) return;
+      pointerId = undefined;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - startY)) show(current + (dx < 0 ? 1 : -1));
+    });
+    root.addEventListener('pointercancel', (e) => {
+      if (e.pointerId === pointerId) pointerId = undefined;
+    });
+    root.addEventListener('focusin', () => requestAnimationFrame(updatePause));
+    root.addEventListener('focusout', () => requestAnimationFrame(updatePause));
+    document.addEventListener('visibilitychange', updatePause);
+    motion.addEventListener('change', resetProgress);
+    root.classList.add('ready');
+    resetProgress();
+  });
+</script>
+<style>
+  .carousel { --hc-bg: #1b1c23; --hc-text: #ececf0; --hc-muted: #c5c6ce; --hc-strong: #fff; --hc-name-base: white; --hc-name-ratio: 70%; --hc-stars: var(--accent); --hc-arrow: rgb(255 255 255 / .45); --hc-arrow-hover: #fff; --hc-arrow-shadow: 0 0 14px rgb(255 255 255 / .75), 0 0 2px #fff; --hc-dot: rgb(255 255 255 / .5); --hc-dot-active: rgb(255 255 255 / .35); --hc-fill: #fff; position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; background: var(--hc-bg); }
+  .carousel.ready { transition: height calc(var(--dur) * 2) var(--ease); }
+  .slide { --bg-deep: var(--hc-bg); --hc-slide-bg: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); position: relative; min-height: 400px; overflow: hidden; isolation: isolate; color: var(--hc-text); background: var(--hc-slide-bg); }
+  .slide[hidden] { display: none; }
+  .slide.moving { position: absolute; top: 0; left: 0; width: 100%; }
+  .slide.enter-forward { animation: enter-forward calc(var(--dur) * 2) var(--ease) both; }
+  .slide.leave-forward { animation: leave-forward calc(var(--dur) * 2) var(--ease) both; }
+  .slide.enter-backward { animation: enter-backward calc(var(--dur) * 2) var(--ease) both; }
+  .slide.leave-backward { animation: leave-backward calc(var(--dur) * 2) var(--ease) both; }
+  .ready .slide:is(.enter-forward, .enter-backward) .copy { animation: gf-fade-up .5s .1s var(--ease) both; }
+  /* Как в галерее: вперёд новый слайд приходит справа (всё едет влево), назад — слева */
+  @keyframes enter-forward { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes leave-forward { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+  @keyframes enter-backward { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+  @keyframes leave-backward { from { transform: translateX(0); } to { transform: translateX(100%); } }
+  .slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--hc-overlay-bg); }
+  .namecard { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: .42; mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 58%, transparent 82%); }
+  .namecard.pattern { opacity: .12; }
+  .namecard.pattern::before { content: ""; position: absolute; inset: 0; background: var(--el); mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath d='M40 4 56 20 40 36 24 20ZM40 44 56 60 40 76 24 60ZM0 24 16 40 0 56M80 24 64 40 80 56' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E") center / 80px 80px repeat; }
+  .splash-art { position: absolute; top: 0; right: max(2vw, calc((100vw - 1400px) / 2)); width: min(56vw, 780px); height: 100%; object-fit: contain; object-position: right center; z-index: -1; }
+  .copy { position: relative; width: min(100%, 1240px); margin: auto; padding: 2rem 4rem 1.4rem; }
+  .phase { color: var(--hc-text); font: 600 clamp(1.5rem, 3vw, 2.25rem)/1.2 var(--font-display); margin: 0 0 1rem; }
+  .title, .region { color: var(--hc-muted); font-size: .9rem; margin: 0; }
+  h1 { max-width: 60%; margin: .2rem 0 .5rem; color: color-mix(in srgb, var(--el) var(--hc-name-ratio), var(--hc-name-base)); font-size: clamp(3rem, 6vw, 5.25rem); overflow-wrap: anywhere; }
+  .identity { display: flex; align-items: center; gap: .5rem; }
+  .el-dot { font-size: 1.6rem; }
+  .stars { color: var(--hc-stars); letter-spacing: .12em; }
+  .region { margin-left: 2.1rem; }
+  .actions { display: flex; gap: .6rem; margin-top: 1rem; }
+  .actions .btn { transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+  .actions .btn:hover, .actions .btn:focus-visible { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .time { display: grid; gap: .1rem; margin: 1.2rem 0 0; color: var(--hc-muted); font-size: .85rem; }
+  .time b { color: var(--hc-strong); font: 600 1.15rem var(--font-display); }
+  .controls { display: none; }
+  .ready .controls { display: contents; }
+  /* Стрелки светлеют при наведении */
+  .arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%; background: none; color: var(--hc-arrow); font: 200 2.4rem/1 var(--font); cursor: pointer; padding: 0 0 .25rem; transition: color var(--dur) var(--ease), text-shadow var(--dur) var(--ease); }
+  .arrow:hover, .arrow:focus-visible { color: var(--hc-arrow-hover); text-shadow: var(--hc-arrow-shadow); }
+  .prev { left: .4rem; } .next { right: .4rem; }
+  .dots { position: absolute; bottom: 1rem; left: 50%; translate: -50% 0; display: flex; gap: .45rem; z-index: 2; }
+  .dot { width: 18px; height: 4px; overflow: hidden; border: 0; border-radius: 99px; padding: 0; background: var(--hc-dot); cursor: pointer; transition: width var(--dur) var(--ease); }
+  .dot.active { width: 42px; background: var(--hc-dot-active); }
+  .fill { display: block; width: 100%; height: 100%; background: var(--hc-fill); transform: scaleX(0); transform-origin: left; }
+  :global(:root[data-theme="light"]) .carousel { --hc-bg: #fff; --hc-text: #14161d; --hc-muted: #4a4f5c; --hc-strong: #14161d; --hc-name-base: #0b0d14; --hc-name-ratio: 72%; --hc-stars: #c98a1a; --hc-arrow: rgb(20 22 30 / .4); --hc-arrow-hover: #14161d; --hc-arrow-shadow: none; --hc-dot: rgb(20 22 30 / .18); --hc-dot-active: rgb(20 22 30 / .12); --hc-fill: #1b1c23; }
+  :global(:root[data-theme="light"]) .slide { --hc-slide-bg: linear-gradient(90deg, #fff 0%, #f5f8fc 32%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, #fff 12%, rgb(255 255 255 / 0) 72%); }
+  :global(:root[data-theme="light"]) .namecard:not(.pattern) { opacity: .55; }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .carousel { --hc-bg: #fff; --hc-text: #14161d; --hc-muted: #4a4f5c; --hc-strong: #14161d; --hc-name-base: #0b0d14; --hc-name-ratio: 72%; --hc-stars: #c98a1a; --hc-arrow: rgb(20 22 30 / .4); --hc-arrow-hover: #14161d; --hc-arrow-shadow: none; --hc-dot: rgb(20 22 30 / .18); --hc-dot-active: rgb(20 22 30 / .12); --hc-fill: #1b1c23; }
+    :global(:root:not([data-theme])) .slide { --hc-slide-bg: linear-gradient(90deg, #fff 0%, #f5f8fc 32%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, #fff 12%, rgb(255 255 255 / 0) 72%); }
+    :global(:root:not([data-theme])) .namecard:not(.pattern) { opacity: .55; }
+  }
+  .ready .dot.active .fill { animation: fill-progress 7s linear both; }
+  .ready.paused .dot.active .fill { animation-play-state: paused; }
+  @keyframes fill-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @media (prefers-reduced-motion: reduce) {
+    .ready .dot.active .fill { animation: none; transform: scaleX(1); }
+  }
+  @media (max-width: 700px) {
+    .carousel { margin: -1.2rem -16px 2.5rem; }
+    .slide { min-height: 0; padding-top: 170px; touch-action: pan-y; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
+    .slide::after { background: linear-gradient(0deg, var(--bg-deep) 35%, transparent 80%); }
+    .splash-art { right: 0; top: 0; width: 100%; height: 230px; opacity: .8; object-position: center top; }
+    .namecard { inset: auto 0 auto 0; top: 0; height: 230px; mask-image: linear-gradient(180deg, #000 40%, transparent 100%); }
+    .namecard:not(.pattern) { opacity: .35; }
+    :global(:root[data-theme="light"]) .namecard:not(.pattern) { opacity: .35; }
+    .copy { padding: 0 1.1rem 2.6rem; }
+    .phase { font-size: 1.2rem; margin-bottom: .5rem; }
+    h1 { max-width: 100%; font-size: clamp(2.2rem, 10vw, 2.8rem); }
+    .actions { flex-wrap: wrap; }
+    .time { margin-top: .9rem; }
+    .arrow { top: 95px; width: 40px; height: 40px; font-size: 2rem; }
+    .prev { left: 0; } .next { right: 0; }
+  }
+  @media (max-width: 700px) and (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .namecard:not(.pattern) { opacity: .35; }
+  }
+</style>

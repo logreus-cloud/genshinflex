@@ -107,14 +107,16 @@ const jsonLd = b && {
         <dl class="meta" data-pagefind-ignore>
           {meta.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
         </dl>
-        <button class="btn fav" type="button" aria-pressed="false" data-pagefind-ignore>
-          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m10 3.5 1.9 4 4.3.5-3.2 3 .9 4.3L10 13.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5Z" /></svg>
-          <span>{t('В избранное')}</span>
-        </button>
-        <a class="btn edit" href={`${base}/guides/editor/?c=${c.slug}`} data-pagefind-ignore>
-          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4 16h3l8.5-8.5-3-3L4 13Zm7-10 3 3" /></svg>
-          <span>{b ? t('Дополнить гайд') : t('Написать гайд')}</span>
-        </a>
+        <div class="head-actions">
+          <button class="btn fav" type="button" aria-pressed="false" data-pagefind-ignore>
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m10 3.5 1.9 4 4.3.5-3.2 3 .9 4.3L10 13.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5Z" /></svg>
+            <span>{t('В избранное')}</span>
+          </button>
+          <a class="btn edit" href={`${base}/guides/editor/?c=${c.slug}`} data-pagefind-ignore>
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4 16h3l8.5-8.5-3-3L4 13Zm7-10 3 3" /></svg>
+            <span>{b ? t('Дополнить гайд') : t('Написать гайд')}</span>
+          </a>
+        </div>
       </div>
     </header>
 
@@ -386,9 +388,9 @@ const jsonLd = b && {
   .meta div { display: grid; }
   .meta dt { color: var(--muted); font-size: .78rem; }
   .meta dd { margin: 0; }
+  .head-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
   .fav svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
   .fav[aria-pressed="true"] svg { fill: currentColor; }
-  .edit { margin-left: .4rem; }
   .edit svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 
   .tabs {
@@ -397,7 +399,7 @@ const jsonLd = b && {
   }
   .tabs a { padding: .75rem 1rem; text-decoration: none; color: var(--muted); white-space: nowrap; border-bottom: 2px solid transparent; font-size: .93rem; }
   .tabs a:hover { color: var(--text); }
-  .tabs a[aria-current] { color: var(--accent); border-bottom-color: var(--accent); }
+  .tabs a[aria-current] { color: var(--accent-text); border-bottom-color: var(--accent); }
 
   .two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; }
   .ratings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
@@ -407,7 +409,7 @@ const jsonLd = b && {
   .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }
   .rank li { display: flex; gap: .7rem; align-items: center; }
   .rank .n { width: 1.4rem; text-align: center; color: var(--muted); font: 600 .85rem var(--font-display); flex: none; }
-  .rank li:first-child .n { color: var(--accent); }
+  .rank li:first-child .n { color: var(--accent-text); }
   /* Отступ внутри рамки: иконки оружия нарисованы до краёв, и скругление срезало бы кончики */
   .rank img { border-radius: 8px; background: var(--surface-3); flex: none; padding: 3px; box-sizing: border-box; }
   .rank img.r5 { background: linear-gradient(160deg, #7a5226, #d1953f); }
@@ -432,9 +434,9 @@ const jsonLd = b && {
 
   .sub { margin: 1.6rem 0 .7rem; }
   .lvl { display: inline-flex; align-items: center; gap: .5rem; }
-  .lvl output { color: var(--accent); font-weight: 600; min-width: 1.4em; }
+  .lvl output { color: var(--accent-text); font-weight: 600; min-width: 1.4em; }
   .lvl input { accent-color: var(--accent); width: 140px; }
-  .chip.ai { margin-left: .5rem; font: 600 .7rem var(--font); letter-spacing: .03em; background: var(--accent-soft); color: var(--accent); border-color: transparent; vertical-align: middle; }
+  .chip.ai { margin-left: .5rem; font: 600 .7rem var(--font); letter-spacing: .03em; background: var(--accent-soft); color: var(--accent-text); border-color: transparent; vertical-align: middle; }
   .analysis p { margin: 0 0 .8rem; line-height: 1.6; }
   .analysis p:last-child { margin: 0; }
   .chip.beta { background: #e0457b; border-color: #e0457b; color: #fff; font-weight: 600; letter-spacing: .04em; }
@@ -449,7 +451,7 @@ const jsonLd = b && {
   .t-head h3 { margin: .1rem 0 0; }
   .desc { white-space: pre-line; color: var(--muted); font-size: .9rem; margin: 0; }
   .talent details { margin-top: .8rem; }
-  .talent summary { color: var(--accent); font-size: .9rem; }
+  .talent summary { color: var(--accent-text); font-size: .9rem; }
   .talent table { margin-top: .5rem; }
   .talent td { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .talent th { font-weight: 400; }
@@ -468,7 +470,7 @@ const jsonLd = b && {
   }
   @media (max-width: 640px) {
     .head { min-height: 0; flex-direction: column; align-items: stretch; }
-    .splash { position: static; translate: none; height: 220px; width: 100%; object-fit: cover; object-position: center 20%; mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
+    .splash { position: static; translate: none; height: 200px; width: 100%; object-fit: cover; object-position: center 20%; mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
     .head-info { padding: 0 1.1rem 1.2rem; }
     .talents, .small-grid, .build { grid-template-columns: 1fr; }
   }

@@ -12,8 +12,8 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   <h1>{t('Проверка команды для Бездны')}</h1>
   <p class="lead">
     {t('Добавьте своих персонажей — вручную или по UID из игры, — соберите по команде на каждую половину и узнайте, потянут ли они текущую Бездну.')}
-    {abyss && t('Текущий цикл — до {date}.', { date: fmtDate(abyss.end) })}
-    {t('Оценка сравнивает ваш билд с рекомендованным и проверяет требования этажа; это ориентир, а не симуляция урона.')}
+    {abyss && <>{' '}{t('Текущий цикл — до {date}.', { date: fmtDate(abyss.end) })}</>}
+    {' '}{t('Оценка сравнивает ваш билд с рекомендованным и проверяет требования этажа; это ориентир, а не симуляция урона.')}
   </p>
   <p class="abyss-context">{t('Требования и рекомендации — для 12-го этажа текущей Бездны.')} <a href={`${base}/abyss/`}>{t('Враги и команды всех этажей')}</a></p>
 
@@ -786,7 +786,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--el);
   }
   .roster :global(.rchip-edit) { display: flex; align-items: center; gap: .5rem; min-width: 0; border: 0; background: none; color: inherit; cursor: pointer; text-align: left; }
-  .roster :global(.rchip-edit[aria-pressed="true"]) { color: var(--accent); }
+  .roster :global(.rchip-edit[aria-pressed="true"]) { color: var(--accent-text); }
   .roster :global(.rchip-edit span) { min-width: 0; overflow-wrap: anywhere; }
   .roster :global(.rchip-halves) { display: flex; gap: .2rem; margin-left: auto; }
   .roster :global(.rchip-halves .btn) { padding: .2rem .4rem; }
@@ -825,14 +825,14 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   #result :global(.score b) { font: 700 2.2rem/1 var(--font-display); }
   #result :global(.score span) { font-size: .85rem; font-weight: 600; }
   #result :global(.good) { color: var(--good); }
-  #result :global(.mid) { color: var(--accent); }
+  #result :global(.mid) { color: var(--accent-text); }
   #result :global(.bad) { color: var(--bad); }
   #result :global(.notes) { list-style: none; padding: 0; margin: .4rem 0; display: grid; gap: .35rem; font-size: .9rem; }
   #result :global(.notes li) { padding-left: 1.4rem; position: relative; }
   #result :global(.notes li::before) { position: absolute; left: 0; font-weight: 700; }
   #result :global(.notes .ok::before) { content: "✓"; color: var(--good); }
   #result :global(.notes .no::before) { content: "!"; color: var(--bad); left: .3rem; }
-  #result :global(.notes .tip::before) { content: "›"; color: var(--accent); left: .2rem; }
+  #result :global(.notes .tip::before) { content: "›"; color: var(--accent-text); left: .2rem; }
   #result :global(.members) { display: grid; gap: 6px; margin-top: .8rem; }
   #result :global(.members details) { background: var(--surface-2); border-radius: var(--radius); padding: .4rem .6rem; }
   #result :global(.members summary) { display: flex; align-items: center; gap: .6rem; }

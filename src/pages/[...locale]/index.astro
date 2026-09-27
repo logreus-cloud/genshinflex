@@ -1,301 +1,291 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import CharacterCard from '../../components/CharacterCard.astro';
-import CalendarWidget from '../../components/CalendarWidget.astro';
+import AbyssGate from '../../components/AbyssGate.astro';
+import HeroCarousel from '../../components/HeroCarousel.astro';
+import EntryGate from '../../components/EntryGate.astro';
+import FeatureTabs from '../../components/FeatureTabs.astro';
+import season from '../../data/season.json';
+import weaponArt from '../../data/generated/weapon-art.json';
+import namecards from '../../data/generated/namecards.json';
 import { siteNews, newsDate } from '../../lib/news';
+import { calendarItems } from '../../lib/calendar';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { characters, weapons, artifacts, getCharacter, getWeapon, MODES, resetAt, fmtServerDate, base, t, lang } = useData(Astro.currentLocale);
+const { characters, weapons, artifacts, getCharacter, MODES, resetAt, base, t, lang } = useData(Astro.currentLocale);
 const latestNews = (await siteNews(lang))[0];
 
 const now = new Date();
-const builds = await getCollection('builds');
+const moment = (value: string) => Date.parse(`${value.replace(' ', 'T').slice(0, 16)}+01:00`);
+const calendarArt = (await calendarItems(lang)).filter((item) => item.image);
+const calendarImage = calendarArt.find((item) => moment(item.start) <= now.getTime() && (item.end === null || moment(item.end) > now.getTime())) ?? calendarArt.find((item) => moment(item.start) > now.getTime());
 const order = Object.keys(MODES);
 const rotations = (await getCollection('rotations')).sort((a, b) => order.indexOf(a.data.mode) - order.indexOf(b.data.mode));
 
 // Текущий баннер — тот, чей конец ещё не наступил (на момент сборки)
 const banners = (await getCollection('banners')).map((b) => b.data).sort((a, b) => a.start.localeCompare(b.start));
 const banner = banners.find((b) => new Date(b.end) > now) ?? banners.at(-1)!;
-const heroes = banner.featured.map((f) => getCharacter(f.slug));
-const buildSet = new Set(builds.map((b) => b.data.character));
+const nextBanner = banners.find((b) => b.start > banner.start && new Date(b.start) > now);
+const slides = [banner, nextBanner].filter((b): b is typeof banner => Boolean(b)).flatMap((b) =>
+  b.featured.map((f) => getCharacter(f.slug)).filter((hero) => hero.rarity === 5)
+    .map((hero) => ({ banner: b, hero: { ...hero, namecard: (namecards as Record<string, string>)[hero.slug] }, upcoming: new Date(b.start) > now })));
+const newsImage = latestNews?.data.image || slides[0]?.hero.splash;
+const newsFallback = !latestNews?.data.image;
+const featuredWeapon = (banner as { weapons?: (string | { slug: string })[] }).weapons?.[0];
+const weaponSlug = typeof featuredWeapon === 'string' ? featuredWeapon : featuredWeapon?.slug;
+const weapon = weapons.find((w) => w.slug === weaponSlug);
+// weapon-art.json — массив слагов оружия, у которых есть полный арт
+const weaponImage = weaponSlug && (weaponArt as string[]).includes(weaponSlug)
+  ? `/img/weapons/${weaponSlug}.webp` : weapon?.icon;
+const latestArtifact = [...artifacts].sort((a, b) => parseFloat(b.version) - parseFloat(a.version))[0];
+const modeNames: Record<string, [string, string]> = {
+  abyss: ['Витая бездна', 'spiral'],
+  theater: ['Театр воображариума', 'mask'],
+  onslaught: ['Натиск', 'flame'],
+};
+const modeItems = rotations.map(({ data: r }) => ({
+  label: modeNames[r.mode]?.[0] ?? MODES[r.mode].short,
+  href: `/${r.mode}`,
+  icon: modeNames[r.mode]?.[1] ?? 'moon',
+  until: resetAt(r.start > now ? r.start : r.end),
+}));
+const modes = [
+  ...modeItems,
+  { label: 'Все режимы', href: '/rotation', icon: 'moon', until: modeItems.map((item) => item.until).sort()[0] },
+];
 
 const leaks = characters.filter((c) => c.beta);
-const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 8 - leaks.length);
-const newWeapons = weapons.filter((w) => w.version === newest[0].version).slice(0, 6);
+const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
+const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
 ---
 <Layout>
-  <section class="hero">
-    <div class="art" aria-hidden="true">
-      {heroes[0]?.splash && <img src={heroes[0].splash} alt="" />}
-    </div>
+  {season.theme === 'snezhnaya' && <EntryGate />}
+  <HeroCarousel slides={slides} />
 
-    <div class="left">
-      <div class="brand">
-        <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
-        <div>
-          <h1>Genshin<span>Flex</span></h1>
-          <p>{t('Билды, команды и рейтинг под текущие Бездну, Театр и Натиск')}</p>
-        </div>
-      </div>
+  <div class="feature-band">
+    <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
+  </div>
 
-      <div class="search" data-home-search>
-        <label class="field">
-          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" /><path d="m13.2 13.2 3.3 3.3" /></svg>
-          <span class="sr-only">{t('Поиск')}</span>
-          <input type="search" placeholder={t('Кого ищем? Например, Коломбина или «Лунный заряд»')} autocomplete="off" />
-        </label>
-        <div class="tabs" role="tablist" aria-label={t('Список под поиском')}>
-          <button role="tab" type="button" data-tab="recent" aria-selected="true">{t('Недавние')}</button>
-          <button role="tab" type="button" data-tab="favs" aria-selected="false">{t('Избранное')}</button>
-          <button role="tab" type="button" data-tab="results" aria-selected="false">{t('Результаты')}</button>
-        </div>
-        <div class="list" role="tabpanel" aria-live="polite"></div>
-      </div>
-    </div>
-
-    <div class="right">
-      <a class="promo" href={`${base}/banners`}>
-        <div class="promo-text">
-          <p class="muted small">{t('Баннеры {v}, фаза {p}', { v: banner.version, p: banner.phase })}</p>
-          <h2>{heroes.map((h) => h.name).join(` ${t('и')} `)}</h2>
-          <p class="small">
-            {t('До {date}. Осталось', { date: fmtServerDate(banner.end) })} <b data-until={banner.end} data-done={t('уже закончился')}>…</b>
-          </p>
-          <span class="btn primary small">{t('Все баннеры')}</span>
-        </div>
-        <div class="promo-faces">
-          {heroes.map((h) => <img src={h.icon} alt="" width="84" height="84" data-el={h.element} />)}
-        </div>
-      </a>
-
-      <div class="now">
-        {rotations.map(({ data: r }) => {
-          const upcoming = r.start > now;
-          return (
-            <a class="mode" href={`${base}/${r.mode}/`} data-mode={r.mode}>
-              <span class="mname">{MODES[r.mode].short}</span>
-              <b class="left-time" data-until={resetAt(upcoming ? r.start : r.end)} data-prefix={upcoming ? t('откроется через') + ' ' : ''} data-done={t('обновилось')}>…</b>
-              <span class="muted small">{upcoming ? t('до нового сезона') : t('до обновления')}</span>
-              <span class="tags">{(upcoming ? ['перерыв'] : r.tags).map((tag) => <span class="chip">{t(tag)}</span>)}</span>
-            </a>
-          );
-        })}
-      </div>
-    </div>
-  </section>
-
+  <h2 class="home-title">{t('Новости сайта')}</h2>
   {latestNews && (
-    <a class="site-news" href={`${base}/news/#${latestNews.data.anchor}`}>
-      <div class="news-copy">
-        <div class="news-meta"><span>{t('Новости сайта')}</span><time datetime={latestNews.data.date.toISOString()}>{newsDate(latestNews.data.date, lang)}</time></div>
-        <h2>{latestNews.data.title}</h2>
+    <a class:list={['promo-card', 'news-card', { 'no-image': !newsImage }]} href={`${base}/news/#${latestNews.data.anchor}`}>
+      <div class="promo-copy">
+        <time datetime={latestNews.data.date.toISOString()}>{t('Обновлено {date}', { date: newsDate(latestNews.data.date, lang) })}</time>
+        <h3>{latestNews.data.title}</h3>
         <p>{latestNews.data.summary}</p>
+        <span class="promo-link"><span aria-hidden="true">▶ </span>{t('Все новости и обновления')}</span>
       </div>
-      <span class="news-link">{t('Все новости и обновления')} <span aria-hidden="true">→</span></span>
+      {newsImage && (
+        <div class:list={['promo-visual', { fallback: newsFallback }]}>
+          <img src={newsImage} alt="" loading="lazy" />
+        </div>
+      )}
     </a>
   )}
 
-  <section class="tiles">
-    <a class="tile" href={`${base}/tools/team-check`}>
-      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
-        {[0, 1, 2, 3].map((i) => <rect x={i * 30} y="6" width="26" height="28" rx="6" />)}
-        <path class="tick" d="M92 20l6 6 12-12" />
-      </svg>
-      <h3>{t('Проверка команды')}</h3>
-      <p class="muted small">{t('Добавьте своих персонажей и узнайте, хватит ли их на текущую Бездну')}</p>
-    </a>
-    <a class="tile" href={`${base}/tools/wishes`}>
-      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
-        <rect x="0" y="16" width="120" height="8" rx="4" class="track" /><rect x="0" y="16" width="78" height="8" rx="4" />
-      </svg>
-      <h3>{t('Трекер круток')}</h3>
-      <p class="muted small">{t('Сколько до гаранта, выиграны ли 50/50 и сколько ушло примогемов')}</p>
-    </a>
-    <a class="tile" href={`${base}/tools/rotation-builder`}>
-      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
-        {[0, 1, 2, 3].map((i) => <><circle cx={14 + i * 31} cy="20" r="11" />{i < 3 && <path d={`M${27 + i * 31} 20h5`} />}</>)}
-      </svg>
-      <h3>{t('Конструктор ротаций')}</h3>
-      <p class="muted small">{t('Соберите команду и порядок действий, поделитесь ссылкой')}</p>
-    </a>
-    <a class="tile" href={`${base}/rating`}>
-      <svg class="viz" viewBox="0 0 120 40" aria-hidden="true">
-        {[6, 10, 15, 22, 30, 36, 33, 26, 18, 12, 8, 5].map((h, i) => <rect x={i * 10} y={40 - h} width="7" height={h} rx="1.5" />)}
-      </svg>
-      <h3>{t('Рейтинг ELO')}</h3>
-      <p class="muted small">{t('Вместо тир-листа: голоса сообщества и реальные забеги')}</p>
-      <span class="chip gold">{t('скоро')}</span>
-    </a>
+  <h2 class="home-title">{t('Календарь событий')}</h2>
+  <a class:list={['promo-card', 'calendar-card', { 'no-image': !calendarImage?.image }]} href={`${base}/calendar/`}>
+    {calendarImage?.image && (
+      <div class="promo-visual">
+        <img class="backdrop" src={calendarImage.image} alt="" aria-hidden="true" loading="lazy" />
+        <img src={calendarImage.image} alt="" loading="lazy" />
+      </div>
+    )}
+    <div class="promo-copy">
+      <time datetime={now.toISOString()}>{t('Обновлено {date}', { date: newsDate(now, lang) })}</time>
+      <h3>{t('Баннеры, ивенты, обновления и сбросы эндгейма на одной шкале')}</h3>
+      <p>{t('Время — по серверу выбранного региона.')}</p>
+      <span class="promo-link"><span aria-hidden="true">▶ </span>{t('Открыть полный календарь')}</span>
+    </div>
+  </a>
+
+  <section class="collection-band">
+    <div class="collection-row">
+      <h2 class="pill-title">{t('Новые персонажи')}</h2>
+      <div class="gate-carousel" data-gate-carousel>
+        <AbyssGate dir="prev" label={t('Предыдущие персонажи')} controls="new-characters" />
+        <div class="gate-list" id="new-characters" role="region" aria-label={t('Новые персонажи')} tabindex="0">
+          <div class="tile-track">
+            {[...leaks, ...newest].map((c) => (
+              <a class:list={['tile', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element} aria-label={c.name} title={c.name}>
+                <img src={c.icon} alt="" width="96" height="96" loading="lazy" />
+                {c.beta && <span class="beta">BETA</span>}
+              </a>
+            ))}
+          </div>
+        </div>
+        <AbyssGate dir="next" label={t('Следующие персонажи')} controls="new-characters" />
+      </div>
+    </div>
+
+    {newWeapons.length > 0 && (
+      <div class="collection-row">
+        <h2 class="pill-title">{t('Новое оружие')}</h2>
+        <div class="gate-carousel" data-gate-carousel>
+          <AbyssGate dir="prev" label={t('Предыдущее оружие')} controls="new-weapons" />
+          <div class="gate-list" id="new-weapons" role="region" aria-label={t('Новое оружие')} tabindex="0">
+            <div class="tile-track">
+              {newWeapons.map((w) => (
+                <a class:list={['tile', 'weapon', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`} aria-label={w.name} title={w.name}>
+                  <img src={w.icon} alt="" width="96" height="96" loading="lazy" />
+                </a>
+              ))}
+            </div>
+          </div>
+          <AbyssGate dir="next" label={t('Следующее оружие')} controls="new-weapons" />
+        </div>
+      </div>
+    )}
   </section>
-
-  <CalendarWidget />
-
-  <h2 class="h-sec">{t('Новые персонажи')} <small><a href={`${base}/characters`}>{t('Все {n}', { n: characters.length - leaks.length })}</a> · <a href={`${base}/guides`}>{t('Руководства')} ({builds.length})</a></small></h2>
-  <div class="cards">{leaks.map((c) => <CharacterCard slug={c.slug} />)}{newest.map((c) => <CharacterCard slug={c.slug} badge={c.version === newest[0].version ? t('новый') : buildSet.has(c.slug) ? t('билд') : undefined} />)}</div>
-
-  {newWeapons.length > 0 && (
-    <>
-      <h2 class="h-sec">{t('Новое оружие')} <small><a href={`${base}/weapons`}>{t('Всё оружие')}</a></small></h2>
-      <div class="weapons">
-        {newWeapons.map((w) => (
-          <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
-            <img src={w.icon} alt="" width="64" height="64" loading="lazy" />
-            <span>{w.name}</span>
-          </a>
-        ))}
-      </div>
-    </>
-  )}
 </Layout>
 
 <script>
-  import { recent, favorites, type Entry } from '../../scripts/common';
-  import { searchNames, searchText, t } from '../../scripts/search';
-
-  const root = document.querySelector<HTMLElement>('[data-home-search]')!;
-  const input = root.querySelector('input')!;
-  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-  const list = root.querySelector<HTMLElement>('.list')!;
-  let tab = 'recent';
-
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
-  const row = (e: Entry) =>
-    `<a class="item" href="${e.href}">${e.icon ? `<img src="${e.icon}" alt="" width="36" height="36" loading="lazy">` : '<span class="ph"></span>'}<span>${esc(e.name)}</span><small>${e.kind}</small></a>`;
-
-  async function render() {
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === tab)));
-    if (tab === 'recent') {
-      const items = recent.list();
-      list.innerHTML = items.length ? items.map(row).join('') : `<p class="empty">${t('Здесь появятся страницы, которые вы открывали.')}</p>`;
-    } else if (tab === 'favs') {
-      const items = favorites.list();
-      list.innerHTML = items.length ? items.map(row).join('') : `<p class="empty">${t('Нажмите «В избранное» на странице персонажа, чтобы он был под рукой.')}</p>`;
-    } else {
-      const q = input.value;
-      if (!q.trim()) { list.innerHTML = `<p class="empty">${t('Начните вводить имя, оружие или реакцию.')}</p>`; return; }
-      const [names, texts] = await Promise.all([searchNames(q, 6), searchText(q, 4)]);
-      if (q !== input.value) return;
-      const textRows = texts.map((t) => `<a class="item text" href="${t.url}"><span><b>${esc(t.meta.title ?? t.url)}</b><small>${t.excerpt}</small></span></a>`);
-      list.innerHTML = names.length || textRows.length
-        ? names.map(row).join('') + (textRows.length ? `<p class="sub">${t('В тексте гайдов')}</p>${textRows.join('')}` : '')
-        : `<p class="empty">${t('По запросу «{q}» ничего нет. Попробуйте имя на английском.', { q: esc(q) })}</p>`;
-    }
-  }
-  tabs.forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab!; render(); }));
-  input.addEventListener('input', () => { tab = input.value.trim() ? 'results' : 'recent'; render(); });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') list.querySelector<HTMLAnchorElement>('a.item')?.click();
+  document.querySelectorAll<HTMLElement>('[data-gate-carousel]').forEach((root) => {
+    const list = root.querySelector<HTMLElement>('.gate-list')!;
+    const track = root.querySelector<HTMLElement>('.tile-track')!;
+    const prev = root.querySelector<HTMLButtonElement>('[data-dir="prev"]')!;
+    const next = root.querySelector<HTMLButtonElement>('[data-dir="next"]')!;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let scrolling = false;
+    let peeked = 0;
+    const loadTiles = () => {
+      track.querySelectorAll<HTMLImageElement>('img').forEach((img) => { img.loading = 'eager'; });
+    };
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) { loadTiles(); observer.disconnect(); }
+    }, { rootMargin: '300px 0px' });
+    observer.observe(root);
+    let destination: number | undefined;
+    let restoreTimer: number | undefined;
+    const maxScroll = () => list.scrollWidth - list.clientWidth;
+    const update = () => {
+      prev.disabled = list.scrollLeft <= 1;
+      next.disabled = list.scrollLeft >= maxScroll() - 1;
+      prev.classList.toggle('shut', prev.disabled);
+      next.classList.toggle('shut', next.disabled);
+    };
+    const peek = (direction: number, arrow: HTMLButtonElement) => {
+      if (scrolling || arrow.disabled || motion.matches || peeked === direction) return;
+      const room = direction > 0 ? maxScroll() - list.scrollLeft : list.scrollLeft;
+      if (room < 1) return;
+      track.style.transform = `translateX(${direction * -Math.min(page().step, room)}px)`;
+      peeked = direction;
+    };
+    const clearPeek = () => {
+      if (peeked === 0) return;
+      track.style.removeProperty('transform');
+      peeked = 0;
+    };
+    const restoreSnap = () => {
+      if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+      restoreTimer = undefined;
+      destination = undefined;
+      scrolling = false;
+      list.style.removeProperty('scroll-snap-type');
+    };
+    const settlePeek = () => {
+      const transform = getComputedStyle(track).transform;
+      if (transform === 'none') return;
+      const offset = new DOMMatrixReadOnly(transform).m41;
+      scrolling = true;
+      track.style.transition = 'none';
+      list.style.scrollSnapType = 'none';
+      if (Math.abs(offset) >= .1) list.scrollLeft -= offset;
+      track.style.removeProperty('transform');
+      peeked = 0;
+      void track.offsetWidth;
+      track.style.removeProperty('transition');
+      if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+      restoreTimer = window.setTimeout(restoreSnap, 1200);
+    };
+    const page = () => {
+      const card = track.querySelector<HTMLElement>('.tile');
+      if (!card) return { step: list.clientWidth, distance: list.clientWidth };
+      const gap = parseFloat(getComputedStyle(track).gap) || 0;
+      const step = card.offsetWidth + gap;
+      return { step, distance: Math.max(1, Math.floor((list.clientWidth + gap) / step)) * step };
+    };
+    [[prev, -1], [next, 1]].forEach(([button, direction]) => {
+      const arrow = button as HTMLButtonElement;
+      const sign = direction as number;
+      arrow.addEventListener('pointerenter', () => { loadTiles(); peek(sign, arrow); });
+      arrow.addEventListener('pointerleave', clearPeek);
+      arrow.addEventListener('focus', () => { loadTiles(); peek(sign, arrow); });
+      arrow.addEventListener('blur', clearPeek);
+      arrow.addEventListener('click', () => {
+        const { step, distance } = page();
+        const target = Math.max(0, Math.min(maxScroll(), Math.round(list.scrollLeft / step) * step + sign * distance));
+        settlePeek();
+        destination = target;
+        scrolling = true;
+        list.scrollTo({ left: target, behavior: motion.matches ? 'auto' : 'smooth' });
+        if (Math.abs(list.scrollLeft - target) <= 1) restoreSnap();
+        else {
+          if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+          restoreTimer = window.setTimeout(restoreSnap, 1200);
+        }
+      });
+    });
+    list.addEventListener('scroll', () => { settlePeek(); update(); }, { passive: true });
+    list.addEventListener('scrollend', () => {
+      if (destination === undefined || Math.abs(list.scrollLeft - destination) <= 1) restoreSnap();
+    });
+    window.addEventListener('resize', update);
+    update();
   });
-  render();
 </script>
 
 <style>
-  .hero {
-    position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px;
-    padding: 2.4rem 0 2rem; isolation: isolate;
+  .home-title { margin: 2.2rem 0 1.2rem; font: 600 clamp(1.5rem, 3vw, 2rem) var(--font-display); text-align: center; }
+  .promo-card { display: grid; min-height: 220px; max-width: 1240px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(90deg, var(--surface-2), color-mix(in srgb, var(--surface-2) 60%, transparent)); color: var(--text); text-decoration: none; transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+  .promo-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / .18); }
+  .promo-card.no-image { grid-template-columns: 1fr; }
+  .news-card { grid-template-columns: 1.6fr 1fr; }
+  .calendar-card { grid-template-columns: 1fr 1.6fr; }
+  .promo-copy { display: flex; flex-direction: column; min-width: 0; padding: 1.4rem 1.6rem; overflow-wrap: anywhere; }
+  .promo-copy time { color: var(--muted); font-size: .75rem; }
+  .promo-copy h3 { margin: .5rem 0 .7rem; font: 600 clamp(1.4rem, 2.6vw, 2rem)/1.15 var(--font-display); }
+  .promo-copy p { margin: 0 0 1rem; color: var(--muted); font-size: .9rem; }
+  .promo-link { align-self: flex-end; margin-top: auto; color: var(--accent); font-size: .78rem; }
+  /* Картинка не влияет на высоту карточки — её задаёт текст */
+  .promo-visual { position: relative; min-width: 0; overflow: hidden; }
+  .promo-visual img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+  .calendar-card .promo-visual img { object-fit: contain; }
+  .calendar-card .promo-visual .backdrop { object-fit: cover; filter: blur(18px) saturate(1.1); transform: scale(1.15); opacity: .7; }
+  .promo-visual.fallback { background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 25%, var(--surface-2)), var(--surface-2)); }
+  .promo-visual.fallback img { object-fit: contain; object-position: center bottom; }
+  .feature-band, .collection-band { margin-inline: calc(50% - 50vw); padding: 2.5rem calc(50vw - 50%); }
+  .feature-band { --band-a: color-mix(in srgb, var(--bg) 94%, #fff 6%); margin-top: -3rem; background: var(--band-a); }
+  .collection-band { background: #111a2e; }
+  .collection-row + .collection-row { margin-top: 2.4rem; }
+  .pill-title { display: table; margin: 0 auto 1.4rem; padding: .55rem 1.6rem; border-radius: 12px; background: color-mix(in srgb, var(--text) 8%, transparent); font: 600 1rem var(--font-display); text-align: center; }
+  .gate-carousel { display: flex; align-items: center; justify-content: center; gap: 1.2rem; min-width: 0; }
+  .gate-list { flex: 0 1 calc(7 * 96px + 6 * 22px + 12px); min-width: 0; max-width: calc(100% - 152px - 2.4rem); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 6px; scrollbar-width: none; }
+  .gate-list::-webkit-scrollbar { display: none; }
+  .tile-track { display: flex; gap: 22px; width: max-content; min-width: 100%; padding: 8px 6px; /* место под подъём и контур плитки */ transition: transform .45s var(--ease); }
+  .tile { position: relative; display: block; flex: 0 0 96px; width: 96px; height: 96px; overflow: hidden; border-radius: 10px; background: linear-gradient(180deg, #5b4b82, #9679c4); scroll-snap-align: start; transition: transform var(--dur) var(--ease); }
+  .tile.r5 { background: linear-gradient(180deg, #7a5226, #d1953f); }
+  .tile.r3 { background: linear-gradient(180deg, #4a5a78, #6b86b0); }
+  .tile.emblem { background: linear-gradient(180deg, color-mix(in srgb, var(--el) 55%, #1c2033), color-mix(in srgb, var(--el) 85%, #fff)); }
+  .tile img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .tile.weapon img { padding: 8px; box-sizing: border-box; object-fit: contain; }
+  .tile .beta { position: absolute; top: 5px; right: 5px; padding: .05rem .3rem; border-radius: 4px; background: #e0457b; color: #fff; font-size: .6rem; font-weight: 600; letter-spacing: .04em; }
+  .tile:hover, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-3px); }
+  :global(html[data-theme='light']) .feature-band { --band-a: var(--bg-deep); }
+  :global(html[data-theme='light']) .collection-band { background: #dfe6f3; }
+  @media (prefers-color-scheme: light) {
+    :global(html:not([data-theme])) .feature-band { --band-a: var(--bg-deep); }
+    :global(html:not([data-theme])) .collection-band { background: #dfe6f3; }
   }
-  /* Отступ арта и затемнение снизу — в пикселях, а не в процентах от высоты блока:
-     иначе при смене вкладки поиска (другая высота блока) арт и затемнение скачут */
-  .art { position: absolute; inset: -1.8rem -24px 0; z-index: -1; overflow: hidden; pointer-events: none; }
-  .art img { position: absolute; right: -6%; top: -64px; width: 80%; opacity: .32; filter: saturate(1.1); mask-image: radial-gradient(closest-side, #000 40%, transparent); }
-  .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 25%, transparent 70%), linear-gradient(0deg, var(--bg), transparent 180px); }
-
-  .brand { display: flex; align-items: center; gap: 1rem; color: var(--accent); margin-bottom: 1.6rem; }
-  .brand h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 700; margin: 0; color: var(--text); letter-spacing: -.02em; }
-  .brand h1 span { color: var(--accent); }
-  .brand p { margin: .2rem 0 0; color: var(--muted); }
-
-  .search { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 10px; }
-  .field { position: relative; display: block; }
-  .field svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; }
-  .field input {
-    width: 100%; height: 54px; padding: 0 1rem 0 46px; font-size: 1.02rem; border-radius: var(--radius);
-    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border)); background: var(--bg-deep);
-  }
-  .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 10px 0 6px; }
-  .tabs button { border: 0; background: var(--surface-2); padding: .5rem; border-radius: var(--radius-sm); cursor: pointer; font-size: .9rem; color: var(--muted); }
-  .tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
-  .list { min-height: 110px; display: grid; align-content: start; }
-  .list :global(.item) { display: flex; align-items: center; gap: .7rem; padding: .45rem .5rem; border-radius: var(--radius-sm); text-decoration: none; }
-  .list :global(.item:hover) { background: var(--surface-2); }
-  .list :global(.item img), .list :global(.ph) { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; background: var(--surface-3); flex: none; }
-  .list :global(.item > small) { margin-left: auto; color: var(--muted); font-size: .78rem; }
-  .list :global(.item.text span) { display: grid; gap: .1rem; }
-  .list :global(.item.text small) { color: var(--muted); font-size: .8rem; }
-  .list :global(.item.text mark) { background: var(--accent-soft); color: var(--accent); }
-  .list :global(.empty) { color: var(--muted); text-align: center; margin: 2rem 0; font-size: .92rem; }
-  .list :global(.sub) { margin: .6rem .5rem .2rem; color: var(--muted); font-size: .8rem; }
-
-  .right { display: grid; gap: 12px; align-content: start; }
-  .promo {
-    position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; padding: 1.2rem 1.3rem;
-    border-radius: var(--radius-lg); text-decoration: none; overflow: hidden;
-    background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 22%, var(--surface)), var(--surface) 70%);
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
-  }
-  .promo h2 { margin: .1rem 0 .4rem; font-size: 1.35rem; }
-  .promo p { margin: 0 0 .6rem; }
-  .promo b { color: var(--accent); }
-  .promo .btn { padding: .35rem .8rem; }
-  .promo-faces { display: flex; }
-  .promo-faces img { width: 84px; height: 84px; border-radius: 50%; border: 3px solid var(--el); background: var(--surface-2); }
-  .promo-faces img + img { margin-left: -18px; }
-
-  .now { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .mode {
-    display: grid; gap: .15rem; align-content: start; padding: .9rem 1rem; border-radius: var(--radius-lg); text-decoration: none;
-    background: var(--surface); border: 1px solid var(--border); min-height: 138px;
-  }
-  .mode:hover { border-color: var(--accent); }
-  .mname { font: 600 .95rem var(--font-display); }
-  .left-time { font: 600 1.25rem var(--font-display); color: var(--accent); margin-top: .5rem; line-height: 1.15; }
-  .tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .5rem; }
-
-  .site-news { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin: .2rem 0 1.2rem; padding: 1.1rem 1.3rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--accent-soft), var(--surface)); text-decoration: none; }
-  .site-news:hover { border-color: var(--accent); }
-  .news-copy { flex: 1 1 32rem; min-width: 0; overflow-wrap: anywhere; }
-  .news-meta { display: flex; flex-wrap: wrap; gap: .35rem 1rem; font-size: .78rem; color: var(--muted); }
-  .news-meta > span { color: var(--accent); font-weight: 600; }
-  .site-news h2 { margin: .4rem 0; font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.45; }
-  .site-news p { margin: 0; color: var(--muted); font-size: .9rem; }
-  .news-link { color: var(--accent); font-size: .85rem; }
-  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: .6rem; }
-  .tile {
-    display: grid; align-content: start; gap: .2rem; padding: 1rem 1.1rem; border-radius: var(--radius-lg); text-decoration: none;
-    background: var(--surface); border: 1px solid var(--border);
-  }
-  .tile:hover { border-color: var(--accent); }
-  .tile h3 { margin: .4rem 0 0; }
-  .tile p { margin: 0 0 .3rem; }
-  .tile .chip { justify-self: start; }
-  .viz { width: 120px; height: 40px; fill: var(--accent); stroke: var(--accent); stroke-width: 2; }
-  .viz circle, .viz .track { fill: var(--surface-3); }
-  .viz .tick { fill: none; stroke: var(--accent-ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-  .big { font: 700 2rem/40px var(--font-display); color: var(--accent); }
-
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
-  .weapons { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .wcard { display: flex; align-items: center; gap: .6rem; padding: .5rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; font-size: .86rem; }
-  /* Длинные названия оружия переносятся внутри карточки, а не вылезают за неё */
-  .wcard span { min-width: 0; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
-  .wcard img { border-radius: 8px; background: linear-gradient(160deg, #5b4b82, #9679c4); flex: none; padding: 4px; box-sizing: border-box; }
-  .wcard.r5 img { background: linear-gradient(160deg, #7a5226, #d1953f); }
-  .wcard:hover { border-color: var(--accent); }
-
-  @media (max-width: 1100px) {
-    .hero { grid-template-columns: 1fr; }
-    .tiles { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 560px) {
-    .hero { padding-top: 1.2rem; }
-    .brand svg { width: 44px; height: 44px; }
-    .now { grid-template-columns: 1fr; }
-    .mode { min-height: 0; }
-    .promo { grid-template-columns: 1fr; }
-    .promo-faces { order: -1; }
-    .tiles { grid-template-columns: 1fr; }
+  @media (max-width: 700px) {
+    .promo-card { grid-template-columns: 1fr; }
+    .news-card, .calendar-card { grid-template-columns: 1fr; }
+    .feature-band { margin-top: -2.5rem; }
+    .promo-visual { height: 160px; }
+    .news-card .promo-visual { order: -1; }
+    .gate-list { flex: 1 1 auto; max-width: 100%; }
+    .tile-track { gap: 12px; }
+    .tile { flex-basis: 72px; width: 72px; height: 72px; }
   }
 </style>

@@ -20,7 +20,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "dev:full": "npm run build && wrangler pages dev dist",
-    "deploy": "node scripts/deploy.mjs",
+    "deploy": "node scripts/deploy.mjs --sanity",
     "deploy:test": "node scripts/deploy.mjs --test",
     "deploy:platform": "node scripts/deploy.mjs --branch=platform --sanity",
     "deploy:verbose": "npm run build && wrangler pages deploy dist --project-name genshinflex",

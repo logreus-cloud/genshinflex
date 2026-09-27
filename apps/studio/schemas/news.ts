@@ -18,6 +18,7 @@ export const news = defineType({
     }),
     defineField({ name: 'title', title: 'Заголовок', type: 'string', validation: (Rule) => Rule.required().min(1) }),
     defineField({ name: 'summary', title: 'Краткое описание', type: 'text', validation: (Rule) => Rule.required().min(1) }),
+    defineField({ name: 'image', title: 'Картинка карточки', type: 'string', description: 'Необязательно. Путь от корня сайта, например /img/news/simulator.webp — показывается в блоке «Новости сайта» на главной.' }),
     defineField({ name: 'date', title: 'Дата', type: 'date', validation: (Rule) => Rule.required() }),
     // Время из Markdown сохраняется отдельно, потому что date хранит только день.
     defineField({ name: 'dateTime', title: 'Исходное время', type: 'string', hidden: true }),

@@ -142,7 +142,7 @@ import Layout from '../layouts/Layout.astro';
   .bar { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: .5rem 0 1rem; }
   .tabs { display: flex; gap: 4px; }
   .tabs button { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--muted); }
-  .tabs [aria-selected="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .tabs [aria-selected="true"] { color: var(--accent-text); border-color: var(--accent); background: var(--accent-soft); }
   .tabs b { margin-left: .3rem; }
   .btn.small { font-size: .82rem; padding: .35rem .7rem; }
   .list { display: grid; gap: 10px; }
@@ -153,6 +153,6 @@ import Layout from '../layouts/Layout.astro';
   .list :global(.msg) { white-space: pre-wrap; }
   .list :global(.comment) { color: var(--muted); font-style: italic; }
   .list :global(pre) { overflow: auto; max-height: 320px; background: var(--surface-2); padding: .6rem; border-radius: var(--radius); }
-  .list :global(details summary) { cursor: pointer; color: var(--accent); }
+  .list :global(details summary) { cursor: pointer; color: var(--accent-text); }
   .list :global(.prose) { margin: .5rem 0; }
 </style>

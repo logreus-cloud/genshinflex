@@ -1,0 +1,164 @@
+---
+type Point = { x: number; y: number };
+const random = (() => {
+  let seed = 0x5eed1234;
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let n = seed;
+    n = Math.imul(n ^ (n >>> 15), n | 1);
+    n ^= n + Math.imul(n ^ (n >>> 7), n | 61);
+    return ((n ^ (n >>> 14)) >>> 0) / 4294967296;
+  };
+})();
+const between = (min: number, max: number) => min + random() * (max - min);
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+const f = (value: number) => Number(value.toFixed(1));
+const curve = (points: Point[], move = true) => {
+  let d = move ? `M${f(points[0].x)} ${f(points[0].y)}` : '';
+  for (let i = 0; i < points.length - 1; i++) {
+    const mid = { x: (points[i].x + points[i + 1].x) / 2, y: (points[i].y + points[i + 1].y) / 2 };
+    d += `Q${f(points[i].x)} ${f(points[i].y)} ${f(mid.x)} ${f(mid.y)}`;
+  }
+  const end = points[points.length - 1];
+  return `${d}Q${f(end.x)} ${f(end.y)} ${f(end.x)} ${f(end.y)}`;
+};
+const outline = (points: Point[], widths: number[]) => {
+  const left: Point[] = [];
+  const right: Point[] = [];
+  points.forEach((point, i) => {
+    const a = points[Math.max(0, i - 1)], b = points[Math.min(points.length - 1, i + 1)];
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const nx = -dy / length * widths[i] / 2, ny = dx / length * widths[i] / 2;
+    left.push({ x: point.x + nx, y: point.y + ny });
+    right.push({ x: point.x - nx, y: point.y - ny });
+  });
+  const tip = points[points.length - 1];
+  const prev = points[points.length - 2];
+  const length = Math.hypot(tip.x - prev.x, tip.y - prev.y) || 1;
+  const cap = { x: tip.x + (tip.x - prev.x) / length * widths[widths.length - 1] / 2, y: tip.y + (tip.y - prev.y) / length * widths[widths.length - 1] / 2 };
+  const reversed = [...right].reverse();
+  return {
+    shape: `${curve(left)}Q${f(cap.x)} ${f(cap.y)} ${f(reversed[0].x)} ${f(reversed[0].y)}${curve(reversed, false)}Z`,
+    edge: curve(left),
+    frost: curve(left.slice(0, 3)),
+  };
+};
+const widthAt = (base: number, tip: number, t: number) => tip + (base - tip) * (1 - t) ** 1.35;
+const thick: string[] = [];
+const fine: string[] = [];
+const rims: string[] = [];
+const frost: string[] = [];
+const lanes = [
+  { from: -130, to: 870, y: 4, width: 20 },
+  { from: 390, to: 1550, y: 12, width: 22 },
+  { from: -100, to: 1510, y: 21, width: 18 },
+  { from: 110, to: 1290, y: 28, width: 14 },
+];
+lanes.forEach((lane, laneIndex) => {
+  const count = Math.ceil((lane.to - lane.from) / 80);
+  const points: Point[] = [];
+  for (let i = 0; i <= count; i++) {
+    const x = lane.from + (lane.to - lane.from) * i / count + (i === 0 || i === count ? 0 : between(-8, 8));
+    const y = lane.y + Math.sin(i * .85 + laneIndex) * 4 + between(-2, 2);
+    points.push({ x, y });
+  }
+  const widths = points.map((_, i) => lane.width * Math.min(1, (i + .2) / 3, (count - i + .2) / 3));
+  thick.push(outline(points, widths).shape);
+});
+const grow = (points: Point[], baseWidth: number, tipWidth: number, depth: number): void => {
+  const widths = points.map((_, i) => widthAt(baseWidth, tipWidth, i / (points.length - 1)));
+  const paths = outline(points, widths);
+  (depth === 1 ? thick : fine).push(paths.shape);
+  if (depth === 1) rims.push(paths.edge);
+  if (depth === 1 && rims.length % 3 === 1) frost.push(paths.frost);
+  if (depth === 3) return;
+  for (let i = 2; i < points.length - 1; i++) {
+    if (random() >= .3 || points[i].y >= 175) continue;
+    const previous = points[i - 1];
+    const parentAngle = Math.atan2(points[i].x - previous.x, points[i].y - previous.y) * 180 / Math.PI;
+    const branch: Point[] = [points[i]];
+    const segments = 3 + Math.floor(random() * 4);
+    let turn = clamp(parentAngle + (random() < .5 ? -1 : 1) * between(25, 55), -82, 82);
+    for (let step = 0; step < segments; step++) {
+      turn = clamp(turn + between(-18, 18), -82, 82);
+      const length = depth === 2 ? between(9, 16) : between(12, 20);
+      const last = branch[branch.length - 1];
+      branch.push({ x: last.x + Math.sin(turn * Math.PI / 180) * length, y: last.y + Math.cos(turn * Math.PI / 180) * length });
+    }
+    const childWidth = depth === 2 ? between(.6, 1) : widths[i] * between(.45, .6);
+    grow(branch, childWidth, depth === 2 ? .6 : .8, depth + 1);
+  }
+};
+for (let i = 0; i < 13; i++) {
+  const points: Point[] = [{ x: 45 + i * 112 + between(-35, 35), y: between(6, 25) }];
+  let angle = 0;
+  const short = i % 3 === 0;
+  const segments = short ? 7 + i % 2 : i % 3 === 1 ? 10 : 9;
+  for (let step = 0; step < segments; step++) {
+    angle = clamp(angle + between(-18, 18), -40, 40);
+    const length = short ? between(14, 18) : between(23, 26);
+    const last = points[points.length - 1];
+    points.push({ x: last.x + Math.sin(angle * Math.PI / 180) * length, y: last.y + Math.cos(angle * Math.PI / 180) * length });
+  }
+  grow(points, between(7, 16), between(.8, 1.5), 1);
+}
+const lights = Array.from({ length: 6 }, () => ({
+  x: f(between(70, 1370)),
+  y: f(between(36, 84)),
+  r: f(between(1, 1.8)),
+  duration: f(between(6, 9)),
+  delay: f(between(0, 9)),
+}));
+---
+<div class="roots-divider" aria-hidden="true">
+  <svg viewBox="0 0 1440 180" preserveAspectRatio="xMidYMin slice" focusable="false">
+    <defs>
+      <linearGradient id="roots-wood" x1="0" y1="0" x2="0" y2="180" gradientUnits="userSpaceOnUse">
+        <stop class="wood-top" />
+        <stop offset="1" class="wood-bottom" />
+      </linearGradient>
+      <linearGradient id="roots-rim-fade" x1="0" y1="0" x2="0" y2="180" gradientUnits="userSpaceOnUse">
+        <stop stop-color="white" />
+        <stop offset=".6" stop-color="black" />
+      </linearGradient>
+      <mask id="roots-rim-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1440" height="180">
+        <rect width="1440" height="180" fill="url(#roots-rim-fade)" />
+      </mask>
+    </defs>
+    <g fill="url(#roots-wood)">
+      {thick.map((d) => <path d={d} />)}
+    </g>
+    <g fill="url(#roots-wood)">
+      {fine.map((d) => <path d={d} />)}
+    </g>
+    <g class="rim" fill="none" stroke-width="1" mask="url(#roots-rim-mask)">
+      {rims.map((d) => <path d={d} />)}
+    </g>
+    <g class="frost" fill="none" stroke="rgb(210 237 255 / .4)" stroke-width="1.2" stroke-linecap="round">
+      {frost.map((d) => <path d={d} />)}
+    </g>
+    <g class="lights">
+      {lights.map((light) => <circle cx={light.x} cy={light.y} r={light.r} style={`--duration: ${light.duration}s; --delay: -${light.delay}s`} />)}
+    </g>
+  </svg>
+</div>
+
+<style>
+  .roots-divider { --root-top: #2a2330; --root-bottom: #0c0d12; --root-edge: rgb(227 176 75 / .22); --roots-top: var(--root-top); --roots-bottom: var(--root-bottom); --roots-rim: var(--root-edge); flex: none; width: 100%; height: 180px; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, transparent, var(--roots-bottom)); }
+  svg { display: block; width: 100%; height: 100%; }
+  .wood-top { stop-color: var(--roots-top); }
+  .wood-bottom { stop-color: var(--roots-bottom); }
+  .rim { stroke: var(--roots-rim); }
+  .lights circle { fill: var(--roots-rim); opacity: 0; animation: roots-glow var(--duration) ease-in-out var(--delay) infinite; }
+  @keyframes roots-glow { 50% { opacity: .6; } }
+  .frost { display: none; }
+  :global(:root[data-season="snezhnaya"]) .roots-divider { --root-edge: rgb(169 220 255 / .22); }
+  :global(:root[data-season="snezhnaya"]) .frost { display: block; }
+  :global(:root[data-theme="light"]) .roots-divider { --root-top: #4a4452; --root-bottom: #2a2f3a; }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .roots-divider { --root-top: #4a4452; --root-bottom: #2a2f3a; }
+  }
+  @media (max-width: 700px) { .roots-divider { height: 120px; } }
+  @media (prefers-reduced-motion: reduce) { .lights circle { animation: none; opacity: .3; } }
+</style>
