@@ -5,8 +5,6 @@
 
 **Stats:** Energy Recharge around 200% (180–230% depending on the team; about 160% is enough at C1), ATK 2000+: both the buff and the healing scale with it. With Favonius Lance you need about 50–60% Crit Rate for the weapon to proc.
 
-**Rotation:** Skill → Burst → the other supports' skills → the main DPS comes in.
-
 **Partners:** Sandrone, Cyno or Wriothesley as the main DPS, Yae Miko as the second Electro, and Odette. He's useful outside Stellar teams too — for example in Overload with Arlecchino, where his ATK buff and off-field damage help.
 
 **Constellations:** C6 is the key one: it strengthens his buffs and gives the team Elemental Mastery. C1 helps with energy, C2 closes the gap between Bursts.

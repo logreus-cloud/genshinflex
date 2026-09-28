@@ -5,8 +5,6 @@
 
 **How she plays:** her Elemental Skill puts her into a combat stance with Anemo infusion. In this stance she builds charges and strikes with the Windborne Sword, which has three power levels — and the damage gap between levels is large, so the main goal of the rotation is to reach level three. Her Elemental Burst summons spirit blades for AoE damage and grants a charge for the sword; it fits best at the end of the rotation.
 
-**Rotation:** support skills → Vesna's Skill → three Normal Attacks and a Charged Attack → level-three Windborne Sword → repeat while the stance lasts; the Burst replaces one of the cycles. Before leaving the field, stack her Stellar Swirl bonus to the max.
-
 **Stats:** ATK 2000+ (the threshold for her third passive), Crit Rate 50–60%+, Crit DMG 180%+, Energy Recharge 120–135%, Elemental Mastery 100–180 as a bonus.
 
 **Partners:** Odette is the core of any Stellar team; the Cryo Traveler provides Cryo for the reaction; C6 Faruzan is one of the best Anemo buffers; Vodyanitsa heals, shreds resistance and changes Vesna's vortex. Vesna's passive buffs the team: ATK for Cryo and Anemo allies, Elemental Mastery for everyone else.

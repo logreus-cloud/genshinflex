@@ -51,7 +51,7 @@ const talentKeys = ['normal', 'skill', 'burst'] as const;
 // У персонажей из утечек часть созвездий неизвестна — раздел показываем, только если есть хоть одно
 const hasCons = c.constellations.some(Boolean);
 const missingNames = (c.betaMissing ?? []).map((k) => TALENTS[k as keyof typeof TALENTS] ?? k);
-const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ...(c.beta ? [['materials', t('Материалы')]] : []), ['talents', t('Таланты')], ...(hasCons ? [['constellations', t('Созвездия')]] : []), ...(c.betaAnalysis ? [['analysis', t('Анализ')]] : [])];
+const tabs = [['profile', t('Профиль')], ...(b ? [['build', t('Билд')], ...(b.rotations.length ? [['rotation', t('Ротация')]] : []), ['teams', t('Команды')]] : []), ...(slug in investments ? [['value', t('Стоит ли выбивать')]] : []), ...(b?.videos.length ? [['videos', t('Видео')]] : []), ...(c.beta ? [['materials', t('Материалы')]] : []), ['talents', t('Таланты')], ...(hasCons ? [['constellations', t('Созвездия')]] : []), ...(c.betaAnalysis ? [['analysis', t('Анализ')]] : [])];
 // Подписи материалов утечки: ключи из beta-characters.json
 const betaLabels: Record<string, string> = {
   mora: t('Мора'), wit: t('Опыт героя'), weekly: t('Материал с еженедельного босса'), crown: t('Корона прозрения'),
@@ -82,7 +82,7 @@ const jsonLd = b && {
   description: seoDescription,
   image: c.splash ?? c.icon,
   dateModified: b.updated.toISOString().slice(0, 10),
-  inLanguage: 'ru',
+  inLanguage: lang,
   mainEntityOfPage: pageUrl,
   author: { '@type': 'Organization', name: 'GenshinFlex', url: Astro.site?.toString() },
   publisher: { '@type': 'Organization', name: 'GenshinFlex' },
@@ -214,6 +214,24 @@ const jsonLd = b && {
             <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`}>{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Дополнить гайд')}</a></p>
           )}
         </section>
+
+        {b.rotations.length > 0 && (
+          <section id="rotation">
+            <h2 class="h-sec">{t('Ротация')}</h2>
+            {b.rotations.map((r) => (
+              <div class="panel rotation-panel">
+                {r.name && <h3>{t(r.name)}</h3>}
+                <ol class="steps" role="list">
+                  {r.steps.split(/\s*(?:→|->)\s*/).filter(Boolean).map((step, i) => (
+                    <li>{i > 0 && <span class="step-arrow" aria-hidden="true">→</span>}<span class="step">{t(step)}</span></li>
+                  ))}
+                </ol>
+                {r.note && <small class="muted note">{t(r.note)}</small>}
+              </div>
+            ))}
+            <p class="muted small rotation-legend">{t('Обозначения: E — навык, E (удерж.) — удержание навыка, Q — взрыв стихии, M1-M2-M3 — серия обычных атак, CA — заряженная атака.')}</p>
+          </section>
+        )}
 
         <section id="teams">
           <h2 class="h-sec">{t('Команды')}</h2>
@@ -436,6 +454,15 @@ const jsonLd = b && {
   .more li .chip { margin-left: .4rem; font-size: .7rem; }
   .more p { margin: .6rem 0 0; }
   .prose :global(p) { margin: .4rem 0; max-width: 80ch; }
+
+  .rotation-panel + .rotation-panel { margin-top: 12px; }
+  .rotation-panel h3 { margin: 0 0 .6rem; }
+  .rotation-panel .note { margin-top: .6rem; }
+  .steps { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .6rem; list-style: none; margin: 0; padding: 0; }
+  .steps li { display: flex; align-items: center; gap: .6rem; min-width: 0; max-width: 100%; }
+  .step-arrow { color: var(--muted); flex: none; }
+  .step { display: inline-block; min-width: 0; max-width: 100%; box-sizing: border-box; padding: .3rem .55rem; border-radius: var(--radius); background: var(--surface-2); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .rotation-legend { margin: .8rem 0 0; }
 
   .sub { margin: 1.6rem 0 .7rem; }
   .lvl { display: inline-flex; align-items: center; gap: .5rem; }

@@ -7,6 +7,4 @@
 
 **Stats:** ATK 2000+, Energy Recharge 130–140% with a second Electro on the team (more without one), Crit Rate 60–70%: her off-field damage procs often, so crit pays off. Crit DMG as much as you can, 175%+.
 
-**Rotation:** Skill ×3 (three totems) → switch to other characters → Burst when all three totems are up (it turns them into powerful strikes) → Skill ×3 again.
-
 **Constellations:** C1 greatly reduces her energy needs and noticeably strengthens her in Stellar-Conduct; C2 strengthens the totems.

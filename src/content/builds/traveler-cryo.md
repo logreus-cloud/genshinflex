@@ -40,6 +40,13 @@ teams:
     members: [vesna, odette, traveler-cryo, vodyanitsa]
   - name: "Звёздное рассеивание Мидзуки"
     members: [yumemizuki-mizuki, odette, traveler-cryo, faruzan]
+rotations:
+  - name: "Звёздный проводник"
+    steps: "E → M1-M2 → CA → Q"
+    note: "Взрыв стихии — на полных стаках Морозного сияния."
+  - name: "Звёздное рассеивание"
+    steps: "E → CA → Q"
+    note: "Заряженная атака после навыка — особая."
 sources:
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/613906

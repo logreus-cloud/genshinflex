@@ -36,6 +36,9 @@ teams:
     members: [skirk, vodyanitsa, escoffier, furina]
   - name: "Заморозка Лоэна"
     members: [lohen, vodyanitsa, escoffier, yelan]
+rotations:
+  - steps: "E → смена персонажа"
+    note: "Взрыв стихии — по желанию: командам он не обязателен."
 sources:
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/606400

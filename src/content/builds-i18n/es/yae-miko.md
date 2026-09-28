@@ -7,6 +7,4 @@
 
 **Estadísticas:** ATQ 2000+, Recarga de Energía 130–140% con un segundo Electro en el equipo (más sin él), Prob. CRIT 60–70%: su daño fuera del campo se activa a menudo, así que el crítico compensa. Daño CRIT tanto como puedas, 175%+.
 
-**Rotación:** Habilidad ×3 (tres tótems) → cambiar a otros personajes → Definitiva cuando estén los tres tótems (los convierte en golpes potentes) → Habilidad ×3 de nuevo.
-
 **Constelaciones:** C1 reduce mucho su necesidad de energía y la refuerza notablemente en Superconductor Estelar; C2 refuerza los tótems.

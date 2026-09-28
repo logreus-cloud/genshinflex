@@ -5,8 +5,6 @@
 
 **Cómo se juega:** su Habilidad Elemental la pone en una postura de combate con infusión Anemo. En esta postura acumula cargas y golpea con la Espada del Viento, que tiene tres niveles de poder, y la diferencia de daño entre niveles es grande: el objetivo principal de la rotación es llegar al tercer nivel. Su Habilidad Definitiva invoca espadas espirituales para daño en área y da una carga para la espada; encaja mejor al final de la rotación.
 
-**Rotación:** habilidades de apoyo → Habilidad de Vesna → tres Ataques Normales y un Ataque Cargado → Espada del Viento de nivel tres → repetir mientras dure la postura; la Definitiva sustituye uno de los ciclos. Antes de salir del campo, acumula al máximo su bonificación de Torbellino Estelar.
-
 **Estadísticas:** ATQ 2000+ (el umbral de su tercer talento pasivo), Prob. CRIT 50–60%+, Daño CRIT 180%+, Recarga de Energía 120–135%, Maestría Elemental 100–180 como extra.
 
 **Compañeros:** Odette es el núcleo de cualquier equipo Estelar; el Viajero Cryo aporta el Cryo para la reacción; Faruzan en C6 es uno de los mejores apoyos Anemo; Vodyanitsa cura, reduce la resistencia y cambia el vórtice de Vesna. El pasivo de Vesna potencia al equipo: ATQ para los aliados Cryo y Anemo, Maestría Elemental para los demás.

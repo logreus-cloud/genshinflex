@@ -5,8 +5,6 @@
 
 **Cómo se juega:** su robot acumula potencia con los ataques, y cuando la barra llega a la zona roja sus golpes se debilitan. Su Habilidad reinicia la barra y además hace daño, así que la rotación alterna Ataques Cargados y la Habilidad.
 
-**Rotación:** mejoras de apoyo → Ataque Cargado (mantener hasta llenar el medidor) → Habilidad → repetir dos o tres veces → Definitiva al final del ciclo.
-
 **Estadísticas:** ATQ 2000+: en ese umbral su pasivo, que convierte ATQ en Maestría Elemental, llega al máximo; de ahí el ATQ en reloj y cáliz. Prob. CRIT 60–70% contando todas las mejoras, Daño CRIT 180%+, Recarga de Energía 120–145%. La Maestría Elemental la da casi toda el pasivo, no hace falta buscarla.
 
 **Compañeros:** Yae Miko es su mejor aplicadora Electro, sobre todo en C1. Alyosha en C6 y Beidou en C6 son apoyos Electro fuertes. Odette potencia las reacciones Estelares. Equipo económico: Beidou, Sacarosa y Qiqi.

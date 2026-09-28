@@ -43,6 +43,9 @@ teams:
     members: [vesna, odette, vodyanitsa, faruzan]
   - name: "Звёздное рассеивание Мидзуки"
     members: [yumemizuki-mizuki, odette, traveler-cryo, sucrose]
+rotations:
+  - steps: "E → Q → смена персонажа"
+    note: "Навык — каждый раз по откату; взрыв стихии — только чтобы закрыть паузу, пока навык на перезарядке."
 sources:
   - title: Game8
     url: https://game8.co/games/Genshin-Impact/archives/606893

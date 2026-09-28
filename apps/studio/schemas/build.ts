@@ -33,6 +33,7 @@ export const build = defineType({
       validation: (Rule) => Rule.custom((items) =>
         !items || items.every((item) => Boolean(item.name)) || 'У команды билда должно быть название'),
     }),
+    defineField({ name: 'rotations', title: 'Ротация', type: 'array', of: [{ type: 'buildRotation' }], initialValue: [], hidden: onlyRussian }),
     defineField({ name: 'sources', title: 'Источники', type: 'array', of: [{ type: 'source' }], initialValue: [], hidden: onlyRussian }),
     defineField({ name: 'external', title: 'Другие гайды', type: 'array', of: [{ type: 'externalLink' }], initialValue: [], hidden: onlyRussian }),
     defineField({ name: 'authors', title: 'Авторы', type: 'array', of: [{ type: 'string' }], initialValue: [], hidden: onlyRussian }),

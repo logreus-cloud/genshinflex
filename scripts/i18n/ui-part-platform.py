@@ -17,4 +17,7 @@ T = [
 ("Вид", "View", "Vista"),
 ("Галерея", "Gallery", "Galería"),
 ("Сетка", "Grid", "Cuadrícula"),
+("Ротация", "Rotation", "Rotación"),
+("Обозначения: E — навык, E (удерж.) — удержание навыка, Q — взрыв стихии, M1-M2-M3 — серия обычных атак, CA — заряженная атака.", "Legend: E — Skill, E (hold) — hold Skill, Q — Burst, M1-M2-M3 — Normal Attack string, CA — Charged Attack.", "Leyenda: E — Habilidad, E (mant.) — mantener Habilidad, Q — Definitiva, M1-M2-M3 — cadena de Ataques Normales, CA — Ataque Cargado."),
+("E (удерж.)", "E (hold)", "E (mant.)"),
 ]

@@ -5,8 +5,6 @@
 
 **Estadísticas:** lo principal es la Recarga de Energía: 250–300% sin C6 y alrededor del 200% en C6. Con el Arco de Favonius necesitas 50%+ de Prob. CRIT para que el arma se active. Para su daño personal: cáliz Anemo y diadema de crítico.
 
-**Rotación:** Habilidad → Ataque Cargado → Definitiva → cambiar al DPS principal; Habilidad otra vez cuando termine el enfriamiento.
-
 **Compañeros:** en Torbellino Estelar — Vesna, Odette y Vodyanitsa, o Mizuki con el Viajero Cryo; entre los equipos clásicos — Xiao y Trotamundos.
 
 **Constelaciones:** C6 es la clave: +40% de Daño CRIT en los ataques Anemo bajo su mejora, y su Habilidad empieza a golpear a los enemigos de forma constante (por eso en C6 su mejor set es Tenacidad de la Geoarmada). C2 alarga su Definitiva 6 segundos; C4 da energía.

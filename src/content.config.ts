@@ -21,6 +21,8 @@ const builds = defineCollection({
     substats: z.array(z.string()),
     talents: z.array(z.enum(['normal', 'skill', 'burst'])).default([]),
     teams: z.array(z.object({ name: z.string(), members: z.array(z.string()).length(4), note: z.string().optional() })),
+    // Последовательности действий в бою
+    rotations: z.array(z.object({ name: z.string().optional(), steps: z.string().trim().min(1), note: z.string().optional() })).default([]),
     sources: z.array(source).default([]),
     // Гайды сообщества на других сайтах — блок «Также можете посмотреть»
     external: z.array(z.object({ title: z.string(), url: z.url(), author: z.string().optional(), lang: z.enum(['ru', 'en', 'es']) })).default([]),
