@@ -79,7 +79,8 @@ onPage((signal) => {
     event: t('Ивенты'), endgame: t('Эндгейм'), livestream: t('Стримы'),
   };
   const dayMs = 86_400_000;
-  const labelWidth = 170;
+  // Ширина колонки подписей задаётся в CSS (--cal-label-width): на телефоне она уже
+  const labelWidth = () => parseFloat(getComputedStyle(timeline).getPropertyValue('--cal-label-width')) || 170;
   const esc = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
   const imageUrl = (value?: string | null) => value && /^https?:\/\//i.test(value) ? value : '';
   const sourceUrl = (value?: string) => value && /^https?:\/\//i.test(value) ? value : '';
@@ -126,7 +127,7 @@ onPage((signal) => {
   const scrollToday = (smooth = false) => {
     const line = board.querySelector<HTMLElement>('.cal-now');
     if (!line) return;
-    const left = Math.max(0, labelWidth + (Date.now() - timelineStart) / dayMs * timelinePx - timeline.clientWidth / 3);
+    const left = Math.max(0, labelWidth() + (Date.now() - timelineStart) / dayMs * timelinePx - timeline.clientWidth / 3);
     timeline.scrollLeft = left;
     if (!smooth) return;
     // Подсветка линии «Сейчас», чтобы нажатие было заметно, даже если шкала уже на месте.
@@ -192,11 +193,11 @@ onPage((signal) => {
         <div class="cal-track" style="width:${width}px"><div class="cal-weekends">${weekMarkup}</div>${bars}</div>
       </div>`;
     }).join('');
-    board.innerHTML = `<div class="cal-board" style="width:${labelWidth + width}px">
+    board.innerHTML = `<div class="cal-board" style="width:calc(var(--cal-label-width) + ${width}px)">
       <div class="cal-head"><div class="cal-side"></div><div class="cal-ruler" style="width:${width}px">
         <div class="cal-months">${months.join('')}</div><div class="cal-days">${dates.join('')}</div>
       </div></div>${laneHtml || `<p class="cal-empty">${esc(t('Нет записей для выбранных категорий.'))}</p>`}
-      <div class="cal-now" style="left:${labelWidth + x(now)}px"><span>${esc(t('Сейчас'))}</span></div>
+      <div class="cal-now" style="left:calc(var(--cal-label-width) + ${x(now)}px)"><span>${esc(t('Сейчас'))}</span></div>
     </div>`;
     if (resetScroll) scrollToday();
   };
@@ -331,7 +332,7 @@ onPage((signal) => {
       if (now >= timelineEnd) render();
       else {
         const line = board.querySelector<HTMLElement>('.cal-now');
-        if (line) line.style.left = `${labelWidth + (now - timelineStart) / dayMs * timelinePx}px`;
+        if (line) line.style.left = `calc(var(--cal-label-width) + ${(now - timelineStart) / dayMs * timelinePx}px)`;
       }
     }
     board.querySelectorAll<HTMLElement>('[data-item]').forEach((entry) => {
@@ -407,12 +408,12 @@ onPage((signal) => {
   .cal-filters { flex-basis: 100%; }
   .cal-filters button { border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); color: var(--muted); padding: .35rem .7rem; cursor: pointer; }
   .cal-filters button[aria-pressed="true"], .cal-buttons button[aria-pressed="true"] { color: var(--accent-text); border-color: var(--accent); background: var(--accent-soft); }
-  .cal-timeline { overflow: auto; max-height: 70vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .cal-timeline { --cal-label-width: 170px; overflow: auto; max-height: 70vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
   .cal-timeline[hidden], .cal-list[hidden], .cal-detail[hidden] { display: none; }
   :global(.cal-board) { position: relative; }
   :global(.cal-head), :global(.cal-lane) { display: flex; }
   :global(.cal-head) { position: sticky; top: 0; z-index: 5; height: 62px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
-  :global(.cal-side) { position: sticky; left: 0; z-index: 4; flex: 0 0 170px; display: flex; align-items: center; padding: .5rem; background: var(--surface-2); border-right: 1px solid var(--border); font-size: .82rem; font-weight: 600; }
+  :global(.cal-side) { position: sticky; left: 0; z-index: 4; flex: 0 0 var(--cal-label-width); min-width: 0; display: flex; align-items: center; padding: .5rem; background: var(--surface-2); border-right: 1px solid var(--border); font-size: .82rem; font-weight: 600; }
   :global(.cal-head .cal-side) { z-index: 6; }
   :global(.cal-ruler), :global(.cal-track), :global(.cal-months), :global(.cal-days) { position: relative; }
   :global(.cal-months), :global(.cal-days) { height: 30px; }
@@ -451,5 +452,9 @@ onPage((signal) => {
   .cal-detail :global(h2) { margin: .3rem 0 .7rem; }
   .cal-detail :global(p) { margin: .4rem 0; }
   .cal-detail :global(.cal-detail-icons) { display: flex; gap: .3rem; }
-  @media (max-width: 640px) { .cal-controls { align-items: flex-start; } }
+  @media (max-width: 640px) {
+    .cal-controls { align-items: flex-start; }
+    .cal-timeline { --cal-label-width: 84px; }
+    :global(.cal-side) { padding: .4rem; font-size: .7rem; line-height: 1.2; overflow-wrap: break-word; }
+  }
 </style>

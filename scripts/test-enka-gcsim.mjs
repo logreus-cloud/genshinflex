@@ -20,6 +20,31 @@ for (const build of builds) {
   assert.ok(build.stats.atk > 0);
 }
 
+const reorderedPreset = {
+  members: [{ slug: 'xiangling', alias: 'xiangling' }],
+  config: 'xiangling char lvl=90/90 cons=0 talent=9,9,9;\nxiangling add refine=5 weapon="thecatch" lvl=90/90;\nxiangling add count=4 set="emblemofseveredfate";',
+};
+const reorderedBuild = {
+  slug: 'xiangling', level: 90, maxLevel: 90, cons: 0, talents: [9, 9, 9],
+  weapon: { key: 'favoniuslance', refine: 1, level: 90, maxLevel: 90 },
+  sets: { noblesseoblige: 4 }, stats: { 'atk%': 0.1 },
+};
+const reordered = applyBuilds(reorderedPreset, new Map([['xiangling', reorderedBuild]]));
+assert.deepEqual(reordered.applied, ['xiangling']);
+assert.match(reordered.config, /xiangling add weapon="favoniuslance" refine=1 lvl=90\/90;\nxiangling add set="noblesseoblige" count=4;/);
+assert.doesNotMatch(reordered.config, /weapon="thecatch"/);
+assert.doesNotMatch(reordered.config, /set="emblemofseveredfate"/);
+
+const withoutSkills = structuredClone(enka);
+for (const avatar of withoutSkills.avatarInfoList ?? []) delete avatar.skillLevelMap;
+const fallbackBuilds = enkaToBuilds(withoutSkills, presets.ids).builds;
+assert.equal(fallbackBuilds.length, builds.length);
+assert.ok(fallbackBuilds.every((build) => build.defaultTalents === true && build.talents.join(',') === '1,1,1'));
+const fallbackPreset = Object.values(presets.presets).find((preset) => preset.members.some((member) => fallbackBuilds.some((build) => build.slug === member.slug)));
+assert.ok(fallbackPreset, 'Для билда без талантов нет пресета');
+const fallback = applyBuilds(fallbackPreset, new Map(fallbackBuilds.map((build) => [build.slug, build])));
+assert.ok(fallback.applied.some((slug) => fallback.warnings.includes(`${slug}: нет уровней талантов, взяты 1/1/1`)));
+
 await import(pathToFileURL(resolve('public/gcsim/wasm_exec.js')).href);
 const go = new globalThis.Go();
 const wasm = gunzipSync(readFileSync('public/gcsim/gcsim.wasm.gz'));

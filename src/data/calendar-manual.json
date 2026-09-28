@@ -14,5 +14,50 @@
       "en": "Expected right after 7.1 ends",
       "es": "Se espera justo al terminar la 7.1"
     }
+  },
+  {
+    "id": "event-predictive-victory-dynamics",
+    "kind": "event",
+    "start": "2026-10-11T22:00",
+    "end": "2026-10-19T21:59",
+    "title": {
+      "ru": "Динамика предсказанной победы",
+      "en": "Predictive Victory Dynamics",
+      "es": "Dinámica de la victoria prevista"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/46771641"
+    }
+  },
+  {
+    "id": "event-resplendent-starlight-login",
+    "kind": "event",
+    "start": "2026-10-01T04:00",
+    "end": "2026-10-19T03:59",
+    "title": {
+      "ru": "Сияние звёзд: ежедневный вход",
+      "en": "Resplendent Starlight — Daily Login",
+      "es": "Resplendor estelar: inicio de sesión diario"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/46771533"
+    }
+  },
+  {
+    "id": "event-missive-of-grace",
+    "kind": "event",
+    "start": "2026-09-28T00:00",
+    "end": "2026-11-02T03:59",
+    "title": {
+      "ru": "Письмо благодарности: подарок",
+      "en": "Missive of Grace: A Thank-You Gift",
+      "es": "Misiva de gratitud: un regalo de agradecimiento"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/46771533"
+    }
   }
 ]

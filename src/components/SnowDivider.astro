@@ -1,6 +1,10 @@
 ---
+// edge — кромка поверх нижнего края блока (без фона подвала); seed — свой узор сугробов
+interface Props { edge?: boolean; seed?: number }
+const { edge = false, seed: start = 0x5eed51a0 } = Astro.props;
+const uid = `snow-${(start >>> 0).toString(36)}`;
 const random = (() => {
-  let seed = 0x5eed51a0;
+  let seed = start;
   return () => {
     seed = (seed + 0x6d2b79f5) | 0;
     let n = seed;
@@ -66,22 +70,22 @@ const sparkles = Array.from({ length: 32 }, (_, i) => {
   };
 });
 ---
-<div class="snow-divider" aria-hidden="true">
+<div class:list={['snow-divider', { edge }]} aria-hidden="true">
   <svg viewBox="0 0 1440 110" preserveAspectRatio="none" focusable="false">
     <defs>
-      <linearGradient id="snow-fill" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id={`${uid}-fill`} x1="0" y1="0" x2="0" y2="1">
         <stop stop-color="#f4f8ff" />
         <stop offset=".55" stop-color="#d6e4f5" />
         <stop offset="1" stop-color="#a9bfdc" />
       </linearGradient>
-      <linearGradient id="snow-ice" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id={`${uid}-ice`} x1="0" y1="0" x2="0" y2="1">
         <stop stop-color="rgb(220 236 255 / .95)" />
         <stop class="ice-bottom" offset="1" stop-color="rgb(160 200 240 / .35)" />
       </linearGradient>
     </defs>
     <g class="snow">
-      <path d={mass} fill="url(#snow-fill)" />
-      {icicles.map((icicle) => <path d={icicle.shape} fill="url(#snow-ice)" />)}
+      <path d={mass} fill={`url(#${uid}-fill)`} />
+      {icicles.map((icicle) => <path d={icicle.shape} fill={`url(#${uid}-ice)`} />)}
     </g>
     <path d={upper} class="crest" />
     <g class="ice-shine">
@@ -95,6 +99,7 @@ const sparkles = Array.from({ length: 32 }, (_, i) => {
 
 <style>
   .snow-divider { --footer-bg: #0c0d12; --snow-shadow: rgb(20 40 80 / .35); flex: none; width: 100%; height: 110px; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, transparent 45%, var(--footer-bg) 54%, var(--footer-bg) 100%); }
+  .snow-divider.edge { background: none; }
   svg { display: block; width: 100%; height: 100%; }
   .snow { filter: drop-shadow(0 6px 8px var(--snow-shadow)); }
   .crest { fill: none; stroke: rgb(255 255 255 / .9); stroke-width: 1.5; }

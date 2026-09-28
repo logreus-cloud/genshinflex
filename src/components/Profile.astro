@@ -10,7 +10,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   slug, name, icon, element, rarity, namecard: cards[slug] ?? '',
 }))).replace(/</g, '\\u003c');
 ---
-<Layout title={t('Мой профиль')} description={t('Избранное, персонажи и история круток из этого браузера.')}>
+<Layout title={t('Мой профиль')} description={t('Избранное, персонажи и история круток.')}>
   <div class="profile-root profile-page">
     <div class="profile-bg" id="profile-bg" aria-hidden="true"></div>
     <canvas class="profile-effect" id="profile-effect" aria-hidden="true" hidden></canvas>
@@ -32,7 +32,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             </span>
           </div>
           <div class="identity">
-            <h1 id="profile-name">{t('Путешественник')}</h1>
+            <div class="name-row">
+              <h1 id="profile-name">{t('Путешественник')}</h1>
+              <span class="title-chip" id="profile-title" hidden></span>
+            </div>
             <p id="profile-about" hidden></p>
             <p class="muted" id="profile-meta" hidden></p>
           </div>
@@ -76,7 +79,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       </section>
     </div>
     <noscript><p class="profile-card">{t('Для профиля нужен JavaScript')}</p></noscript>
-    <p class="privacy">{t('Все данные профиля хранятся только в этом браузере и никуда не отправляются, кроме запроса витрины по UID.')}</p>
+    <p class="privacy">{t('Без входа данные профиля хранятся только в этом браузере. После входа оформление, избранное, персонажи и UID синхронизируются с аккаунтом.')}</p>
 
     <dialog class="profile-dialog" id="profile-dialog" aria-labelledby="editor-title">
       <div class="dialog-head">
@@ -111,6 +114,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <label for="editor-about">{t('О себе')}</label>
             <textarea class="input" id="editor-about" maxlength="300" rows="4"></textarea>
             <small id="about-count"></small>
+          </div>
+          <!-- Титул хранится в аккаунте и меняется сразу, без «Готово» -->
+          <div class="editor-field" id="title-field" data-none={t('Без титула')} hidden>
+            <label for="profile-title-select">{t('Титул')}</label>
+            <select class="input" id="profile-title-select"></select>
+            <small id="title-hint">{t('Титулы выдаются за ивенты и участие в жизни сайта.')}</small>
           </div>
         </div>
         <div class="editor-panel" data-panel="avatar" hidden>
@@ -234,15 +243,105 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 </Layout>
 
 <script>
+  // Титулы из аккаунта: чип рядом с ником и выбор активного титула. Работает только для вошедших.
+  import { onPage } from '../scripts/router';
+  import { pageLang } from '../i18n/client';
+  import { API_URL } from '../lib/platform';
+
+  type Title = { id: string; name_ru: string; name_en: string | null; name_es: string | null; color: string; description: string | null; note?: string | null };
+  const colorOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+
+  onPage((signal) => {
+    const chip = document.getElementById('profile-title');
+    const field = document.getElementById('title-field');
+    const select = document.getElementById('profile-title-select') as HTMLSelectElement | null;
+    if (!chip || !field || !select) return;
+    const lang = pageLang();
+    const nameOf = (title: Title) => (lang === 'en' ? title.name_en : lang === 'es' ? title.name_es : null) || title.name_ru;
+    let owned: Title[] = [];
+    let active: string | null = null;
+    let token = '';
+
+    const renderChip = () => {
+      const title = owned.find((item) => item.id === active);
+      chip.hidden = !title;
+      chip.replaceChildren();
+      if (!title) return;
+      chip.style.setProperty('--title-color', colorOk(title.color) ? title.color : '#e3b04b');
+      chip.append(Object.assign(document.createElement('span'), { className: 'title-mark', textContent: '◆' }), document.createTextNode(nameOf(title)));
+      chip.title = title.description || '';
+    };
+    const renderSelect = () => {
+      select.replaceChildren(new Option(select.dataset.none || '—', ''));
+      for (const title of owned) select.append(new Option(nameOf(title), title.id, false, title.id === active));
+      select.value = active ?? '';
+      select.disabled = !owned.length;
+    };
+
+    // Выход из аккаунта или сбой — титулы скрываются
+    const reset = () => { owned = []; active = null; token = ''; field.hidden = true; renderChip(); };
+    const load = async () => {
+      reset();
+      let stored = false;
+      try { stored = !!localStorage.getItem('gf:auth'); } catch {}
+      if (!stored) return;
+      try {
+        const { getSupabase } = await import('../scripts/auth');
+        const { data } = await getSupabase().auth.getSession();
+        token = data.session?.access_token || '';
+        if (!token || signal.aborted) return;
+        const response = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${token}` }, signal });
+        if (!response.ok) return;
+        const me = await response.json() as { titles?: Title[]; active_title?: string | null };
+        if (signal.aborted) return;
+        owned = Array.isArray(me.titles) ? me.titles.filter((item) => item && typeof item.id === 'string' && typeof item.name_ru === 'string') : [];
+        active = typeof me.active_title === 'string' && owned.some((item) => item.id === me.active_title) ? me.active_title : null;
+        field.hidden = false;
+        renderSelect();
+        renderChip();
+      } catch { /* Нет сети или API — профиль работает и без титулов */ }
+    };
+
+    select.dataset.none = select.dataset.none || document.getElementById('title-field')?.dataset.none || '';
+    select.addEventListener('change', async () => {
+      const next = select.value || null;
+      const previous = active;
+      active = next;
+      renderChip();
+      select.disabled = true;
+      try {
+        const response = await fetch(`${API_URL}/me/title`, {
+          method: 'POST', signal,
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: next }),
+        });
+        if (!response.ok) throw new Error();
+      } catch {
+        if (signal.aborted) return;
+        active = previous;
+        renderChip();
+        select.value = active ?? '';
+      } finally {
+        if (!signal.aborted) select.disabled = !owned.length;
+      }
+    }, { signal });
+
+    void load();
+    document.addEventListener('gf:auth', () => { void load(); }, { signal });
+  });
+</script>
+
+<script>
   import { favorites, recent, store, type Entry } from '../scripts/common';
   import { BASE, t } from '../scripts/search';
   import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
   import { onPage, cleanup } from '../scripts/router';
+  import { markChanged, syncNow, type SyncResult } from '../scripts/profile-sync';
+  import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
 
   type Char = { id: number | null; s: string; n: string; i: string };
   type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
   type Profile = { uid: string; time: number; player: { nickname: string; level: number; worldLevel: number; signature: string; profilePictureId?: number }; showcase: number[] };
-  type Wish = { id: string; uid: string; gacha_type: string; time: string; name: string; item_type: string; rank_type: string };
   type Avatar = { type: 'none' } | { type: 'character'; slug: string } | { type: 'upload' };
   type CoverType = 'none' | 'namecard' | 'upload';
   type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
@@ -494,7 +593,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const box = $(id);
     box.replaceChildren();
     box.closest('section')!.hidden = hideEmpty && !list.length;
-    if (!list.length) { if (!hideEmpty) box.textContent = t(empty); return; }
+    if (!list.length) { if (!hideEmpty) box.append(el('span', 'empty', t(empty))); return; }
     for (const item of list.slice(0, 100)) {
       const href = safeHref(item.href);
       if (!href) continue;
@@ -505,7 +604,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       link.append(el('span', '', item.name));
       box.append(link);
     }
-    if (!box.childElementCount && !hideEmpty) box.textContent = t(empty);
+    if (!box.childElementCount && !hideEmpty) box.append(el('span', 'empty', t(empty)));
     if (hideEmpty && !box.childElementCount) box.closest('section')!.hidden = true;
   }
   function renderRoster() {
@@ -521,15 +620,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     for (const item of list.slice(0, 16)) addChar(box, charsBySlug.get(item.s)!);
     if (list.length > 16) box.append(el('span', 'more', `+${list.length - 16}`));
   }
-  function renderWishes() {
+  function renderWishes(wishStore: WishStore) {
     const box = $('wishes-list');
     box.replaceChildren();
-    const raw = read('gf:wish-uids');
-    const uids = Array.isArray(raw) ? [...new Set(raw.filter((uid): uid is string => uidOk(uid) || uid === 'manual'))] : [];
-    for (const uid of uids) {
-      const saved = read(`gf:wishes:${uid}`);
-      const list: Wish[] = Array.isArray(saved) ? saved.filter((item): item is Wish => isRecord(item) && ['id', 'uid', 'gacha_type', 'time', 'name', 'item_type', 'rank_type'].every((key) => typeof item[key] === 'string'))
-        .sort((a, b) => a.id.length - b.id.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)) : [];
+    for (const uid of wishStore.uids()) {
+      const list: Wish[] = wishStore.list(uid);
       if (!list.length) continue;
       const account = el('div', 'account');
       account.append(el('h3', '', uid === 'manual' ? t('Ручной ввод') : t('UID {uid}', { uid })));
@@ -796,7 +891,19 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
   renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
   renderEntries('recent-list', entries(recent.list), '', true);
-  renderWishes();
+  let wishesRequest = 0;
+  const loadWishes = async () => {
+    const request = ++wishesRequest;
+    $('wishes-list').replaceChildren(el('p', 'empty', t('Загружаю…')));
+    try {
+      const wishStore = await openWishStore(signal);
+      if (!signal.aborted && request === wishesRequest) renderWishes(wishStore);
+    } catch {
+      if (!signal.aborted && request === wishesRequest) $('wishes-list').replaceChildren(el('p', 'empty', t('История круток не загружена')));
+    }
+  };
+  void loadWishes();
+  document.addEventListener('gf:auth', () => { void loadWishes(); }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
     let raw = read('gf:profile-custom');
@@ -826,7 +933,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     renderProfile();
     editButton.disabled = false;
   }
-  void initCustom();
+  void initCustom().then(() => { if (!signal.aborted) void syncNow(); });
   const cachedProfile = validCache(read('gf:profile-cache'));
   const uidInput = $<HTMLInputElement>('profile-uid');
   const storedUid = read('gf:profile-uid');
@@ -836,6 +943,46 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   else if (!uidCleared) for (const key of ['gf:sim-uid', 'gf:wish-uid']) { const value = read(key); if (uidOk(value)) { uidInput.value = value; break; } }
   currentProfile = cachedProfile?.uid === uidInput.value ? cachedProfile : null;
   renderProfile();
+  const pendingSync = { custom: false, data: false };
+  let refreshing = false;
+  const refreshSync = async () => {
+    if (signal.aborted || dialog.open || refreshing) return;
+    refreshing = true;
+    try {
+      if (pendingSync.custom) {
+        pendingSync.custom = false;
+        for (const url of committedUrls.values()) URL.revokeObjectURL(url);
+        committedUrls.clear();
+        await initCustom();
+      }
+      if (pendingSync.data && !signal.aborted) {
+        pendingSync.data = false;
+        renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
+        renderRoster();
+        cancelShowcase();
+        const uid = read('gf:profile-uid');
+        const nextUid = uidOk(uid) ? uid : null;
+        const cached = validCache(read('gf:profile-cache'));
+        if (!nextUid || cached?.uid !== nextUid) try { localStorage.removeItem('gf:profile-cache'); } catch {}
+        uidInput.value = nextUid ?? '';
+        currentProfile = nextUid && cached?.uid === nextUid ? cached : null;
+        renderProfile();
+      }
+    } finally {
+      refreshing = false;
+      if (!signal.aborted && !dialog.open && (pendingSync.custom || pendingSync.data)) void refreshSync();
+    }
+  };
+  document.addEventListener('gf:profile-synced', (event) => {
+    const detail = (event as CustomEvent<SyncResult>).detail;
+    pendingSync.custom ||= detail.custom === 'pulled';
+    pendingSync.data ||= detail.data === 'pulled';
+    void refreshSync();
+  }, { signal });
+  document.addEventListener('gf:profile-sync-error', () => status(t('Не удалось синхронизировать профиль с аккаунтом'), true), { signal });
+  document.addEventListener('gf:profile-sync-ok', () => {
+    if ($('profile-status').textContent === t('Не удалось синхронизировать профиль с аккаунтом')) status('');
+  }, { signal });
   const checkerController = new AbortController();
   fetch(`${BASE}/data/checker.json`, { signal: checkerController.signal }).then(async (response) => { if (!response.ok) throw new Error(); return response.json(); }).then((data: unknown) => {
     if (signal.aborted) return;
@@ -869,7 +1016,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const showcase = Array.isArray(shown) ? shown.map((item) => isRecord(item) ? num(item.avatarId) : null).filter((id): id is number => id !== null) : [];
       currentProfile = { uid, time: Date.now(), player: { nickname: typeof player.nickname === 'string' ? player.nickname : '', level: num(player.level) ?? 0,
         worldLevel: num(player.worldLevel) ?? 0, signature: typeof player.signature === 'string' ? player.signature : '', profilePictureId: picture ?? undefined }, showcase };
-      store.set('gf:profile-uid', uid);
+      if (store.set('gf:profile-uid', uid)) markChanged('data');
       store.set('gf:profile-cache', currentProfile);
       renderProfile();
       status(t('Витрина обновлена.'));
@@ -889,6 +1036,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (!keepChanges) { draft = structuredClone(saved); renderPersonal(); }
     revokeStaged(urls);
     editButton.focus({ preventScroll: true });
+    void refreshSync();
   });
   $('close-editor').addEventListener('click', closeEditor);
   $('cancel-editor').addEventListener('click', closeEditor);
@@ -926,6 +1074,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       if (!dialog.open || session !== editorSession) throw new Error();
       localStorage.setItem('gf:profile-custom', JSON.stringify(snapshot));
       switched = true;
+      markChanged('custom');
       const previous = saved;
       saved = structuredClone(snapshot);
       const previousUrls = new Map(committedUrls);
@@ -935,9 +1084,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       }
       if (importSnapshot) {
         cancelShowcase();
-        store.set('gf:favs', importSnapshot.favs);
-        store.set('gf:roster', importSnapshot.roster);
-        store.set('gf:profile-uid', importSnapshot.uid);
+        const imported = [store.set('gf:favs', importSnapshot.favs), store.set('gf:roster', importSnapshot.roster), store.set('gf:profile-uid', importSnapshot.uid)];
+        if (imported.every(Boolean)) markChanged('data');
         if (importSnapshot.uid === null) try { localStorage.removeItem('gf:profile-cache'); } catch {}
         uidInput.value = importSnapshot.uid ?? '';
         const cached = validCache(read('gf:profile-cache'));
@@ -1238,6 +1386,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .tile-grid :global(a:hover) { border-color: var(--profile-accent); }
   .tile-grid :global(img) { flex: none; border-radius: 8px; }
   .tile-grid :global(span) { min-width: 0; }
+  .tile-grid :global(.empty) { grid-column: 1 / -1; }
   #roster-count { color: var(--muted); font-size: .75rem; font-weight: 400; }
   .wish-list { display: grid; gap: .7rem; }
   .wish-list :global(.account) { padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
@@ -1305,6 +1454,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     .profile-root :global(#profile-avatar-shell) { width: 72px; height: 72px; margin-top: -36px; }
     .profile-dialog { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border-radius: 0; }
   }
+  /* Ник на телефоне — одной строкой и с переносом только по словам */
+  @media (max-width: 540px) {
+    .identity { flex: 1 1 0; container-type: inline-size; overflow-wrap: break-word; }
+    .name-row h1 { min-width: 0; max-width: 100%; font-size: clamp(.8rem, 8.8cqi, 1.5rem); }
+  }
   @media (max-width: 400px) {
     .profile-card:not(.hero) { padding: .9rem; }
     .hero-content { padding: 0 .9rem .9rem; }
@@ -1313,4 +1467,18 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     .dialog-body { padding: .9rem; }
     .dialog-foot { padding: .7rem; }
   }
+  /* Титул рядом с ником */
+  .name-row { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; }
+  .name-row h1 { margin: 0; }
+  .title-chip {
+    --title-color: #e3b04b;
+    display: inline-flex; align-items: center; gap: .35rem; padding: .2rem .65rem; border-radius: 999px;
+    border: 1px solid var(--title-color); background: color-mix(in srgb, var(--title-color) 18%, transparent);
+    color: var(--title-color); font: 600 .78rem var(--font-display); letter-spacing: .02em; white-space: nowrap;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--title-color) 30%, transparent);
+  }
+  .title-chip[hidden] { display: none; }
+  .title-mark { font-size: .7em; }
+  :global(:root[data-theme="light"]) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); }
+  @media (prefers-color-scheme: light) { :global(:root:not([data-theme])) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); } }
 </style>

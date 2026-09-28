@@ -1,37 +1,222 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
-import CharacterCard from '../../../components/CharacterCard.astro';
+import CharacterTile from '../../../components/CharacterTile.astro';
 import FilterBar from '../../../components/FilterBar.astro';
 import { useData, LANGS } from '../../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { characters, t } = useData(Astro.currentLocale);
+const { characters, getWeapon, getArtifact, lang, t } = useData(Astro.currentLocale);
 
-const withBuild = new Set((await getCollection('builds')).map((b) => b.data.character));
+const builds = new Map((await getCollection('builds')).map((b) => [b.data.character, b.data]));
 const released = characters.filter((c) => !c.beta);
-const latest = Math.max(...released.map((c) => parseFloat(c.version)));
-// Утечки — в начале списка, чтобы их было видно сразу
-const ordered = [...characters.filter((c) => c.beta), ...released];
+const compareVersions = (a: string, b: string) => {
+  const left = a.split('.').map(Number);
+  const right = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(left.length, right.length); i++) {
+    const diff = (left[i] ?? 0) - (right[i] ?? 0);
+    if (diff) return diff;
+  }
+  return 0;
+};
+const latest = released.reduce((version, c) => compareVersions(c.version, version) > 0 ? c.version : version, '0');
+const byName = (a: typeof characters[number], b: typeof characters[number]) => a.name.localeCompare(b.name, lang);
+const byRarity = (a: typeof characters[number], b: typeof characters[number]) => b.rarity - a.rarity || byName(a, b);
+const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released.sort((a, b) => compareVersions(b.version, a.version) || byRarity(a, b))];
 ---
 <Layout title={t('Персонажи')} wide>
   <h1>{t('Персонажи')}</h1>
-  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.', { n: released.length })}</p>
+  <p class="lead">{t('Все {n} играбельных персонажей со статами, талантами и созвездиями. Наведите на карточку, чтобы увидеть роль, лучшее оружие и сеты.', { n: released.length })}</p>
 
-  <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} extra={{ key: 'build', label: t('Только с билдом') }} />
-
-  <div class="cards" id="chars">
-    {ordered.map((c) => (
-      <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-element={c.element} data-weapon={c.weapon}
-        data-rarity={String(c.rarity)} data-beta={c.beta ? '1' : undefined} data-build={withBuild.has(c.slug) ? '1' : ''}>
-        <CharacterCard slug={c.slug} badge={parseFloat(c.version) === latest ? t('новый') : withBuild.has(c.slug) ? t('билд') : undefined} />
+  <div class="controls">
+    <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} />
+    <div class="toolbar">
+      <div class="sort" role="group" aria-label={t('Сортировка')}>
+        <button type="button" data-sort="new" aria-pressed="true">{t('Сначала новые')}</button>
+        <button type="button" data-sort="old" aria-pressed="false">{t('Сначала старые')}</button>
+        <button type="button" data-sort="name" aria-pressed="false">{t('По имени')}</button>
       </div>
-    ))}
+      <div class="group">
+        <button type="button" aria-pressed="false">{t('По версиям')}</button>
+      </div>
+      <div class="view" role="group" aria-label={t('Вид')}>
+        <button type="button" data-view="gallery" aria-pressed="true" aria-label={t('Галерея')} title={t('Галерея')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg><span class="view-label">{t('Галерея')}</span></button>
+        <button type="button" data-view="grid" aria-pressed="false" aria-label={t('Сетка')} title={t('Сетка')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg><span class="view-label">{t('Сетка')}</span></button>
+        <button type="button" data-view="list" aria-pressed="false" aria-label={t('Список')} title={t('Список')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1" /></svg><span class="view-label">{t('Список')}</span></button>
+      </div>
+    </div>
   </div>
+
+  <div class="cards" id="chars" lang={lang} data-view="gallery">
+    {ordered.map((c, i) => {
+      const group = c.beta ? 'beta' : c.version;
+      const previous = ordered[i - 1];
+      const build = builds.get(c.slug);
+      return (
+        <Fragment>
+          {(i === 0 || group !== (previous.beta ? 'beta' : previous.version)) && (
+            <h2 class="version-heading" data-version-heading={group} hidden>{c.beta ? t('Утечки и бета') : t('Версия {n}', { n: c.version })}</h2>
+          )}
+          <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={c.name} data-version={c.version}
+            data-element={c.element} data-weapon={c.weapon} data-rarity={String(c.rarity)} data-beta={c.beta ? '1' : undefined}>
+            <CharacterTile slug={c.slug} badge={!c.beta && c.version === latest ? t('новый') : undefined} role={build?.role}
+              weapons={build?.weapons.slice(0, 3).map(({ slug }) => getWeapon(slug)) ?? []}
+              artifacts={build?.artifacts.slice(0, 3).map(({ sets }) => sets.map((slug) => getArtifact(slug))) ?? []} />
+          </div>
+        </Fragment>
+      );
+    })}
+  </div>
+  <script is:inline data-astro-rerun>
+    (() => {
+      const grid = document.currentScript?.previousElementSibling;
+      if (!grid) return;
+      let view = 'gallery';
+      try {
+        const saved = localStorage.getItem('gf-chars-view');
+        if (saved === 'grid' || saved === 'list') view = saved;
+      } catch {}
+      grid.setAttribute('data-view', view);
+      for (const button of document.querySelectorAll('.view button[data-view]'))
+        button.setAttribute('aria-pressed', String(button.getAttribute('data-view') === view));
+    })();
+  </script>
   <p class="empty muted" hidden>{t('Никого не нашлось. Сбросьте часть фильтров.')}</p>
 </Layout>
 
+<script>
+  import { onPage, cleanup } from '../../../scripts/router';
+  type Sort = 'new' | 'old' | 'name';
+  const compareVersions = (a: string, b: string) => {
+    const left = a.split('.').map(Number);
+    const right = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(left.length, right.length); i++) {
+      const diff = (left[i] ?? 0) - (right[i] ?? 0);
+      if (diff) return diff;
+    }
+    return 0;
+  };
+
+  onPage((signal) => {
+    const grid = document.querySelector<HTMLElement>('#chars');
+    const controls = document.querySelector<HTMLElement>('.sort');
+    const groupButton = document.querySelector<HTMLButtonElement>('.group button');
+    const viewControls = document.querySelector<HTMLElement>('.view');
+    if (!grid || !controls || !groupButton || !viewControls) return;
+    const cards = [...grid.querySelectorAll<HTMLElement>(':scope > [data-name]')];
+    const headings = [...grid.querySelectorAll<HTMLElement>(':scope > [data-version-heading]')];
+    const buttons = [...controls.querySelectorAll<HTMLButtonElement>('button[data-sort]')];
+    const viewButtons = [...viewControls.querySelectorAll<HTMLButtonElement>('button[data-view]')];
+    const locale = grid.lang;
+    const byName = (a: HTMLElement, b: HTMLElement) => (a.dataset.sortName ?? '').localeCompare(b.dataset.sortName ?? '', locale);
+    const byRarity = (a: HTMLElement, b: HTMLElement) => Number(b.dataset.rarity) - Number(a.dataset.rarity) || byName(a, b);
+    const beta = cards.filter((card) => card.dataset.beta === '1');
+    const released = cards.filter((card) => card.dataset.beta !== '1');
+    let activeSort: Sort = 'new';
+    const params = new URLSearchParams(location.search);
+    let grouped = params.get('group') === 'version';
+    if (!params.has('group')) {
+      try { grouped = localStorage.getItem('gf-chars-group') === 'version'; } catch {}
+    }
+    groupButton.setAttribute('aria-pressed', String(grouped));
+
+    const updateHeadings = () => {
+      for (const heading of headings) {
+        const group = heading.dataset.versionHeading;
+        heading.hidden = !grouped || activeSort === 'name' || !cards.some((card) =>
+          !card.hidden && (group === 'beta' ? card.dataset.beta === '1' : card.dataset.beta !== '1' && card.dataset.version === group));
+      }
+    };
+    const observer = new MutationObserver((records) => {
+      if (records.some(({ target }) => (target as HTMLElement).hasAttribute('data-name'))) updateHeadings();
+    });
+    observer.observe(grid, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    cleanup(signal, () => observer.disconnect());
+
+    const updateUrl = () => {
+      const url = new URL(location.href);
+      url.searchParams.set('sort', activeSort);
+      if (grouped) url.searchParams.set('group', 'version');
+      else url.searchParams.delete('group');
+      history.replaceState(history.state, '', url);
+    };
+
+    const render = (sort: Sort) => {
+      activeSort = sort;
+      const fragment = document.createDocumentFragment();
+      const betaHeading = headings.find((heading) => heading.dataset.versionHeading === 'beta');
+      if (betaHeading) fragment.append(betaHeading);
+      for (const card of [...beta].sort(sort === 'name' ? byName : byRarity)) fragment.append(card);
+      if (sort === 'name') {
+        for (const card of [...released].sort(byName)) fragment.append(card);
+        for (const heading of headings.filter((heading) => heading !== betaHeading)) fragment.append(heading);
+      } else {
+        const versions = [...new Set(released.map((card) => card.dataset.version ?? ''))]
+          .sort((a, b) => sort === 'new' ? compareVersions(b, a) : compareVersions(a, b));
+        for (const version of versions) {
+          const heading = headings.find((item) => item.dataset.versionHeading === version);
+          if (heading) fragment.append(heading);
+          for (const card of released.filter((item) => item.dataset.version === version).sort(byRarity)) fragment.append(card);
+        }
+      }
+      grid.append(fragment);
+      for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.sort === sort));
+      groupButton.disabled = sort === 'name';
+      updateHeadings();
+      updateUrl();
+      try { localStorage.setItem('gf-chars-sort', sort); } catch {}
+    };
+    let requested = params.get('sort');
+    if (requested !== 'new' && requested !== 'old' && requested !== 'name') {
+      try { requested = localStorage.getItem('gf-chars-sort'); } catch {}
+    }
+    render(requested === 'old' || requested === 'name' ? requested : 'new');
+    for (const button of buttons) button.addEventListener('click', () => render(button.dataset.sort as Sort), { signal });
+    groupButton.addEventListener('click', () => {
+      grouped = !grouped;
+      groupButton.setAttribute('aria-pressed', String(grouped));
+      updateHeadings();
+      updateUrl();
+      try { localStorage.setItem('gf-chars-group', grouped ? 'version' : 'none'); } catch {}
+    }, { signal });
+    const setView = (view: string) => {
+      grid.dataset.view = view;
+      for (const item of viewButtons) item.setAttribute('aria-pressed', String(item.dataset.view === view));
+    };
+    // Подстраховка к inline-скрипту: вид из localStorage при каждом заходе на страницу
+    let saved = 'gallery';
+    try { saved = localStorage.getItem('gf-chars-view') ?? 'gallery'; } catch {}
+    setView(saved === 'grid' || saved === 'list' ? saved : 'gallery');
+    for (const button of viewButtons) button.addEventListener('click', () => {
+      const view = button.dataset.view!;
+      setView(view);
+      try { localStorage.setItem('gf-chars-view', view); } catch {}
+    }, { signal });
+  });
+</script>
+
 <style>
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; margin-bottom: 1.2rem; }
+  .controls :global(.fb) { margin-bottom: 0; }
+  .toolbar { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .sort, .group, .view { display: flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .sort button, .group button, .view button { border: 0; border-radius: 7px; padding: .35rem .6rem; background: none; color: var(--muted); font-size: .85rem; cursor: pointer; }
+  .sort button:hover, .group button:not(:disabled):hover, .view button:hover { color: var(--text); background: var(--surface-2); }
+  .sort button[aria-pressed="true"], .group button[aria-pressed="true"], .view button[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+  .group button:disabled { opacity: .5; cursor: default; }
+  .view button { display: inline-flex; align-items: center; gap: .35rem; }
+  .view svg { width: 16px; height: 16px; flex: none; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .cards[data-view="grid"] { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .cards[data-view="list"] { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .version-heading { grid-column: 1 / -1; margin: .7rem 0 0; font-size: 1.2rem; }
+  .cards[data-view="list"] .version-heading { margin: .35rem 0 0; }
+  .version-heading[hidden] { display: none; }
   .empty { text-align: center; margin: 3rem 0; }
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .cards[data-view="grid"] { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+    .view .view-label { display: none; }
+    .view button { min-width: 40px; min-height: 40px; justify-content: center; }
+  }
 </style>

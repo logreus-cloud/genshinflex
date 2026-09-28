@@ -5,6 +5,7 @@ import AbyssGate from '../../components/AbyssGate.astro';
 import HeroCarousel from '../../components/HeroCarousel.astro';
 import EntryGate from '../../components/EntryCompass.astro';
 import FeatureTabs from '../../components/FeatureTabs.astro';
+import SnowDivider from '../../components/SnowDivider.astro';
 import season from '../../data/season.json';
 import weaponArt from '../../data/generated/weapon-art.json';
 import namecards from '../../data/generated/namecards.json';
@@ -64,6 +65,7 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
   <HeroCarousel slides={slides} />
 
   <div class="feature-band">
+    <div class="hero-snow"><SnowDivider edge seed={0x0b1a5ed} /></div>
     <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
   </div>
 
@@ -240,6 +242,9 @@ onPage((signal) => {
   .feature-band, .collection-band { position: relative; isolation: isolate; margin-inline: calc(50% - 50vw); padding: 2.5rem calc(50vw - 50%); background: transparent; }
   .feature-band::before, .collection-band::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%); }
   .feature-band { margin-top: -3rem; }
+  /* Снежная кромка по низу баннера: линия сугробов (y=55 из 110) ложится на границу */
+  .hero-snow { position: absolute; top: -55px; left: 0; right: 0; z-index: 1; }
+  @media (max-width: 700px) { .hero-snow { top: -40px; } }
   .feature-band::before { background: linear-gradient(115deg, rgb(38 42 60 / .82) 0%, rgb(30 36 58 / .78) 45%, rgb(44 38 64 / .8) 100%); }
   .collection-band::before { background: linear-gradient(115deg, rgb(14 26 52 / .85) 0%, rgb(12 34 58 / .8) 50%, rgb(28 22 58 / .85) 100%); }
   .collection-row + .collection-row { margin-top: 2.4rem; }

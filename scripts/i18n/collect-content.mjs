@@ -18,6 +18,10 @@ for (const f of readdirSync(new URL('src/content/builds/', root))) {
   fm.weapons.forEach((w) => add(w.note));
   fm.artifacts.forEach((a) => add(a.note));
   fm.teams.forEach((t) => { add(t.name); add(t.note); });
+  (fm.rotations ?? []).forEach((r) => {
+    add(r.name); add(r.note);
+    r.steps.split(/\s*(?:→|->)\s*/).filter(Boolean).forEach(add);
+  });
 }
 for (const f of readdirSync(new URL('src/content/rotations/', root))) {
   const r = JSON.parse(read(`src/content/rotations/${f}`));

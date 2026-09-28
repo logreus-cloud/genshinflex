@@ -5,7 +5,7 @@ import { news } from './news';
 import { weaponGuide } from './weaponGuide';
 import { endgameGuide } from './endgameGuide';
 import {
-  source, team, externalLink, video, localeString,
+  source, team, buildRotation, externalLink, video, localeString,
   weaponChoice, artifactChoice, mainStats, rotationCast, rotationHalf,
   rotationFloor, rotationChamber, rotationEnemyHalf, rotationStage,
   featuredCharacter,
@@ -13,7 +13,7 @@ import {
 import { guideSubmission, feedback } from './moderation';
 
 export const schemaTypes = [
-  source, team, externalLink, video, localeString,
+  source, team, buildRotation, externalLink, video, localeString,
   weaponChoice, artifactChoice, mainStats, rotationCast, rotationHalf,
   rotationFloor, rotationChamber, rotationEnemyHalf, rotationStage,
   featuredCharacter,

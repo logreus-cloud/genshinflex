@@ -60,6 +60,16 @@ export const team = defineType({
   preview: { select: { title: 'name', subtitle: 'note' } },
 });
 
+export const buildRotation = defineType({
+  name: 'buildRotation', title: 'Ротация билда', type: 'object',
+  fields: [
+    defineField({ name: 'name', title: 'Название', type: 'string' }),
+    defineField({ name: 'steps', title: 'Шаги', type: 'string', description: 'E — навык, E (удерж.) — удержание, Q — взрыв стихии, M1-M2-M3 — обычные атаки, CA — заряженная атака; шаги разделяются → или ->, перед шагом можно указать имя союзника.', validation: required }),
+    defineField({ name: 'note', title: 'Примечание', type: 'text' }),
+  ],
+  preview: { select: { title: 'name', subtitle: 'steps' } },
+});
+
 export const rotationTeam = defineArrayMember({
   name: 'rotationTeam', title: 'Команда ротации', type: 'object',
   fields: [

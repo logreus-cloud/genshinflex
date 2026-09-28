@@ -61,9 +61,11 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 
 <script>
   import { store } from '../../../scripts/common';
+  import { navigate } from 'astro:transitions/client';
   import { BASE, t, LANG } from '../../../scripts/search';
   import { combobox, norm } from '../../../scripts/combobox';
   import { onPage, cleanup } from '../../../scripts/router';
+  import { markChanged } from '../../../scripts/profile-sync';
 
   // ---------- Данные ----------
   type Build = { role: string; healer: boolean; cls: 'dps' | 'sub' | 'support'; weapons: string[]; sets: string[][]; main: Record<'sands' | 'goblet' | 'circlet', string[]>; subs: string[] };
@@ -81,6 +83,10 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 
   onPage((signal) => {
     if (!document.querySelector('.tc')) return;
+    document.addEventListener('gf:profile-synced', (event) => {
+      if ((event as CustomEvent<{ data: string }>).detail.data === 'pulled')
+        void navigate(location.pathname + location.search + location.hash, { history: 'replace' });
+    }, { signal });
     void fetch(`${BASE}/data/checker.json`, { signal }).then((r) => r.json()).then((data: Data) => {
       if (signal.aborted) return;
   const chars = new Map(data.characters.map((c) => [c.s, c]));
@@ -163,7 +169,14 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   const removedRev = new Map<string, number>();
   const markEdited = (e: Entry) => { editedRev.set(e.key, ++rosterRev); };
   const markRemoved = (e: Entry) => { removedRev.set(e.s, ++rosterRev); editedRev.delete(e.key); };
-  const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); if (checked) renderResult(false); };
+  // Синхронизируется только ростер: составы команд остаются в браузере и не должны помечать данные изменёнными
+  let savedRoster = JSON.stringify(roster);
+  const persist = () => {
+    const next = JSON.stringify(roster);
+    if (next !== savedRoster && store.set('gf:roster', roster)) { savedRoster = next; markChanged('data'); }
+    store.set('gf:abyss-teams', teams);
+    if (checked) renderResult(false);
+  };
 
   // Новый персонаж получает рекомендованный билд как отправную точку
   function fromBuild(s: string): Entry {
@@ -357,6 +370,10 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
     }).join('') : `<p class="muted small">${t('Пока никого. Добавьте персонажа по имени или загрузите витрину по UID.')}</p>`;
     renderPicker();
   }
+  const focusRoster = (key: string | null) => {
+    const button = [...$('roster').querySelectorAll<HTMLButtonElement>('[data-edit]')].find((node) => node.dataset.edit === key);
+    (button ?? $<HTMLInputElement>('add-char')).focus();
+  };
 
   $('open-picker').addEventListener('click', () => {
     const picker = $('picker');
@@ -499,13 +516,20 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
         ? t('Поставлено {n} из 4. Нет: {list}', { n: teams[h].length, list: missing.join(', ') })
         : t('Команда «{name}» поставлена', { name: t(team.name ?? '') }));
     } else if (b.dataset.edit) openEditor(editing === b.dataset.edit ? null : b.dataset.edit);
-    else if (b.hasAttribute('data-close')) openEditor(null);
+    else if (b.hasAttribute('data-close')) {
+      const key = editing;
+      openEditor(null);
+      focusRoster(key);
+    }
     else if (b.hasAttribute('data-remove') && editing) {
+      const index = roster.findIndex((x) => x.key === editing);
+      const next = roster[index + 1]?.key ?? roster[index - 1]?.key;
       const removed = roster.find((x) => x.key === editing);
       if (removed) markRemoved(removed);
       roster = roster.filter((x) => x.key !== editing);
       for (const h of [1, 2]) teams[h] = teams[h].filter((k) => k !== editing);
       persist(); openEditor(null); renderTeams();
+      focusRoster(next ?? null);
     }
   }, { signal });
 

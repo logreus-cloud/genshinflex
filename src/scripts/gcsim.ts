@@ -11,6 +11,7 @@ let ready: Promise<Client[]> | null = null;
 let size = 0;
 let nextId = 0;
 let queue: Promise<unknown> = Promise.resolve();
+let warming = false, loadingWarmUp = false;
 
 const defaultWorkers = () => Math.min(3, Math.max(1, (navigator.hardwareConcurrency || 2) - 1));
 const abortError = () => new DOMException('Симуляция отменена', 'AbortError');
@@ -80,7 +81,7 @@ function exclusive<T>(task: () => Promise<T>, signal?: AbortSignal): Promise<T> 
     const onAbort = () => {
       if (settled) return;
       settled = true;
-      if (started) dispose(abortError());
+      if (started || loadingWarmUp) dispose(abortError());
       reject(abortError());
     };
     signal?.addEventListener('abort', onAbort, { once: true });
@@ -112,14 +113,21 @@ function exclusive<T>(task: () => Promise<T>, signal?: AbortSignal): Promise<T> 
 }
 
 export function warmUp(): void {
-  void exclusive(() => pool(clients.length || defaultWorkers())).catch(() => {});
+  if (warming) return;
+  warming = true;
+  void exclusive(async () => {
+    loadingWarmUp = true;
+    try { await pool(clients.length || defaultWorkers()); }
+    finally { loadingWarmUp = false; }
+  }).catch(() => {}).finally(() => { warming = false; });
 }
 
-export function validateSim(config: string): Promise<string | null> {
+export function validateSim(config: string, signal?: AbortSignal): Promise<string | null> {
   return exclusive(async () => {
     const [first] = await pool(defaultWorkers());
+    if (signal?.aborted) throw abortError();
     return first.call<string | null>('validate', { config });
-  });
+  }, signal);
 }
 
 export function runSim(

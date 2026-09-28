@@ -61,7 +61,7 @@ T = [
 ("Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.", "Could not confirm sign-in. Request a new link or sign in again.", "No se pudo confirmar el acceso. Solicita otro enlace o vuelve a iniciar sesión."),
 ("Не удалось загрузить профиль.", "Could not load your profile.", "No se pudo cargar tu perfil."),
 ("Политика конфиденциальности", "Privacy policy", "Política de privacidad"),
-("Редакция от 27 сентября 2026", "Revised September 27, 2026", "Revisión del 27 de septiembre de 2026"),
+("Редакция от 28 сентября 2026", "Revised September 28, 2026", "Revisión del 28 de septiembre de 2026"),
 ("Форма обратной связи", "Feedback form", "Formulario de contacto"),
 ("Мне есть 13 лет и я соглашаюсь с", "I am at least 13 and agree to the", "Tengo al menos 13 años y acepto la"),
 ("политикой конфиденциальности", "privacy policy", "política de privacidad"),

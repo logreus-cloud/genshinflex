@@ -14,12 +14,12 @@ const claims = (age: number): TokenClaims => ({
 
 function deletionClient() {
   const calls: { method: string; args: unknown[] }[] = [];
-  const list = async (...args: unknown[]) => {
-    calls.push({ method: 'list', args });
+  const list = async (bucket: string, ...args: unknown[]) => {
+    calls.push({ method: 'list', args: [bucket, ...args] });
     return { data: [{ id: 'a', name: 'one.png' }, { id: 'b', name: 'two.webp' }], error: null };
   };
-  const remove = async (...args: unknown[]) => {
-    calls.push({ method: 'remove', args });
+  const remove = async (bucket: string, ...args: unknown[]) => {
+    calls.push({ method: 'remove', args: [bucket, ...args] });
     return { error: null };
   };
   const deleteUser = async (...args: unknown[]) => {
@@ -27,18 +27,20 @@ function deletionClient() {
     return { error: null };
   };
   const client = {
-    storage: { from: () => ({ list, remove }) },
+    storage: { from: (bucket: string) => ({ list: (...args: unknown[]) => list(bucket, ...args), remove: (...args: unknown[]) => remove(bucket, ...args) }) },
     auth: { admin: { deleteUser } },
   } as unknown as AdminClient;
   return { client, calls };
 }
 
-test('removes avatars before deleting a user after a fresh sign-in', async () => {
+test('removes avatars and profile media before deleting a user after a fresh sign-in', async () => {
   const { client, calls } = deletionClient();
   assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
   assert.deepEqual(calls, [
-    { method: 'list', args: [id, { limit: 100, offset: 0 }] },
-    { method: 'remove', args: [[`${id}/one.png`, `${id}/two.webp`]] },
+    { method: 'list', args: ['avatars', id, { limit: 100, offset: 0 }] },
+    { method: 'remove', args: ['avatars', [`${id}/one.png`, `${id}/two.webp`]] },
+    { method: 'list', args: ['profile-media', id, { limit: 100, offset: 0 }] },
+    { method: 'remove', args: ['profile-media', [`${id}/one.png`, `${id}/two.webp`]] },
     { method: 'deleteUser', args: [id, false] },
   ]);
 });
@@ -56,6 +58,7 @@ test('requires the exact confirmation', async () => {
 });
 
 test('includes every export section without provider tokens', async () => {
+    const wishes = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, game_uid: '700000000', id: String(index + 1) }));
     const row = (data: unknown) => ({
       select: () => ({
         eq: () => ({
@@ -70,8 +73,13 @@ test('includes every export section without provider tokens', async () => {
       roles: [{ user_id: id, role: 'author' }],
       telegram_accounts: { user_id: id, telegram_id: 123 },
     };
+    const ranges: [number, number][] = [];
     const client = {
-      from: (table: string) => row(rows[table]),
+      from: (table: string) => table === 'wishes' ? {
+        select: () => ({ eq: () => ({ order: () => ({ order: () => ({
+          range: async (start: number, end: number) => { ranges.push([start, end]); return { data: wishes.slice(start, end + 1), error: null }; },
+        }) }) }) }),
+      } : row(rows[table]),
       auth: {
         admin: {
           getUserById: async () => ({
@@ -100,6 +108,8 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(data.auth.user_metadata, { display_name: 'Traveler' });
     assert.deepEqual(data.profile, rows.profiles);
     assert.deepEqual(data.user_data, rows.user_data);
+    assert.deepEqual(data.wishes, wishes);
+    assert.deepEqual(ranges, [[0, 999], [1000, 1999]]);
     assert.deepEqual(data.roles, rows.roles);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
     assert.ok(data.exported_at);
