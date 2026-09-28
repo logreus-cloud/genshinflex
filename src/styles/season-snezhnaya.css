@@ -62,21 +62,30 @@
 
 :root[data-season="snezhnaya"] .season-snow {
   --flake-small: rgb(255 255 255 / .5); --flake-medium: rgb(255 255 255 / .65); --flake-large: rgb(255 255 255 / .8);
-  position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; opacity: .55;
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; contain: strict; opacity: .55;
+}
+/* Запас слоя покрывает экран на всём пути движения. */
+:root[data-season="snezhnaya"] .season-snow span {
+  position: absolute; will-change: transform; backface-visibility: hidden;
+}
+:root[data-season="snezhnaya"] .season-snow .snow-small {
+  top: -720px; right: 0; bottom: 0; left: -180px;
   background: radial-gradient(circle at 24px 35px, var(--flake-small) 1.5px, transparent 2px) 0 0 / 180px 180px;
   animation: snezhnaya-snow-small 18s linear infinite;
 }
-:root[data-season="snezhnaya"] .season-snow::before {
-  content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 95px 72px, var(--flake-medium) 2.5px, transparent 3px) 0 0 / 260px 260px;
+:root[data-season="snezhnaya"] .season-snow .snow-medium {
+  top: -780px; right: -260px; bottom: 0; left: 0;
+  background: radial-gradient(circle at 95px 72px, var(--flake-medium) 2.5px, transparent 3px) 0 0 / 260px 260px;
   animation: snezhnaya-snow-medium 26s linear infinite;
 }
-:root[data-season="snezhnaya"] .season-snow::after {
-  content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 180px 110px, var(--flake-large) 3.5px, transparent 4px) 0 0 / 340px 340px;
+:root[data-season="snezhnaya"] .season-snow .snow-large {
+  top: -1020px; right: 0; bottom: 0; left: -340px;
+  background: radial-gradient(circle at 180px 110px, var(--flake-large) 3.5px, transparent 4px) 0 0 / 340px 340px;
   animation: snezhnaya-snow-large 34s linear infinite;
 }
-@keyframes snezhnaya-snow-small { to { background-position: 180px 720px; } }
-@keyframes snezhnaya-snow-medium { to { background-position: -260px 780px; } }
-@keyframes snezhnaya-snow-large { to { background-position: 340px 1020px; } }
+@keyframes snezhnaya-snow-small { to { transform: translate3d(180px, 720px, 0); } }
+@keyframes snezhnaya-snow-medium { to { transform: translate3d(-260px, 780px, 0); } }
+@keyframes snezhnaya-snow-large { to { transform: translate3d(340px, 1020px, 0); } }
 :root[data-season="snezhnaya"][data-theme="light"] .season-snow {
   --flake-small: rgb(111 160 210 / .6); --flake-medium: rgb(111 160 210 / .6); --flake-large: rgb(111 160 210 / .6); opacity: .35;
 }
@@ -147,7 +156,7 @@
 }
 
 @media (max-width: 700px) {
-  :root[data-season="snezhnaya"] .season-snow::after { display: none; }
+  :root[data-season="snezhnaya"] .season-snow .snow-large { display: none; }
   :root[data-season="snezhnaya"] .top::after { height: 6px; background-size: 120px 6px; }
 }
 @media (prefers-reduced-motion: reduce) {
