@@ -164,8 +164,12 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
       groupButton.disabled = sort === 'name';
       updateHeadings();
       updateUrl();
+      try { localStorage.setItem('gf-chars-sort', sort); } catch {}
     };
-    const requested = params.get('sort');
+    let requested = params.get('sort');
+    if (requested !== 'new' && requested !== 'old' && requested !== 'name') {
+      try { requested = localStorage.getItem('gf-chars-sort'); } catch {}
+    }
     render(requested === 'old' || requested === 'name' ? requested : 'new');
     for (const button of buttons) button.addEventListener('click', () => render(button.dataset.sort as Sort), { signal });
     groupButton.addEventListener('click', () => {

@@ -48,12 +48,34 @@ const { target, placeholder, groups, rarities = [5, 4], extra, choices } = Astro
   onPage((signal) => {
     const forms = document.querySelectorAll<HTMLFormElement>('[data-filter]');
     if (!forms.length) return;
+    const params = new URLSearchParams(location.search);
     for (const form of forms) {
     const items = [...document.querySelectorAll<HTMLElement>(`${form.dataset.filter} > [data-name]`)];
     const buttons = [...form.querySelectorAll<HTMLButtonElement>('button[data-key]')];
     const input = form.querySelector('input')!;
     const count = form.querySelector('.count')!;
     const empty = document.querySelector<HTMLElement>(`${form.dataset.filter} ~ .empty`);
+
+    const path = location.pathname.replace(/^\/(?:en|es)(?=\/|$)/, '').replace(/\/?$/, '/');
+    const storageKey = `gf:filters:${path}|${form.dataset.filter}`;
+    const keys = new Set(buttons.map((b) => b.dataset.key!));
+    const save = (reset = false) => {
+      const on: Record<string, string[]> = {};
+      for (const b of buttons) if (b.getAttribute('aria-pressed') === 'true') (on[b.dataset.key!] ??= []).push(b.dataset.value!);
+      const q = input.value;
+      try {
+        if (reset) localStorage.removeItem(storageKey);
+        else localStorage.setItem(storageKey, JSON.stringify({ q, on }));
+      } catch {}
+      const url = new URL(location.href);
+      for (const key of keys) {
+        url.searchParams.delete(key);
+        for (const value of on[key] ?? []) url.searchParams.append(key, value);
+      }
+      url.searchParams.delete('q');
+      if (q.trim()) url.searchParams.set('q', q);
+      history.replaceState(history.state, '', url);
+    };
 
     const apply = () => {
       const q = input.value.trim().toLowerCase().replace(/ё/g, 'е');
@@ -68,15 +90,24 @@ const { target, placeholder, groups, rarities = [5, 4], extra, choices } = Astro
       count.textContent = t('Показано: {a} из {b}', { a: shown, b: items.length });
       if (empty) empty.hidden = shown > 0;
     };
-    for (const b of buttons) b.addEventListener('click', () => { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); apply(); });
-    input.addEventListener('input', apply);
+    for (const b of buttons) b.addEventListener('click', () => { b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); apply(); save(); });
+    input.addEventListener('input', () => { apply(); save(); });
     form.addEventListener('submit', (e) => e.preventDefault());
     let resetTimer: number | undefined;
-    form.addEventListener('reset', () => { buttons.forEach((b) => b.setAttribute('aria-pressed', 'false')); resetTimer = window.setTimeout(apply); });
+    form.addEventListener('reset', () => { buttons.forEach((b) => b.setAttribute('aria-pressed', 'false')); resetTimer = window.setTimeout(() => { apply(); save(true); }); });
     cleanup(signal, () => { if (resetTimer !== undefined) clearTimeout(resetTimer); });
 
-    const params = new URLSearchParams(location.search);
-    for (const b of buttons) if (params.getAll(b.dataset.key!).includes(b.dataset.value!)) b.setAttribute('aria-pressed', 'true');
+    if (params.has('q') || buttons.some((b) => params.has(b.dataset.key!))) {
+      input.value = params.get('q') ?? '';
+      for (const b of buttons) if (params.getAll(b.dataset.key!).includes(b.dataset.value!)) b.setAttribute('aria-pressed', 'true');
+      save();
+    } else {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
+        if (typeof saved?.q === 'string') input.value = saved.q;
+        for (const b of buttons) if (Array.isArray(saved?.on?.[b.dataset.key!]) && saved.on[b.dataset.key!].includes(b.dataset.value)) b.setAttribute('aria-pressed', 'true');
+      } catch {}
+    }
     apply();
     }
   });
