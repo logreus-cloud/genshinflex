@@ -1,5 +1,8 @@
 # Перевод интерфейса: титулы профиля, экран входа и новый список персонажей (ветка platform)
 T = [
+("Не удалось синхронизировать профиль с аккаунтом", "Couldn't sync your profile with your account", "No se pudo sincronizar el perfil con tu cuenta"),
+("Избранное, персонажи и история круток.", "Favorites, characters and wish history.", "Favoritos, personajes e historial de deseos."),
+("Без входа данные профиля хранятся только в этом браузере. После входа оформление, избранное, персонажи и UID синхронизируются с аккаунтом.", "Without signing in, profile data stays in this browser. After signing in, customization, favorites, characters and UID sync with your account.", "Sin iniciar sesión, los datos del perfil se guardan solo en este navegador. Al iniciar sesión, la personalización, los favoritos, los personajes y el UID se sincronizan con tu cuenta."),
 ("Без титула", "No title", "Sin título"),
 ("Титул", "Title", "Título"),
 ("Титулы выдаются за ивенты и участие в жизни сайта.", "Titles are awarded for events and taking part in the site community.", "Los títulos se otorgan por eventos y por participar en la comunidad del sitio."),

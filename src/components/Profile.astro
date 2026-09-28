@@ -10,7 +10,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   slug, name, icon, element, rarity, namecard: cards[slug] ?? '',
 }))).replace(/</g, '\\u003c');
 ---
-<Layout title={t('Мой профиль')} description={t('Избранное, персонажи и история круток из этого браузера.')}>
+<Layout title={t('Мой профиль')} description={t('Избранное, персонажи и история круток.')}>
   <div class="profile-root profile-page">
     <div class="profile-bg" id="profile-bg" aria-hidden="true"></div>
     <canvas class="profile-effect" id="profile-effect" aria-hidden="true" hidden></canvas>
@@ -79,7 +79,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       </section>
     </div>
     <noscript><p class="profile-card">{t('Для профиля нужен JavaScript')}</p></noscript>
-    <p class="privacy">{t('Все данные профиля хранятся только в этом браузере и никуда не отправляются, кроме запроса витрины по UID.')}</p>
+    <p class="privacy">{t('Без входа данные профиля хранятся только в этом браузере. После входа оформление, избранное, персонажи и UID синхронизируются с аккаунтом.')}</p>
 
     <dialog class="profile-dialog" id="profile-dialog" aria-labelledby="editor-title">
       <div class="dialog-head">
@@ -336,6 +336,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { BASE, t } from '../scripts/search';
   import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
   import { onPage, cleanup } from '../scripts/router';
+  import { markChanged, syncNow, type SyncResult } from '../scripts/profile-sync';
 
   type Char = { id: number | null; s: string; n: string; i: string };
   type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
@@ -924,7 +925,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     renderProfile();
     editButton.disabled = false;
   }
-  void initCustom();
+  void initCustom().then(() => { if (!signal.aborted) void syncNow(); });
   const cachedProfile = validCache(read('gf:profile-cache'));
   const uidInput = $<HTMLInputElement>('profile-uid');
   const storedUid = read('gf:profile-uid');
@@ -934,6 +935,46 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   else if (!uidCleared) for (const key of ['gf:sim-uid', 'gf:wish-uid']) { const value = read(key); if (uidOk(value)) { uidInput.value = value; break; } }
   currentProfile = cachedProfile?.uid === uidInput.value ? cachedProfile : null;
   renderProfile();
+  const pendingSync = { custom: false, data: false };
+  let refreshing = false;
+  const refreshSync = async () => {
+    if (signal.aborted || dialog.open || refreshing) return;
+    refreshing = true;
+    try {
+      if (pendingSync.custom) {
+        pendingSync.custom = false;
+        for (const url of committedUrls.values()) URL.revokeObjectURL(url);
+        committedUrls.clear();
+        await initCustom();
+      }
+      if (pendingSync.data && !signal.aborted) {
+        pendingSync.data = false;
+        renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
+        renderRoster();
+        cancelShowcase();
+        const uid = read('gf:profile-uid');
+        const nextUid = uidOk(uid) ? uid : null;
+        const cached = validCache(read('gf:profile-cache'));
+        if (!nextUid || cached?.uid !== nextUid) try { localStorage.removeItem('gf:profile-cache'); } catch {}
+        uidInput.value = nextUid ?? '';
+        currentProfile = nextUid && cached?.uid === nextUid ? cached : null;
+        renderProfile();
+      }
+    } finally {
+      refreshing = false;
+      if (!signal.aborted && !dialog.open && (pendingSync.custom || pendingSync.data)) void refreshSync();
+    }
+  };
+  document.addEventListener('gf:profile-synced', (event) => {
+    const detail = (event as CustomEvent<SyncResult>).detail;
+    pendingSync.custom ||= detail.custom === 'pulled';
+    pendingSync.data ||= detail.data === 'pulled';
+    void refreshSync();
+  }, { signal });
+  document.addEventListener('gf:profile-sync-error', () => status(t('Не удалось синхронизировать профиль с аккаунтом'), true), { signal });
+  document.addEventListener('gf:profile-sync-ok', () => {
+    if ($('profile-status').textContent === t('Не удалось синхронизировать профиль с аккаунтом')) status('');
+  }, { signal });
   const checkerController = new AbortController();
   fetch(`${BASE}/data/checker.json`, { signal: checkerController.signal }).then(async (response) => { if (!response.ok) throw new Error(); return response.json(); }).then((data: unknown) => {
     if (signal.aborted) return;
@@ -967,7 +1008,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const showcase = Array.isArray(shown) ? shown.map((item) => isRecord(item) ? num(item.avatarId) : null).filter((id): id is number => id !== null) : [];
       currentProfile = { uid, time: Date.now(), player: { nickname: typeof player.nickname === 'string' ? player.nickname : '', level: num(player.level) ?? 0,
         worldLevel: num(player.worldLevel) ?? 0, signature: typeof player.signature === 'string' ? player.signature : '', profilePictureId: picture ?? undefined }, showcase };
-      store.set('gf:profile-uid', uid);
+      if (store.set('gf:profile-uid', uid)) markChanged('data');
       store.set('gf:profile-cache', currentProfile);
       renderProfile();
       status(t('Витрина обновлена.'));
@@ -987,6 +1028,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (!keepChanges) { draft = structuredClone(saved); renderPersonal(); }
     revokeStaged(urls);
     editButton.focus({ preventScroll: true });
+    void refreshSync();
   });
   $('close-editor').addEventListener('click', closeEditor);
   $('cancel-editor').addEventListener('click', closeEditor);
@@ -1024,6 +1066,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       if (!dialog.open || session !== editorSession) throw new Error();
       localStorage.setItem('gf:profile-custom', JSON.stringify(snapshot));
       switched = true;
+      markChanged('custom');
       const previous = saved;
       saved = structuredClone(snapshot);
       const previousUrls = new Map(committedUrls);
@@ -1033,9 +1076,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       }
       if (importSnapshot) {
         cancelShowcase();
-        store.set('gf:favs', importSnapshot.favs);
-        store.set('gf:roster', importSnapshot.roster);
-        store.set('gf:profile-uid', importSnapshot.uid);
+        const imported = [store.set('gf:favs', importSnapshot.favs), store.set('gf:roster', importSnapshot.roster), store.set('gf:profile-uid', importSnapshot.uid)];
+        if (imported.every(Boolean)) markChanged('data');
         if (importSnapshot.uid === null) try { localStorage.removeItem('gf:profile-cache'); } catch {}
         uidInput.value = importSnapshot.uid ?? '';
         const cached = validCache(read('gf:profile-cache'));

@@ -1,4 +1,5 @@
 import { pageLang } from '../i18n/client';
+import { markChanged } from './profile-sync';
 // Общие клиентские утилиты: безопасное хранилище, недавние/избранное, таймеры по времени сервера.
 
 export type Entry = { href: string; name: string; icon?: string | null; kind: string };
@@ -8,7 +9,7 @@ export const store = {
     try { const v = localStorage.getItem(key); return v ? (JSON.parse(v) as T) : fallback; } catch { return fallback; }
   },
   set(key: string, value: unknown) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* приватный режим — просто не запоминаем */ }
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; /* приватный режим — просто не запоминаем */ }
   },
 };
 
@@ -27,7 +28,7 @@ export const favorites = {
   toggle(e: Entry) {
     const list = favorites.list();
     const next = list.some((x) => x.href === e.href) ? list.filter((x) => x.href !== e.href) : [e, ...list];
-    store.set(langKey('gf:favs'), next);
+    if (store.set(langKey('gf:favs'), next)) markChanged('data');
     return next.some((x) => x.href === e.href);
   },
 };

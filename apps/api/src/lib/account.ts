@@ -57,13 +57,13 @@ export function deletionCheck(confirm: unknown, claims: TokenClaims, now = Date.
   return null;
 }
 
-async function avatarPaths(client: AdminClient, folder: string): Promise<string[]> {
-  const bucket = client.storage.from('avatars');
+async function mediaPaths(client: AdminClient, bucketName: string, folder: string): Promise<string[]> {
+  const bucket = client.storage.from(bucketName);
   const paths: string[] = [];
   const visit = async (path: string): Promise<void> => {
     for (let offset = 0; ; offset += 100) {
       const { data, error } = await bucket.list(path, { limit: 100, offset });
-      if (error || !data) throw new Error('Avatar listing failed');
+      if (error || !data) throw new Error('Media listing failed');
       for (const item of data) {
         const itemPath = `${path}/${item.name}`;
         if (item.id) paths.push(itemPath);
@@ -79,11 +79,13 @@ async function avatarPaths(client: AdminClient, folder: string): Promise<string[
 export async function deleteAccount(client: AdminClient, id: string, confirm: unknown, claims: TokenClaims, now = Date.now()) {
   const check = deletionCheck(confirm, claims, now);
   if (check) return check;
-  const bucket = client.storage.from('avatars');
-  const paths = await avatarPaths(client, id);
-  for (let offset = 0; offset < paths.length; offset += 100) {
-    const { error } = await bucket.remove(paths.slice(offset, offset + 100));
-    if (error) throw new Error('Avatar removal failed');
+  for (const name of ['avatars', 'profile-media']) {
+    const bucket = client.storage.from(name);
+    const paths = await mediaPaths(client, name, id);
+    for (let offset = 0; offset < paths.length; offset += 100) {
+      const { error } = await bucket.remove(paths.slice(offset, offset + 100));
+      if (error) throw new Error('Media removal failed');
+    }
   }
   const { error } = await client.auth.admin.deleteUser(id, false);
   if (error) throw new Error('Account removal failed');

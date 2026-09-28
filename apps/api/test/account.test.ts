@@ -14,12 +14,12 @@ const claims = (age: number): TokenClaims => ({
 
 function deletionClient() {
   const calls: { method: string; args: unknown[] }[] = [];
-  const list = async (...args: unknown[]) => {
-    calls.push({ method: 'list', args });
+  const list = async (bucket: string, ...args: unknown[]) => {
+    calls.push({ method: 'list', args: [bucket, ...args] });
     return { data: [{ id: 'a', name: 'one.png' }, { id: 'b', name: 'two.webp' }], error: null };
   };
-  const remove = async (...args: unknown[]) => {
-    calls.push({ method: 'remove', args });
+  const remove = async (bucket: string, ...args: unknown[]) => {
+    calls.push({ method: 'remove', args: [bucket, ...args] });
     return { error: null };
   };
   const deleteUser = async (...args: unknown[]) => {
@@ -27,18 +27,20 @@ function deletionClient() {
     return { error: null };
   };
   const client = {
-    storage: { from: () => ({ list, remove }) },
+    storage: { from: (bucket: string) => ({ list: (...args: unknown[]) => list(bucket, ...args), remove: (...args: unknown[]) => remove(bucket, ...args) }) },
     auth: { admin: { deleteUser } },
   } as unknown as AdminClient;
   return { client, calls };
 }
 
-test('removes avatars before deleting a user after a fresh sign-in', async () => {
+test('removes avatars and profile media before deleting a user after a fresh sign-in', async () => {
   const { client, calls } = deletionClient();
   assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
   assert.deepEqual(calls, [
-    { method: 'list', args: [id, { limit: 100, offset: 0 }] },
-    { method: 'remove', args: [[`${id}/one.png`, `${id}/two.webp`]] },
+    { method: 'list', args: ['avatars', id, { limit: 100, offset: 0 }] },
+    { method: 'remove', args: ['avatars', [`${id}/one.png`, `${id}/two.webp`]] },
+    { method: 'list', args: ['profile-media', id, { limit: 100, offset: 0 }] },
+    { method: 'remove', args: ['profile-media', [`${id}/one.png`, `${id}/two.webp`]] },
     { method: 'deleteUser', args: [id, false] },
   ]);
 });

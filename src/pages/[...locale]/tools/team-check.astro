@@ -61,9 +61,11 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 
 <script>
   import { store } from '../../../scripts/common';
+  import { navigate } from 'astro:transitions/client';
   import { BASE, t, LANG } from '../../../scripts/search';
   import { combobox, norm } from '../../../scripts/combobox';
   import { onPage, cleanup } from '../../../scripts/router';
+  import { markChanged } from '../../../scripts/profile-sync';
 
   // ---------- Данные ----------
   type Build = { role: string; healer: boolean; cls: 'dps' | 'sub' | 'support'; weapons: string[]; sets: string[][]; main: Record<'sands' | 'goblet' | 'circlet', string[]>; subs: string[] };
@@ -81,6 +83,10 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 
   onPage((signal) => {
     if (!document.querySelector('.tc')) return;
+    document.addEventListener('gf:profile-synced', (event) => {
+      if ((event as CustomEvent<{ data: string }>).detail.data === 'pulled')
+        void navigate(location.pathname + location.search + location.hash, { history: 'replace' });
+    }, { signal });
     void fetch(`${BASE}/data/checker.json`, { signal }).then((r) => r.json()).then((data: Data) => {
       if (signal.aborted) return;
   const chars = new Map(data.characters.map((c) => [c.s, c]));
@@ -163,7 +169,14 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   const removedRev = new Map<string, number>();
   const markEdited = (e: Entry) => { editedRev.set(e.key, ++rosterRev); };
   const markRemoved = (e: Entry) => { removedRev.set(e.s, ++rosterRev); editedRev.delete(e.key); };
-  const persist = () => { store.set('gf:roster', roster); store.set('gf:abyss-teams', teams); if (checked) renderResult(false); };
+  // Синхронизируется только ростер: составы команд остаются в браузере и не должны помечать данные изменёнными
+  let savedRoster = JSON.stringify(roster);
+  const persist = () => {
+    const next = JSON.stringify(roster);
+    if (next !== savedRoster && store.set('gf:roster', roster)) { savedRoster = next; markChanged('data'); }
+    store.set('gf:abyss-teams', teams);
+    if (checked) renderResult(false);
+  };
 
   // Новый персонаж получает рекомендованный билд как отправную точку
   function fromBuild(s: string): Entry {
