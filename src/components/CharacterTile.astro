@@ -14,7 +14,7 @@ const hasArt = (cardArt as string[]).includes(c.slug);
 const roleText = role ? t(role) : '';
 ---
 <a class:list={['tile', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element}>
-  <img class:list={['art', { fallback: !hasArt }]} src={hasArt ? `/img/chars/${c.slug}.webp` : c.icon} alt="" loading="lazy" decoding="async" width="256" height="512" />
+  <img class:list={['art', { fallback: !hasArt }]} src={hasArt ? `/img/chars/${c.slug}.webp` : c.icon} alt="" loading="lazy" decoding="async" width="320" height="640" />
   {c.emblem && <img class="skill" src={c.emblem} alt="" loading="lazy" decoding="async" width="40" height="40" />}
   {c.beta ? <span class="badge beta">BETA</span> : badge && <span class="badge">{badge}</span>}
   <span class="name">{c.name}</span>
