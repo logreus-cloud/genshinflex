@@ -139,6 +139,11 @@ code { font-size: .88em; background: var(--surface-2); padding: .1em .35em; bord
 .notice > :last-child { margin-bottom: 0; }
 
 details summary { cursor: pointer; }
+/* Сенсорные экраны: чипы-ссылки и раскрывашки не меньше 32px по высоте, чтобы по ним легко попасть пальцем */
+@media (pointer: coarse) {
+  a.chip { min-height: 32px; }
+  details > summary { padding-block: .35rem; }
+}
 details[open] > :not(summary) { animation: gf-fade-up .4s var(--ease) backwards; }
 table { border-collapse: collapse; width: 100%; font-size: .9rem; }
 th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--border); }

@@ -81,4 +81,11 @@ const profileUrl = `${base}/profile/`;
   .account-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-left: auto; }
   .account-state > .btn { margin-left: auto; }
   .account-strip [hidden] { display: none !important; }
+  /* На телефоне заголовок, текст и кнопки идут столбиком на всю ширину */
+  @media (max-width: 540px) {
+    .account-strip { flex-direction: column; align-items: stretch; }
+    .account-state { flex: none; }
+    .account-state p { flex-basis: 100%; }
+    .account-actions, .account-state > .btn { margin-left: 0; }
+  }
 </style>

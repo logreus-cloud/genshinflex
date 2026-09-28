@@ -185,5 +185,6 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
     .cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
     .cards[data-view="grid"] { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
     .view .view-label { display: none; }
+    .view button { min-width: 40px; min-height: 40px; justify-content: center; }
   }
 </style>

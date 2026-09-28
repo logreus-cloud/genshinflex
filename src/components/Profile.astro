@@ -592,7 +592,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const box = $(id);
     box.replaceChildren();
     box.closest('section')!.hidden = hideEmpty && !list.length;
-    if (!list.length) { if (!hideEmpty) box.textContent = t(empty); return; }
+    if (!list.length) { if (!hideEmpty) box.append(el('span', 'empty', t(empty))); return; }
     for (const item of list.slice(0, 100)) {
       const href = safeHref(item.href);
       if (!href) continue;
@@ -603,7 +603,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       link.append(el('span', '', item.name));
       box.append(link);
     }
-    if (!box.childElementCount && !hideEmpty) box.textContent = t(empty);
+    if (!box.childElementCount && !hideEmpty) box.append(el('span', 'empty', t(empty)));
     if (hideEmpty && !box.childElementCount) box.closest('section')!.hidden = true;
   }
   function renderRoster() {
@@ -1336,6 +1336,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .tile-grid :global(a:hover) { border-color: var(--profile-accent); }
   .tile-grid :global(img) { flex: none; border-radius: 8px; }
   .tile-grid :global(span) { min-width: 0; }
+  .tile-grid :global(.empty) { grid-column: 1 / -1; }
   #roster-count { color: var(--muted); font-size: .75rem; font-weight: 400; }
   .wish-list { display: grid; gap: .7rem; }
   .wish-list :global(.account) { padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
@@ -1402,6 +1403,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     .banner { height: 120px; }
     .profile-root :global(#profile-avatar-shell) { width: 72px; height: 72px; margin-top: -36px; }
     .profile-dialog { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border-radius: 0; }
+  }
+  /* Ник на телефоне — одной строкой и с переносом только по словам */
+  @media (max-width: 540px) {
+    .identity { flex: 1 1 0; container-type: inline-size; overflow-wrap: break-word; }
+    .name-row h1 { min-width: 0; max-width: 100%; font-size: clamp(.8rem, 8.8cqi, 1.5rem); }
   }
   @media (max-width: 400px) {
     .profile-card:not(.hero) { padding: .9rem; }

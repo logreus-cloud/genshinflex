@@ -130,6 +130,12 @@ const roleText = role ? t(role) : '';
     /* Текст стихии и оружия прячем только визуально — для скринридера он остаётся */
     .row-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
+  /* Галерея на телефоне: карточка ниже (кадр от макушки до груди), чтобы список не растягивался на десятки экранов */
+  @media (max-width: 540px) {
+    :global(.cards[data-view="gallery"]) .tile { aspect-ratio: 3 / 4; }
+    :global(.cards[data-view="gallery"]) .art { object-position: top; }
+    :global(.cards[data-view="gallery"]) .name { font-size: .95rem; }
+  }
   @media (hover: hover) and (pointer: fine) {
     .tile:hover, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; transform: translateY(-3px); box-shadow: 0 8px 20px rgb(0 0 0 / .22); }
     .tile:hover .art, .tile:focus-visible .art { transform: scale(1.04); }

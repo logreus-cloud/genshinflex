@@ -282,6 +282,12 @@ const { slides } = Astro.props;
     .time { margin-top: .9rem; }
     .arrow { top: 95px; width: 40px; height: 40px; font-size: 2rem; }
     .prev { left: 0; } .next { right: 0; }
+    /* Точки: зона нажатия 24px по высоте, видимая полоска прежняя — 4px */
+    .dots { bottom: calc(1.8rem - 10px); }
+    .dot, .dot.active { position: relative; height: 24px; border-radius: 0; background: transparent; }
+    .dot::before { content: ""; position: absolute; inset: 10px 0 auto; height: 4px; border-radius: 99px; background: var(--hc-dot); }
+    .dot.active::before { background: var(--hc-dot-active); }
+    .fill { position: absolute; inset: 10px 0 auto; height: 4px; border-radius: 99px; }
   }
   @media (max-width: 700px) and (prefers-color-scheme: light) {
     :global(:root:not([data-theme])) .namecard:not(.pattern) { opacity: .35; }
