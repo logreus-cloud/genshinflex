@@ -1,12 +1,23 @@
 ---
 lang: en
 anchor: profile-sync-and-guides
-title: Your profile on every device, rotations in guides and new breakdowns
-summary: Your profile, favorites and wish history are now stored in your account and available on any device. Guides get a "Rotation" section, eight guides are updated, and lists remember your filters.
+title: A new Characters tab, your profile on every device and rotations in guides
+summary: The Characters tab gets character art, three views and build previews. Your profile, favorites and wish history are now stored in your account and available on any device. Guides get a "Rotation" section, and eight guides are updated.
 date: 2026-09-28T22:00:00+05:00
 ---
 
 This update is about convenience: everything of yours now lives in your account, guides are more detailed, and the site works better on phones.
+
+### A new Characters tab
+
+[Characters](/en/characters/) has a fresh look:
+
+- tall cards with character art, framed on the face; leaked characters show their splash art;
+- three views: "Gallery" with large cards, a compact "Grid" and a "List";
+- hover over a card to preview the build — best weapons and artifacts without opening the page;
+- sort by "Newest first", "Oldest first" or "By name"; characters show as one continuous grid by default, and you can group them with the "By version" button.
+
+All lists — characters, weapons and artifacts — now remember your filters, search, sorting and view: open a character, come back, and your selection is still there.
 
 ### Your profile on every device
 
@@ -25,12 +36,6 @@ Character guides now have a "Rotation" section — the action order in short not
 ### Updated guides
 
 The guides for [Vesna](/en/characters/vesna/), [Sandrone](/en/characters/sandrone/), [Odette](/en/characters/odette/), [Alyosha](/en/characters/alyosha/), [Vodyanitsa](/en/characters/vodyanitsa/), [Faruzan](/en/characters/faruzan/), [Yae Miko](/en/characters/yae-miko/) and the [Cryo Traveler](/en/characters/traveler-cryo/) were rewritten from several sources: more weapon options (including 4★ and craftable ones), budget teams, stat targets, kit breakdowns and constellation advice. Faruzan now has a full breakdown covering her new role in Stellar Swirl.
-
-### Character, weapon and artifact lists
-
-- Filters, search and sorting are remembered: open a character, come back — your selection is still there.
-- [Characters](/en/characters/) now show as one continuous grid by default; turn version grouping on with the "By version" button. The filter panel is tidier.
-- 12 character cards had off-center framing — now the face is centered like everyone else's.
 
 ### Mobile
 

@@ -1,12 +1,23 @@
 ---
 lang: es
 anchor: profile-sync-and-guides
-title: Tu perfil en todos los dispositivos, rotaciones en las guías y nuevos análisis
-summary: El perfil, los favoritos y el historial de deseos ahora se guardan en tu cuenta y están disponibles en cualquier dispositivo. Las guías estrenan la sección «Rotación», ocho guías se han actualizado y las listas recuerdan los filtros.
+title: Nueva pestaña de personajes, tu perfil en todos los dispositivos y rotaciones en las guías
+summary: La pestaña de personajes estrena ilustraciones, tres vistas y vista previa de builds. El perfil, los favoritos y el historial de deseos ahora se guardan en tu cuenta y están disponibles en cualquier dispositivo. Las guías estrenan la sección «Rotación» y ocho guías se han actualizado.
 date: 2026-09-28T22:00:00+05:00
 ---
 
 Una actualización pensada para la comodidad: todo lo tuyo vive ahora en tu cuenta, las guías son más detalladas y el sitio funciona mejor en el móvil.
+
+### Nueva pestaña de personajes
+
+Los [personajes](/es/characters/) tienen un aspecto nuevo:
+
+- tarjetas altas con las ilustraciones de los personajes, encuadradas en la cara; los personajes filtrados muestran su splash art;
+- tres vistas: «Galería» con tarjetas grandes, una «Cuadrícula» compacta y una «Lista»;
+- pasa el cursor por una tarjeta para ver la vista previa del build: las mejores armas y artefactos sin abrir la página;
+- orden «Más nuevos primero», «Más antiguos primero» o «Por nombre»; por defecto los personajes se muestran en una cuadrícula continua, y puedes agruparlos con el botón «Por versión».
+
+Todas las listas —personajes, armas y artefactos— recuerdan ahora los filtros, la búsqueda, el orden y la vista: abres un personaje, vuelves y tu selección sigue ahí.
 
 ### Tu perfil en todos los dispositivos
 
@@ -25,12 +36,6 @@ Las guías de personajes tienen una nueva sección «Rotación»: el orden de ac
 ### Guías actualizadas
 
 Las guías de [Vesna](/es/characters/vesna/), [Sandrone](/es/characters/sandrone/), [Odette](/es/characters/odette/), [Alyosha](/es/characters/alyosha/), [Vodyanitsa](/es/characters/vodyanitsa/), [Faruzan](/es/characters/faruzan/), [Yae Miko](/es/characters/yae-miko/) y el [Viajero Cryo](/es/characters/traveler-cryo/) se han reescrito a partir de varias fuentes: más opciones de armas (incluidas 4★ y forjables), equipos económicos, objetivos de estadísticas, análisis de habilidades y consejos de constelaciones. Faruzan tiene ahora un análisis completo con su nuevo papel en el Torbellino Estelar.
-
-### Listas de personajes, armas y artefactos
-
-- Los filtros, la búsqueda y el orden se recuerdan: abres un personaje, vuelves y tu selección sigue ahí.
-- Los [personajes](/es/characters/) se muestran por defecto en una cuadrícula continua; la agrupación por versiones se activa con el botón «Por versión». El panel de filtros es más ordenado.
-- 12 tarjetas de personajes tenían el encuadre desplazado; ahora la cara queda centrada como en las demás.
 
 ### Móvil
 
