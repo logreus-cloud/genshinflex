@@ -4,6 +4,7 @@ export type SimBuild = {
   weapon: { key: string; refine: number; level: number; maxLevel: number } | null;
   sets: Record<string, number>;
   unknownSets?: number;                   // вещи из сетов, которых нет в gcsim: их бонус теряется
+  defaultTalents?: boolean;               // уровни талантов отсутствуют, подставлены 1/1/1
   stats: Record<string, number>;
 };
 
@@ -56,8 +57,8 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
       continue;
     }
     const skills = Object.values(record(avatar.skillLevelMap)).map((v) => integer(v, 1, 15));
-    const talents: [number, number, number] = skills.length >= 3 && skills[0] !== null && skills[1] !== null && skills.at(-1) !== null
-      ? [skills[0]!, skills[1]!, skills.at(-1)!] : [1, 1, 1];
+    const defaultTalents = skills.length < 3 || skills[0] === null || skills[1] === null || skills.at(-1) === null;
+    const talents: [number, number, number] = defaultTalents ? [1, 1, 1] : [skills[0]!, skills[1]!, skills.at(-1)!];
     const sets: Record<string, number> = {}, sums: Record<string, number> = {};
     let unknownSets = 0;
     let weapon: SimBuild['weapon'] = null;
@@ -90,7 +91,7 @@ export function enkaToBuilds(body: unknown, ids: SimIds): { builds: SimBuild[]; 
     const stats = Object.fromEntries(Object.entries(sums).map(([name, value]) => [name, +value.toFixed(4)]));
     builds.push({
       slug, level, maxLevel: charCap(level, promote), cons: Math.min(6, Array.isArray(avatar.talentIdList) ? avatar.talentIdList.length : 0),
-      talents, weapon, sets, stats, unknownSets,
+      talents, ...(defaultTalents ? { defaultTalents: true } : {}), weapon, sets, stats, unknownSets,
     });
   }
   return { builds, skipped };
@@ -102,27 +103,28 @@ export function applyBuilds(
 ): { config: string; applied: string[]; warnings: string[] } {
   let lines = preset.config.split('\n');
   const applied: string[] = [], warnings: string[] = [];
+  const command = (line: string) => {
+    let quoted = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"' && line[i - 1] !== '\\') quoted = !quoted;
+      if (line[i] === '#' && !quoted) return line.slice(0, i);
+    }
+    return line;
+  };
   for (const { slug, alias } of preset.members) {
     const build = builds.get(slug);
     if (!build) continue;
     const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const character = new RegExp(`^(\\s*)${escaped}\\s+char\\b`);
-    const weapon = new RegExp(`^(\\s*)${escaped}\\s+add\\s+weapon=`);
-    const artifact = new RegExp(`^\\s*${escaped}\\s+add\\s+(?:set=|stats\\b)`);
+    const add = new RegExp(`^(\\s*)${escaped}\\s+add\\b`);
+    const weapon = (line: string) => add.test(command(line)) && /(?:^|\s)weapon=/.test(command(line));
+    const artifact = (line: string) => add.test(command(line)) && /(?:^|\s)(?:set=|stats(?=\s|;|$))/.test(command(line));
     const charIndex = lines.findIndex((line) => character.test(line));
-    const weaponIndex = lines.findIndex((line) => weapon.test(line));
+    const weaponIndex = lines.findIndex(weapon);
     if (charIndex < 0 || weaponIndex < 0) {
       warnings.push(`${slug}: не найдена строка персонажа или оружия`);
       continue;
     }
-    const command = (line: string) => {
-      let quoted = false;
-      for (let i = 0; i < line.length; i++) {
-        if (line[i] === '"' && line[i - 1] !== '\\') quoted = !quoted;
-        if (line[i] === '#' && !quoted) return line.slice(0, i);
-      }
-      return line;
-    };
     const params = (line: string) => command(line).match(/\+params=\[[^\]]*\]/)?.[0] ?? '';
     const prefix = lines[charIndex].match(character)![1];
     lines[charIndex] = `${prefix}${alias} char lvl=${build.level}/${build.maxLevel} cons=${build.cons} talent=${build.talents.join(',')}${params(lines[charIndex]) ? ` ${params(lines[charIndex])}` : ''};`;
@@ -130,11 +132,11 @@ export function applyBuilds(
     if (build.weapon) {
       const oldKey = command(original).match(/\bweapon="([^"]+)"/)?.[1];
       const keep = oldKey === build.weapon.key ? params(original) : '';
-      const indent = original.match(weapon)![1];
+      const indent = original.match(add)![1];
       lines[weaponIndex] = `${indent}${alias} add weapon="${build.weapon.key}" refine=${build.weapon.refine} lvl=${build.weapon.level}/${build.weapon.maxLevel}${keep ? ` ${keep}` : ''};`;
     } else warnings.push(`${slug}: неизвестное оружие, оставлено эталонное`);
-    lines = lines.filter((line) => !artifact.test(line));
-    const insert = lines.findIndex((line) => weapon.test(line));
+    lines = lines.filter((line) => !artifact(line));
+    const insert = lines.findIndex(weapon);
     const sets = Object.entries(build.sets).sort((a, b) => b[1] - a[1]);
     const four = sets.find(([, count]) => count >= 4);
     const chosen = four ? [[four[0], 4] as const] : sets.filter(([, count]) => count >= 2).slice(0, 2).map(([key]) => [key, 2] as const);
@@ -143,6 +145,7 @@ export function applyBuilds(
     if (stats.length) additions.push(`${alias} add stats ${stats.map(([key, value]) => `${key}=${value}`).join(' ')};`);
     else warnings.push(`${slug}: нет статов артефактов`);
     if ((build.unknownSets ?? 0) >= 2) warnings.push(`${slug}: сет артефактов неизвестен gcsim, его бонус не учтён`);
+    if (build.defaultTalents) warnings.push(`${slug}: нет уровней талантов, взяты 1/1/1`);
     lines.splice(insert + 1, 0, ...additions);
     applied.push(slug);
   }

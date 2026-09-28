@@ -110,6 +110,7 @@ onPage((signal) => {
     if (reason === 'неизвестное оружие, оставлено эталонное') return t('Оружие {name} пока не поддерживается в gcsim — в симуляции эталонное.', { name: label });
     if (reason === 'сет артефактов неизвестен gcsim, его бонус не учтён') return t('Сет артефактов {name} пока не поддерживается в gcsim — учтены только статы, без бонуса сета.', { name: label });
     if (reason === 'нет статов артефактов') return t('У {name} нет статов артефактов.', { name: label });
+    if (reason === 'нет уровней талантов, взяты 1/1/1') return t('У {name} в витрине нет уровней талантов — в симуляции таланты 1/1/1.', { name: label });
     return t('Не удалось применить билд {name}.', { name: label });
   }
   function renderShowcase() {
@@ -233,7 +234,7 @@ onPage((signal) => {
     const config = applyBuilds(preset, builds).config;
     status(t('Загружаю движок gcsim (≈10 МБ, один раз)…'));
     try {
-      const issue = await validateSim(config);
+      const issue = await validateSim(config, simController.signal);
       if (gen !== generation) return;
       if (issue) return status(t('gcsim не принял конфиг: {message}', { message: issue }), true);
       const ours = await runSim(config, {

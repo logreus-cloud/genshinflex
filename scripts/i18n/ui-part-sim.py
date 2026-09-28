@@ -20,6 +20,7 @@ T = [
 ("эталон", "reference", "referencia"),
 ("Не удалось применить билд {name}: в конфиге нет персонажа или оружия.", "Could not apply {name}'s build: the config has no character or weapon entry.", "No se pudo aplicar la build de {name}: falta el personaje o el arma en la configuración."),
 ("У {name} нет статов артефактов.", "{name} has no artifact stats.", "{name} no tiene estadísticas de artefactos."),
+("У {name} в витрине нет уровней талантов — в симуляции таланты 1/1/1.", "{name} has no talent levels in the showcase — the simulation uses talents 1/1/1.", "{name} no tiene niveles de talentos en el escaparate: la simulación usa talentos 1/1/1."),
 ("Не удалось применить билд {name}.", "Could not apply {name}'s build.", "No se pudo aplicar la build de {name}."),
 ("Точность", "Accuracy", "Precisión"),
 ("Быстро (100)", "Fast (100)", "Rápido (100)"),
