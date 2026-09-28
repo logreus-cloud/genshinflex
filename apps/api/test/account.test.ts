@@ -58,6 +58,7 @@ test('requires the exact confirmation', async () => {
 });
 
 test('includes every export section without provider tokens', async () => {
+    const wishes = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, game_uid: '700000000', id: String(index + 1) }));
     const row = (data: unknown) => ({
       select: () => ({
         eq: () => ({
@@ -72,8 +73,13 @@ test('includes every export section without provider tokens', async () => {
       roles: [{ user_id: id, role: 'author' }],
       telegram_accounts: { user_id: id, telegram_id: 123 },
     };
+    const ranges: [number, number][] = [];
     const client = {
-      from: (table: string) => row(rows[table]),
+      from: (table: string) => table === 'wishes' ? {
+        select: () => ({ eq: () => ({ order: () => ({ order: () => ({
+          range: async (start: number, end: number) => { ranges.push([start, end]); return { data: wishes.slice(start, end + 1), error: null }; },
+        }) }) }) }),
+      } : row(rows[table]),
       auth: {
         admin: {
           getUserById: async () => ({
@@ -102,6 +108,8 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(data.auth.user_metadata, { display_name: 'Traveler' });
     assert.deepEqual(data.profile, rows.profiles);
     assert.deepEqual(data.user_data, rows.user_data);
+    assert.deepEqual(data.wishes, wishes);
+    assert.deepEqual(ranges, [[0, 999], [1000, 1999]]);
     assert.deepEqual(data.roles, rows.roles);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
     assert.ok(data.exported_at);

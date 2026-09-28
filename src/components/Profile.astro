@@ -337,11 +337,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
   import { onPage, cleanup } from '../scripts/router';
   import { markChanged, syncNow, type SyncResult } from '../scripts/profile-sync';
+  import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
 
   type Char = { id: number | null; s: string; n: string; i: string };
   type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
   type Profile = { uid: string; time: number; player: { nickname: string; level: number; worldLevel: number; signature: string; profilePictureId?: number }; showcase: number[] };
-  type Wish = { id: string; uid: string; gacha_type: string; time: string; name: string; item_type: string; rank_type: string };
   type Avatar = { type: 'none' } | { type: 'character'; slug: string } | { type: 'upload' };
   type CoverType = 'none' | 'namecard' | 'upload';
   type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
@@ -620,15 +620,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     for (const item of list.slice(0, 16)) addChar(box, charsBySlug.get(item.s)!);
     if (list.length > 16) box.append(el('span', 'more', `+${list.length - 16}`));
   }
-  function renderWishes() {
+  function renderWishes(wishStore: WishStore) {
     const box = $('wishes-list');
     box.replaceChildren();
-    const raw = read('gf:wish-uids');
-    const uids = Array.isArray(raw) ? [...new Set(raw.filter((uid): uid is string => uidOk(uid) || uid === 'manual'))] : [];
-    for (const uid of uids) {
-      const saved = read(`gf:wishes:${uid}`);
-      const list: Wish[] = Array.isArray(saved) ? saved.filter((item): item is Wish => isRecord(item) && ['id', 'uid', 'gacha_type', 'time', 'name', 'item_type', 'rank_type'].every((key) => typeof item[key] === 'string'))
-        .sort((a, b) => a.id.length - b.id.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)) : [];
+    for (const uid of wishStore.uids()) {
+      const list: Wish[] = wishStore.list(uid);
       if (!list.length) continue;
       const account = el('div', 'account');
       account.append(el('h3', '', uid === 'manual' ? t('Ручной ввод') : t('UID {uid}', { uid })));
@@ -895,7 +891,19 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
   renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
   renderEntries('recent-list', entries(recent.list), '', true);
-  renderWishes();
+  let wishesRequest = 0;
+  const loadWishes = async () => {
+    const request = ++wishesRequest;
+    $('wishes-list').replaceChildren(el('p', 'empty', t('Загружаю…')));
+    try {
+      const wishStore = await openWishStore(signal);
+      if (!signal.aborted && request === wishesRequest) renderWishes(wishStore);
+    } catch {
+      if (!signal.aborted && request === wishesRequest) $('wishes-list').replaceChildren(el('p', 'empty', t('История круток не загружена')));
+    }
+  };
+  void loadWishes();
+  document.addEventListener('gf:auth', () => { void loadWishes(); }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
     let raw = read('gf:profile-custom');

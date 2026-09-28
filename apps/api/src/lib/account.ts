@@ -16,6 +16,14 @@ function cleanMetadata(value: unknown): unknown {
 }
 
 export async function exportAccount(client: AdminClient, id: string) {
+  const wishes: unknown[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await client.from('wishes').select('*').eq('user_id', id)
+      .order('game_uid').order('id').range(offset, offset + 999);
+    if (error || !data) throw new Error('Account export failed');
+    wishes.push(...data);
+    if (data.length < 1000) break;
+  }
   const [auth, profile, userData, roles, telegram] = await Promise.all([
     client.auth.admin.getUserById(id),
     client.from('profiles').select('*').eq('id', id).maybeSingle(),
@@ -42,6 +50,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     },
     profile: profile.data,
     user_data: userData.data,
+    wishes,
     roles: roles.data,
     telegram: telegram.data,
     exported_at: new Date().toISOString(),
