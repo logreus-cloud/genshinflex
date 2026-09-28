@@ -30,15 +30,20 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
 
   <div class="controls">
     <FilterBar target="#chars" placeholder={t('Найти персонажа')} groups={['rarity', 'element', 'weapon']} />
-    <div class="sort" role="group" aria-label={t('Сортировка')}>
-      <button type="button" data-sort="new" aria-pressed="true">{t('Сначала новые')}</button>
-      <button type="button" data-sort="old" aria-pressed="false">{t('Сначала старые')}</button>
-      <button type="button" data-sort="name" aria-pressed="false">{t('По имени')}</button>
-    </div>
-    <div class="view" role="group" aria-label={t('Вид')}>
-      <button type="button" data-view="gallery" aria-pressed="true" aria-label={t('Галерея')} title={t('Галерея')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg><span class="view-label">{t('Галерея')}</span></button>
-      <button type="button" data-view="grid" aria-pressed="false" aria-label={t('Сетка')} title={t('Сетка')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg><span class="view-label">{t('Сетка')}</span></button>
-      <button type="button" data-view="list" aria-pressed="false" aria-label={t('Список')} title={t('Список')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1" /></svg><span class="view-label">{t('Список')}</span></button>
+    <div class="toolbar">
+      <div class="sort" role="group" aria-label={t('Сортировка')}>
+        <button type="button" data-sort="new" aria-pressed="true">{t('Сначала новые')}</button>
+        <button type="button" data-sort="old" aria-pressed="false">{t('Сначала старые')}</button>
+        <button type="button" data-sort="name" aria-pressed="false">{t('По имени')}</button>
+      </div>
+      <div class="group">
+        <button type="button" aria-pressed="false">{t('По версиям')}</button>
+      </div>
+      <div class="view" role="group" aria-label={t('Вид')}>
+        <button type="button" data-view="gallery" aria-pressed="true" aria-label={t('Галерея')} title={t('Галерея')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg><span class="view-label">{t('Галерея')}</span></button>
+        <button type="button" data-view="grid" aria-pressed="false" aria-label={t('Сетка')} title={t('Сетка')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg><span class="view-label">{t('Сетка')}</span></button>
+        <button type="button" data-view="list" aria-pressed="false" aria-label={t('Список')} title={t('Список')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1" /></svg><span class="view-label">{t('Список')}</span></button>
+      </div>
     </div>
   </div>
 
@@ -50,7 +55,7 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
       return (
         <Fragment>
           {(i === 0 || group !== (previous.beta ? 'beta' : previous.version)) && (
-            <h2 class="version-heading" data-version-heading={group}>{c.beta ? t('Утечки и бета') : t('Версия {n}', { n: c.version })}</h2>
+            <h2 class="version-heading" data-version-heading={group} hidden>{c.beta ? t('Утечки и бета') : t('Версия {n}', { n: c.version })}</h2>
           )}
           <div data-name={`${c.name} ${c.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={c.name} data-version={c.version}
             data-element={c.element} data-weapon={c.weapon} data-rarity={String(c.rarity)} data-beta={c.beta ? '1' : undefined}>
@@ -95,8 +100,9 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
   onPage((signal) => {
     const grid = document.querySelector<HTMLElement>('#chars');
     const controls = document.querySelector<HTMLElement>('.sort');
+    const groupButton = document.querySelector<HTMLButtonElement>('.group button');
     const viewControls = document.querySelector<HTMLElement>('.view');
-    if (!grid || !controls || !viewControls) return;
+    if (!grid || !controls || !groupButton || !viewControls) return;
     const cards = [...grid.querySelectorAll<HTMLElement>(':scope > [data-name]')];
     const headings = [...grid.querySelectorAll<HTMLElement>(':scope > [data-version-heading]')];
     const buttons = [...controls.querySelectorAll<HTMLButtonElement>('button[data-sort]')];
@@ -107,11 +113,17 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
     const beta = cards.filter((card) => card.dataset.beta === '1');
     const released = cards.filter((card) => card.dataset.beta !== '1');
     let activeSort: Sort = 'new';
+    const params = new URLSearchParams(location.search);
+    let grouped = params.get('group') === 'version';
+    if (!params.has('group')) {
+      try { grouped = localStorage.getItem('gf-chars-group') === 'version'; } catch {}
+    }
+    groupButton.setAttribute('aria-pressed', String(grouped));
 
     const updateHeadings = () => {
       for (const heading of headings) {
         const group = heading.dataset.versionHeading;
-        heading.hidden = activeSort === 'name' || !cards.some((card) =>
+        heading.hidden = !grouped || activeSort === 'name' || !cards.some((card) =>
           !card.hidden && (group === 'beta' ? card.dataset.beta === '1' : card.dataset.beta !== '1' && card.dataset.version === group));
       }
     };
@@ -120,6 +132,14 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
     });
     observer.observe(grid, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
     cleanup(signal, () => observer.disconnect());
+
+    const updateUrl = () => {
+      const url = new URL(location.href);
+      url.searchParams.set('sort', activeSort);
+      if (grouped) url.searchParams.set('group', 'version');
+      else url.searchParams.delete('group');
+      history.replaceState(history.state, '', url);
+    };
 
     const render = (sort: Sort) => {
       activeSort = sort;
@@ -141,14 +161,20 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
       }
       grid.append(fragment);
       for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.sort === sort));
+      groupButton.disabled = sort === 'name';
       updateHeadings();
-      const url = new URL(location.href);
-      url.searchParams.set('sort', sort);
-      history.replaceState(history.state, '', url);
+      updateUrl();
     };
-    const requested = new URLSearchParams(location.search).get('sort');
+    const requested = params.get('sort');
     render(requested === 'old' || requested === 'name' ? requested : 'new');
     for (const button of buttons) button.addEventListener('click', () => render(button.dataset.sort as Sort), { signal });
+    groupButton.addEventListener('click', () => {
+      grouped = !grouped;
+      groupButton.setAttribute('aria-pressed', String(grouped));
+      updateHeadings();
+      updateUrl();
+      try { localStorage.setItem('gf-chars-group', grouped ? 'version' : 'none'); } catch {}
+    }, { signal });
     const setView = (view: string) => {
       grid.dataset.view = view;
       for (const item of viewButtons) item.setAttribute('aria-pressed', String(item.dataset.view === view));
@@ -166,12 +192,14 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
 </script>
 
 <style>
-  .controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .75rem; margin-bottom: 1.2rem; }
-  .controls :global(.fb) { flex: 1 1 580px; min-width: 0; margin-bottom: 0; }
-  .sort, .view { display: flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
-  .sort button, .view button { border: 0; border-radius: 7px; padding: .35rem .6rem; background: none; color: var(--muted); font-size: .85rem; cursor: pointer; }
-  .sort button:hover, .view button:hover { color: var(--text); background: var(--surface-2); }
-  .sort button[aria-pressed="true"], .view button[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+  .controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; margin-bottom: 1.2rem; }
+  .controls :global(.fb) { margin-bottom: 0; }
+  .toolbar { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .sort, .group, .view { display: flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .sort button, .group button, .view button { border: 0; border-radius: 7px; padding: .35rem .6rem; background: none; color: var(--muted); font-size: .85rem; cursor: pointer; }
+  .sort button:hover, .group button:not(:disabled):hover, .view button:hover { color: var(--text); background: var(--surface-2); }
+  .sort button[aria-pressed="true"], .group button[aria-pressed="true"], .view button[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+  .group button:disabled { opacity: .5; cursor: default; }
   .view button { display: inline-flex; align-items: center; gap: .35rem; }
   .view svg { width: 16px; height: 16px; flex: none; }
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
