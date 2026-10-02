@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { claimsFromToken, userIdFromToken } from './lib/auth.ts';
+import { claimsFromToken } from './lib/auth.ts';
+import type { TokenClaims } from './lib/auth.ts';
 import { deleteAccount, exportAccount } from './lib/account.ts';
+import type { AdminClient } from './lib/account.ts';
 import type { Env } from './lib/env.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
@@ -15,12 +16,21 @@ import {
 } from './lib/titles.ts';
 import type { TitleClient } from './lib/titles.ts';
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<ApiEnv>();
 const version = '0.5.0';
 
-type ApiContext = Context<{ Bindings: Env }>;
+export type ServiceClient = AdminClient & TitleClient & Parameters<typeof telegramLogin>[0];
+type ApiEnv = {
+  Bindings: Env;
+  Variables: {
+    adminClient: (c: ApiContext) => ServiceClient | Response;
+    claims: typeof claimsFromToken;
+  };
+};
+type ApiContext = Context<ApiEnv>;
+type AppDeps = Partial<ApiEnv['Variables']>;
 
-function serviceClient(c: ApiContext): SupabaseClient | Response {
+function defaultClient(c: ApiContext): ServiceClient | Response {
   if (!c.env.SUPABASE_URL || !c.env.SUPABASE_SERVICE_ROLE_KEY) {
     return c.json({ error: 'Сервис недоступен' }, 503);
   }
@@ -29,22 +39,26 @@ function serviceClient(c: ApiContext): SupabaseClient | Response {
   });
 }
 
+function serviceClient(c: ApiContext): ServiceClient | Response {
+  return c.get('adminClient')(c);
+}
+
 export async function requireUser(
-  c: ApiContext, resolve = userIdFromToken,
-): Promise<{ id: string } | Response> {
+  c: ApiContext, resolve = claimsFromToken,
+): Promise<TokenClaims | Response> {
   const token = /^Bearer (.+)$/i.exec(c.req.header('Authorization') || '')?.[1];
   if (!token) return c.json({ error: 'Требуется авторизация' }, 401);
-  const id = await resolve(token, c.env);
-  return id ? { id } : c.json({ error: 'Требуется авторизация' }, 401);
+  const claims = await resolve(token, c.env);
+  return claims || c.json({ error: 'Требуется авторизация' }, 401);
 }
 
 export async function requireAdmin(
-  c: ApiContext, client: TitleClient, resolve = userIdFromToken,
-): Promise<{ id: string } | Response> {
+  c: ApiContext, client: TitleClient, resolve = claimsFromToken,
+): Promise<TokenClaims | Response> {
   const user = await requireUser(c, resolve);
   if (user instanceof Response) return user;
   const { data, error } = await client.from('roles').select('role')
-    .eq('user_id', user.id).eq('role', 'admin').maybeSingle();
+    .eq('user_id', user.sub).eq('role', 'admin').maybeSingle();
   if (error) return c.json({ error: 'Сервис недоступен' }, 503);
   if (!data) return c.json({ error: 'Нужны права администратора' }, 403);
   return user;
@@ -97,16 +111,16 @@ app.get('/titles', async (c) => {
 });
 
 app.get('/me', async (c) => {
-  const user = await requireUser(c);
+  const user = await requireUser(c, c.get('claims'));
   if (user instanceof Response) return user;
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const { data, error } = await client.from('profiles').select('*').eq('id', user.id).single();
+  const { data, error } = await client.from('profiles').select('*').eq('id', user.sub).single();
   if (error || !data) return c.json({ error: 'Профиль не найден' }, 404);
   try {
     const [titles, roles] = await Promise.all([
-      getUserTitles(client, user.id),
-      getUserRoles(client, user.id),
+      getUserTitles(client, user.sub),
+      getUserRoles(client, user.sub),
     ]);
     return c.json({ ...data, titles, roles });
   } catch (failure) {
@@ -115,12 +129,12 @@ app.get('/me', async (c) => {
 });
 
 app.post('/me/title', async (c) => {
-  const user = await requireUser(c);
+  const user = await requireUser(c, c.get('claims'));
   if (user instanceof Response) return user;
   const client = serviceClient(c);
   if (client instanceof Response) return client;
   try {
-    return c.json(await setActiveTitle(client, user.id, await titleBody(c)));
+    return c.json(await setActiveTitle(client, user.sub, await titleBody(c)));
   } catch (error) {
     return titleFailure(c, error);
   }
@@ -129,7 +143,7 @@ app.post('/me/title', async (c) => {
 app.get('/admin/titles', async (c) => {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const admin = await requireAdmin(c, client);
+  const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   try {
     return c.json(await listAdminTitles(client));
@@ -141,11 +155,11 @@ app.get('/admin/titles', async (c) => {
 app.post('/admin/titles', async (c) => {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const admin = await requireAdmin(c, client);
+  const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   try {
-    const title = await createTitle(client, await titleBody(c), admin.id);
-    logTitleAction(admin.id, 'create_title', title.id);
+    const title = await createTitle(client, await titleBody(c), admin.sub);
+    logTitleAction(admin.sub, 'create_title', title.id);
     return c.json(title, 201);
   } catch (error) {
     return titleFailure(c, error);
@@ -155,11 +169,11 @@ app.post('/admin/titles', async (c) => {
 app.delete('/admin/titles/:id', async (c) => {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const admin = await requireAdmin(c, client);
+  const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   try {
     const result = await deleteTitle(client, c.req.param('id'));
-    logTitleAction(admin.id, 'delete_title', c.req.param('id'));
+    logTitleAction(admin.sub, 'delete_title', c.req.param('id'));
     return c.json(result);
   } catch (error) {
     return titleFailure(c, error);
@@ -169,7 +183,7 @@ app.delete('/admin/titles/:id', async (c) => {
 app.get('/admin/users', async (c) => {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const admin = await requireAdmin(c, client);
+  const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   try {
     return c.json(await searchUsers(client, c.req.query('q') || ''));
@@ -181,13 +195,13 @@ app.get('/admin/users', async (c) => {
 app.post('/admin/users/:userId/titles', async (c) => {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const admin = await requireAdmin(c, client);
+  const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   try {
     const body = await titleBody(c);
-    const result = await grantTitle(client, c.req.param('userId'), body, admin.id);
+    const result = await grantTitle(client, c.req.param('userId'), body, admin.sub);
     const title = (body as { title: string }).title;
-    logTitleAction(admin.id, 'grant_title', `${c.req.param('userId')}:${title}`);
+    logTitleAction(admin.sub, 'grant_title', `${c.req.param('userId')}:${title}`);
     return c.json(result, 201);
   } catch (error) {
     return titleFailure(c, error);
@@ -197,11 +211,11 @@ app.post('/admin/users/:userId/titles', async (c) => {
 app.delete('/admin/users/:userId/titles/:titleId', async (c) => {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
-  const admin = await requireAdmin(c, client);
+  const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   try {
     const result = await revokeTitle(client, c.req.param('userId'), c.req.param('titleId'));
-    logTitleAction(admin.id, 'revoke_title', `${c.req.param('userId')}:${c.req.param('titleId')}`);
+    logTitleAction(admin.sub, 'revoke_title', `${c.req.param('userId')}:${c.req.param('titleId')}`);
     return c.json(result);
   } catch (error) {
     return titleFailure(c, error);
@@ -209,16 +223,10 @@ app.delete('/admin/users/:userId/titles/:titleId', async (c) => {
 });
 
 app.get('/me/export', async (c) => {
-  const token = /^Bearer (.+)$/i.exec(c.req.header('Authorization') || '')?.[1];
-  if (!token) return c.json({ error: 'Требуется авторизация' }, 401);
-  const claims = await claimsFromToken(token, c.env);
-  if (!claims) return c.json({ error: 'Требуется авторизация' }, 401);
-  if (!c.env.SUPABASE_URL || !c.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return c.json({ error: 'Сервис недоступен' }, 503);
-  }
-  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const claims = await requireUser(c, c.get('claims'));
+  if (claims instanceof Response) return claims;
+  const supabase = serviceClient(c);
+  if (supabase instanceof Response) return supabase;
   try {
     const data = await exportAccount(supabase, claims.sub);
     return c.body(JSON.stringify(data), 200, {
@@ -232,10 +240,8 @@ app.get('/me/export', async (c) => {
 });
 
 app.delete('/me', async (c) => {
-  const token = /^Bearer (.+)$/i.exec(c.req.header('Authorization') || '')?.[1];
-  if (!token) return c.json({ error: 'Требуется авторизация' }, 401);
-  const claims = await claimsFromToken(token, c.env);
-  if (!claims) return c.json({ error: 'Требуется авторизация' }, 401);
+  const claims = await requireUser(c, c.get('claims'));
+  if (claims instanceof Response) return claims;
   let body: unknown;
   try {
     body = await c.req.json();
@@ -245,12 +251,8 @@ app.delete('/me', async (c) => {
   const confirm = body && typeof body === 'object' && !Array.isArray(body)
     ? (body as { confirm?: unknown }).confirm : undefined;
   if (confirm !== 'DELETE') return c.json({ error: 'Требуется подтверждение' }, 400);
-  if (!c.env.SUPABASE_URL || !c.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return c.json({ error: 'Сервис недоступен' }, 503);
-  }
-  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const supabase = serviceClient(c);
+  if (supabase instanceof Response) return supabase;
   try {
     const result = await deleteAccount(supabase, claims.sub, confirm, claims);
     if (result === 'reauth_required') {
@@ -264,7 +266,9 @@ app.delete('/me', async (c) => {
 });
 
 app.post('/auth/telegram', async (c) => {
-  if (!c.env.TELEGRAM_BOT_TOKEN || !c.env.SUPABASE_URL || !c.env.SUPABASE_SERVICE_ROLE_KEY) return c.json({ error: 'Сервис недоступен' }, 503);
+  const supabase = serviceClient(c);
+  if (supabase instanceof Response) return supabase;
+  if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
   let body: unknown;
   try {
     body = await c.req.json();
@@ -276,9 +280,6 @@ app.post('/auth/telegram', async (c) => {
   const telegram = await verifyTelegram(input.auth, c.env.TELEGRAM_BOT_TOKEN, Date.now(), 3_600_000);
   if (!telegram) return c.json({ error: 'Неверная подпись Telegram' }, 401);
   const auth = input.auth as Record<string, unknown>;
-  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
   try {
     const token_hash = await telegramLogin(supabase, {
       ...telegram,
@@ -321,7 +322,17 @@ app.post('/hooks/sanity', async (c) => {
   return c.json({ ok: true });
 });
 
-app.notFound((c) => c.json({ error: 'Не найдено' }, 404));
-app.onError((_error, c) => c.json({ error: 'Внутренняя ошибка' }, 500));
+export function createApp(deps: AppDeps = {}) {
+  const instance = new Hono<ApiEnv>();
+  instance.use('*', async (c, next) => {
+    c.set('adminClient', deps.adminClient || defaultClient);
+    c.set('claims', deps.claims || claimsFromToken);
+    return next();
+  });
+  instance.route('/', app);
+  instance.notFound((c) => c.json({ error: 'Не найдено' }, 404));
+  instance.onError((_error, c) => c.json({ error: 'Внутренняя ошибка' }, 500));
+  return instance;
+}
 
-export default app;
+export default createApp();

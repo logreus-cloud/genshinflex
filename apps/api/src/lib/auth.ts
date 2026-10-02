@@ -9,10 +9,6 @@ export type TokenClaims = {
   amr: { method?: string; timestamp: number }[];
 };
 
-export async function userIdFromToken(token: string, env: Env): Promise<string | null> {
-  return (await claimsFromToken(token, env))?.sub || null;
-}
-
 export async function claimsFromToken(token: string, env: Env): Promise<TokenClaims | null> {
   if (!env.SUPABASE_URL) return null;
   const issuer = `${env.SUPABASE_URL.replace(/\/$/, '')}/auth/v1`;
