@@ -102,19 +102,24 @@ export function hasStoredUserData(kind: Kind, storage: KeyValueStorage = browser
   return keys.some((key) => storage.getItem(key) !== null);
 }
 
-function updateMarker(kind: Kind, storage: KeyValueStorage): boolean {
+function updateMarker(kind: Kind | readonly Kind[], storage: KeyValueStorage): boolean {
   try {
+    const kinds = typeof kind === 'string' ? [kind] : kind;
     let value: unknown;
     try { value = JSON.parse(storage.getItem('gf:sync') || 'null'); } catch { value = null; }
-    const previous = record(value) && record(value[kind]) ? value[kind] : {};
-    const at = typeof previous.at === 'number' && Number.isFinite(previous.at) && previous.at >= 0 ? previous.at : 0;
-    const synced = typeof previous.synced === 'number' && Number.isFinite(previous.synced) && previous.synced >= 0 ? previous.synced : 0;
     const marker = record(value) ? value : {};
+    // Каждый вид — от собственной отметки: synced сохраняется, at растёт монотонно
+    const next = (current: Kind) => {
+      const previous = record(marker[current]) ? marker[current] : {};
+      const at = typeof previous.at === 'number' && Number.isFinite(previous.at) && previous.at >= 0 ? previous.at : 0;
+      const synced = typeof previous.synced === 'number' && Number.isFinite(previous.synced) && previous.synced >= 0 ? previous.synced : 0;
+      return kinds.includes(current) ? { at: Math.max(Date.now(), at + 1, synced + 1), synced } : marker[current] ?? { at: 0, synced: 0 };
+    };
     storage.setItem('gf:sync', JSON.stringify({
       ...marker,
       user: typeof marker.user === 'string' ? marker.user : '',
-      custom: kind === 'custom' ? { at: Math.max(Date.now(), at + 1, synced + 1), synced } : marker.custom ?? { at: 0, synced: 0 },
-      data: kind === 'data' ? { at: Math.max(Date.now(), at + 1, synced + 1), synced } : marker.data ?? { at: 0, synced: 0 },
+      custom: next('custom'),
+      data: next('data'),
     }));
     return true;
   } catch { return false; }
@@ -176,6 +181,82 @@ export function createUserData({ storage = browserStorage, onChanged }: {
       try { onChanged?.(registry[key].kind); } catch {}
       return true;
     },
+    snapshot(): { favorites: Record<Lang, Entry[]>; roster: Record<string, unknown>[]; profileUid: string | null; damaged: boolean } {
+      let damaged = false;
+      const list = <K extends 'favorites' | 'roster'>(key: K, lang: Lang = 'ru'): Values[K] => {
+        let value: unknown;
+        try {
+          const raw = storage.getItem(userDataKey(key, lang));
+          if (raw === null) return registry[key].fallback() as Values[K];
+          value = JSON.parse(raw);
+        } catch { damaged = true; return registry[key].fallback() as Values[K]; }
+        if (!Array.isArray(value)) { damaged = true; return registry[key].fallback() as Values[K]; }
+        const filtered = value.filter((item) => validUserData(key, [item])) as Values[K];
+        if (filtered.length !== value.length) damaged = true;
+        return filtered;
+      };
+      let profileUid: string | null = null;
+      try {
+        const raw = storage.getItem(userDataKey('profileUid'));
+        if (raw !== null) {
+          const value: unknown = JSON.parse(raw);
+          if (validUserData('profileUid', value)) profileUid = value;
+          else damaged = true;
+        }
+      } catch { damaged = true; }
+      return {
+        favorites: { ru: list('favorites'), en: list('favorites', 'en'), es: list('favorites', 'es') },
+        roster: list('roster'), profileUid, damaged,
+      };
+    },
+    restore(data: { favorites: Partial<Record<Lang, Entry[]>>; roster: Record<string, unknown>[]; profileUid: string | null; profileCustom?: Record<string, unknown> }): boolean {
+      if (!record(data) || !record(data.favorites) ||
+        Object.keys(data.favorites).some((lang) => !['ru', 'en', 'es'].includes(lang))) return false;
+      const entries = new Map<string, { key: Key; lang: Lang; raw: string; value: unknown }>();
+      const add = <K extends Key>(key: K, value: Values[K], lang: Lang = 'ru') => {
+        const serialized = serializeValue(key, value);
+        if (!serialized) return false;
+        entries.set(userDataKey(key, lang), { key, lang, ...serialized });
+        return true;
+      };
+      for (const lang of ['ru', 'en', 'es'] as const) {
+        if (Object.prototype.hasOwnProperty.call(data.favorites, lang) && !add('favorites', data.favorites[lang]!, lang)) return false;
+      }
+      if (!add('roster', data.roster) || !add('profileUid', data.profileUid)) return false;
+      if (Object.prototype.hasOwnProperty.call(data, 'profileCustom') && !add('profileCustom', data.profileCustom!)) return false;
+      let previous: (readonly [string, string | null])[];
+      try { previous = [...entries.keys(), 'gf:sync'].map((path) => [path, storage.getItem(path)] as const); }
+      catch { return false; }
+      const original = new Map(previous);
+      const written: string[] = [];
+      const kinds: Kind[] = ['data'];
+      if (entries.has(userDataKey('profileCustom'))) kinds.push('custom');
+      try {
+        for (const [path, entry] of entries) {
+          storage.setItem(path, entry.raw);
+          written.push(path);
+        }
+        if (!updateMarker(kinds, storage)) throw new Error('Could not update sync marker');
+        written.push('gf:sync');
+      } catch {
+        for (const path of written.reverse()) try {
+          const value = original.get(path);
+          if (value == null) storage.removeItem(path);
+          else storage.setItem(path, value);
+        } catch {}
+        return false;
+      }
+      for (const [path, value] of previous) {
+        const entry = entries.get(path);
+        if (entry && value !== entry.raw) notifySubscribers(storage, entry.key, entry.value, entry.lang);
+      }
+      for (const kind of kinds) try { onChanged?.(kind); } catch {}
+      return true;
+    },
+    toolUid(own: unknown): string {
+      if (validUserData('profileUid', own) && own !== null) return own;
+      try { return readStrict('profileUid', 'ru', storage) ?? ''; } catch { return ''; }
+    },
     subscribe<K extends Key>(key: K, listener: (value: Values[K], lang: Lang) => void): () => void {
       const listeners = subscribers.get(storage) ?? new Map<Key, Set<Listener>>();
       const group = listeners.get(key) ?? new Set<Listener>();
@@ -196,11 +277,17 @@ export function writePulled(writes: UserDataWrite[], storage: KeyValueStorage = 
     entries.set(userDataKey(key, language), { key, lang: language, ...serialized });
   }
   const previous = [...entries.keys()].map((path) => [path, storage.getItem(path)] as const);
+  const original = new Map(previous);
+  const written: string[] = [];
   try {
-    for (const [path, entry] of entries) storage.setItem(path, entry.raw);
+    for (const [path, entry] of entries) {
+      storage.setItem(path, entry.raw);
+      written.push(path);
+    }
   } catch (error) {
-    for (const [path, value] of previous) try {
-      if (value === null) storage.removeItem(path);
+    for (const path of written.reverse()) try {
+      const value = original.get(path);
+      if (value == null) storage.removeItem(path);
       else storage.setItem(path, value);
     } catch {}
     throw error;

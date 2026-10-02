@@ -60,6 +60,7 @@ const { t } = useData(Astro.currentLocale);
   import { enkaToBuilds, applyBuilds, type SimBuild, type SimIds } from '../../../lib/enka-gcsim';
   import { BASE, LANG, t } from '../../../scripts/search';
   import { onPage, cleanup } from '../../../scripts/router';
+  import { userData } from '../../../scripts/user-data';
 
   type Preset = { config: string; members: { slug: string; alias: string }[]; dps: number; source: string; own?: boolean };
   type Presets = { gcsim: string; presets: Record<string, Preset>; ids: SimIds };
@@ -259,7 +260,7 @@ onPage((signal) => {
       }
     }
   }, { signal });
-  try { uid.value = localStorage.getItem('gf:sim-uid') ?? ''; } catch {}
+  try { uid.value = userData.toolUid(localStorage.getItem('gf:sim-uid')); } catch { uid.value = userData.toolUid(null); }
 });
 </script>
 

@@ -90,6 +90,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   import { onPage, cleanup } from '../../../scripts/router';
   import { openWishStore, type Wish } from '../../../scripts/wish-store';
   import { onSessionChange } from '../../../scripts/user-data/session';
+  import { userData } from '../../../scripts/user-data';
   import { navigate } from 'astro:transitions/client';
 
   type Idx = { characters: { id: number | null; s: string; n: string; i: string | null; r: number }[]; weapons: { id: number; s: string; n: string; i: string | null; r: number }[] };
@@ -168,8 +169,8 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   };
   const savedUid = store.get<string>('gf:wish-uid', '');
   const uids = wishStore.uids();
-  let uid = uids.includes(savedUid) ? savedUid : uids[0] ?? '';
-  if (uid !== savedUid) store.set('gf:wish-uid', uid);
+  let uid = uids.includes(savedUid) ? savedUid : uids[0] ?? (!savedUid ? userData.toolUid(savedUid) : '');
+  if (uid !== savedUid && (uids.length || savedUid)) store.set('gf:wish-uid', uid);
 
   let wipeArmedUid = '';
   let wipeTimer: ReturnType<typeof setTimeout> | undefined;
