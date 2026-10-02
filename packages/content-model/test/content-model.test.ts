@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { collections, documentId, entryId, entryIdFromId, fieldOrder, isDocumentId, localizedPaths, objectTypes } from '../src/index.ts';
+import { collections, documentId, entryId, entryIdFromId, fieldOrder, isDocumentId, localizedPaths, objectTypes, translatableStrings } from '../src/index.ts';
 
 test('объектные типы совпадают с прежней картой', () => {
   const expected = {
@@ -98,4 +98,37 @@ test('id документа и записи образуют круг для к�
 
 test('неверный id записи сохраняет прежнюю ошибку', () => {
   assert.throws(() => entryId('news', { _id: 'news.ru.bad', lang: 'ru', slug: 'bad/name' }), /Sanity: неверный id в коллекции news, документ news\.ru\.bad/);
+});
+
+test('строки билда берутся из отмеченных полей схемы', () => {
+  const data = {
+    role: 'Главный ДД',
+    weapons: [{ slug: 'sword', note: 'Оружие' }],
+    artifacts: [{ sets: ['set'], note: 'Артефакты' }],
+    teams: [{ name: 'Команда', members: ['a', 'b', 'c', 'd'], note: 'Примечание' }],
+    rotations: [{ name: 'Цикл', steps: 'Навык → Взрыв', note: 'Ротация' }],
+    sources: [{ title: 'Источник' }],
+  };
+  assert.deepEqual(translatableStrings('builds', data).sort(), [
+    'Главный ДД', 'Оружие', 'Артефакты', 'Команда', 'Примечание', 'Цикл', 'Навык → Взрыв', 'Ротация',
+  ].sort());
+  assert.deepEqual(translatableStrings('endgameGuides', data), []);
+});
+
+test('строки ротации учитывают localeString (в том числе этажи) и строковых врагов', () => {
+  const data = {
+    cycle: 'Цикл',
+    note: 'Примечание',
+    tags: ['Метка'],
+    buffs: ['Бонус'],
+    stages: [{ name: 'Этап', halves: [{ enemies: ['Враг'], note: 'Половина' }] }],
+    cast: [{ title: 'Состав' }],
+    teams: [{ name: 'Команда', note: 'Совет' }],
+    halves: [{ label: 'Первая половина', tip: 'Подсказка', need: [['pyro']] }],
+    floors: [{ chambers: [{ name: 'Зал' }] }],
+  };
+  assert.deepEqual(translatableStrings('rotations', data).sort(), [
+    'Цикл', 'Примечание', 'Метка', 'Бонус', 'Этап', 'Враг', 'Половина',
+    'Состав', 'Команда', 'Совет', 'Первая половина', 'Подсказка', 'Зал',
+  ].sort());
 });

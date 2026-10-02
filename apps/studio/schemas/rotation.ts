@@ -1,6 +1,8 @@
 import { defineField, defineType } from 'sanity';
 import { rotationTeam } from './objects';
 
+const translate = { translate: true } as any;
+
 export const rotation = defineType({
   name: 'rotation',
   title: 'Ротация',
@@ -18,7 +20,7 @@ export const rotation = defineType({
         { title: 'Натиск', value: 'onslaught' },
       ] },
     }),
-    defineField({ name: 'cycle', title: 'Цикл', type: 'string', validation: (Rule) => Rule.required() }),
+    defineField({ name: 'cycle', title: 'Цикл', type: 'string', options: translate, validation: (Rule) => Rule.required() }),
     defineField({ name: 'start', title: 'Начало', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'end', title: 'Конец', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'draft', title: 'Черновик', type: 'boolean', initialValue: false }),

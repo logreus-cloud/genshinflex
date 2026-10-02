@@ -1,8 +1,14 @@
-// Собирает строки контента, автоматически переводит шаблонные, остальное выводит в /tmp/content-manual.json
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
-import yaml from 'js-yaml';
+// Собирает строки контента, автоматически переводит шаблонные, остальное выводит в .cache/content-manual.json
+// Запуск: npm run i18n:collect (пакет content-model написан на TS, нужен tsx)
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import matter from 'gray-matter';
+import YAML from 'yaml';
+import { translatableEntries } from '@genshinflex/content-model';
+import { createStore } from '../cms/store.mjs';
 
 const root = new URL('../../', import.meta.url);
+const store = createStore({ root: fileURLToPath(root) });
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 const gen = (f) => JSON.parse(read(`src/data/generated/${f}`));
 const ruChars = gen('characters.json'), enChars = gen('characters.en.json'), esChars = gen('characters.es.json');
@@ -12,24 +18,23 @@ const enName = nameBy(enChars), esName = nameBy(esChars);
 
 const strings = new Set();
 const add = (s) => { if (s && /[А-Яа-яЁё]/.test(s)) strings.add(s); };
-for (const f of readdirSync(new URL('src/content/builds/', root))) {
-  const fm = yaml.load(read(`src/content/builds/${f}`).split('---')[1]);
-  add(fm.role);
-  fm.weapons.forEach((w) => add(w.note));
-  fm.artifacts.forEach((a) => add(a.note));
-  fm.teams.forEach((t) => { add(t.name); add(t.note); });
-  (fm.rotations ?? []).forEach((r) => {
-    add(r.name); add(r.note);
-    r.steps.split(/\s*(?:→|->)\s*/).filter(Boolean).forEach(add);
-  });
+for (const id of await store.listEntries('builds')) {
+  const entry = await store.readEntry('builds', id);
+  if (!entry) continue;
+  const parsed = matter(entry.text, { engines: { yaml: (source) => YAML.parse(source) } });
+  const data = Object.fromEntries(Object.entries(parsed.data).map(([key, value]) => [
+    key, value instanceof Date ? value.toISOString().slice(0, 10) : value,
+  ]));
+  for (const { path, value } of translatableEntries('builds', data)) {
+    if (path === 'rotations[].steps') value.split(/\s*(?:→|->)\s*/).filter(Boolean).forEach(add);
+    else add(value);
+  }
 }
-for (const f of readdirSync(new URL('src/content/rotations/', root))) {
-  const r = JSON.parse(read(`src/content/rotations/${f}`));
-  [r.cycle, r.note, ...(r.tags ?? []), ...(r.buffs ?? [])].forEach(add);
-  (r.stages ?? []).forEach((s) => { add(s.name); s.halves.forEach((h) => { h.enemies.forEach(add); add(h.note); }); });
-  (r.cast ?? []).forEach((c) => add(c.title));
-  (r.teams ?? []).forEach((t) => { add(t.name); add(t.note); });
-  (r.halves ?? []).forEach((h) => { add(h.label); add(h.tip); });
+for (const id of await store.listEntries('rotations')) {
+  const entry = await store.readEntry('rotations', id);
+  if (!entry) continue;
+  // Строки этажей Бездны в словарь контента не собираются (как и раньше)
+  translatableEntries('rotations', JSON.parse(entry.text)).filter(({ path }) => !path.startsWith('floors[]')).forEach(({ value }) => add(value));
 }
 // Сгенерированный текст разбора (шаблон)
 add('Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.');
@@ -66,5 +71,6 @@ for (const s of strings) {
   } else manual.push(s);
 }
 writeFileSync(new URL('scripts/i18n/content-auto.json', root), JSON.stringify(auto, null, 1));
-writeFileSync('/tmp/content-manual.json', JSON.stringify(manual.sort(), null, 1));
+mkdirSync(new URL('.cache/', root), { recursive: true });
+writeFileSync(new URL('.cache/content-manual.json', root), JSON.stringify(manual.sort(), null, 1));
 console.log(`всего: ${strings.size}, автоматически: ${Object.keys(auto.en).length}, вручную: ${manual.length}`);

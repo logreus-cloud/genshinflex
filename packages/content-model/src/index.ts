@@ -4,7 +4,7 @@ import { schemaTypes } from '../../../apps/studio/schemas/index.ts';
 
 export type Collection = 'builds' | 'buildsI18n' | 'rotations' | 'banners' | 'news' | 'weaponGuides' | 'endgameGuides';
 type Document = { _id: string; lang?: string; character?: string; slug?: string | { current?: string } };
-export type Shape = { name?: string; jsonType?: string; fields?: { name: string; type: Shape }[]; of?: Shape[] };
+export type Shape = { name?: string; jsonType?: string; options?: { translate?: boolean }; fields?: { name: string; type: Shape; options?: { translate?: boolean } }[]; of?: Shape[] };
 
 export const collections: Record<Collection, { folder: string; type: string; extension: string }> = {
   builds: { folder: 'builds', type: 'build', extension: '.md' },
@@ -18,7 +18,7 @@ export const collections: Record<Collection, { folder: string; type: string; ext
 
 // Встроенные типы Sanity (slug, image…) нужны, чтобы поля с ними разрешались при обходе
 const schema = Schema.compile({ name: 'migration', types: [...builtinTypes, ...schemaTypes] });
-const models = new Map<string, { objects: Record<string, string>; localized: Set<string> }>();
+const models = new Map<string, { objects: Record<string, string>; localized: Set<string>; translatable: Set<string> }>();
 // htmlToBlocks ждёт тип-массив (поле body), а не сам тип блока
 export const buildBodyType = (schema.get('build') as { fields: { name: string; type: unknown }[] }).fields.find((field) => field.name === 'body')!.type;
 
@@ -62,11 +62,14 @@ function model(type: string) {
   if (saved) return saved;
   const objects: Record<string, string> = {};
   const localized = new Set<string>();
+  const translatable = new Set<string>();
   function visit(value: Shape, path: string) {
     if (value.name === 'localeString') {
       localized.add(`${type}:${path}`);
+      translatable.add(path);
       return;
     }
+    if (value.options?.translate && value.jsonType === 'string') translatable.add(path);
     if (value.jsonType === 'array') {
       for (const member of value.of ?? []) visit(member, `${path}[]`);
       return;
@@ -74,13 +77,15 @@ function model(type: string) {
     if (value.jsonType !== 'object' || value.name === 'slug') return;
     if (path && value.name && value.name !== 'object') objects[`${type}:${path}`] ??= value.name;
     for (const field of value.fields ?? []) {
-      if (field.name !== 'body') visit(field.type, path ? `${path}.${field.name}` : field.name);
+      const fieldPath = path ? `${path}.${field.name}` : field.name;
+      if (field.options?.translate && field.type.jsonType === 'string') translatable.add(fieldPath);
+      if (field.name !== 'body') visit(field.type, fieldPath);
     }
   }
   visit(schema.get(type) as unknown as Shape, '');
   // Схема допускает enemy и enemyText в обоих массивах; для этажей прежний выбор — enemy.
   if (type === 'rotation') objects['rotation:floors[].chambers[].halves[].enemies[]'] = 'enemy';
-  const result = { objects, localized };
+  const result = { objects, localized, translatable };
   models.set(type, result);
   return result;
 }
@@ -96,6 +101,37 @@ export function isLocalized(type: string, path: string): boolean {
 export function localizedPaths(type: string): Set<string> {
   return model(type).localized;
 }
+
+function valuesAt(value: unknown, parts: string[]): unknown[] {
+  if (!parts.length) return [value];
+  const [part, ...rest] = parts;
+  const array = part.endsWith('[]');
+  const field = array ? part.slice(0, -2) : part;
+  const next = value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)[field] : undefined;
+  return array ? Array.isArray(next) ? next.flatMap((item) => valuesAt(item, rest)) : [] : valuesAt(next, rest);
+}
+
+export function translatableEntries(collection: Collection, data: unknown): { path: string; value: string }[] {
+  if (collection !== 'builds' && collection !== 'rotations') return [];
+  const type = collections[collection].type;
+  const result: { path: string; value: string }[] = [];
+  for (const path of model(type).translatable) {
+    const enemyName = path.endsWith('.enemies[].name');
+    const source = enemyName ? path.slice(0, -'.name'.length) : path;
+    for (const item of valuesAt(data, source.split('.'))) {
+      const value = enemyName && item && typeof item === 'object' && !Array.isArray(item)
+        ? (item as Record<string, unknown>).name : item;
+      if (typeof value === 'string') result.push({ path, value });
+    }
+  }
+  return result;
+}
+
+export function translatableStrings(collection: Collection, data: unknown): string[] {
+  return translatableEntries(collection, data).map(({ value }) => value);
+}
+
 
 export function fieldOrder(collection: Collection): string[] {
   if (collection === 'buildsI18n' || collections[collection].extension === '.json') return [];
