@@ -17,7 +17,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.5.0';
+const version = '0.5.1';
 
 export type ServiceClient = AdminClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
