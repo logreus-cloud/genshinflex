@@ -39,6 +39,7 @@ const labels = {
 
 <script>
   import { authUrl, errorText, getSupabase, labelsOf, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
+  import { notifySessionChanged } from '../../../scripts/user-data/session';
   onPage('#login', (root) => {
     const next = pageNext();
     for (const link of root.querySelectorAll<HTMLAnchorElement>('[data-page]')) {
@@ -66,7 +67,7 @@ const labels = {
           options: { captchaToken: captcha.token() },
         });
         if (error) throw error;
-        document.dispatchEvent(new Event('gf:auth'));
+        notifySessionChanged();
         location.assign(next || authUrl(root.dataset.base || '', ''));
       } catch (error) {
         status.textContent = error instanceof Error && error.message === 'captcha'

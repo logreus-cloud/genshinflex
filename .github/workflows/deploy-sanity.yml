@@ -60,8 +60,13 @@ jobs:
       - name: Установить зависимости
         run: npm ci
 
+      # Контрактный тест схем, круг md ↔ Sanity, store и API: при расхождении сайт не выкладывается
+      - name: Тесты
+        run: npm test
+
       - name: Собрать и выложить
         env:
+          I18N_STRICT: '1'
           SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

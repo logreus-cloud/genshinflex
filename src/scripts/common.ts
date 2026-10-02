@@ -1,5 +1,6 @@
 import { pageLang } from '../i18n/client';
-import { markChanged } from './profile-sync';
+import { userData, type Lang } from './user-data';
+import { hasSession, onSessionChange } from './user-data/session';
 // Общие клиентские утилиты: безопасное хранилище, недавние/избранное, таймеры по времени сервера.
 
 export type Entry = { href: string; name: string; icon?: string | null; kind: string };
@@ -23,12 +24,13 @@ export const recent = {
 };
 
 export const favorites = {
-  list: () => store.get<Entry[]>(langKey('gf:favs'), []),
+  list: () => userData.get('favorites', pageLang() as Lang),
   has: (href: string) => favorites.list().some((x) => x.href === href),
   toggle(e: Entry) {
-    const list = favorites.list();
+    const lang = pageLang() as Lang;
+    const list = userData.get('favorites', lang);
     const next = list.some((x) => x.href === e.href) ? list.filter((x) => x.href !== e.href) : [e, ...list];
-    if (store.set(langKey('gf:favs'), next)) markChanged('data');
+    userData.set('favorites', next, lang);
     return next.some((x) => x.href === e.href);
   },
 };
@@ -94,7 +96,7 @@ async function updateAccountLink() {
   const turn = ++accountLinkRequest;
 
   try {
-    if (!localStorage.getItem('gf:auth')) return;
+    if (!hasSession()) return;
     const { getSupabase } = await import('./auth');
     const supabase = getSupabase();
     const { data } = await supabase.auth.getSession();
@@ -117,4 +119,4 @@ async function updateAccountLink() {
 
 updateAccountLink();
 document.addEventListener('astro:page-load', updateAccountLink);
-document.addEventListener('gf:auth', updateAccountLink);
+onSessionChange(updateAccountLink);

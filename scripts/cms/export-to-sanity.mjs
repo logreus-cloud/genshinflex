@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+import { contentHash } from '../../src/lib/cms-mapping.ts';
 import { files, readContent, toDocument } from './mapping.mjs';
 
 const documents = [];
@@ -8,6 +9,7 @@ const groups = new Map();
 for (const file of await files()) {
   const { data, body } = await readContent(file);
   const document = toDocument(file, data, body);
+  document.syncHash = contentHash(document);
   documents.push(document);
   counts[document._type] = (counts[document._type] ?? 0) + 1;
   if (!['build', 'news', 'weaponGuide', 'endgameGuide'].includes(document._type)) continue;

@@ -5,9 +5,8 @@
 // а оружие, сеты и команды выводятся для ручного переноса: заметки и статы в билде хранятся по-русски.
 // После записи заявка помечается одобренной.
 import { execSync } from 'node:child_process';
-import matter from 'gray-matter';
-import YAML from 'yaml';
 import { store } from './cms/store.mjs';
+import { addAuthor, buildFromSubmission, guideFromSubmission } from './guides/submission.mjs';
 
 const id = Number(process.argv[2]);
 if (!Number.isInteger(id)) { console.error('Укажите номер заявки: npm run guide:md -- 12'); process.exit(1); }
@@ -28,18 +27,7 @@ if (g.kind === 'weapon' || g.kind === 'endgame') {
   const collection = g.kind === 'weapon' ? 'weaponGuides' : 'endgameGuides';
   const contentId = `${lang}/${g.target}`;
   const previous = await store.readEntry(collection, contentId);
-  const prevAuthors = previous ? matter(previous.text, { engines: { yaml: (source) => YAML.parse(source) } }).data.authors ?? [] : [];
-  const qq = (s) => JSON.stringify(s ?? '');
-  const head = [
-    '---',
-    ...(g.kind === 'endgame' ? [`cycle: ${qq(g.cycle)}`] : []),
-    `updated: ${new Date().toISOString().slice(0, 10)}`,
-    `authors: ${JSON.stringify([...new Set([...prevAuthors, row.author])])}`,
-    ...(g.kind === 'endgame' && g.teams?.length ? ['teams:', ...g.teams.flatMap((t) => [`  - name: ${qq(t.name || 'Команда')}`, `    members: [${t.members.join(', ')}]`, ...(t.note ? [`    note: ${qq(t.note)}`] : [])])] : []),
-    ...(g.external?.length ? ['external:', ...g.external.flatMap((x) => [`  - title: ${qq(x.title)}`, `    url: ${x.url}`, ...(x.author ? [`    author: ${qq(x.author)}`] : []), `    lang: ${x.lang}`])] : []),
-    '---',
-  ].join('\n');
-  const text = `${head}\n\n${g.body.trim()}\n`;
+  const text = guideFromSubmission({ g, previousText: previous?.text, author: row.author, today: new Date().toISOString().slice(0, 10) });
   if (process.argv.includes('--dry')) {
     console.log(`# заявка ${id} · ${g.kind} ${g.target} · ${lang} · ${row.author} · ${row.contact ?? 'без контакта'} · ${row.status}`);
     if (row.comment) console.log(`# комментарий: ${row.comment}`);
@@ -54,39 +42,15 @@ if (g.kind === 'weapon' || g.kind === 'endgame') {
 }
 
 const file = `src/content/builds/${g.character}.md`;
-// Источники и видео из старого билда сохраняем — редактор их не трогает
 const previous = await store.readEntry('builds', g.character);
 const old = previous?.text.replace(/\r\n/g, '\n') ?? '';
-const oldParsed = old ? matter(old, { engines: { yaml: (source) => YAML.parse(source) } }) : null;
-const oldData = oldParsed?.data ?? {};
-const keep = (key) => store.mode === 'sanity'
-  ? oldData[key]?.length ? YAML.stringify({ [key]: oldData[key] }) : ''
-  : old.match(new RegExp(`^${key}:\n(?:  .*\n)+`, 'm'))?.[0] ?? '';
-const oldAuthors = oldData.authors ?? [];
-
-const q = (s) => JSON.stringify(s ?? '');
-const lines = [
-  '---',
-  `character: ${g.character}`,
-  `role: ${q(g.role || 'ДД')}`,
-  `updated: ${new Date().toISOString().slice(0, 10)}`,
-  `patch: ${q(g.patch || '7.1')}`,
-  'weapons:', ...g.weapons.flatMap((w) => [`  - slug: ${w.slug}`, ...(w.note ? [`    note: ${q(w.note)}`] : [])]),
-  'artifacts:', ...g.artifacts.flatMap((a) => [`  - sets: [${a.sets.join(', ')}]`, ...(a.note ? [`    note: ${q(a.note)}`] : [])]),
-  'mainStats:', ...['sands', 'goblet', 'circlet'].map((k) => `  ${k}: ${q(g.mainStats[k] || 'Любой')}`),
-  `substats: [${g.substats.map(q).join(', ')}]`,
-  ...(g.talents.length ? [`talents: [${g.talents.join(', ')}]`] : []),
-  'teams:', ...g.teams.flatMap((t) => [`  - name: ${q(t.name || 'Команда')}`, `    members: [${t.members.join(', ')}]`, ...(t.note ? [`    note: ${q(t.note)}`] : [])]),
-  `authors: ${JSON.stringify([...new Set([...oldAuthors, row.author])])}`,
-  ...(g.external?.length ? ['external:', ...g.external.flatMap((x) => [`  - title: ${q(x.title)}`, `    url: ${x.url}`, ...(x.author ? [`    author: ${q(x.author)}`] : []), `    lang: ${x.lang}`])] : []),
-].join('\n');
 const lang = g.lang ?? 'ru';
-const md = `${lines}\n${keep('sources')}${keep('videos')}${g.external?.length ? '' : keep('external')}---\n\n${g.body}\n`;
+const md = buildFromSubmission({ g, previousText: old, author: row.author, today: new Date().toISOString().slice(0, 10) });
 const i18nFile = `src/content/builds-i18n/${lang}/${g.character}.md`;
 if (process.argv.includes('--dry')) {
   console.log(`# заявка ${id} · ${lang} · ${row.mode === 'edit' ? 'правка' : 'новый гайд'} · ${row.author} · ${row.contact ?? 'без контакта'} · ${row.status}`);
   if (row.comment) console.log(`# комментарий: ${row.comment}`);
-  console.log(lang === 'ru' ? md : `# текст → ${i18nFile}\n${g.body}\n\n# билд (перенести вручную, по-русски):\n${lines}`);
+  console.log(lang === 'ru' ? md : `# текст → ${i18nFile}\n${g.body}\n\n# билд (перенести вручную, по-русски):\n${md.slice(0, md.indexOf('\n---\n') + 4)}`);
   process.exit(0);
 }
 if (lang === 'ru') {
@@ -96,10 +60,7 @@ if (lang === 'ru') {
   if (!old) { console.error(`Русского билда ${file} ещё нет — сначала создайте его, перевод без билда не показывается.`); process.exit(1); }
   const translation = await store.readEntry('buildsI18n', `${lang}/${g.character}`);
   await store.writeEntry('buildsI18n', `${lang}/${g.character}`, `---\n---\n\n${g.body.trim()}\n`, { ifRevision: translation?.rev, mustNotExist: !translation });
-  const authors = `authors: ${JSON.stringify([...new Set([...oldAuthors, row.author])])}`;
-  const updated = store.mode === 'sanity'
-    ? `---\n${YAML.stringify({ ...oldData, authors: [...new Set([...oldAuthors, row.author])] })}---\n${oldParsed.content}`
-    : /^authors: .*$/m.test(old) ? old.replace(/^authors: .*$/m, authors) : old.replace(/\n---\n/, `\n${authors}\n---\n`);
+  const updated = addAuthor({ previousText: old, author: row.author });
   await store.writeEntry('builds', g.character, updated, { ifRevision: previous?.rev });
   console.log(store.mode === 'sanity' ? `Готово: записано в Sanity (${lang}/${g.character}) — сайт пересоберётся сам` : `Готово: записано в файл ${i18nFile} (автор — ${row.author}). Оружие, сеты и команды из заявки сравните с билдом вручную: npm run guide:md -- ${id} --dry`);
 }

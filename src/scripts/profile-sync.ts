@@ -1,7 +1,8 @@
 import { getMedia, type MediaKey } from './profile-media';
+import { hasSession, onSessionChange } from './user-data/session';
+import { cancelScheduledSync, hasStoredUserData, readStrict, userDataKey, validUserData, writePulled, type Kind, type UserDataWrite } from './user-data';
 import type { Entry } from './common';
 
-type Kind = 'custom' | 'data';
 type Result = 'pulled' | 'pushed' | 'same' | 'skipped';
 export type SyncResult = Record<Kind, Result>;
 type Stamp = { at: number; synced: number };
@@ -14,9 +15,7 @@ const mediaKeys: MediaKey[] = ['avatar', 'cover', 'background'];
 const langs = ['ru', 'en', 'es'] as const;
 const blank = (): SyncResult => ({ custom: 'skipped', data: 'skipped' });
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
-const hasSession = () => { try { return !!localStorage.getItem('gf:auth'); } catch { return false; } };
 const timestamp = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0;
-const present = (kind: Kind) => (kind === 'custom' ? ['gf:profile-custom'] : ['gf:favs', 'gf:favs:en', 'gf:favs:es', 'gf:roster', 'gf:profile-uid']).some((key) => localStorage.getItem(key) !== null);
 
 function readMarker(user: string): Marker {
   let value: unknown;
@@ -46,39 +45,17 @@ function stable(user: string, kind: Kind, before: number) {
   return record(value) && value.user === user && record(value[kind]) && value[kind].at === before;
 }
 
-let timer: number | undefined;
-export function markChanged(kind: Kind) {
-  try {
-    let value: unknown;
-    try { value = JSON.parse(localStorage.getItem('gf:sync') || 'null'); } catch { value = null; }
-    const current = readMarker(record(value) && typeof value.user === 'string' ? value.user : '');
-    current[kind].at = Math.max(Date.now(), current[kind].at + 1, current[kind].synced + 1);
-    saveMarker(current);
-  } catch {}
-  if (!hasSession()) return;
-  clearTimeout(timer);
-  timer = window.setTimeout(() => { void syncNow(); }, 1500);
-}
-
-function parsed(key: string, fallback: unknown): unknown {
-  const raw = localStorage.getItem(key);
-  return raw === null ? fallback : JSON.parse(raw);
-}
-const validEntries = (value: unknown): value is Entry[] => Array.isArray(value) && value.every((item) => record(item) && typeof item.href === 'string' && typeof item.name === 'string' && typeof item.kind === 'string' && (item.icon === undefined || item.icon === null || typeof item.icon === 'string'));
-const validRoster = (value: unknown): value is Record<string, unknown>[] => Array.isArray(value) && value.every((item) => record(item) && typeof item.s === 'string');
-const validUid = (value: unknown): value is string | null => value === null || typeof value === 'string' && /^\d{9,10}$/.test(value);
 function localData(): Payload {
-  const favorites = Object.fromEntries(langs.map((lang) => [lang, parsed(lang === 'ru' ? 'gf:favs' : `gf:favs:${lang}`, [])])) as Payload['favorites'];
-  const roster = parsed('gf:roster', []);
-  const uid = parsed('gf:profile-uid', null);
-  if (!langs.every((lang) => validEntries(favorites[lang])) || !validRoster(roster) || !validUid(uid)) throw new Error('Invalid local profile data');
+  const favorites = Object.fromEntries(langs.map((lang) => [lang, readStrict('favorites', lang)])) as Payload['favorites'];
+  const roster = readStrict('roster');
+  const uid = readStrict('profileUid');
   return { favorites, roster, settings: { uid } };
 }
 function cloudData(row: unknown): Payload | null {
   if (!record(row)) return null;
   const favorites = row.favorites, roster = row.roster, settings = row.settings;
   if (!(record(favorites) && langs.some((lang) => Array.isArray(favorites[lang])) || Array.isArray(roster) && roster.length > 0 || record(settings) && 'uid' in settings)) return null;
-  if (!record(favorites) || !langs.every((lang) => validEntries(favorites[lang])) || !validRoster(roster) || !record(settings) || !validUid(settings.uid)) throw new Error('Invalid cloud profile data');
+  if (!record(favorites) || !langs.every((lang) => validUserData('favorites', favorites[lang])) || !validUserData('roster', roster) || !record(settings) || !validUserData('profileUid', settings.uid)) throw new Error('Invalid cloud profile data');
   return { favorites: favorites as Payload['favorites'], roster, settings: { uid: settings.uid } };
 }
 
@@ -142,7 +119,7 @@ function choose(local: boolean, remote: boolean, stamp: Stamp, remoteAt: number)
 
 async function customPart(client: Client, id: string, stamp: Stamp, remote: unknown, updated: unknown, active: () => boolean, conflict: () => void): Promise<Result> {
   if (remote !== null) mediaOf(remote);
-  const raw = localStorage.getItem('gf:profile-custom');
+  const raw = localStorage.getItem(userDataKey('profileCustom'));
   const mode = choose(raw !== null, remote !== null, stamp, timestamp(updated));
   if (mode === 'same') return 'same';
   const local = mode === 'push' ? JSON.parse(raw!) : null;
@@ -163,7 +140,7 @@ async function customPart(client: Client, id: string, stamp: Stamp, remote: unkn
       }
     }
     if (!active() || !stable(id, 'custom', stamp.at)) return 'skipped';
-    localStorage.setItem('gf:profile-custom', JSON.stringify(remote));
+    writePulled([['profileCustom', remote as Record<string, unknown>]]);
     finish(id, 'custom', stamp.at, timestamp(updated), active, true);
     return 'pulled';
   }
@@ -202,22 +179,16 @@ async function customPart(client: Client, id: string, stamp: Stamp, remote: unkn
 }
 async function dataPart(client: Client, id: string, stamp: Stamp, row: unknown, active: () => boolean, conflict: () => void): Promise<Result> {
   const cloud = cloudData(row);
-  const mode = choose(present('data'), cloud !== null, stamp, record(row) ? timestamp(row.updated_at) : 0);
+  const mode = choose(hasStoredUserData('data'), cloud !== null, stamp, record(row) ? timestamp(row.updated_at) : 0);
   if (mode === 'same') return 'same';
   if (mode === 'pull') {
     if (!active() || !stable(id, 'data', stamp.at)) return 'skipped';
     // Все ключи пишутся вместе: при ошибке (например, нет места) возвращаем прежние значения, чтобы не осталось смеси
-    const writes: [string, string][] = [
-      ...langs.map((lang) => [lang === 'ru' ? 'gf:favs' : `gf:favs:${lang}`, JSON.stringify(cloud!.favorites[lang])] as [string, string]),
-      ['gf:roster', JSON.stringify(cloud!.roster)], ['gf:profile-uid', JSON.stringify(cloud!.settings.uid)],
+    const writes: UserDataWrite[] = [
+      ...langs.map((lang): UserDataWrite => ['favorites', cloud!.favorites[lang], lang]),
+      ['roster', cloud!.roster], ['profileUid', cloud!.settings.uid],
     ];
-    const previous = writes.map(([key]) => [key, localStorage.getItem(key)] as const);
-    try {
-      for (const [key, value] of writes) localStorage.setItem(key, value);
-    } catch (error) {
-      for (const [key, value] of previous) try { if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value); } catch {}
-      throw error;
-    }
+    writePulled(writes);
     if (!active()) return 'skipped';
     finish(id, 'data', stamp.at, record(row) ? timestamp(row.updated_at) : 0, active, true);
     return 'pulled';
@@ -287,14 +258,14 @@ async function run(): Promise<SyncResult> {
 
 let tail = Promise.resolve(blank());
 export function syncNow(): Promise<SyncResult> {
-  if (timer !== undefined) clearTimeout(timer);
+  cancelScheduledSync();
   if (retryTimer !== undefined) clearTimeout(retryTimer);
   retryTimer = undefined;
   const next = tail.then(run, run);
   tail = next;
   return next;
 }
-document.addEventListener('gf:auth', () => {
+onSessionChange(() => {
   generation++;
   clearTimeout(retryTimer);
   retryTimer = undefined;

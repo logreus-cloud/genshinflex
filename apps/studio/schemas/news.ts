@@ -26,6 +26,7 @@ export const news = defineType({
     defineField({ name: 'body', title: 'Текст новости', type: 'array', of: [bodyBlock] }),
     defineField({ name: 'bodyMarkdown', title: 'Исходный Markdown', type: 'text', hidden: true }),
     defineField({ name: 'bodyHash', title: 'Отпечаток текста', type: 'string', hidden: true }),
+    defineField({ name: 'syncHash', type: 'string', hidden: true, readOnly: true }),
   ],
   preview: { select: { title: 'title', subtitle: 'date' } },
 });

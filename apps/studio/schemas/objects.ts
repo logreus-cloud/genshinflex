@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 const required = (Rule: any) => Rule.required();
+const translate = { translate: true } as any;
 const elements = ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo']
   .map((value) => ({ title: value, value }));
 
@@ -49,13 +50,13 @@ export const source = defineType({
 export const team = defineType({
   name: 'team', title: 'Команда', type: 'object',
   fields: [
-    defineField({ name: 'name', title: 'Название', type: 'string', description: 'Можно оставить пустым для команд ротации.' }),
+    defineField({ name: 'name', title: 'Название', type: 'string', options: translate, description: 'Можно оставить пустым для команд ротации.' }),
     defineField({
       name: 'members', title: 'Персонажи', type: 'array',
       description: 'Четыре слага персонажей из src/data/generated.',
       of: [{ type: 'string' }], validation: (Rule) => Rule.required().length(4),
     }),
-    defineField({ name: 'note', title: 'Примечание', type: 'text' }),
+    defineField({ name: 'note', title: 'Примечание', type: 'text', options: translate }),
   ],
   preview: { select: { title: 'name', subtitle: 'note' } },
 });
@@ -63,9 +64,9 @@ export const team = defineType({
 export const buildRotation = defineType({
   name: 'buildRotation', title: 'Ротация билда', type: 'object',
   fields: [
-    defineField({ name: 'name', title: 'Название', type: 'string' }),
-    defineField({ name: 'steps', title: 'Шаги', type: 'string', description: 'E — навык, E (удерж.) — удержание, Q — взрыв стихии, M1-M2-M3 — обычные атаки, CA — заряженная атака; шаги разделяются → или ->, перед шагом можно указать имя союзника.', validation: required }),
-    defineField({ name: 'note', title: 'Примечание', type: 'text' }),
+    defineField({ name: 'name', title: 'Название', type: 'string', options: translate }),
+    defineField({ name: 'steps', title: 'Шаги', type: 'string', options: translate, description: 'E — навык, E (удерж.) — удержание, Q — взрыв стихии, M1-M2-M3 — обычные атаки, CA — заряженная атака; шаги разделяются → или ->, перед шагом можно указать имя союзника.', validation: required }),
+    defineField({ name: 'note', title: 'Примечание', type: 'text', options: translate }),
   ],
   preview: { select: { title: 'name', subtitle: 'steps' } },
 });
@@ -108,7 +109,7 @@ export const weaponChoice = defineType({
   name: 'weaponChoice', title: 'Оружие билда', type: 'object',
   fields: [
     defineField({ name: 'slug', title: 'Слаг оружия', type: 'string', validation: required }),
-    defineField({ name: 'note', title: 'Примечание', type: 'string' }),
+    defineField({ name: 'note', title: 'Примечание', type: 'string', options: translate }),
   ],
 });
 
@@ -116,7 +117,7 @@ export const artifactChoice = defineType({
   name: 'artifactChoice', title: 'Артефакты билда', type: 'object',
   fields: [
     defineField({ name: 'sets', title: 'Сеты', type: 'array', of: [{ type: 'string' }], validation: (Rule) => Rule.required().min(1) }),
-    defineField({ name: 'note', title: 'Примечание', type: 'string' }),
+    defineField({ name: 'note', title: 'Примечание', type: 'string', options: translate }),
   ],
 });
 
@@ -176,7 +177,7 @@ export const rotationEnemyHalf = defineType({
         {
           type: 'object', name: 'enemyText', title: 'Враг по названию',
           fields: [
-            defineField({ name: 'name', title: 'Название', type: 'string', validation: required }),
+            defineField({ name: 'name', title: 'Название', type: 'string', options: translate, validation: required }),
             defineField({ name: 'n', title: 'Количество', type: 'number', validation: (Rule) => Rule.integer().min(1) }),
             defineField({ name: 'note', title: 'Примечание', type: 'localeString' }),
           ],

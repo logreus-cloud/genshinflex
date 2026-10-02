@@ -10,6 +10,7 @@ import season from '../data/season.json';
 import social from '../data/social.json';
 import { ogPath } from '../lib/og';
 import { icons } from '../lib/nav-icons';
+import { SECTIONS, NAV_GROUPS, FOOTER_COLUMNS, sectionHref } from '../lib/sections';
 import { useData, LANGS, prefixOf } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
 
@@ -27,28 +28,19 @@ const path = Astro.url.pathname.replace(/^\/(en|es)(?=\/|$)/, '').replace(/\/$/,
 // Та же страница на других языках — для переключателя и hreflang
 const alt = (l: typeof lang) => new URL(`${prefixOf(l)}${path === '/' ? '' : path}/`, Astro.site).toString();
 const OG_LOCALE = { ru: 'ru_RU', en: 'en_US', es: 'es_ES' } as const;
-const MAP_LANG = { ru: 'ru-ru', en: 'en-us', es: 'es-es' } as const;
-
-const nav = [
-  { group: null, items: [['Главная', '/', 'home']] },
-  { group: 'База', items: [['Персонажи', '/characters', 'user'], ['Оружие', '/weapons', 'sword'], ['Артефакты', '/artifacts', 'flower']] },
-  { group: 'Эндгейм', items: [['Все режимы', '/rotation', 'moon'], ['Витая бездна', '/abyss', 'spiral'], ['Театр воображариума', '/theater', 'mask'], ['Натиск', '/onslaught', 'flame']] },
-  { group: 'Таймлайн', items: [['Календарь', '/calendar', 'calendar'], ['Баннеры', '/banners', 'moon']] },
-  { group: 'Гайды', items: [['Руководства', '/guides', 'book']] },
-  { group: 'Сайт', items: [['Мой профиль', '/profile', 'user'], ['Новости сайта', '/news', 'book']] },
-  { group: 'Инструменты', items: [['Симулятор команды', '/tools/simulator', 'chart'], ['Проверка команды', '/tools/team-check', 'check'], ['Трекер круток', '/tools/wishes', 'star'], ['Конструктор ротаций', '/tools/rotation-builder', 'tool'], ['Калькулятор прокачки', '/tools/calculator', 'calc']] },
-  // Разделы, которые выйдут не скоро: отдельно и приглушённо, чтобы не путать с готовыми
-  { group: 'В разработке', soon: true, items: [['Рейтинг', '/rating', 'chart']] },
-] as const;
-
-// Колонки подвала
-const footerCols: [string, [string, string][]][] = [
-  ['База', [['Персонажи', '/characters/'], ['Оружие', '/weapons/'], ['Артефакты', '/artifacts/'], ['Руководства', '/guides/']]],
-  ['Эндгейм', [['Календарь', '/calendar/'], ['Витая бездна', '/abyss/'], ['Театр воображариума', '/theater/'], ['Натиск', '/onslaught/'], ['Баннеры', '/banners/'], ['История баннеров', '/banners/#history'], ['Рейтинг', '/rating/']]],
-  ['Инструменты', [['Симулятор команды', '/tools/simulator/'], ['Проверка команды', '/tools/team-check/'], ['Трекер круток', '/tools/wishes/'], ['Конструктор ротаций', '/tools/rotation-builder/'], ['Калькулятор прокачки', '/tools/calculator/'],
-    ['Карта Тейвата', `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`]]],
-  ['Сайт', [['Новости сайта', '/news/'], ['Telegram-канал', social.telegram], ...(social.discord ? [['Discord-сервер', social.discord] as [string, string]] : []), ['О сайте', '/about/'], ['Обратная связь', '/feedback/'], ['Политика конфиденциальности', '/privacy/'], ['Sitemap', '/sitemap.xml']]],
-];
+const linked = Object.fromEntries(SECTIONS.map((section) => [section.id, sectionHref(section, lang, social)]));
+const nav = NAV_GROUPS.map((group) => ({
+  group,
+  items: SECTIONS.filter((section) => section.navGroup === group).map((section) => ({ ...section, href: sectionHref(section, lang, social)! })),
+}));
+const footerCols = FOOTER_COLUMNS.map((title) => ({
+  title,
+  links: SECTIONS.filter((section) => section.footerColumn === title).sort((a, b) => a.footerOrder! - b.footerOrder!)
+    .flatMap((section) => {
+      const href = sectionHref(section, lang, social);
+      return href ? [{ ...section, href: section.footerOnly ? href : `${href}/` }] : [];
+    }),
+}));
 const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 ---
 <!doctype html>
@@ -94,74 +86,20 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         }
       })();
     </script>
-    <script is:inline>
-      window.gfParallax = function (element, maxX, maxY) {
-        var reduced = matchMedia('(prefers-reduced-motion: reduce)');
-        var coarse = matchMedia('(hover: none), (pointer: coarse)');
-        var x = 0, y = 0, targetX = 0, targetY = 0, frame = 0;
-        function enabled() { return !reduced.matches && !coarse.matches && !document.hidden; }
-        function stop() {
-          cancelAnimationFrame(frame);
-          frame = 0; x = y = targetX = targetY = 0;
-          element.style.setProperty('--px', '0px');
-          element.style.setProperty('--py', '0px');
-          element.style.willChange = '';
-        }
-        function tick() {
-          frame = 0;
-          if (!enabled()) { stop(); return; }
-          x += (targetX - x) * .08;
-          y += (targetY - y) * .08;
-          if (Math.abs(targetX - x) <= .1) x = targetX;
-          if (Math.abs(targetY - y) <= .1) y = targetY;
-          element.style.setProperty('--px', x + 'px');
-          element.style.setProperty('--py', y + 'px');
-          if (x !== targetX || y !== targetY) start();
-          else element.style.willChange = '';
-        }
-        function start() {
-          if (frame || !enabled()) return;
-          element.style.willChange = 'transform';
-          frame = requestAnimationFrame(tick);
-        }
-        function move(event) {
-          if (!enabled()) return;
-          targetX = Math.max(-1, Math.min(1, event.clientX / innerWidth * 2 - 1)) * maxX;
-          targetY = Math.max(-1, Math.min(1, event.clientY / innerHeight * 2 - 1)) * maxY;
-          start();
-        }
-        function center() { targetX = targetY = 0; start(); }
-        function check() { if (!enabled()) stop(); }
-        window.addEventListener('pointermove', move, { passive: true });
-        // pointerleave у window не срабатывает при уходе курсора со страницы — слушаем корневой элемент
-        document.documentElement.addEventListener('pointerleave', center);
-        window.addEventListener('blur', center);
-        document.addEventListener('visibilitychange', check);
-        reduced.addEventListener('change', check);
-        coarse.addEventListener('change', check);
-        return function () {
-          window.removeEventListener('pointermove', move);
-          document.documentElement.removeEventListener('pointerleave', center);
-          window.removeEventListener('blur', center);
-          document.removeEventListener('visibilitychange', check);
-          reduced.removeEventListener('change', check);
-          coarse.removeEventListener('change', check);
-          stop();
-        };
-      };
-    </script>
   </head>
   <body>
     {season.theme && <div class="season-scene" aria-hidden="true" transition:persist="season-scene"></div>}
     {season.theme && <div class="season-snow" aria-hidden="true" transition:persist="season-snow"><span class="snow-small"></span><span class="snow-medium"></span><span class="snow-large"></span></div>}
-    {season.theme && <script is:inline>
-      (() => {
-        if (window.gfSeasonParallaxStarted) return;
-        const scene = document.querySelector('.season-scene');
+    {season.theme && <script>
+      import { parallax } from '../scripts/parallax';
+      const startSeasonParallax = () => {
+        const scene = document.querySelector<HTMLElement>('.season-scene');
         if (!scene) return;
-        window.gfParallax(scene, 14, 10);
-        window.gfSeasonParallaxStarted = true;
-      })();
+        parallax(scene, 14, 10);
+        document.removeEventListener('astro:page-load', startSeasonParallax);
+      };
+      document.addEventListener('astro:page-load', startSeasonParallax);
+      startSeasonParallax();
     </script>}
     <Splash season={season.theme} />
     <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
@@ -174,20 +112,20 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <button class="icon-btn side-close" type="button" aria-label={t('Закрыть меню')}>×</button>
       </div>
       <nav>
-        {nav.map(({ group, items, ...rest }) => (
-          <div class:list={['group', { soon: 'soon' in rest }]}>
+        {nav.map(({ group, items }) => (
+          <div class:list={['group', { soon: items.some((item) => item.soon) }]}>
             {group && <p class="gtitle">{t(group)}</p>}
-            {items.map(([label, href, icon]) => (
+            {items.map(({ label, href, icon, soon }) => (
               <a href={`${base}${href}`} aria-current={active(href) ? 'page' : undefined}>
                 <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" set:html={icons[icon]} />
                 {t(label)}
-                {'soon' in rest && <small class="soon-tag">{t('скоро')}</small>}
+                {soon && <small class="soon-tag">{t('скоро')}</small>}
               </a>
             ))}
           </div>
         ))}
       </nav>
-      <a class="map-card" href={`https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`} target="_blank" rel="noopener">
+      <a class="map-card" href={linked.map} target="_blank" rel="noopener">
         <svg class="contours" viewBox="0 0 200 90" aria-hidden="true" preserveAspectRatio="none">
           <path d="M-10 70c30-18 55-8 80-22s45-30 80-18 40 6 60-4M-10 84c35-16 60-4 88-18s50-26 82-14 38 8 50 2M20 -4c10 18 30 24 52 20s40 6 48 22" />
         </svg>
@@ -241,11 +179,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" /><path d="M4 17c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2" /></svg>
             <span class="account-letter" hidden></span>
           </a>
-          <a class="icon-btn tg" href={social.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
+          <a class="icon-btn tg" href={linked.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17.5 3.5 2.8 9.2c-.6.2-.6 1 0 1.2l3.6 1.2 1.4 4.3c.2.5.8.6 1.1.2l2-2.2 3.7 2.7c.4.3 1 .1 1.1-.4l2.5-11.8c.1-.6-.5-1.1-1-.9ZM6.4 11.6l8.3-5.3-6.4 6.3" /></svg>
           </a>
-          {social.discord && (
-            <a class="icon-btn dc" href={social.discord} target="_blank" rel="noopener" aria-label={t('Discord-сервер проекта')} title={t('Discord-сервер проекта')}>
+          {linked.discord && (
+            <a class="icon-btn dc" href={linked.discord} target="_blank" rel="noopener" aria-label={t('Discord-сервер проекта')} title={t('Discord-сервер проекта')}>
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.1 14.1 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z" /></svg>
             </a>
           )}
@@ -256,11 +194,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
       <SnowDivider />
       <footer class="footer">
         <div class="f-grid">
-          {footerCols.map(([title, links]) => (
+          {footerCols.map(({ title, links }) => (
             <nav class="f-col" aria-label={t(title)}>
               <h2>{t(title)}</h2>
-              <ul>{links.map(([label, href]) => (
-                <li><a href={href.startsWith('http') ? href : `${base}${href}`} {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{t(label)}</a></li>
+              <ul>{links.map(({ label, href, soon }) => (
+                <li><a class={soon ? 'soon' : undefined} href={href.startsWith('http') ? href : `${base}${href}`} {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{t(label)}</a></li>
               ))}</ul>
             </nav>
           ))}
@@ -283,107 +221,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
       </footer>
     </div>
 
-    <script>
-      import '../scripts/common';
-      import { onPage, cleanup } from '../scripts/router';
-      onPage((signal) => {
-      const side = document.getElementById('side');
-      if (!side) return;
-      const root = document.documentElement;
-      document.getElementById('theme')?.addEventListener('click', () => {
-        const dark = root.dataset.theme ? root.dataset.theme === 'dark' : !matchMedia('(prefers-color-scheme: light)').matches;
-        root.dataset.theme = dark ? 'light' : 'dark';
-        try { localStorage.setItem('gf:theme', root.dataset.theme); } catch {}
-      }, { signal });
-      const scrim = document.getElementById('scrim')!, burger = document.getElementById('burger')!;
-      const shell = document.querySelector<HTMLElement>('.shell')!;
-      const searchPanel = document.getElementById('search-panel')!;
-      const searchButtons = [document.getElementById('search-pill')!, document.getElementById('search-icon')!];
-      const languageButton = document.getElementById('language-button')!;
-      const languageMenu = document.getElementById('language-menu')!;
-      const openMenuLabel = burger.getAttribute('aria-label')!;
-      const closeMenuLabel = burger.dataset.closeLabel!;
-      let searchTrigger = searchButtons[0];
-      const closeSearch = (restore = false) => {
-        if (searchPanel.hidden) return;
-        searchPanel.hidden = true;
-        searchButtons.forEach((button) => button.setAttribute('aria-expanded', 'false'));
-        if (restore) searchTrigger.focus({ preventScroll: true });
-      };
-      const closeLanguage = (restore = false) => {
-        if (languageMenu.hidden) return;
-        languageMenu.hidden = true;
-        languageButton.setAttribute('aria-expanded', 'false');
-        if (restore) languageButton.focus({ preventScroll: true });
-      };
-      const toggle = (open: boolean, restore = false) => {
-        if (open) { closeSearch(); closeLanguage(); }
-        if (!open) shell.inert = false;
-        side.classList.toggle('open', open);
-        side.inert = !open;
-        side.setAttribute('aria-hidden', String(!open));
-        scrim.hidden = !open;
-        burger.setAttribute('aria-expanded', String(open));
-        burger.setAttribute('aria-label', open ? closeMenuLabel : openMenuLabel);
-        if (open) {
-          shell.inert = true;
-          side.querySelector<HTMLElement>('.side-close')?.focus({ preventScroll: true });
-        }
-        else if (restore) burger.focus({ preventScroll: true });
-      };
-      cleanup(signal, () => {
-        closeSearch();
-        closeLanguage();
-        toggle(false);
-      });
-      burger.addEventListener('click', () => toggle(!side.classList.contains('open')), { signal });
-      side.querySelector('.side-close')?.addEventListener('click', () => toggle(false, true), { signal });
-      scrim.addEventListener('click', () => toggle(false, true), { signal });
-      searchButtons.forEach((button) => button.addEventListener('click', () => {
-        const open = searchPanel.hidden;
-        closeLanguage();
-        if (open) {
-          searchTrigger = button;
-          searchPanel.hidden = false;
-          searchButtons.forEach((item) => item.setAttribute('aria-expanded', 'true'));
-          searchPanel.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true });
-        } else closeSearch(true);
-      }, { signal }));
-      languageButton.addEventListener('click', () => {
-        const open = languageMenu.hidden;
-        closeSearch();
-        languageMenu.hidden = !open;
-        languageButton.setAttribute('aria-expanded', String(open));
-        if (open) languageMenu.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
-      }, { signal });
-      document.addEventListener('pointerdown', (e) => {
-        const target = e.target as Node;
-        if (!searchPanel.contains(target) && !searchButtons.some((button) => button.contains(target))) closeSearch();
-        if (!languageMenu.contains(target) && !languageButton.contains(target)) closeLanguage();
-      }, { signal });
-      document.addEventListener('keydown', (e) => {
-        if (!side.classList.contains('open')) return;
-        if (e.key === '/') { e.preventDefault(); e.stopPropagation(); }
-        if (e.key !== 'Tab') return;
-        const items = [...side.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')];
-        const first = items[0], last = items.at(-1);
-        if (e.shiftKey && (document.activeElement === first || !side.contains(document.activeElement))) {
-          e.preventDefault();
-          last?.focus({ preventScroll: true });
-        } else if (!e.shiftKey && (document.activeElement === last || !side.contains(document.activeElement))) {
-          e.preventDefault();
-          first?.focus({ preventScroll: true });
-        }
-      }, { capture: true, signal });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (side.classList.contains('open')) toggle(false, true);
-          else if (!searchPanel.hidden) closeSearch(true);
-          else closeLanguage(true);
-        }
-      }, { signal });
-      });
-    </script>
+    <script>import '../scripts/layout-nav';</script>
   </body>
 </html>
 
@@ -510,6 +348,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .f-col h2 { font: 600 .82rem var(--font); color: var(--text); margin: .3rem 0 .8rem; letter-spacing: .02em; }
   .f-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
   .f-col a { color: var(--muted); text-decoration: none; font-size: .82rem; }
+  .f-col a.soon { opacity: .7; }
   .f-col a:hover { color: var(--accent-text); }
   .f-bottom { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1.2rem; display: flex; justify-content: space-between; gap: 2rem; }
   .f-bottom p { color: var(--muted); }

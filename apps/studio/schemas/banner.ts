@@ -20,6 +20,7 @@ export const banner = defineType({
     defineField({ name: 'fourStars', title: 'Персонажи 4★', type: 'array', of: [{ type: 'string' }], initialValue: [] }),
     defineField({ name: 'weapons', title: 'Оружие', type: 'array', of: [{ type: 'string' }], initialValue: [] }),
     defineField({ name: 'sources', title: 'Источники', type: 'array', of: [{ type: 'source' }], initialValue: [] }),
+    defineField({ name: 'syncHash', type: 'string', hidden: true, readOnly: true }),
   ],
   preview: { select: { title: 'version', phase: 'phase' }, prepare: ({ title, phase }) => ({ title: `Версия ${title}`, subtitle: `Фаза ${phase}` }) },
 });

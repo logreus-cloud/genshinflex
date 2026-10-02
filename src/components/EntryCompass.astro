@@ -118,7 +118,6 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {};
     }
     place(0);
     if (!reduced) frame = requestAnimationFrame(follow);
-    var stopParallax = window.gfParallax ? window.gfParallax(gate.querySelector('.parallax'), 16, 10) : function () {};
 
     function cleanupGate() {
       clearTimeout(timer);
@@ -127,7 +126,7 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {};
       document.removeEventListener('astro:before-swap', cleanupGate);
       document.removeEventListener('keydown', onKeydown, true);
       document.removeEventListener('focusin', keepFocus, true);
-      stopParallax();
+      gate.dispatchEvent(new Event('gf:entry-close'));
       // Остановить загрузку видео
       video.pause();
       video.querySelectorAll('source').forEach(function (source) { source.removeAttribute('src'); });
@@ -196,6 +195,31 @@ const butterflies: Record<string, { size: number; track: number[][] }> = {};
     document.addEventListener('focusin', keepFocus, true);
     document.addEventListener('astro:before-swap', cleanupGate, { once: true });
   })();
+</script>
+<script>
+  import { parallax } from '../scripts/parallax';
+  let activeGate: HTMLElement | null = null;
+  let stopParallax: (() => void) | null = null;
+  const stop = () => {
+    if (!stopParallax) return;
+    stopParallax();
+    stopParallax = null;
+    activeGate?.removeEventListener('gf:entry-close', stop);
+    activeGate = null;
+    document.removeEventListener('astro:before-swap', stop);
+  };
+  const start = () => {
+    const gate = document.getElementById('gf-entry');
+    if (!gate || gate.hidden || gate === activeGate) return;
+    const layer = gate.querySelector<HTMLElement>('.parallax');
+    if (!layer) return;
+    activeGate = gate;
+    stopParallax = parallax(layer, 16, 10);
+    gate.addEventListener('gf:entry-close', stop, { once: true });
+    document.addEventListener('astro:before-swap', stop, { once: true });
+  };
+  start();
+  document.addEventListener('astro:page-load', start);
 </script>
 <style>
   /* Фокус содержимого не обводим */

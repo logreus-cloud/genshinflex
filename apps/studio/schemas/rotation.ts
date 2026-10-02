@@ -1,6 +1,8 @@
 import { defineField, defineType } from 'sanity';
 import { rotationTeam } from './objects';
 
+const translate = { translate: true } as any;
+
 export const rotation = defineType({
   name: 'rotation',
   title: 'Ротация',
@@ -18,7 +20,7 @@ export const rotation = defineType({
         { title: 'Натиск', value: 'onslaught' },
       ] },
     }),
-    defineField({ name: 'cycle', title: 'Цикл', type: 'string', validation: (Rule) => Rule.required() }),
+    defineField({ name: 'cycle', title: 'Цикл', type: 'string', options: translate, validation: (Rule) => Rule.required() }),
     defineField({ name: 'start', title: 'Начало', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'end', title: 'Конец', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'draft', title: 'Черновик', type: 'boolean', initialValue: false }),
@@ -31,6 +33,7 @@ export const rotation = defineType({
     defineField({ name: 'stages', title: 'Этапы', type: 'array', of: [{ type: 'rotationStage' }], initialValue: [] }),
     defineField({ name: 'teams', title: 'Общие команды', type: 'array', of: [rotationTeam], initialValue: [] }),
     defineField({ name: 'sources', title: 'Источники', type: 'array', of: [{ type: 'source' }], initialValue: [] }),
+    defineField({ name: 'syncHash', type: 'string', hidden: true, readOnly: true }),
   ],
   preview: { select: { title: 'mode', subtitle: 'cycle' } },
 });

@@ -10,7 +10,8 @@ import season from '../../data/season.json';
 import weaponArt from '../../data/generated/weapon-art.json';
 import namecards from '../../data/generated/namecards.json';
 import { siteNews, newsDate } from '../../lib/news';
-import { calendarItems } from '../../lib/calendar';
+import { calendarItems, serverTime } from '../../lib/calendar';
+import { MODE_SECTIONS, ROTATION_SECTION } from '../../lib/sections';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
@@ -18,9 +19,8 @@ const { characters, weapons, artifacts, getCharacter, MODES, resetAt, base, t, l
 const latestNews = (await siteNews(lang))[0];
 
 const now = new Date();
-const moment = (value: string) => Date.parse(`${value.replace(' ', 'T').slice(0, 16)}+01:00`);
 const calendarArt = (await calendarItems(lang)).filter((item) => item.image);
-const calendarImage = calendarArt.find((item) => moment(item.start) <= now.getTime() && (item.end === null || moment(item.end) > now.getTime())) ?? calendarArt.find((item) => moment(item.start) > now.getTime());
+const calendarImage = calendarArt.find((item) => serverTime(item.start) <= now.getTime() && (item.end === null || serverTime(item.end) > now.getTime())) ?? calendarArt.find((item) => serverTime(item.start) > now.getTime());
 const order = Object.keys(MODES);
 const rotations = (await getCollection('rotations')).sort((a, b) => order.indexOf(a.data.mode) - order.indexOf(b.data.mode));
 
@@ -40,20 +40,15 @@ const weapon = weapons.find((w) => w.slug === weaponSlug);
 const weaponImage = weaponSlug && (weaponArt as string[]).includes(weaponSlug)
   ? `/img/weapons/${weaponSlug}.webp` : weapon?.icon;
 const latestArtifact = [...artifacts].sort((a, b) => parseFloat(b.version) - parseFloat(a.version))[0];
-const modeNames: Record<string, [string, string]> = {
-  abyss: ['Витая бездна', 'spiral'],
-  theater: ['Театр воображариума', 'mask'],
-  onslaught: ['Натиск', 'flame'],
-};
 const modeItems = rotations.map(({ data: r }) => ({
-  label: modeNames[r.mode]?.[0] ?? MODES[r.mode].short,
-  href: `/${r.mode}`,
-  icon: modeNames[r.mode]?.[1] ?? 'moon',
+  label: MODE_SECTIONS[r.mode].label,
+  href: MODE_SECTIONS[r.mode].href,
+  icon: MODE_SECTIONS[r.mode].icon,
   until: resetAt(r.start > now ? r.start : r.end),
 }));
 const modes = [
   ...modeItems,
-  { label: 'Все режимы', href: '/rotation', icon: 'moon', until: modeItems.map((item) => item.until).sort()[0] },
+  { label: ROTATION_SECTION.label, href: ROTATION_SECTION.href, icon: ROTATION_SECTION.icon, until: modeItems.map((item) => item.until).sort()[0] },
 ];
 
 const leaks = characters.filter((c) => c.beta);

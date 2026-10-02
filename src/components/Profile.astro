@@ -247,6 +247,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { onPage } from '../scripts/router';
   import { pageLang } from '../i18n/client';
   import { API_URL } from '../lib/platform';
+  import { hasSession, onSessionChange } from '../scripts/user-data/session';
 
   type Title = { id: string; name_ru: string; name_en: string | null; name_es: string | null; color: string; description: string | null; note?: string | null };
   const colorOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
@@ -280,20 +281,24 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
     // Выход из аккаунта или сбой — титулы скрываются
     const reset = () => { owned = []; active = null; token = ''; field.hidden = true; renderChip(); };
+    let loadRequest = 0;
     const load = async () => {
+      const request = ++loadRequest;
+      const current = () => !signal.aborted && request === loadRequest;
       reset();
-      let stored = false;
-      try { stored = !!localStorage.getItem('gf:auth'); } catch {}
-      if (!stored) return;
+      if (!hasSession()) return;
       try {
         const { getSupabase } = await import('../scripts/auth');
+        if (!current()) return;
         const { data } = await getSupabase().auth.getSession();
-        token = data.session?.access_token || '';
-        if (!token || signal.aborted) return;
-        const response = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${token}` }, signal });
-        if (!response.ok) return;
+        if (!current()) return;
+        const accessToken = data.session?.access_token || '';
+        if (!accessToken) return;
+        const response = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${accessToken}` }, signal });
+        if (!current() || !response.ok) return;
         const me = await response.json() as { titles?: Title[]; active_title?: string | null };
-        if (signal.aborted) return;
+        if (!current()) return;
+        token = accessToken;
         owned = Array.isArray(me.titles) ? me.titles.filter((item) => item && typeof item.id === 'string' && typeof item.name_ru === 'string') : [];
         active = typeof me.active_title === 'string' && owned.some((item) => item.id === me.active_title) ? me.active_title : null;
         field.hidden = false;
@@ -327,7 +332,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }, { signal });
 
     void load();
-    document.addEventListener('gf:auth', () => { void load(); }, { signal });
+    onSessionChange(() => { void load(); }, { signal });
   });
 </script>
 
@@ -336,8 +341,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { BASE, t } from '../scripts/search';
   import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
   import { onPage, cleanup } from '../scripts/router';
-  import { markChanged, syncNow, type SyncResult } from '../scripts/profile-sync';
+  import { syncNow, type SyncResult } from '../scripts/profile-sync';
+  import { userData, userDataKey } from '../scripts/user-data';
   import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
+  import { onSessionChange } from '../scripts/user-data/session';
 
   type Char = { id: number | null; s: string; n: string; i: string };
   type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
@@ -348,7 +355,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss';
   type Effect = 'none' | 'snow' | 'sparks' | 'petals' | 'stars' | 'fireflies' | 'blizzard';
   type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
-  type ImportData = { custom: Custom; favs: Entry[]; roster: { s: string }[]; uid: string | null; media: Partial<Record<MediaKey, Blob>> };
+  // Избранное по языкам: старые файлы экспорта содержат только ru — остальные языки тогда не трогаем
+  type ImportData = { custom: Custom; favs: Partial<Record<'ru' | 'en' | 'es', Entry[]>>; roster: RosterEntry[]; uid: string | null; media: Partial<Record<MediaKey, Blob>> };
+  // Запись «Моих персонажей» целиком: прокачку проверяет и нормализует team-check, профиль её только переносит
+  type RosterEntry = Record<string, unknown> & { s: string };
   type StagedMedia = { blob: Blob; url: string };
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const read = (key: string): unknown => { try { return store.get<unknown>(key, null); } catch { return null; } };
@@ -464,13 +474,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }
     return { value: list, valid };
   }
-  function validRoster(value: unknown) {
+  // known: для показа отбрасываем персонажей, которых нет в каталоге; для переноса (импорт) — только структурная проверка,
+  // как в снимке модуля, чтобы экспортированный файл импортировался без потерь
+  function validRoster(value: unknown, known = true) {
     if (!Array.isArray(value)) return null;
-    const list: { s: string }[] = [];
+    const list: RosterEntry[] = [];
     let valid = true;
     for (const item of value) {
-      if (!isRecord(item) || typeof item.s !== 'string' || !pickerBySlug.has(item.s)) { valid = false; continue; }
-      list.push({ s: item.s });
+      if (!isRecord(item) || typeof item.s !== 'string' || (known && !pickerBySlug.has(item.s))) { valid = false; continue; }
+      list.push({ ...item, s: item.s });
     }
     return { value: list, valid };
   }
@@ -611,7 +623,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const box = $('roster-list');
     box.replaceChildren();
     if (!charsReady) { box.textContent = t('Не удалось загрузить данные персонажей.'); return; }
-    const raw = read('gf:roster');
+    // Для показа читаем мягко: validRoster отбрасывает только повреждённые записи, а не весь список
+    const raw = read(userDataKey('roster'));
     const seen = new Set<string>();
     const valid = validRoster(raw)?.value ?? [];
     const list = valid.filter((item) => charsBySlug.has(item.s) && !seen.has(item.s) && !!seen.add(item.s));
@@ -903,10 +916,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }
   };
   void loadWishes();
-  document.addEventListener('gf:auth', () => { void loadWishes(); }, { signal });
+  onSessionChange(() => { void loadWishes(); }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
-    let raw = read('gf:profile-custom');
+    // Сырое значение: старый формат аватара мигрирует ниже, глубокую проверку делает validCustom
+    let raw = read(userDataKey('profileCustom'));
     if (isRecord(raw) && isRecord(raw.avatar) && raw.avatar.type === 'upload' && typeof raw.avatar.data === 'string') {
       try {
         const blob = await dataUrlToBlob(raw.avatar.data, 'avatar');
@@ -915,7 +929,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         if (!blob || !await commitMedia({ avatar: blob }, version)) throw new Error();
         if (signal.aborted) { await deleteMedia('avatar', version); return; }
         const migrated = { ...raw, avatar: { type: 'upload' }, media: { ...(isRecord(raw.media) ? raw.media : {}), avatar: version } };
-        try { localStorage.setItem('gf:profile-custom', JSON.stringify(migrated)); raw = migrated; }
+        // Миграция формата, а не правка пользователя — без отметки изменений
+        try { localStorage.setItem(userDataKey('profileCustom'), JSON.stringify(migrated)); raw = migrated; }
         catch { await deleteMedia('avatar', version); throw new Error(); }
         await deleteMedia('avatar');
         if (signal.aborted) return;
@@ -936,8 +951,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   void initCustom().then(() => { if (!signal.aborted) void syncNow(); });
   const cachedProfile = validCache(read('gf:profile-cache'));
   const uidInput = $<HTMLInputElement>('profile-uid');
-  const storedUid = read('gf:profile-uid');
-  const uidCleared = (() => { try { return localStorage.getItem('gf:profile-uid') === 'null'; } catch { return false; } })();
+  const storedUid = userData.get('profileUid');
+  // Сохранённый null — пользователь сам стёр UID; отсутствие ключа — UID ещё не задавали
+  const uidCleared = (() => { try { return localStorage.getItem(userDataKey('profileUid')) === 'null'; } catch { return false; } })();
   const selectedUid = uidCleared ? null : uidOk(storedUid) ? storedUid : cachedProfile?.uid;
   if (selectedUid) uidInput.value = selectedUid;
   else if (!uidCleared) for (const key of ['gf:sim-uid', 'gf:wish-uid']) { const value = read(key); if (uidOk(value)) { uidInput.value = value; break; } }
@@ -960,8 +976,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
         renderRoster();
         cancelShowcase();
-        const uid = read('gf:profile-uid');
-        const nextUid = uidOk(uid) ? uid : null;
+        const nextUid = userData.get('profileUid');
         const cached = validCache(read('gf:profile-cache'));
         if (!nextUid || cached?.uid !== nextUid) try { localStorage.removeItem('gf:profile-cache'); } catch {}
         uidInput.value = nextUid ?? '';
@@ -1014,9 +1029,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const picture = isRecord(player.profilePicture) ? num(player.profilePicture.avatarId ?? player.profilePicture.id) : null;
       const shown = Array.isArray(player.showAvatarInfoList) && player.showAvatarInfoList.length ? player.showAvatarInfoList : body.avatarInfoList;
       const showcase = Array.isArray(shown) ? shown.map((item) => isRecord(item) ? num(item.avatarId) : null).filter((id): id is number => id !== null) : [];
+      // UID не сохранился (например, нет места) — витрину не подменяем, чтобы кеш не разошёлся с UID
+      if (!userData.set('profileUid', uid)) return status(t('Не удалось сохранить профиль в этом браузере'), true);
       currentProfile = { uid, time: Date.now(), player: { nickname: typeof player.nickname === 'string' ? player.nickname : '', level: num(player.level) ?? 0,
         worldLevel: num(player.worldLevel) ?? 0, signature: typeof player.signature === 'string' ? player.signature : '', profilePictureId: picture ?? undefined }, showcase };
-      if (store.set('gf:profile-uid', uid)) markChanged('data');
       store.set('gf:profile-cache', currentProfile);
       renderProfile();
       status(t('Витрина обновлена.'));
@@ -1072,9 +1088,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       if (!await commitMedia(changes, version)) throw new Error();
       if (signal.aborted) throw new Error();
       if (!dialog.open || session !== editorSession) throw new Error();
-      localStorage.setItem('gf:profile-custom', JSON.stringify(snapshot));
+      // Импорт: данные из файла и оформление — одной атомарной записью; при сбое ничего не меняется, медиа откатываются в catch
+      const stored = importSnapshot
+        ? userData.restore({ favorites: importSnapshot.favs, roster: importSnapshot.roster, profileUid: importSnapshot.uid, profileCustom: snapshot })
+        : userData.set('profileCustom', snapshot);
+      if (!stored) throw new Error();
       switched = true;
-      markChanged('custom');
       const previous = saved;
       saved = structuredClone(snapshot);
       const previousUrls = new Map(committedUrls);
@@ -1084,8 +1103,6 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       }
       if (importSnapshot) {
         cancelShowcase();
-        const imported = [store.set('gf:favs', importSnapshot.favs), store.set('gf:roster', importSnapshot.roster), store.set('gf:profile-uid', importSnapshot.uid)];
-        if (imported.every(Boolean)) markChanged('data');
         if (importSnapshot.uid === null) try { localStorage.removeItem('gf:profile-cache'); } catch {}
         uidInput.value = importSnapshot.uid ?? '';
         const cached = validCache(read('gf:profile-cache'));
@@ -1173,10 +1190,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   });
   async function exportProfile() {
     const custom = structuredClone(saved);
-    const rawFavs = read('gf:favs'), rawRoster = read('gf:roster'), rawUid = read('gf:profile-uid');
-    const favs = validEntries(rawFavs), roster = validRoster(rawRoster);
-    const damaged = (rawFavs !== null && (!favs || !favs.valid)) || (rawRoster !== null && (!roster || !roster.valid));
-    $('import-status').textContent = damaged ? t('Некоторые повреждённые записи не вошли в экспорт.') : '';
+    // Снимок модуля: те же ключи и проверки, что у синхронизации, избранное — на всех языках
+    const snapshot = userData.snapshot();
+    $('import-status').textContent = snapshot.damaged ? t('Некоторые повреждённые записи не вошли в экспорт.') : '';
     const media: Partial<Record<MediaKey, string>> = {};
     for (const key of mediaKeys) {
       const used = usesMedia(custom, key);
@@ -1193,9 +1209,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const data = {
       'gf:profile-custom': custom,
       'gf:profile-media': media,
-      'gf:favs': favs?.value ?? [],
-      'gf:roster': roster?.value ?? [],
-      'gf:profile-uid': uidOk(rawUid) ? rawUid : null,
+      'gf:favs': snapshot.favorites.ru,
+      'gf:favs:en': snapshot.favorites.en,
+      'gf:favs:es': snapshot.favorites.es,
+      'gf:roster': snapshot.roster,
+      'gf:profile-uid': snapshot.profileUid,
     };
     if (signal.aborted) return;
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
@@ -1235,8 +1253,18 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const mediaRaw = raw['gf:profile-media'];
       const legacy = isRecord(customRaw) && isRecord(customRaw.avatar) && customRaw.avatar.type === 'upload' && typeof customRaw.avatar.data === 'string' ? customRaw.avatar.data : null;
       if (legacy && isRecord(customRaw)) customRaw = { ...customRaw, avatar: { type: 'upload' } };
-      const custom = validCustom(customRaw), favs = validEntries(raw['gf:favs']), roster = validRoster(raw['gf:roster']), uid = raw['gf:profile-uid'];
+      const custom = validCustom(customRaw), favs = validEntries(raw['gf:favs']), roster = validRoster(raw['gf:roster'], false), uid = raw['gf:profile-uid'];
       if (!custom.valid || !favs || !roster || (uid !== null && !uidOk(uid)) || (mediaRaw !== undefined && !isRecord(mediaRaw))) throw new Error();
+      // en/es появились в экспорте позже: если ключа нет — язык не трогаем, если есть, но повреждён — файл неверный
+      const favsByLang: ImportData['favs'] = { ru: favs.value };
+      let favsValid = favs.valid;
+      for (const lang of ['en', 'es'] as const) {
+        if (!Object.prototype.hasOwnProperty.call(raw, `gf:favs:${lang}`)) continue;
+        const list = validEntries(raw[`gf:favs:${lang}`]);
+        if (!list) throw new Error();
+        favsByLang[lang] = list.value;
+        favsValid &&= list.valid;
+      }
       const media: Partial<Record<MediaKey, Blob>> = {};
       for (const key of mediaKeys) {
         const used = key === 'avatar' ? custom.value.avatar.type === 'upload' : key === 'cover' ? custom.value.coverType === 'upload' : custom.value.background.type === 'upload';
@@ -1250,8 +1278,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         } else if (data !== undefined) throw new Error();
       }
       if (!active()) return;
-      pendingImport = { custom: custom.value, favs: favs.value, roster: roster.value, uid: uid as string | null, media };
-      $('import-status').textContent = favs.valid && roster.valid ? t('Файл готов к импорту.') : t('Файл готов к импорту. Некоторые повреждённые записи будут пропущены.');
+      pendingImport = { custom: custom.value, favs: favsByLang, roster: roster.value, uid: uid as string | null, media };
+      $('import-status').textContent = favsValid && roster.valid ? t('Файл готов к импорту.') : t('Файл готов к импорту. Некоторые повреждённые записи будут пропущены.');
       $('replace-profile').hidden = false;
     } catch { if (active()) $('import-status').textContent = t('Неверный файл профиля.'); }
   });

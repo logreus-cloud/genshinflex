@@ -8,9 +8,7 @@ import vm from 'node:vm';
 const source = readFileSync(new URL('../src/pages/[...locale]/tools/team-check.astro', import.meta.url), 'utf8');
 const script = source.match(/<script>([\s\S]*?)<\/script>/)[1].replace(/^\s*import .*;\s*$/gm, '');
 const js = stripTypeScriptTypes(script);
-const newTranslations = readFileSync(new URL('./i18n/ui-part9.py', import.meta.url), 'utf8')
-  .split(/\r?\n/).filter((line) => line.startsWith('('))
-  .map((line) => JSON.parse(`[${line.slice(1, -2)}]`));
+const ui = JSON.parse(readFileSync(new URL('../src/i18n/ui.json', import.meta.url), 'utf8'));
 
 class Element {
   value = ''; innerHTML = ''; textContent = ''; hidden = false; dataset = {};
@@ -40,15 +38,14 @@ for (const lang of ['ru', 'en', 'es']) {
   document.querySelector = node;
   node('picker').hidden = true;
   const saved = new Map();
-  const dict = lang === 'ru' ? {} : JSON.parse(readFileSync(new URL(`../src/i18n/ui.${lang}.json`, import.meta.url), 'utf8'));
+  const dict = lang === 'ru' ? {} : Object.fromEntries(Object.entries(ui).map(([ru, row]) => [ru, row[lang]]));
   if (lang !== 'ru') {
     const placeholders = (text) => [...new Set(text.match(/\{\w+\}/g) ?? [])].sort();
-    for (const [ru, en, es] of newTranslations) {
-      assert.equal(dict[ru], lang === 'en' ? en : es, `${lang}: translation source matches dictionary`);
-      assert.deepEqual(placeholders(dict[ru]), placeholders(ru));
-    }
     for (const [, key] of source.matchAll(/\bt\('([^'\\]*)'/g)) {
-      if (/[А-Яа-яЁё]/.test(key)) assert.ok(dict[key], `${lang}: missing translation: ${key}`);
+      if (/[А-Яа-яЁё]/.test(key)) {
+        assert.ok(dict[key], `${lang}: missing translation: ${key}`);
+        assert.deepEqual(placeholders(dict[key]), placeholders(key));
+      }
     }
   }
   const t = (key, vars = {}) => (dict[key] ?? key).replace(/\{(\w+)\}/g, (m, k) => vars[k] ?? m);

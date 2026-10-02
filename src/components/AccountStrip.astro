@@ -23,6 +23,7 @@ const profileUrl = `${base}/profile/`;
 
 <script>
   import { onPage } from '../scripts/router';
+  import { hasSession, onSessionChange } from '../scripts/user-data/session';
 
   onPage((signal) => {
     const root = document.getElementById('account-strip');
@@ -40,9 +41,7 @@ const profileUrl = `${base}/profile/`;
     const load = async () => {
       const turn = ++request;
       root.hidden = true;
-      let stored = false;
-      try { stored = !!localStorage.getItem('gf:auth'); } catch {}
-      if (!stored) { if (!signal.aborted) show(guest); return; }
+      if (!hasSession()) { if (!signal.aborted) show(guest); return; }
       try {
         const { getSupabase } = await import('../scripts/auth');
         const supabase = getSupabase();
@@ -67,7 +66,7 @@ const profileUrl = `${base}/profile/`;
       } catch { if (!signal.aborted && turn === request) show(guest); }
     };
     void load();
-    document.addEventListener('gf:auth', () => { void load(); }, { signal });
+    onSessionChange(() => { void load(); }, { signal });
   });
 </script>
 

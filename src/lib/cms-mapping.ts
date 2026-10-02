@@ -1,53 +1,6 @@
+import { isLocalized, objectTypes } from '@genshinflex/content-model';
 type Value = string | number | boolean | null | Value[] | { [key: string]: Value };
 type RecordValue = { [key: string]: Value };
-
-const objectTypes: Record<string, string> = {
-  'build:weapons[]': 'weaponChoice',
-  'build:artifacts[]': 'artifactChoice',
-  'build:mainStats': 'mainStats',
-  'build:teams[]': 'team',
-  'build:sources[]': 'source',
-  'build:external[]': 'externalLink',
-  'build:videos[]': 'video',
-  'banner:featured[]': 'featuredCharacter',
-  'banner:sources[]': 'source',
-  'rotation:cast[]': 'rotationCast',
-  'rotation:halves[]': 'rotationHalf',
-  'rotation:halves[].need[]': 'elementGroup',
-  'rotation:floors[]': 'rotationFloor',
-  'rotation:floors[].chambers[]': 'rotationChamber',
-  'rotation:floors[].chambers[].halves[]': 'rotationEnemyHalf',
-  'rotation:floors[].chambers[].halves[].enemies[]': 'enemy',
-  'rotation:floors[].teams[]': 'rotationTeam',
-  'rotation:stages[]': 'rotationStage',
-  'rotation:stages[].halves[]': 'rotationEnemyHalf',
-  'rotation:stages[].halves[].enemies[]': 'enemyText',
-  'rotation:teams[]': 'rotationTeam',
-  'rotation:sources[]': 'source',
-  'endgameGuide:teams[]': 'team',
-  'endgameGuide:external[]': 'externalLink',
-  'weaponGuide:external[]': 'externalLink',
-};
-
-const localized = new Set([
-  'rotation:note',
-  'rotation:tags[]',
-  'rotation:buffs[]',
-  'rotation:cast[].title',
-  'rotation:halves[].label',
-  'rotation:halves[].tip',
-  'rotation:floors[].disorder[]',
-  'rotation:floors[].chambers[].name',
-  'rotation:floors[].chambers[].halves[].note',
-  'rotation:floors[].chambers[].halves[].enemies[].note',
-  'rotation:floors[].teams[].name',
-  'rotation:floors[].teams[].note',
-  'rotation:stages[].name',
-  'rotation:stages[].halves[].note',
-  'rotation:stages[].halves[].enemies[].note',
-  'rotation:teams[].name',
-  'rotation:teams[].note',
-]);
 
 const needs = 'rotation:halves[].need[]';
 const enemyPaths = new Set([
@@ -69,12 +22,35 @@ export function bodyHash(body: unknown): string | undefined {
   return hash(body);
 }
 
+export function contentHash(document: Record<string, unknown>): string {
+  const systemFields = new Set(['_id', '_type', '_rev', '_createdAt', '_updatedAt', 'syncHash']);
+  function canonical(value: unknown, root = false): unknown {
+    if (Array.isArray(value)) return value.map((item) => canonical(item));
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(Object.keys(value)
+        .filter((key) => key !== '_key' && (!root || !systemFields.has(key)))
+        .sort()
+        .map((key) => [key, canonical((value as Record<string, unknown>)[key])]));
+    }
+    return value;
+  }
+  // Своя функция, а не hash(): та берёт только первую половину суррогатной пары (😀 и 😁 совпали бы),
+  // но менять её нельзя — от неё зависят _key и уже сохранённые bodyHash
+  const text = JSON.stringify(canonical(document, true));
+  let result = 2166136261;
+  for (let index = 0; index < text.length; index++) {
+    result ^= text.charCodeAt(index);
+    result = Math.imul(result, 16777619);
+  }
+  return (result >>> 0).toString(36);
+}
+
 function convert(value: Value, type: string, path: string, direction: 'to' | 'from', index = 0): Value {
   const key = `${type}:${path}`;
-  if (direction === 'to' && localized.has(key) && typeof value === 'string') {
+  if (direction === 'to' && isLocalized(type, path) && typeof value === 'string') {
     return { _type: 'localeString', ...(path.endsWith('[]') ? { _key: `${index}-${hash(value)}` } : {}), ru: value };
   }
-  if (direction === 'from' && localized.has(key) && value && !Array.isArray(value) && typeof value === 'object') {
+  if (direction === 'from' && isLocalized(type, path) && value && !Array.isArray(value) && typeof value === 'object') {
     return (value as RecordValue).ru ?? '';
   }
   if (direction === 'to' && key === needs && Array.isArray(value)) {
@@ -99,7 +75,7 @@ function convert(value: Value, type: string, path: string, direction: 'to' | 'fr
       fields[field] = convert(item, type, path ? `${path}.${field}` : field, direction);
     }
     if (direction === 'to') {
-      const objectType = objectTypes[key];
+      const objectType = objectTypes(type)[key];
       if (objectType) {
         fields._type = objectType;
         if (path.endsWith('[]')) fields._key = `${index}-${hash(value)}`;
@@ -121,7 +97,7 @@ export function toSanityData(type: string, data: RecordValue): RecordValue {
 
 export function fromSanityData(type: string, document: RecordValue): RecordValue {
   const data = convert(document, type, '', 'from') as RecordValue;
-  for (const field of ['body', 'bodyMarkdown', 'bodyHash', 'dateTime']) delete data[field];
+  for (const field of ['body', 'bodyMarkdown', 'bodyHash', 'dateTime', 'syncHash']) delete data[field];
   if (type === 'news' && typeof document.dateTime === 'string' && document.dateTime.slice(0, 10) === document.date) data.date = document.dateTime;
   if (type === 'build' || type === 'weaponGuide' || type === 'endgameGuide') delete data.lang;
   if (['news', 'rotation', 'banner', 'weaponGuide', 'endgameGuide'].includes(type)) delete data.slug;

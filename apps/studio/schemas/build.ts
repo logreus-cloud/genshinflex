@@ -2,6 +2,7 @@ import { bodyBlock } from './objects';
 import { defineField, defineType } from 'sanity';
 
 const onlyRussian = ({ document }: { document?: { lang?: string } }) => Boolean(document?.lang && document.lang !== 'ru');
+const translate = { translate: true } as any;
 const requiredForRussian = (Rule: any) => Rule.custom((value: unknown, context: { document?: { lang?: string } }) =>
   (context.document?.lang ?? 'ru') !== 'ru' || value !== undefined && value !== null || 'Обязательно для русской версии');
 
@@ -10,7 +11,7 @@ export const build = defineType({
   fields: [
     defineField({ name: 'lang', title: 'Язык', type: 'string', hidden: true, options: { list: ['ru', 'en', 'es'] }, initialValue: 'ru' }),
     defineField({ name: 'character', title: 'Слаг персонажа', type: 'string', description: 'Структура билда берётся из русской версии. Ссылка на персонажа из src/data/generated.', validation: (Rule) => Rule.required() }),
-    defineField({ name: 'role', title: 'Роль', type: 'string', hidden: onlyRussian, validation: requiredForRussian }),
+    defineField({ name: 'role', title: 'Роль', type: 'string', options: translate, hidden: onlyRussian, validation: requiredForRussian }),
     defineField({ name: 'updated', title: 'Обновлено', type: 'date', hidden: onlyRussian, validation: requiredForRussian }),
     defineField({ name: 'patch', title: 'Патч', type: 'string', hidden: onlyRussian, validation: requiredForRussian }),
     defineField({ name: 'weapons', title: 'Оружие', type: 'array', of: [{ type: 'weaponChoice' }], hidden: onlyRussian, validation: requiredForRussian }),
@@ -41,6 +42,7 @@ export const build = defineType({
     defineField({ name: 'body', title: 'Текст билда', type: 'array', of: [bodyBlock], validation: (Rule) => Rule.required() }),
     defineField({ name: 'bodyMarkdown', title: 'Исходный Markdown', type: 'text', hidden: true }),
     defineField({ name: 'bodyHash', title: 'Отпечаток текста', type: 'string', hidden: true }),
+    defineField({ name: 'syncHash', type: 'string', hidden: true, readOnly: true }),
   ],
   preview: {
     select: { title: 'character', role: 'role', lang: 'lang' },
