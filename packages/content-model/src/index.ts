@@ -135,7 +135,7 @@ export function translatableStrings(collection: Collection, data: unknown): stri
 
 export function fieldOrder(collection: Collection): string[] {
   if (collection === 'buildsI18n' || collections[collection].extension === '.json') return [];
-  const excluded = new Set(['body', 'bodyMarkdown', 'bodyHash', 'dateTime', 'slug']);
+  const excluded = new Set(['body', 'bodyMarkdown', 'bodyHash', 'dateTime', 'slug', 'syncHash']);
   if (['builds', 'weaponGuides', 'endgameGuides'].includes(collection)) excluded.add('lang');
   // image раньше записывался после упорядоченных полей новости.
   if (collection === 'news') excluded.add('image');

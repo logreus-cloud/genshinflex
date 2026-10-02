@@ -42,6 +42,7 @@ export const build = defineType({
     defineField({ name: 'body', title: 'Текст билда', type: 'array', of: [bodyBlock], validation: (Rule) => Rule.required() }),
     defineField({ name: 'bodyMarkdown', title: 'Исходный Markdown', type: 'text', hidden: true }),
     defineField({ name: 'bodyHash', title: 'Отпечаток текста', type: 'string', hidden: true }),
+    defineField({ name: 'syncHash', type: 'string', hidden: true, readOnly: true }),
   ],
   preview: {
     select: { title: 'character', role: 'role', lang: 'lang' },

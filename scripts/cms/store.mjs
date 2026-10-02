@@ -5,6 +5,7 @@ import { createClient } from '@sanity/client';
 import { collections, documentId, entryIdFromId, fieldOrder, isDocumentId } from '@genshinflex/content-model';
 import matter from 'gray-matter';
 import YAML from 'yaml';
+import { bodyHash, contentHash } from '../../src/lib/cms-mapping.ts';
 import { fromDocument, portableTextToMarkdown, toDocument } from './mapping.mjs';
 
 function entry(collection, id, root) {
@@ -33,7 +34,8 @@ function renderText(file, document) {
     ...Object.entries(data).filter(([key]) => !order.includes(key)),
   ]);
   const yaml = Object.keys(ordered).length ? YAML.stringify(ordered).trimEnd() + '\n' : '';
-  const body = document.bodyMarkdown ?? portableTextToMarkdown(document.body ?? []);
+  const body = document.bodyHash === bodyHash(document.body) && typeof document.bodyMarkdown === 'string'
+    ? document.bodyMarkdown : portableTextToMarkdown(document.body ?? []);
   // bodyMarkdown — тело из gray-matter, уже начинается с «\n»: второй перенос копился бы при каждом круге чтение → запись
   const text = body.startsWith('\n') ? body : `\n${body}`;
   return `---\n${yaml}---\n${text.endsWith('\n') ? text : `${text}\n`}`;
@@ -68,11 +70,15 @@ export function createStore({ client, root = process.cwd(), source } = {}) {
   async function readEntry(collection, id) {
     const file = entry(collection, id, root);
     if (mode === 'files') {
-      try { return { text: await readFile(file.path, 'utf8'), rev: null }; }
+      try { return { text: await readFile(file.path, 'utf8'), rev: null, studioEdited: false }; }
       catch (error) { if (error.code === 'ENOENT') return null; throw error; }
     }
     const document = await getClient().fetch('*[_id == $id][0]', { id: documentId(file.collection, file.id) });
-    return document ? { text: renderText(file, document), rev: document._rev } : null;
+    return document ? {
+      text: renderText(file, document),
+      rev: document._rev,
+      studioEdited: !document.syncHash || contentHash(document) !== document.syncHash,
+    } : null;
   }
 
   async function listEntries(collection) {
@@ -108,6 +114,7 @@ export function createStore({ client, root = process.cwd(), source } = {}) {
     const api = getClient(true);
     const { data, body } = parseText(file, text);
     const document = toDocument(file, data, body);
+    document.syncHash = contentHash(document);
     const draft = await api.fetch('*[_id == $id][0]._id', { id: `drafts.${document._id}` }, { perspective: 'raw' });
     if (draft) console.warn(`В Studio есть неопубликованный черновик: ${document._id}; при публикации он перезапишет эту запись`);
 

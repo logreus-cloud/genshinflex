@@ -50,12 +50,15 @@ function sanityPaths(node: Shape, path = '', paths = new Set<string>()): Set<str
 type Exception = { collection: Collection; path: string; reason: string };
 const translatedBuild = 'Перевод билда хранит только текст; структурные поля принадлежат русскому билду.';
 const markdownBody = 'Markdown и Portable Text сохраняются отдельно от полей коллекции.';
+const syncMarker = 'Отметка синхронизации хранится только в Sanity.';
 const sanityOnly: Exception[] = [
+  { collection: 'builds', path: 'syncHash', reason: syncMarker },
   { collection: 'builds', path: 'lang', reason: 'Язык русского билда хранится только в Sanity.' },
   { collection: 'builds', path: 'body', reason: markdownBody },
   { collection: 'builds', path: 'bodyMarkdown', reason: markdownBody },
   { collection: 'builds', path: 'bodyHash', reason: markdownBody },
 
+  { collection: 'buildsI18n', path: 'syncHash', reason: syncMarker },
   { collection: 'buildsI18n', path: 'lang', reason: translatedBuild },
   { collection: 'buildsI18n', path: 'character', reason: translatedBuild },
   { collection: 'buildsI18n', path: 'role', reason: translatedBuild },
@@ -76,6 +79,7 @@ const sanityOnly: Exception[] = [
   { collection: 'buildsI18n', path: 'bodyMarkdown', reason: markdownBody },
   { collection: 'buildsI18n', path: 'bodyHash', reason: markdownBody },
 
+  { collection: 'rotations', path: 'syncHash', reason: syncMarker },
   { collection: 'rotations', path: 'slug', reason: 'Слаг файла хранится только в Sanity.' },
   { collection: 'rotations', path: 'halves[].need[].elements', reason: 'cms-mapping.ts превращает массив стихий в elementGroup.' },
   { collection: 'rotations', path: 'floors[].chambers[].halves[].enemies[].name', reason: 'cms-mapping.ts превращает строкового врага в enemyText.' },
@@ -84,20 +88,24 @@ const sanityOnly: Exception[] = [
   { collection: 'rotations', path: 'stages[].halves[].enemies[].n', reason: 'Sanity допускает enemy наряду с enemyText; zod этапа хранит строки.' },
   { collection: 'rotations', path: 'stages[].halves[].enemies[].note', reason: 'Sanity допускает enemy наряду с enemyText; zod этапа хранит строки.' },
 
+  { collection: 'banners', path: 'syncHash', reason: syncMarker },
   { collection: 'banners', path: 'slug', reason: 'Слаг файла хранится только в Sanity.' },
 
+  { collection: 'news', path: 'syncHash', reason: syncMarker },
   { collection: 'news', path: 'slug', reason: 'Слаг файла хранится только в Sanity.' },
   { collection: 'news', path: 'dateTime', reason: 'cms-mapping.ts сохраняет исходное время отдельно от даты.' },
   { collection: 'news', path: 'body', reason: markdownBody },
   { collection: 'news', path: 'bodyMarkdown', reason: markdownBody },
   { collection: 'news', path: 'bodyHash', reason: markdownBody },
 
+  { collection: 'weaponGuides', path: 'syncHash', reason: syncMarker },
   { collection: 'weaponGuides', path: 'lang', reason: 'Язык берётся из id записи.' },
   { collection: 'weaponGuides', path: 'slug', reason: 'Слаг берётся из id записи.' },
   { collection: 'weaponGuides', path: 'body', reason: markdownBody },
   { collection: 'weaponGuides', path: 'bodyMarkdown', reason: markdownBody },
   { collection: 'weaponGuides', path: 'bodyHash', reason: markdownBody },
 
+  { collection: 'endgameGuides', path: 'syncHash', reason: syncMarker },
   { collection: 'endgameGuides', path: 'lang', reason: 'Язык берётся из id записи.' },
   { collection: 'endgameGuides', path: 'slug', reason: 'Слаг берётся из id записи.' },
   { collection: 'endgameGuides', path: 'body', reason: markdownBody },

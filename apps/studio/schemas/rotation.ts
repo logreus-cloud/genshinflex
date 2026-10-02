@@ -33,6 +33,7 @@ export const rotation = defineType({
     defineField({ name: 'stages', title: 'Этапы', type: 'array', of: [{ type: 'rotationStage' }], initialValue: [] }),
     defineField({ name: 'teams', title: 'Общие команды', type: 'array', of: [rotationTeam], initialValue: [] }),
     defineField({ name: 'sources', title: 'Источники', type: 'array', of: [{ type: 'source' }], initialValue: [] }),
+    defineField({ name: 'syncHash', type: 'string', hidden: true, readOnly: true }),
   ],
   preview: { select: { title: 'mode', subtitle: 'cycle' } },
 });

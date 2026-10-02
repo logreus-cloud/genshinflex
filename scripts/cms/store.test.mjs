@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import matter from 'gray-matter';
 import YAML from 'yaml';
+import { contentHash } from '../../src/lib/cms-mapping.ts';
 import { createStore } from './store.mjs';
 import { toDocument } from './mapping.mjs';
 
@@ -93,18 +94,51 @@ test('Sanity: чтение сохраняет данные и тело, запи
   client.documents.set(original._id, { ...original, _rev: 'before' });
   const read = await store.readEntry('builds', 'albedo');
   assert.equal(read.rev, 'before');
+  // Документ без syncHash (например, импортированный до отметок) считается правленым в Studio
+  assert.equal(read.studioEdited, true);
   const roundtrip = matter(read.text, { engines: { yaml: (text) => YAML.parse(text) } });
   assert.deepEqual(toDocument(file, roundtrip.data, roundtrip.content), original);
 
   const rev = await store.writeEntry('builds', 'albedo', read.text, { ifRevision: read.rev });
   assert.equal(rev, 'rev-1');
   assert.deepEqual(client.commits[0], { returnDocuments: true });
+  const written = client.documents.get(original._id);
+  assert.equal(written.syncHash, contentHash(written));
+  assert.equal((await store.readEntry('builds', 'albedo')).studioEdited, false);
   assert.equal(client.mutations[0][0].patch.ifRevisionID, 'before');
   assert.equal(client.mutations[0][1].kind, 'replace');
   const group = client.documents.get('translation.metadata.build.albedo');
   assert.deepEqual(group.translations.map((item) => item._key), ['ru']);
   await store.writeEntry('builds', 'albedo', read.text);
   assert.deepEqual(group.translations.map((item) => item._key), ['ru']);
+});
+
+test('Sanity: отметка различает правки Studio и перестановку _key', async () => {
+  const client = fakeClient();
+  const store = createStore({ client, source: 'sanity' });
+  await store.writeEntry('builds', 'albedo', build);
+  const document = [...client.documents.values()].find((item) => item._type === 'build');
+  assert.ok(document);
+  document.body[0]._key = 'studio-key';
+  document.body[0].children[0]._key = 'nested-studio-key';
+  assert.equal((await store.readEntry('builds', 'albedo')).studioEdited, false);
+  document.role = 'Изменено в Studio';
+  assert.equal((await store.readEntry('builds', 'albedo')).studioEdited, true);
+  delete document.syncHash;
+  assert.equal((await store.readEntry('builds', 'albedo')).studioEdited, true);
+});
+
+test('Sanity: изменённый body читается вместо устаревшего bodyMarkdown', async () => {
+  const client = fakeClient();
+  const store = createStore({ client, source: 'sanity' });
+  await store.writeEntry('builds', 'albedo', build);
+  const document = [...client.documents.values()].find((item) => item._type === 'build');
+  assert.ok(document);
+  document.body[0].children[0].text = 'Текст из Studio.';
+  const read = await store.readEntry('builds', 'albedo');
+  assert.equal(read.studioEdited, true);
+  assert.match(read.text, /Текст из Studio\./);
+  assert.doesNotMatch(read.text, /Текст билда\./);
 });
 
 test('Sanity: новый документ создаётся без перезаписи существующего', async () => {
@@ -124,7 +158,7 @@ test('Файлы: запись и чтение сохраняют текст п�
   try {
     const store = createStore({ root, source: 'files' });
     await store.writeEntry('buildsI18n', 'en/albedo', build);
-    assert.deepEqual(await store.readEntry('buildsI18n', 'en/albedo'), { text: build, rev: null });
+    assert.deepEqual(await store.readEntry('buildsI18n', 'en/albedo'), { text: build, rev: null, studioEdited: false });
     assert.deepEqual(await store.listEntries('buildsI18n'), ['en/albedo']);
     assert.equal(await readFile(join(root, 'src/content/builds-i18n/en/albedo.md'), 'utf8'), build);
   } finally {

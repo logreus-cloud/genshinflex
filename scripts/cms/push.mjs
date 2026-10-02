@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from 'node:util';
-import { readFile, readdir, mkdir, writeFile, stat } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import { resolve, relative, sep, extname, join } from 'node:path';
 import { collections } from '@genshinflex/content-model';
 import matter from 'gray-matter';
@@ -9,17 +9,12 @@ import { createStore } from './store.mjs';
 
 const folders = Object.fromEntries(Object.entries(collections).map(([collection, config]) => [config.folder, collection]));
 const base = resolve('src/content');
-const stateFile = '.cache/cms-push.json';
 const force = process.argv.includes('--force');
 const dry = process.argv.includes('--dry');
 const inputs = process.argv.slice(2).filter((arg) => !arg.startsWith('--'));
 if (!inputs.length) throw new Error('Укажите файлы или папки внутри src/content');
 
 const store = createStore({ source: 'sanity' });
-let saved;
-try { saved = JSON.parse(await readFile(stateFile, 'utf8')); }
-catch (error) { if (error.code === 'ENOENT') saved = {}; else throw error; }
-
 async function walk(path) {
   const info = await stat(path);
   if (info.isFile()) return ['.md', '.json'].includes(extname(path)) ? [path] : [];
@@ -64,9 +59,8 @@ for (const path of [...new Set(paths)].sort()) {
   const text = await readFile(path, 'utf8');
   const current = await store.readEntry(file.collection, file.id);
   const document = content(file, text);
-  const key = document._id;
   if (current && isDeepStrictEqual(content(file, current.text), document)) { totals.same++; continue; }
-  if (current && saved[key] !== current.rev && !force) {
+  if (current?.studioEdited && !force) {
     console.log(`изменён в Studio: ${file.id}`);
     totals.studio++;
     continue;
@@ -76,10 +70,7 @@ for (const path of [...new Set(paths)].sort()) {
     totals.pushed++;
     continue;
   }
-  const rev = await store.writeEntry(file.collection, file.id, text, { ifRevision: current?.rev, mustNotExist: !current });
-  saved[key] = rev;
-  await mkdir('.cache', { recursive: true });
-  await writeFile(stateFile, `${JSON.stringify(saved, null, 2)}\n`);
+  await store.writeEntry(file.collection, file.id, text, { ifRevision: current?.rev, mustNotExist: !current });
   console.log(`выгружено в Sanity: ${file.id}`);
   totals.pushed++;
 }

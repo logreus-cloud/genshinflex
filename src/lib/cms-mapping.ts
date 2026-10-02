@@ -22,6 +22,29 @@ export function bodyHash(body: unknown): string | undefined {
   return hash(body);
 }
 
+export function contentHash(document: Record<string, unknown>): string {
+  const systemFields = new Set(['_id', '_type', '_rev', '_createdAt', '_updatedAt', 'syncHash']);
+  function canonical(value: unknown, root = false): unknown {
+    if (Array.isArray(value)) return value.map((item) => canonical(item));
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(Object.keys(value)
+        .filter((key) => key !== '_key' && (!root || !systemFields.has(key)))
+        .sort()
+        .map((key) => [key, canonical((value as Record<string, unknown>)[key])]));
+    }
+    return value;
+  }
+  // Своя функция, а не hash(): та берёт только первую половину суррогатной пары (😀 и 😁 совпали бы),
+  // но менять её нельзя — от неё зависят _key и уже сохранённые bodyHash
+  const text = JSON.stringify(canonical(document, true));
+  let result = 2166136261;
+  for (let index = 0; index < text.length; index++) {
+    result ^= text.charCodeAt(index);
+    result = Math.imul(result, 16777619);
+  }
+  return (result >>> 0).toString(36);
+}
+
 function convert(value: Value, type: string, path: string, direction: 'to' | 'from', index = 0): Value {
   const key = `${type}:${path}`;
   if (direction === 'to' && isLocalized(type, path) && typeof value === 'string') {
@@ -74,7 +97,7 @@ export function toSanityData(type: string, data: RecordValue): RecordValue {
 
 export function fromSanityData(type: string, document: RecordValue): RecordValue {
   const data = convert(document, type, '', 'from') as RecordValue;
-  for (const field of ['body', 'bodyMarkdown', 'bodyHash', 'dateTime']) delete data[field];
+  for (const field of ['body', 'bodyMarkdown', 'bodyHash', 'dateTime', 'syncHash']) delete data[field];
   if (type === 'news' && typeof document.dateTime === 'string' && document.dateTime.slice(0, 10) === document.date) data.date = document.dateTime;
   if (type === 'build' || type === 'weaponGuide' || type === 'endgameGuide') delete data.lang;
   if (['news', 'rotation', 'banner', 'weaponGuide', 'endgameGuide'].includes(type)) delete data.slug;
