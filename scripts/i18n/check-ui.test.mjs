@@ -4,10 +4,20 @@ import { test } from 'node:test';
 
 const src = new URL('../../src/', import.meta.url);
 const ui = JSON.parse(readFileSync(new URL('i18n/ui.json', src), 'utf8'));
-const content = Object.fromEntries(['en', 'es'].map((lang) => [
-  lang, JSON.parse(readFileSync(new URL(`i18n/content.${lang}.json`, src), 'utf8')),
-]));
-const placeholders = (value) => [...new Set(value.match(/\{\w+\}/g) ?? [])].sort();
+// Словарь контента собирается так же, как в src/i18n/index.ts: шаблонные переводы, поверх — ручные
+const contentAuto = JSON.parse(readFileSync(new URL('i18n/content-auto.json', src), 'utf8'));
+const contentManual = JSON.parse(readFileSync(new URL('i18n/content.manual.json', src), 'utf8'));
+const content = Object.fromEntries(['en', 'es'].map((lang) => [lang, {
+  ...contentAuto[lang], ...Object.fromEntries(Object.entries(contentManual).map(([ru, value]) => [ru, value[lang]])),
+}]));
+
+test('ручные переводы контента полны и сохраняют плейсхолдеры', () => {
+  const broken = Object.entries(contentManual).filter(([ru, value]) => ['en', 'es'].some((lang) =>
+    typeof value?.[lang] !== 'string' || !value[lang].trim()
+    || JSON.stringify(placeholders(value[lang])) !== JSON.stringify(placeholders(ru))));
+  assert.deepEqual(broken.map(([ru]) => ru), []);
+});
+function placeholders(value) { return [...new Set(value.match(/\{\w+\}/g) ?? [])].sort(); }
 const cyrillic = /[А-Яа-яЁё]/;
 const translations = /\bt\('((?:[^'\\]|\\.)*)'/g;
 

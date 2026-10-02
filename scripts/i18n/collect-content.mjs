@@ -70,7 +70,7 @@ for (const s of strings) {
     auto.en[s] = `${enName.get(slug)} team`; auto.es[s] = `Equipo de ${esName.get(slug)}`;
   } else manual.push(s);
 }
-writeFileSync(new URL('scripts/i18n/content-auto.json', root), JSON.stringify(auto, null, 1));
+writeFileSync(new URL('src/i18n/content-auto.json', root), JSON.stringify(auto, null, 1));
 mkdirSync(new URL('.cache/', root), { recursive: true });
 writeFileSync(new URL('.cache/content-manual.json', root), JSON.stringify(manual.sort(), null, 1));
 console.log(`всего: ${strings.size}, автоматически: ${Object.keys(auto.en).length}, вручную: ${manual.length}`);

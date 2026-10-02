@@ -1,0 +1,914 @@
+{
+ "1-я половина: Звёздное рассеивание": {
+  "en": "1st half: Stellar Swirl",
+  "es": "1.ª mitad: Torbellino Estelar"
+ },
+ "1-я половина: Звёздный проводник": {
+  "en": "1st half: Stellar-Conduct",
+  "es": "1.ª mitad: Superconductor Estelar"
+ },
+ "1-я половина: Рассеивание и Звёздное рассеивание": {
+  "en": "1st half: Swirl and Stellar Swirl",
+  "es": "1.ª mitad: Torbellino y Torbellino Estelar"
+ },
+ "1-я половина: Ризли": {
+  "en": "1st half: Wriothesley",
+  "es": "1.ª mitad: Wriothesley"
+ },
+ "1-я половина: урон Рассеивания +200%, Звёздного рассеивания +75%, бонус Анемо урона +60%": {
+  "en": "1st half: Swirl DMG +200%, Stellar Swirl DMG +75%, Anemo DMG Bonus +60%",
+  "es": "1.ª mitad: daño de Torbellino +200%, Torbellino Estelar +75%, Bono de Daño Anemo +60%"
+ },
+ "2 + 2 — проще набрать 65 000 HP": {
+  "en": "2 + 2 — easier to reach 65,000 HP",
+  "es": "2 + 2: más fácil llegar a 65 000 de Vida"
+ },
+ "2 + 2, временно": {
+  "en": "2 + 2, temporary",
+  "es": "2 + 2, provisional"
+ },
+ "2 + 2, если команде нужна атака": {
+  "en": "2 + 2, if the team needs ATK",
+  "es": "2 + 2, si el equipo necesita ATQ"
+ },
+ "2-я половина: Заряд и Лунный заряд": {
+  "en": "2nd half: Electro-Charged and Lunar-Charged",
+  "es": "2.ª mitad: Electrocargado y Electrocargado Lunar"
+ },
+ "2-я половина: Лунная бутонизация": {
+  "en": "2nd half: Lunar-Bloom",
+  "es": "2.ª mitad: Florecimiento Lunar"
+ },
+ "2-я половина: Лунный заряд": {
+  "en": "2nd half: Lunar-Charged",
+  "es": "2.ª mitad: Electrocargado Lunar"
+ },
+ "2-я половина: Лунный кристалл": {
+  "en": "2nd half: Lunar-Crystallize",
+  "es": "2.ª mitad: Cristalización Lunar"
+ },
+ "2-я половина: урон Заряда +200%, Лунного заряда +75%, бонус Электро урона +60%": {
+  "en": "2nd half: Electro-Charged DMG +200%, Lunar-Charged DMG +75%, Electro DMG Bonus +60%",
+  "es": "2.ª mitad: daño de Electrocargado +200%, Electrocargado Lunar +75%, Bono de Daño Electro +60%"
+ },
+ "3★, бюджетно": {
+  "en": "3★, budget",
+  "es": "3★, económica"
+ },
+ "3★, при высоком шансе крита": {
+  "en": "3★, with high Crit Rate",
+  "es": "3★, con Prob. CRIT alta"
+ },
+ "4 предмета — альтернатив нет": {
+  "en": "4-piece — no real alternatives",
+  "es": "4 piezas: sin alternativas reales"
+ },
+ "4 предмета — бафф атаки команде особенно хорош в Звёздном рассеивании": {
+  "en": "4-piece — the team ATK buff is especially good with Stellar Swirl",
+  "es": "4 piezas: el bono de ATQ al equipo es especialmente bueno con Torbellino Estelar"
+ },
+ "4 предмета — в Звёздном рассеивании или как саб-ДД": {
+  "en": "4-piece — for Stellar Swirl or as a sub DPS",
+  "es": "4 piezas: para Torbellino Estelar o como DPS secundario"
+ },
+ "4 предмета — в командах Звёздного проводника": {
+  "en": "4-piece — in Stellar-Conduct teams",
+  "es": "4 piezas: en equipos de Superconductor Estelar"
+ },
+ "4 предмета — вне Звёздных команд": {
+  "en": "4-piece — outside Stellar teams",
+  "es": "4 piezas: fuera de los equipos Estelares"
+ },
+ "4 предмета — лучший вариант": {
+  "en": "4-piece — best option",
+  "es": "4 piezas: la mejor opción"
+ },
+ "4 предмета — лучший вариант на C6": {
+  "en": "4-piece — best option at C6",
+  "es": "4 piezas: la mejor opción en C6"
+ },
+ "4 предмета — лучший вариант с большим отрывом": {
+  "en": "4-piece — best option by a wide margin",
+  "es": "4 piezas: la mejor opción con diferencia"
+ },
+ "4 предмета — почти безальтернативно": {
+  "en": "4-piece — almost no alternatives",
+  "es": "4 piezas: casi sin alternativas"
+ },
+ "4 предмета, бюджетно": {
+  "en": "4-piece, budget",
+  "es": "4 piezas, económico"
+ },
+ "4 предмета, в Заморозке": {
+  "en": "4-piece, in Freeze",
+  "es": "4 piezas, en Congelación"
+ },
+ "4 предмета, для Катализа": {
+  "en": "4-piece, for Quicken",
+  "es": "4 piezas, para Aceleración"
+ },
+ "4 предмета, для Квикбума": {
+  "en": "4-piece, for Quickbloom",
+  "es": "4 piezas, para Quickbloom"
+ },
+ "4 предмета, если Серенада занята": {
+  "en": "4-piece, if Serenade is taken",
+  "es": "4 piezas, si la Serenata ya está en uso"
+ },
+ "4 предмета, если в команде мало снижения сопротивления": {
+  "en": "4-piece, if the team lacks RES shred",
+  "es": "4 piezas, si al equipo le falta reducción de RES"
+ },
+ "4 предмета, если его не носит Одетта": {
+  "en": "4-piece, if Odette isn't using it",
+  "es": "4 piezas, si Odette no lo usa"
+ },
+ "4 предмета, если никто в команде его не носит": {
+  "en": "4-piece, if nobody else on the team uses it",
+  "es": "4 piezas, si nadie más del equipo lo lleva"
+ },
+ "4 предмета, пока нет основного сета": {
+  "en": "4-piece, until you have the main set",
+  "es": "4 piezas, mientras no tengas el set principal"
+ },
+ "4★ вариант": {
+  "en": "4★ option",
+  "es": "opción 4★"
+ },
+ "4★, энергия и МС команде": {
+  "en": "4★, energy and EM for the team",
+  "es": "4★, energía y Maestría para el equipo"
+ },
+ "4★, энергия команде": {
+  "en": "4★, energy for the team",
+  "es": "4★, energía para el equipo"
+ },
+ "Domovoy Sculptor («Чурин», закалённый)": {
+  "en": "Battle-Hardened Domovoy Sculptor (“Churin”)",
+  "es": "Domovoy Sculptor (“Churin”, curtido)"
+ },
+ "Lightkeeper («Сигурд», закалённый)": {
+  "en": "Battle-Hardened Lightkeeper (“Sigurd”)",
+  "es": "Lightkeeper (“Sigurd”, curtido)"
+ },
+ "R5, бесплатно": {
+  "en": "R5, free",
+  "es": "R5, gratuita"
+ },
+ "R5, бюджетно": {
+  "en": "R5, budget",
+  "es": "R5, económica"
+ },
+ "R5, доступный вариант": {
+  "en": "R5, accessible option",
+  "es": "R5, opción accesible"
+ },
+ "Акт 10: Лучезарный мотылёк-призрак — нужен хилер на всю команду": {
+  "en": "Act 10: Radiant Moonfly — bring a team-wide healer",
+  "es": "Acto 10: Selenimariposa Radiante — lleva un sanador para todo el equipo"
+ },
+ "Акт 3: Пернатый плесенник — уязвим к Электро": {
+  "en": "Act 3: Jadeplume Terrorshroom — weak to Electro",
+  "es": "Acto 3: Espantohongo Plumaverde — débil a Electro"
+ },
+ "Акт 6: Император огня и железа — Пиро-щит, нужен Гидро": {
+  "en": "Act 6: Emperor of Fire and Iron — Pyro shield, bring Hydro",
+  "es": "Acto 6: Emperador Piroacorazado — escudo Pyro, lleva Hydro"
+ },
+ "Акт 8: Pipilpan Idol (закалённый) — уязвим к Заряду / Лунному заряду": {
+  "en": "Act 8: Battle-Hardened Pipilpan Idol — weak to Electro-Charged / Lunar-Charged",
+  "es": "Acto 8: Pipilpan Idol (curtido) — débil a Electrocargado / Electrocargado Lunar"
+ },
+ "Алёша желателен на C6": {
+  "en": "Alyosha preferably at C6",
+  "es": "Alyosha preferiblemente en C6"
+ },
+ "Анемо": {
+  "en": "Anemo",
+  "es": "Anemo"
+ },
+ "Бесплатный вариант": {
+  "en": "Free option",
+  "es": "Opción gratuita"
+ },
+ "Бессмертный конструкт": {
+  "en": "Immortal Construct",
+  "es": "Creación Derivada Inmortal"
+ },
+ "Благословение Бездны: Рассеивание и Звёздное рассеивание вызывают ударную волну с истинным уроном (раз в 4 с.)": {
+  "en": "Abyssal Moon blessing: Swirl and Stellar Swirl release a shockwave dealing True DMG (once every 4 s)",
+  "es": "Bendición del Abismo: Torbellino y Torbellino Estelar liberan una onda de choque de daño verdadero (una vez cada 4 s)"
+ },
+ "Боевой пропуск": {
+  "en": "Battle Pass",
+  "es": "Pase de Batalla"
+ },
+ "Бой 1 — Звёздное сияние": {
+  "en": "Fight 1 — Stellar Glimmer",
+  "es": "Combate 1 — Destello Estelar"
+ },
+ "Бой 1: Домовой-скульптор «Чурин» (закалённый) — пока он лепит ледяные статуи, бейте Звёздным сиянием: статуи взрываются и снижают его сопротивления": {
+  "en": "Fight 1: Battle-Hardened Domovoy Sculptor (“Churin”) — hit it with Stellar Glimmer while it carves ice sculptures: they explode and lower its resistances",
+  "es": "Combate 1: Escultor domovói curtido («Churin») — golpéalo con Destello Estelar mientras talla esculturas de hielo: estallan y reducen sus resistencias"
+ },
+ "Бой 2 — Крио Скирк": {
+  "en": "Fight 2 — Cryo Skirk",
+  "es": "Combate 2 — Skirk Cryo"
+ },
+ "Бой 2: Автоматон таинственного источника: Надсмотрщик — стартует с огромным сопротивлением, частые Крио-удары сбивают его заряд и открывают окно урона": {
+  "en": "Fight 2: Secret Source Automaton: Overseer Device — starts with huge resistance; frequent Cryo hits drain its momentum and open a damage window",
+  "es": "Combate 2: Autómata Fuentenigma - Máquina de control — empieza con una resistencia enorme; los golpes Cryo frecuentes agotan su impulso y abren una ventana de daño"
+ },
+ "Бой 3 — Электро против щита": {
+  "en": "Fight 3 — Electro vs. shield",
+  "es": "Combate 3 — Electro contra el escudo"
+ },
+ "Бой 3: Разящая вьюга — с 80% HP ставит Крио-щит; сломайте его Электро (лунный заряд) или Пиро, и босс на 10 секунд обездвижен с низкими сопротивлениями": {
+  "en": "Fight 3: Guardian Blade of Drifting Snow — raises a Cryo shield at 80% HP; break it with Electro (Lunar-Charged) or Pyro and the boss is stunned for 10 seconds with low resistances",
+  "es": "Combate 3: Espadachina Protectora Surcanieves — al 80% de Vida crea un escudo Cryo; rómpelo con Electro (Carga Lunar) o Pyro y la jefa queda aturdida 10 segundos con resistencias bajas"
+ },
+ "Бэй Доу желательна на C6": {
+  "en": "Beidou preferably at C6",
+  "es": "Beidou preferiblemente en C6"
+ },
+ "Бюджетное Звёздное рассеивание": {
+  "en": "Budget Stellar Swirl",
+  "es": "Torbellino Estelar económico"
+ },
+ "Бюджетный Звёздный проводник": {
+  "en": "Budget Stellar-Conduct",
+  "es": "Superconductor Estelar económico"
+ },
+ "Варка + Дурин": {
+  "en": "Varka + Durin",
+  "es": "Varka + Durin"
+ },
+ "Версия 7.0 — 12-й этаж (уровни врагов 95 / 98 / 100, звёзды за 180 / 300 / 420 с. остатка)": {
+  "en": "Version 7.0 — Floor 12 (enemy levels 95 / 98 / 100, stars for 180 / 300 / 420 s remaining)",
+  "es": "Versión 7.0 — piso 12 (enemigos de nivel 95 / 98 / 100, estrellas con 180 / 300 / 420 s restantes)"
+ },
+ "Версия 7.0 — этажи 9–12": {
+  "en": "Version 7.0 — Floors 9–12",
+  "es": "Versión 7.0: pisos 9–12"
+ },
+ "Версия 7.1": {
+  "en": "Version 7.1",
+  "es": "Versión 7.1"
+ },
+ "Версия 7.1 — «Сияющий фронт»": {
+  "en": "Version 7.1 — “Luminous Battlefront”",
+  "es": "Versión 7.1 — «Frente Luminoso»"
+ },
+ "Взрыв стихии — до выхода главного ДД, чтобы метка охотника и бафф атаки уже работали.": {
+  "en": "Burst before the main DPS comes in, so the hunter's mark and ATK buff are already active.",
+  "es": "Definitiva antes de que entre el DPS principal, para que la marca y la mejora de ATQ ya estén activas."
+ },
+ "Взрыв стихии — когда стоят все три тотема: он сбивает их в мощные удары.": {
+  "en": "Burst when all three totems are up: it turns them into powerful strikes.",
+  "es": "Definitiva cuando estén los tres tótems: los convierte en golpes potentes."
+ },
+ "Взрыв стихии — на полных стаках Морозного сияния.": {
+  "en": "Burst at full Frost Radiance stacks.",
+  "es": "Definitiva con las cargas de Resplandor Gélido al máximo."
+ },
+ "Взрыв стихии — по желанию: командам он не обязателен.": {
+  "en": "Burst is optional: teams don't require it.",
+  "es": "La Definitiva es opcional: los equipos no la necesitan."
+ },
+ "Водяница лечит и снижает сопротивление": {
+  "en": "Vodyanitsa heals and shreds resistance",
+  "es": "Vodyanitsa cura y reduce la resistencia"
+ },
+ "Враги актов пока не объявлены — дополним, когда появятся": {
+  "en": "Act enemies aren't announced yet — we'll add them once they are",
+  "es": "Los enemigos de los actos aún no se han anunciado; los añadiremos cuando se publiquen"
+ },
+ "Гидро": {
+  "en": "Hydro",
+  "es": "Hydro"
+ },
+ "Гидро-саппорт Лунного знамения": {
+  "en": "Moonsign Hydro support",
+  "es": "Apoyo Hydro de Presagio lunar"
+ },
+ "Гиперкэрри": {
+  "en": "Hypercarry",
+  "es": "Hypercarry"
+ },
+ "Гиперкэрри Невиллета": {
+  "en": "Neuvillette hypercarry",
+  "es": "Hipercarry de Neuvillette"
+ },
+ "Гиперцветение Нилу": {
+  "en": "Nilou Hyperbloom",
+  "es": "Hyperbloom de Nilou"
+ },
+ "Главный / внефилдовый ДД, батарея энергии": {
+  "en": "Main / off-field DPS, energy battery",
+  "es": "DPS principal / fuera de campo, batería de energía"
+ },
+ "Главный ДД / саб-ДД Звёздных реакций": {
+  "en": "Main DPS / sub DPS for Stellar reactions",
+  "es": "DPS principal / secundario de reacciones Estelares"
+ },
+ "Главный ДД Звёздного проводника": {
+  "en": "Stellar-Conduct main DPS",
+  "es": "DPS principal de Superconductor Estelar"
+ },
+ "Главный ДД Звёздного рассеивания": {
+  "en": "Stellar Swirl main DPS",
+  "es": "DPS principal de Torbellino Estelar"
+ },
+ "Главный ДД Лунного заряда": {
+  "en": "Lunar-Charged main DPS",
+  "es": "DPS principal de Electrocargado Lunar"
+ },
+ "Главный ДД Лунного кристалла, от защиты": {
+  "en": "Lunar-Crystallize main DPS, DEF scaling",
+  "es": "DPS principal de Cristalización Lunar, escala con DEF"
+ },
+ "Главный ДД Лунной бутонизации": {
+  "en": "Lunar-Bloom main DPS",
+  "es": "DPS principal de Florecimiento Lunar"
+ },
+ "Главный ДД, Обострение / Квикбум": {
+  "en": "Main DPS, Aggravate / Quickbloom",
+  "es": "DPS principal, Intensificación / Quickbloom"
+ },
+ "Главный ДД, обычные атаки": {
+  "en": "Main DPS, Normal Attacks",
+  "es": "DPS principal, Ataques Normales"
+ },
+ "Главный выбор: бафф этажа ровно под него": {
+  "en": "Top pick: the floor buff is made for it",
+  "es": "Primera opción: la bonificación del piso encaja a la perfección"
+ },
+ "Два стартовых персонажа": {
+  "en": "Two opening characters",
+  "es": "Dos personajes iniciales"
+ },
+ "Два стартовых персонажа, Барбара лечит и копит Фурине очки фанфар": {
+  "en": "Two opening characters; Barbara heals and builds Furina's Fanfare",
+  "es": "Dos personajes iniciales; Barbara cura y acumula la Fanfarria de Furina"
+ },
+ "Две стартовых с бонусом +20%": {
+  "en": "Two opening characters with the +20% bonus",
+  "es": "Dos personajes iniciales con el bono del +20%"
+ },
+ "Дендро": {
+  "en": "Dendro",
+  "es": "Dendro"
+ },
+ "Для Звёздного рассеивания: ВЭ и бонус к Звёздному блеску": {
+  "en": "For Stellar Swirl: Energy Recharge and a Stellar Glimmer bonus",
+  "es": "Para Torbellino Estelar: Recarga de Energía y bonificación de Destello Estelar"
+ },
+ "Для Катализа": {
+  "en": "For Quicken",
+  "es": "Para Aceleración"
+ },
+ "Драйвер Цветения": {
+  "en": "Bloom driver",
+  "es": "Activador de Florecimiento"
+ },
+ "Зал 12-1": {
+  "en": "Chamber 12-1",
+  "es": "Sala 12-1"
+ },
+ "Зал 12-2": {
+  "en": "Chamber 12-2",
+  "es": "Sala 12-2"
+ },
+ "Зал 12-3": {
+  "en": "Chamber 12-3",
+  "es": "Sala 12-3"
+ },
+ "Заморозка": {
+  "en": "Freeze",
+  "es": "Congelación"
+ },
+ "Заморозка Лоэна": {
+  "en": "Lohen Freeze",
+  "es": "Congelación de Lohen"
+ },
+ "Заряд Кокоми": {
+  "en": "Kokomi Electro-Charged",
+  "es": "Electrocargado de Kokomi"
+ },
+ "Заряд с гостями": {
+  "en": "Electro-Charged with guests",
+  "es": "Electrocargado con invitados"
+ },
+ "Заряженная атака после навыка — особая.": {
+  "en": "The Charged Attack after the Skill is a special one.",
+  "es": "El Ataque Cargado después de la Habilidad es especial."
+ },
+ "Заряженную атаку держать, пока не заполнится шкала; навык сбрасывает полоску мощности робота.": {
+  "en": "Hold the Charged Attack until the gauge fills; the Skill resets the robot's power bar.",
+  "es": "Mantén el Ataque Cargado hasta llenar el medidor; la Habilidad reinicia la barra de potencia del robot."
+ },
+ "Звёздное рассеивание": {
+  "en": "Stellar Swirl",
+  "es": "Torbellino Estelar"
+ },
+ "Звёздное рассеивание Весны": {
+  "en": "Vesna Stellar Swirl",
+  "es": "Torbellino Estelar de Vesna"
+ },
+ "Звёздное рассеивание Мидзуки": {
+  "en": "Mizuki Stellar Swirl",
+  "es": "Torbellino Estelar de Mizuki"
+ },
+ "Звёздное рассеивание с Водяницей": {
+  "en": "Stellar Swirl with Vodyanitsa",
+  "es": "Torbellino Estelar con Vodyanitsa"
+ },
+ "Звёздное рассеивание с Водяницей и Фарузан": {
+  "en": "Stellar Swirl with Vodyanitsa and Faruzan",
+  "es": "Torbellino Estelar con Vodyanitsa y Faruzan"
+ },
+ "Звёздное рассеивание с Мидзуки": {
+  "en": "Stellar Swirl with Mizuki",
+  "es": "Torbellino Estelar con Mizuki"
+ },
+ "Звёздное рассеивание с Эскофье": {
+  "en": "Stellar Swirl with Escoffier",
+  "es": "Torbellino Estelar con Escoffier"
+ },
+ "Звёздный проводник": {
+  "en": "Stellar-Conduct",
+  "es": "Superconductor Estelar"
+ },
+ "Звёздный проводник Ризли": {
+  "en": "Wriothesley Stellar-Conduct",
+  "es": "Superconductor Estelar de Wriothesley"
+ },
+ "Звёздный проводник Сайно": {
+  "en": "Cyno Stellar-Conduct",
+  "es": "Superconductor Estelar de Cyno"
+ },
+ "Звёздный проводник Сандроне": {
+  "en": "Sandrone Stellar-Conduct",
+  "es": "Superconductor Estelar de Sandrone"
+ },
+ "Звёздный проводник Сандроне (Бездна 7.0)": {
+  "en": "Sandrone Stellar-Conduct (Abyss 7.0)",
+  "es": "Superconductor Estelar de Sandrone (Abismo 7.0)"
+ },
+ "Звёздный проводник с Бэй Доу": {
+  "en": "Stellar-Conduct with Beidou",
+  "es": "Superconductor Estelar con Beidou"
+ },
+ "Звёздный проводник с Николь": {
+  "en": "Stellar-Conduct with Nicole",
+  "es": "Superconductor Estelar con Nicole"
+ },
+ "Звёздный проводник с Ци Ци": {
+  "en": "Stellar-Conduct with Qiqi",
+  "es": "Superconductor Estelar con Qiqi"
+ },
+ "Ивентовое": {
+  "en": "Event weapon",
+  "es": "De evento"
+ },
+ "Ивентовое, бесплатно": {
+  "en": "Event weapon, free",
+  "es": "De evento, gratis"
+ },
+ "Ивентовое, чуть слабее крафтового": {
+  "en": "Event weapon, slightly weaker than the craftable",
+  "es": "De evento, un poco más débil que la forjable"
+ },
+ "Изгнанник пустошей ×9": {
+  "en": "Wilderness Exile ×9",
+  "es": "Espectro de los Páramos ×9"
+ },
+ "Инеффа и Яэ Мико допускаются как особые гости, хотя они Электро": {
+  "en": "Ineffa and Yae Miko are allowed as special guests even though they're Electro",
+  "es": "Ineffa y Yae Miko se permiten como estrellas invitadas aunque son Electro"
+ },
+ "Испытания Арканы: Чёрный доспех (I), Вишап глубин: Исток (II)": {
+  "en": "Arcana Challenges: Shadowy Husks (I), Primordial Bathysmal Vishap (II)",
+  "es": "Desafíos Arcanos: Soldados del Vacío (I), Dragarto de las Profundidades Primordial (II)"
+ },
+ "Каждый лишний персонаж в составе даёт +2 уровня благословения": {
+  "en": "Each extra roster member grants +2 Blessing levels",
+  "es": "Cada miembro extra del elenco otorga +2 niveles de Bendición"
+ },
+ "Квикбум": {
+  "en": "Quickbloom",
+  "es": "Quickbloom"
+ },
+ "Квикбум Сайно": {
+  "en": "Cyno Quickbloom",
+  "es": "Quickbloom de Cyno"
+ },
+ "Квикен Аль-Хайтама": {
+  "en": "Alhaitham Quicken",
+  "es": "Aceleración de Alhaitham"
+ },
+ "Классика: второй навык за ротацию": {
+  "en": "Classic pick: a second skill per rotation",
+  "es": "Clásica: una segunda habilidad por rotación"
+ },
+ "Команды — наш вывод из правил сезона: больше стартовых персонажей с бонусом и особые гости для Электро-реакций.": {
+  "en": "Teams are our own take on the season rules: more bonus opening characters, plus special guests for Electro reactions.",
+  "es": "Los equipos son nuestra interpretación de las reglas de la temporada: más personajes iniciales con bonificación y estrellas invitadas para las reacciones Electro."
+ },
+ "Команды — наш вывод из правил сезона: состав рассчитан так, чтобы собрать больше стартовых персонажей с бонусом и закрыть Гидро- и Электро-проверки актов 6 и 8.": {
+  "en": "These teams are our own take on the season rules: built to field more opening characters with the bonus and to cover the Hydro and Electro checks in Acts 6 and 8.",
+  "es": "Estos equipos son nuestra propuesta según las reglas de la temporada: buscan usar más personajes iniciales con el bono y cubrir las pruebas de Hydro y Electro de los actos 6 y 8."
+ },
+ "Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.": {
+  "en": "Quick build based on community data: role — {role}; options are ranked from best to fallback. A detailed write-up isn't available yet.",
+  "es": "Build rápida basada en datos de la comunidad: rol — {role}; las opciones van de la mejor a la de reserva. Todavía no hay un análisis detallado."
+ },
+ "Крафтовое, лечит команду": {
+  "en": "Craftable, heals the team",
+  "es": "Forjable, cura al equipo"
+ },
+ "Крафтовое, на R5": {
+  "en": "Craftable, at R5",
+  "es": "Forjable, en R5"
+ },
+ "Крафтовый, бонус к Звёздному блеску": {
+  "en": "Craftable, bonus to Stellar Glimmer",
+  "es": "Forjable, bono a Destello Estelar"
+ },
+ "Крио": {
+  "en": "Cryo",
+  "es": "Cryo"
+ },
+ "Крио Скирк": {
+  "en": "Cryo Skirk",
+  "es": "Skirk Cryo"
+ },
+ "Лунная бутонизация": {
+  "en": "Lunar-Bloom",
+  "es": "Florecimiento Lunar"
+ },
+ "Лунная бутонизация (Бездна 7.0)": {
+  "en": "Lunar-Bloom (Abyss 7.0)",
+  "es": "Florecimiento Lunar (Abismo 7.0)"
+ },
+ "Лунная бутонизация Нефер": {
+  "en": "Nefer Lunar-Bloom",
+  "es": "Florecimiento Lunar de Nefer"
+ },
+ "Лунная бутонизация с Линнеей": {
+  "en": "Lunar-Bloom with Linnea",
+  "es": "Florecimiento Lunar con Linnea"
+ },
+ "Лунный заряд": {
+  "en": "Lunar-Charged",
+  "es": "Electrocargado Lunar"
+ },
+ "Лунный заряд (Бездна 7.0)": {
+  "en": "Lunar-Charged (Abyss 7.0)",
+  "es": "Electrocargado Lunar (Abismo 7.0)"
+ },
+ "Лунный заряд Флинса": {
+  "en": "Flins Lunar-Charged",
+  "es": "Electrocargado Lunar de Flins"
+ },
+ "Лунный заряд с Айно": {
+  "en": "Lunar-Charged with Aino",
+  "es": "Electrocargado Lunar con Aino"
+ },
+ "Лунный кристалл": {
+  "en": "Lunar-Crystallize",
+  "es": "Cristalización Lunar"
+ },
+ "Лунный кристалл Цзы Бай": {
+  "en": "Zibai Lunar-Crystallize",
+  "es": "Cristalización Lunar de Zibai"
+ },
+ "Лунный кристалл с Коломбиной (Бездна 7.0)": {
+  "en": "Lunar-Crystallize with Columbina (Abyss 7.0)",
+  "es": "Cristalización Lunar con Columbina (Abismo 7.0)"
+ },
+ "Лучший 4★, на R5": {
+  "en": "Best 4★, at R5",
+  "es": "La mejor 4★, en R5"
+ },
+ "Лучший F2P-вариант, R5 из рыбалки": {
+  "en": "Best F2P option, R5 from fishing",
+  "es": "Mejor opción F2P, R5 con la pesca"
+ },
+ "Лучший бесплатный вариант": {
+  "en": "Best free option",
+  "es": "Mejor opción gratuita"
+ },
+ "Лучший бесплатный вариант: HP и бафф следующему персонажу": {
+  "en": "Best free option: HP plus a buff for the next character",
+  "es": "Mejor opción gratuita: Vida y un bono para el siguiente personaje"
+ },
+ "Лучший вариант": {
+  "en": "Best option",
+  "es": "La mejor opción"
+ },
+ "Лучший вариант: ВЭ и атака от ВЭ": {
+  "en": "Best option: Energy Recharge and ATK from Energy Recharge",
+  "es": "La mejor opción: Recarga de Energía y ATQ según la Recarga"
+ },
+ "Максимум баффов в ульту Райдэн": {
+  "en": "Maximum buffs for Raiden's burst",
+  "es": "Máximo de bonificaciones para la definitiva de Raiden"
+ },
+ "Меч реющих ветров доводить до третьего уровня; Q — вместо одного из циклов. Перед уходом с поля набрать максимум стаков бонуса к Звёздному рассеиванию.": {
+  "en": "Bring the Windborne Sword to level three; Q replaces one of the cycles. Before leaving the field, max out the Stellar Swirl bonus stacks.",
+  "es": "Lleva la Espada del Viento al nivel tres; Q sustituye uno de los ciclos. Antes de salir del campo, acumula al máximo la bonificación de Torbellino Estelar."
+ },
+ "Навык — каждый раз по откату; взрыв стихии — только чтобы закрыть паузу, пока навык на перезарядке.": {
+  "en": "Skill every time it's off cooldown; Burst only to fill the gap while the Skill recharges.",
+  "es": "Habilidad cada vez que termine el enfriamiento; Definitiva solo para cubrir el hueco mientras se recarga."
+ },
+ "Навык — снова по откату.": {
+  "en": "Skill again when it's off cooldown.",
+  "es": "Habilidad otra vez cuando termine el enfriamiento."
+ },
+ "Нацкоманда Райдэн": {
+  "en": "Raiden National",
+  "es": "National de Raiden"
+ },
+ "Нужен Анемо-персонаж и стихия, которую он рассеивает: этаж усиливает урон Рассеивания на 200%, благословение добавляет истинный урон за каждое Рассеивание. Все враги — одиночные боссы.": {
+  "en": "You need an Anemo character plus an element to Swirl: the floor boosts Swirl DMG by 200% and the blessing adds True DMG on every Swirl. Every enemy is a single boss.",
+  "es": "Necesitas un personaje Anemo y un elemento que dispersar: el piso aumenta el daño de Torbellino un 200% y la bendición añade daño verdadero con cada Torbellino. Todos los enemigos son jefes únicos."
+ },
+ "Нужны Электро и Гидро: этаж усиливает Заряд на 200% и Лунный заряд на 75%, а большинство врагов прячутся за щитами, которые эффективно снимает именно эта реакция.": {
+  "en": "You need Electro and Hydro: the floor boosts Electro-Charged by 200% and Lunar-Charged by 75%, and most enemies hide behind shields that this reaction breaks efficiently.",
+  "es": "Necesitas Electro e Hydro: el piso aumenta Electrocargado un 200% y Electrocargado Lunar un 75%, y la mayoría de enemigos se esconden tras escudos que esta reacción rompe con eficacia."
+ },
+ "Нужны частые Крио-попадания, а не один мощный взрыв": {
+  "en": "Needs frequent Cryo hits rather than one big burst",
+  "es": "Necesita golpes Cryo frecuentes, no una sola gran explosión"
+ },
+ "Нёвиллет + Фурина": {
+  "en": "Neuvillette + Furina",
+  "es": "Neuvillette + Furina"
+ },
+ "Обострение": {
+  "en": "Aggravate",
+  "es": "Intensificación"
+ },
+ "Обратное таяние": {
+  "en": "Reverse Melt",
+  "es": "Derretido inverso"
+ },
+ "Опричник: Штурмовик огненного клинка («Раскольников»)": {
+  "en": "Oprichniki Fireblade Shock Trooper (“Raskolnikov”)",
+  "es": "Opríchnik Fatui - Comando filoígneo (“Raskolnikov”)"
+ },
+ "Особые гости": {
+  "en": "Special guests",
+  "es": "Invitados especiales"
+ },
+ "Особые гости получают двойной бонус к характеристикам": {
+  "en": "Special guest stars get double the stat bonus",
+  "es": "Las estrellas invitadas obtienen el doble de bonificación de atributos"
+ },
+ "Пар Тартальи": {
+  "en": "Tartaglia Vaporize",
+  "es": "Vaporización de Tartaglia"
+ },
+ "Пар Ху Тао": {
+  "en": "Hu Tao Vaporize",
+  "es": "Vaporización de Hu Tao"
+ },
+ "Перегрузка": {
+  "en": "Overloaded",
+  "es": "Sobrecarga"
+ },
+ "Перегрузка + Пар, Райдэн восполняет энергию всей команде": {
+  "en": "Overloaded + Vaporize, Raiden restores energy for the whole team",
+  "es": "Sobrecarga + Vaporización, Raiden recarga energía a todo el equipo"
+ },
+ "Перегрузка Арлекино": {
+  "en": "Arlecchino Overloaded",
+  "es": "Sobrecarga de Arlecchino"
+ },
+ "Перерыв между сезонами: сезон 7.0 (Крылатая химера-лев, Оперативник ветра, Железный утёнок) закончился 22 сентября. Следующий откроется 30 сентября — боссы ещё не объявлены.": {
+  "en": "Between seasons: the 7.0 season (Chimeric Winged Lion, Wind Operative, Knuckle Duckle) ended on September 22. The next one opens on September 30 — bosses not announced yet.",
+  "es": "Entre temporadas: la temporada 7.0 (León Quimérico Alado, Soldado Fatui - Senescal Anemo, Puñopato) terminó el 22 de septiembre. La siguiente abre el 30 de septiembre; aún no se han anunciado los jefes."
+ },
+ "Персонажа нельзя использовать в двух боях — оставьте Электро-отряд на третий бой": {
+  "en": "A character can't be used in two fights — save your Electro team for the third fight",
+  "es": "Un personaje no puede usarse en dos combates: guarda tu equipo Electro para el tercero"
+ },
+ "Повелитель скрытых глубин: Шёпот кошмаров": {
+  "en": "Lord of the Hidden Depths: Whisperer of Nightmares",
+  "es": "Susurrador de Pesadillas de las Profundidades Insondables"
+ },
+ "Прямое попадание в бафф этажа и благословение": {
+  "en": "A direct fit for the floor buff and the blessing",
+  "es": "Encaja de lleno con la bonificación del piso y la bendición"
+ },
+ "Райдэн «Нацкоманда»": {
+  "en": "Raiden “National”",
+  "es": "Raiden «National»"
+ },
+ "Рассеивание": {
+  "en": "Swirl",
+  "es": "Torbellino"
+ },
+ "Режим «Бедствие»: уложиться в 180 секунд — награда за прохождение": {
+  "en": "Dire difficulty: clear within 180 seconds for the reward",
+  "es": "Dificultad Funesta: supérala en menos de 180 segundos para obtener la recompensa"
+ },
+ "Решает проблему крита": {
+  "en": "Fixes the crit problem",
+  "es": "Resuelve el problema del CRIT"
+ },
+ "Рыболов скрытых глубин ×4": {
+  "en": "Fisher of Hidden Depths ×4",
+  "es": "Pescador de las Profundidades Insondables ×4"
+ },
+ "Саб-ДД / саппорт Лунного заряда": {
+  "en": "Sub DPS / support for Lunar-Charged",
+  "es": "DPS secundario / apoyo de Electrocargado Lunar"
+ },
+ "Саб-ДД / ядро Звёздных реакций": {
+  "en": "Sub DPS / core of Stellar reactions",
+  "es": "DPS secundario / núcleo de reacciones Estelares"
+ },
+ "Саб-ДД, офф-филдовый Гидро": {
+  "en": "Sub DPS, off-field Hydro",
+  "es": "DPS secundario, Hydro fuera de campo"
+ },
+ "Саб-ДД, офф-филдовый Электро": {
+  "en": "Sub DPS, off-field Electro",
+  "es": "DPS secundario, Electro fuera de campo"
+ },
+ "Самая высокая базовая атака": {
+  "en": "Highest base ATK",
+  "es": "El ATQ base más alto"
+ },
+ "Саппорт / лечение, Гиперцветение": {
+  "en": "Support / healing, Hyperbloom",
+  "es": "Apoyo / curación, Hyperbloom"
+ },
+ "Саппорт / саб-ДД для Лунных реакций, масштабируется от HP": {
+  "en": "Support / sub DPS for Lunar reactions, HP scaling",
+  "es": "Apoyo / DPS secundario para reacciones Lunares, escala con Vida"
+ },
+ "Саппорт Анемо и Звёздного рассеивания": {
+  "en": "Anemo and Stellar Swirl support",
+  "es": "Apoyo Anemo y de Torbellino Estelar"
+ },
+ "Саппорт Лунного знамения": {
+  "en": "Moonsign support",
+  "es": "Apoyo de Presagio lunar"
+ },
+ "Саппорт Лунного знамения, от защиты": {
+  "en": "Moonsign support, DEF scaling",
+  "es": "Apoyo de Presagio lunar, escala con DEF"
+ },
+ "Саппорт Лунной бутонизации и Цветения": {
+  "en": "Lunar-Bloom and Bloom support",
+  "es": "Apoyo de Florecimiento Lunar y Florecimiento"
+ },
+ "Саппорт, Электро для Звёздного проводника": {
+  "en": "Support, Electro for Stellar-Conduct",
+  "es": "Apoyo, Electro para Superconductor Estelar"
+ },
+ "Саппорт, баффер атаки": {
+  "en": "Support, ATK buffer",
+  "es": "Apoyo, potenciador de ATQ"
+ },
+ "Саппорт, офф-филдовый Электро": {
+  "en": "Support, off-field Electro",
+  "es": "Apoyo, Electro fuera de campo"
+ },
+ "Саппорт: включает Звёздное рассеивание, лечит, снижает сопротивление": {
+  "en": "Support: enables Stellar Swirl, heals, shreds RES",
+  "es": "Apoyo: activa Torbellino Estelar, cura y reduce RES"
+ },
+ "Саппорт: сопротивления, МС, группировка": {
+  "en": "Support: RES shred, EM, grouping",
+  "es": "Apoyo: reducción de RES, Maestría, agrupación"
+ },
+ "Саппорты E/Q": {
+  "en": "Supports E/Q",
+  "es": "Apoyos E/Q"
+ },
+ "Сахароза допускается как особый гость, хотя она Анемо": {
+  "en": "Sucrose is allowed as a special guest even though she's Anemo",
+  "es": "Sacarosa está permitida como invitada especial aunque es Anemo"
+ },
+ "Сезон 27 — стихии: Гидро, Электро, Дендро": {
+  "en": "Season 27 — elements: Hydro, Electro, Dendro",
+  "es": "Temporada 27 — elementos: Hydro, Electro, Dendro"
+ },
+ "Сезон 28 — стихии: Гидро, Крио, Анемо": {
+  "en": "Season 28 — elements: Hydro, Cryo, Anemo",
+  "es": "Temporada 28 — elementos: Hydro, Cryo, Anemo"
+ },
+ "Сигнатурка": {
+  "en": "Signature",
+  "es": "Arma exclusiva"
+ },
+ "Сигнатурка Одетты, почти не уступает": {
+  "en": "Odette's signature, nearly as good",
+  "es": "Arma exclusiva de Odette, casi igual de buena"
+ },
+ "Сигнатурка, есть на баннере оружия 7.1": {
+  "en": "Signature, on the 7.1 weapon banner",
+  "es": "Arma exclusiva, en el gachapón de armas 7.1"
+ },
+ "Сигнатурка, лучший вариант": {
+  "en": "Signature, best option",
+  "es": "Arma exclusiva, la mejor opción"
+ },
+ "Сигнатурка, на 5–10% сильнее остальных": {
+  "en": "Signature, 5–10% stronger than the rest",
+  "es": "Arma exclusiva, un 5–10% más fuerte que las demás"
+ },
+ "Ситлали — стартовая с бонусом": {
+  "en": "Citlali is an opening character with the bonus",
+  "es": "Citlali es personaje inicial con la bonificación"
+ },
+ "Скиталец": {
+  "en": "Wanderer",
+  "es": "Trotamundos"
+ },
+ "Стартовые персонажи": {
+  "en": "Opening characters",
+  "es": "Personajes iniciales"
+ },
+ "Стартовые персонажи получают +20% к макс. HP, атаке и защите": {
+  "en": "Opening characters get +20% Max HP, ATK and DEF",
+  "es": "Los personajes iniciales obtienen +20% de Vida máx., ATQ y DEF"
+ },
+ "Сяо": {
+  "en": "Xiao",
+  "es": "Xiao"
+ },
+ "Тазер": {
+  "en": "Taser",
+  "es": "Taser"
+ },
+ "Тазер Инеффы": {
+  "en": "Ineffa Taser",
+  "es": "Taser de Ineffa"
+ },
+ "Три босса, два из них требуют Крио — заранее прокачайте два разных Крио-отряда или Крио и Звёздное сияние.": {
+  "en": "Three bosses, two of them want Cryo — build two different Cryo teams in advance, or Cryo plus Stellar Glimmer.",
+  "es": "Tres jefes, dos de ellos piden Cryo: prepara de antemano dos equipos Cryo distintos, o Cryo y Destello Estelar."
+ },
+ "Три стартовых персонажа": {
+  "en": "Three opening characters",
+  "es": "Tres personajes iniciales"
+ },
+ "Фарузан желательна на C6": {
+  "en": "Faruzan preferably at C6",
+  "es": "Faruzan preferiblemente en C6"
+ },
+ "Хилер": {
+  "en": "Healer",
+  "es": "Sanador"
+ },
+ "Химера-землерой (закалённая)": {
+  "en": "Battle-Hardened Chimeric Burrowbeast",
+  "es": "Bestia Quimérica Terralanzadera (curtida)"
+ },
+ "Цветение Нилу": {
+  "en": "Nilou Bloom",
+  "es": "Florecimiento de Nilou"
+ },
+ "Цветение Нилу с Кокоми": {
+  "en": "Nilou Bloom with Kokomi",
+  "es": "Florecimiento de Nilou con Kokomi"
+ },
+ "Часка": {
+  "en": "Chasca",
+  "es": "Chasca"
+ },
+ "Электро": {
+  "en": "Electro",
+  "es": "Electro"
+ },
+ "Энергия команде": {
+  "en": "Energy for the team",
+  "es": "Energía para el equipo"
+ },
+ "большинство врагов под щитами — ломаются Зарядом / Лунным зарядом": {
+  "en": "most enemies are shielded — break them with Electro-Charged / Lunar-Charged",
+  "es": "la mayoría de enemigos tienen escudo; rómpelos con Electrocargado / Electrocargado Lunar"
+ },
+ "бюджетно": {
+  "en": "budget",
+  "es": "económica"
+ },
+ "для HP-билда": {
+  "en": "for an HP build",
+  "es": "para una build de Vida"
+ },
+ "один босс": {
+  "en": "single boss",
+  "es": "un solo jefe"
+ },
+ "смена персонажа": {
+  "en": "switch",
+  "es": "cambio"
+ }
+}
