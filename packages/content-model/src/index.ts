@@ -4,7 +4,7 @@ import { schemaTypes } from '../../../apps/studio/schemas/index.ts';
 
 export type Collection = 'builds' | 'buildsI18n' | 'rotations' | 'banners' | 'news' | 'weaponGuides' | 'endgameGuides';
 type Document = { _id: string; lang?: string; character?: string; slug?: string | { current?: string } };
-type Shape = { name?: string; jsonType?: string; fields?: { name: string; type: Shape }[]; of?: Shape[] };
+export type Shape = { name?: string; jsonType?: string; fields?: { name: string; type: Shape }[]; of?: Shape[] };
 
 export const collections: Record<Collection, { folder: string; type: string; extension: string }> = {
   builds: { folder: 'builds', type: 'build', extension: '.md' },
@@ -21,6 +21,10 @@ const schema = Schema.compile({ name: 'migration', types: [...builtinTypes, ...s
 const models = new Map<string, { objects: Record<string, string>; localized: Set<string> }>();
 // htmlToBlocks ждёт тип-массив (поле body), а не сам тип блока
 export const buildBodyType = (schema.get('build') as { fields: { name: string; type: unknown }[] }).fields.find((field) => field.name === 'body')!.type;
+
+export function compiledType(collection: Collection): Shape {
+  return schema.get(collections[collection].type) as unknown as Shape;
+}
 
 export function documentId(collection: Collection, id: string): string {
   const name = id.split('/').at(-1);
