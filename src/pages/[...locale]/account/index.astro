@@ -11,6 +11,7 @@ const { base, t } = useData(Astro.currentLocale);
     data-export-error={t('Не удалось скачать данные. Попробуйте позже.')}
     data-delete-error={t('Не удалось удалить аккаунт. Попробуйте позже.')}
     data-reauth={t('Для удаления войдите заново.')}
+    data-session-changed={t('Сессия изменилась. Проверьте данные аккаунта и повторите действие.')}
     data-delete-word={t('УДАЛИТЬ')}>
     <h1>{t('Аккаунт')}</h1>
     <div class="panel auth-panel">
@@ -51,6 +52,7 @@ const { base, t } = useData(Astro.currentLocale);
 <script>
   import { authUrl, getSupabase, onPage, signOut } from '../../../scripts/auth';
   import { API_URL } from '../../../lib/platform';
+  import { notifySessionChanged, onSessionChange } from '../../../scripts/user-data/session';
   onPage('#account', (root) => {
     const base = root.dataset.base || '';
     const status = root.querySelector<HTMLElement>('.status')!;
@@ -63,11 +65,27 @@ const { base, t } = useData(Astro.currentLocale);
       dataStatus.textContent = message;
       dataStatus.className = 'status small bad';
     };
+    const word = root.querySelector<HTMLInputElement>('#delete-word')!;
+    const submit = root.querySelector<HTMLButtonElement>('#delete-submit')!;
+    const reauth = root.querySelector<HTMLButtonElement>('#reauth')!;
+    let deleting = false;
+    let leaving = false;
+    let loadedUserId: string | null = null;
+    let loadRequest = 0;
+    const updateSubmit = () => {
+      submit.disabled = deleting || word.value.trim().toLocaleUpperCase() !== (root.dataset.deleteWord || '').toLocaleUpperCase();
+    };
     if (location.hash === '#delete') root.querySelector<HTMLDetailsElement>('#delete-account')!.open = true;
     const load = async () => {
+      const request = ++loadRequest;
+      loadedUserId = null;
+      details.forEach((detail) => { detail.hidden = true; });
+      status.textContent = '';
+      status.className = 'status small';
       try {
         const supabase = getSupabase();
         const { data: session } = await supabase.auth.getSession();
+        if (request !== loadRequest || !root.isConnected) return;
         if (!session.session) {
           location.replace(authUrl(base, 'login', location.pathname + location.search + location.hash));
           return;
@@ -75,7 +93,7 @@ const { base, t } = useData(Astro.currentLocale);
         const user = session.session.user;
         const { data: profile, error } = await supabase.from('profiles')
           .select('nickname,display_name').eq('id', user.id).maybeSingle();
-        if (!root.isConnected) return;
+        if (request !== loadRequest || !root.isConnected) return;
         // Сбой запроса не выдаём за пустой профиль
         if (error) throw error;
         field('nickname', String(profile?.nickname || ''));
@@ -91,26 +109,48 @@ const { base, t } = useData(Astro.currentLocale);
         const reset = root.querySelector<HTMLAnchorElement>('[data-page="reset"]')!;
         reset.href = authUrl(base, 'reset');
         reset.hidden = !providers.has('email');
+        loadedUserId = user.id;
         details.forEach((detail) => { detail.hidden = false; });
       } catch {
+        if (request !== loadRequest || !root.isConnected) return;
         status.textContent = root.dataset.error || '';
         status.className = 'status small bad';
       }
     };
     void load();
+    const refreshAccount = () => {
+      word.value = '';
+      reauth.hidden = true;
+      updateSubmit();
+      showDataStatus(root.dataset.sessionChanged || '');
+      void load();
+    };
+    onSessionChange(() => { if (!leaving && root.isConnected) refreshAccount(); });
+    // Пользователь фиксируется до первого await: пока ждём сессию, страница может успеть загрузить другой аккаунт
     const accessToken = async () => {
+      const expected = loadedUserId;
       const { data, error } = await getSupabase().auth.getSession();
-      if (error || !data.session) throw new Error('session');
-      return data.session.access_token;
+      if (error) throw new Error('session');
+      if (!expected || loadedUserId !== expected || !data.session || data.session.user.id !== expected) {
+        refreshAccount();
+        return null;
+      }
+      return { token: data.session.access_token, userId: expected };
+    };
+    // Сессия всё ещё того пользователя, для которого начата операция
+    const sameUser = async (userId: string) => {
+      const { data } = await getSupabase().auth.getSession();
+      return loadedUserId === userId && data.session?.user.id === userId;
     };
     root.querySelector<HTMLButtonElement>('#export-data')!.addEventListener('click', async (event) => {
       const button = event.currentTarget as HTMLButtonElement;
       button.disabled = true;
       dataStatus.textContent = '';
       try {
-        const token = await accessToken();
+        const access = await accessToken();
+        if (!access) return;
         const response = await fetch(`${API_URL}/me/export`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${access.token}` },
         });
         if (!response.ok) throw new Error('export');
         const url = URL.createObjectURL(await response.blob());
@@ -127,13 +167,6 @@ const { base, t } = useData(Astro.currentLocale);
         button.disabled = false;
       }
     });
-    const word = root.querySelector<HTMLInputElement>('#delete-word')!;
-    const submit = root.querySelector<HTMLButtonElement>('#delete-submit')!;
-    const reauth = root.querySelector<HTMLButtonElement>('#reauth')!;
-    let deleting = false;
-    const updateSubmit = () => {
-      submit.disabled = deleting || word.value.trim().toLocaleUpperCase() !== (root.dataset.deleteWord || '').toLocaleUpperCase();
-    };
     word.addEventListener('input', () => {
       updateSubmit();
     });
@@ -144,12 +177,15 @@ const { base, t } = useData(Astro.currentLocale);
       updateSubmit();
       dataStatus.textContent = '';
       try {
-        const token = await accessToken();
+        const access = await accessToken();
+        if (!access) return;
         const response = await fetch(`${API_URL}/me`, {
           method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { Authorization: `Bearer ${access.token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ confirm: 'DELETE' }),
         });
+        // Пока шёл запрос, в другой вкладке могли войти в другой аккаунт: его не трогаем
+        if (!await sameUser(access.userId)) { refreshAccount(); return; }
         if (response.status === 401) {
           const data = await response.json() as { code?: string };
           if (data.code === 'reauth_required') {
@@ -160,7 +196,8 @@ const { base, t } = useData(Astro.currentLocale);
         }
         if (!response.ok) throw new Error('delete');
         await getSupabase().auth.signOut({ scope: 'local' });
-        document.dispatchEvent(new Event('gf:auth'));
+        leaving = true;
+        notifySessionChanged();
         location.assign(`${base}/account/deleted/`);
       } catch {
         showDataStatus(root.dataset.deleteError || '');
@@ -172,7 +209,8 @@ const { base, t } = useData(Astro.currentLocale);
     });
     reauth.addEventListener('click', async () => {
       await getSupabase().auth.signOut({ scope: 'local' });
-      document.dispatchEvent(new Event('gf:auth'));
+      leaving = true;
+      notifySessionChanged();
       location.assign(authUrl(base, 'login', `${base}/account/#delete`));
     });
     root.querySelector<HTMLButtonElement>('#signout')!.addEventListener('click', async () => {
@@ -182,7 +220,8 @@ const { base, t } = useData(Astro.currentLocale);
         status.className = 'status small bad';
         return;
       }
-      document.dispatchEvent(new Event('gf:auth'));
+      leaving = true;
+      notifySessionChanged();
       location.assign(`${base}/`);
     });
   });

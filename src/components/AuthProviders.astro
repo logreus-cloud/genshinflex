@@ -18,6 +18,7 @@ const { base, lang, t } = useData(Astro.currentLocale);
 <script>
   import { API_URL } from '../lib/platform';
   import { authUrl, getSupabase, onPage, pageNext } from '../scripts/auth';
+  import { notifySessionChanged } from '../scripts/user-data/session';
 
   declare global {
     interface Window {
@@ -58,7 +59,7 @@ const { base, lang, t } = useData(Astro.currentLocale);
         if (!body.token_hash) throw new Error('telegram');
         const { error: authError } = await getSupabase().auth.verifyOtp({ token_hash: body.token_hash, type: 'magiclink' });
         if (authError) throw authError;
-        document.dispatchEvent(new Event('gf:auth'));
+        notifySessionChanged();
         location.assign(next || authUrl(base, ''));
       } catch { error(); }
     };

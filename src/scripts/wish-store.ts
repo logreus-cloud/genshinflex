@@ -1,3 +1,5 @@
+import { hasSession } from './user-data/session';
+
 export type Wish = { id: string; uid: string; gacha_type: string; time: string; name: string; item_type: string; rank_type: string; item_id?: string };
 export type WishStore = {
   mode: 'local' | 'cloud';
@@ -95,9 +97,7 @@ function localStore(offline = false): WishStore {
 }
 
 export async function openWishStore(signal?: AbortSignal): Promise<WishStore> {
-  let hasAuth = false;
-  try { hasAuth = !!localStorage.getItem('gf:auth'); } catch {}
-  if (!hasAuth) return localStore();
+  if (!hasSession()) return localStore();
 
   try {
     const { getSupabase } = await import('./auth');

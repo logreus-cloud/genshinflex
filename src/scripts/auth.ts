@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_KEY, SUPABASE_URL, TURNSTILE_SITE_KEY } from '../lib/platform';
+import { SESSION_KEY } from './user-data/session';
 
 let client: ReturnType<typeof createClient> | undefined;
 
@@ -10,7 +11,7 @@ export function getSupabase() {
       persistSession: true,
       detectSessionInUrl: true,
       autoRefreshToken: true,
-      storageKey: 'gf:auth',
+      storageKey: SESSION_KEY,
     },
   });
 }

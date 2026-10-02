@@ -1,5 +1,6 @@
 import { pageLang } from '../i18n/client';
 import { markChanged } from './profile-sync';
+import { hasSession, onSessionChange } from './user-data/session';
 // Общие клиентские утилиты: безопасное хранилище, недавние/избранное, таймеры по времени сервера.
 
 export type Entry = { href: string; name: string; icon?: string | null; kind: string };
@@ -94,7 +95,7 @@ async function updateAccountLink() {
   const turn = ++accountLinkRequest;
 
   try {
-    if (!localStorage.getItem('gf:auth')) return;
+    if (!hasSession()) return;
     const { getSupabase } = await import('./auth');
     const supabase = getSupabase();
     const { data } = await supabase.auth.getSession();
@@ -117,4 +118,4 @@ async function updateAccountLink() {
 
 updateAccountLink();
 document.addEventListener('astro:page-load', updateAccountLink);
-document.addEventListener('gf:auth', updateAccountLink);
+onSessionChange(updateAccountLink);

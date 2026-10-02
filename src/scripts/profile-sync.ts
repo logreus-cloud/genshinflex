@@ -1,4 +1,5 @@
 import { getMedia, type MediaKey } from './profile-media';
+import { hasSession, onSessionChange } from './user-data/session';
 import type { Entry } from './common';
 
 type Kind = 'custom' | 'data';
@@ -14,7 +15,6 @@ const mediaKeys: MediaKey[] = ['avatar', 'cover', 'background'];
 const langs = ['ru', 'en', 'es'] as const;
 const blank = (): SyncResult => ({ custom: 'skipped', data: 'skipped' });
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
-const hasSession = () => { try { return !!localStorage.getItem('gf:auth'); } catch { return false; } };
 const timestamp = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0;
 const present = (kind: Kind) => (kind === 'custom' ? ['gf:profile-custom'] : ['gf:favs', 'gf:favs:en', 'gf:favs:es', 'gf:roster', 'gf:profile-uid']).some((key) => localStorage.getItem(key) !== null);
 
@@ -294,7 +294,7 @@ export function syncNow(): Promise<SyncResult> {
   tail = next;
   return next;
 }
-document.addEventListener('gf:auth', () => {
+onSessionChange(() => {
   generation++;
   clearTimeout(retryTimer);
   retryTimer = undefined;

@@ -18,6 +18,7 @@ const { base, t } = useData(Astro.currentLocale);
 
 <script>
   import { authUrl, getSupabase, onPage, pageNext, safeNext } from '../../../scripts/auth';
+  import { notifySessionChanged } from '../../../scripts/user-data/session';
   onPage('#callback', (root) => {
     const status = root.querySelector<HTMLElement>('.status')!;
     const login = root.querySelector<HTMLAnchorElement>('[data-page]')!;
@@ -42,7 +43,7 @@ const { base, t } = useData(Astro.currentLocale);
       done = true;
       status.textContent = root.dataset.done || '';
       status.className = 'status small ok';
-      document.dispatchEvent(new Event('gf:auth'));
+      notifySessionChanged();
       location.replace(next ? safeNext(next) : authUrl(base, ''));
     };
     const { data: listener } = auth.onAuthStateChange((event, session) => {

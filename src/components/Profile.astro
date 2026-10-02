@@ -247,6 +247,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { onPage } from '../scripts/router';
   import { pageLang } from '../i18n/client';
   import { API_URL } from '../lib/platform';
+  import { hasSession, onSessionChange } from '../scripts/user-data/session';
 
   type Title = { id: string; name_ru: string; name_en: string | null; name_es: string | null; color: string; description: string | null; note?: string | null };
   const colorOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
@@ -280,20 +281,24 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
     // Выход из аккаунта или сбой — титулы скрываются
     const reset = () => { owned = []; active = null; token = ''; field.hidden = true; renderChip(); };
+    let loadRequest = 0;
     const load = async () => {
+      const request = ++loadRequest;
+      const current = () => !signal.aborted && request === loadRequest;
       reset();
-      let stored = false;
-      try { stored = !!localStorage.getItem('gf:auth'); } catch {}
-      if (!stored) return;
+      if (!hasSession()) return;
       try {
         const { getSupabase } = await import('../scripts/auth');
+        if (!current()) return;
         const { data } = await getSupabase().auth.getSession();
-        token = data.session?.access_token || '';
-        if (!token || signal.aborted) return;
-        const response = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${token}` }, signal });
-        if (!response.ok) return;
+        if (!current()) return;
+        const accessToken = data.session?.access_token || '';
+        if (!accessToken) return;
+        const response = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${accessToken}` }, signal });
+        if (!current() || !response.ok) return;
         const me = await response.json() as { titles?: Title[]; active_title?: string | null };
-        if (signal.aborted) return;
+        if (!current()) return;
+        token = accessToken;
         owned = Array.isArray(me.titles) ? me.titles.filter((item) => item && typeof item.id === 'string' && typeof item.name_ru === 'string') : [];
         active = typeof me.active_title === 'string' && owned.some((item) => item.id === me.active_title) ? me.active_title : null;
         field.hidden = false;
@@ -327,7 +332,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }, { signal });
 
     void load();
-    document.addEventListener('gf:auth', () => { void load(); }, { signal });
+    onSessionChange(() => { void load(); }, { signal });
   });
 </script>
 
@@ -338,6 +343,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { onPage, cleanup } from '../scripts/router';
   import { markChanged, syncNow, type SyncResult } from '../scripts/profile-sync';
   import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
+  import { onSessionChange } from '../scripts/user-data/session';
 
   type Char = { id: number | null; s: string; n: string; i: string };
   type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
@@ -905,7 +911,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }
   };
   void loadWishes();
-  document.addEventListener('gf:auth', () => { void loadWishes(); }, { signal });
+  onSessionChange(() => { void loadWishes(); }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
     let raw = read('gf:profile-custom');
