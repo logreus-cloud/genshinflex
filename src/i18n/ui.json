@@ -1,0 +1,4474 @@
+{
+ "(версии 3 и 4) — его выгружают paimon.moe, Starward, SnapHutao и другие трекеры. Новые записи добавятся к уже загруженным без дублей.": {
+  "en": "(versions 3 and 4) — exported by paimon.moe, Starward, SnapHutao and other trackers. New entries are merged with what you already have, without duplicates.",
+  "es": "(versiones 3 y 4): lo exportan paimon.moe, Starward, SnapHutao y otros rastreadores. Las entradas nuevas se suman a las ya cargadas, sin duplicados."
+ },
+ "(если сообщение про конкретную)": {
+  "en": "(if the message is about a specific page)",
+  "es": "(si el mensaje es sobre una página concreta)"
+ },
+ "(необязательно)": {
+  "en": "(optional)",
+  "es": "(opcional)"
+ },
+ "(откроется в новой вкладке)": {
+  "en": "(opens in a new tab)",
+  "es": "(se abre en una pestaña nueva)"
+ },
+ ". На сервер они не отправляются.": {
+  "en": ". They are never sent to our server.",
+  "es": ". Nunca se envían a nuestro servidor."
+ },
+ "1-я половина: Мавуика": {
+  "en": "1st half: Mavuika",
+  "es": "1.ª mitad: Mavuika"
+ },
+ "1-я половина: без 5★": {
+  "en": "1st half: no 5★",
+  "es": "1.ª mitad: sin 5★"
+ },
+ "1-я половина: бонус Анемо урона +60%": {
+  "en": "1st half: Anemo DMG Bonus +60%",
+  "es": "1.ª mitad: Bono de Daño Anemo +60%"
+ },
+ "12 врагов": {
+  "en": "12 enemies",
+  "es": "12 enemigos"
+ },
+ "15 врагов": {
+  "en": "15 enemies",
+  "es": "15 enemigos"
+ },
+ "15 врагов, 3 волны": {
+  "en": "15 enemies, 3 waves",
+  "es": "15 enemigos, 3 oleadas"
+ },
+ "2 предмета": {
+  "en": "2-piece",
+  "es": "2 piezas"
+ },
+ "2-я половина: Перегрузка": {
+  "en": "2nd half: Overloaded",
+  "es": "2.ª mitad: Sobrecarga"
+ },
+ "2-я половина: Перегрузка без 5★": {
+  "en": "2nd half: Overloaded with no 5★",
+  "es": "2.ª mitad: Sobrecarga sin 5★"
+ },
+ "2-я половина: бонус Электро урона +60%": {
+  "en": "2nd half: Electro DMG Bonus +60%",
+  "es": "2.ª mitad: Bono de Daño Electro +60%"
+ },
+ "4 предмета": {
+  "en": "4-piece",
+  "es": "4 piezas"
+ },
+ "4★ или 5★ предмет": {
+  "en": "4★ or 5★ item",
+  "es": "Objeto 4★ o 5★"
+ },
+ "4★ персонажи с повышенным шансом": {
+  "en": "Rate-up 4★ characters",
+  "es": "Personajes 4★ con probabilidad aumentada"
+ },
+ "5 врагов": {
+  "en": "5 enemies",
+  "es": "5 enemigos"
+ },
+ "5★ на этом баннере ещё не было.": {
+  "en": "No 5★ on this banner yet.",
+  "es": "Aún no ha salido ningún 5★ en este gachapón."
+ },
+ "5★ оружие": {
+  "en": "5★ weapons",
+  "es": "Armas 5★"
+ },
+ "5★ персонажи — именно они выпадают, когда проигрываешь 50/50 на баннере события.": {
+  "en": "5★ characters — these are the ones you get when you lose the 50/50 on an event banner.",
+  "es": "Personajes 5★: son los que obtienes cuando pierdes el 50/50 en un gachapón de evento."
+ },
+ "8 врагов": {
+  "en": "8 enemies",
+  "es": "8 enemigos"
+ },
+ "80 и таланты 1/9/9": {
+  "en": "80 and talents 1/9/9",
+  "es": "80 y talentos 1/9/9"
+ },
+ "90 и таланты 9/9/9": {
+  "en": "90 and talents 9/9/9",
+  "es": "90 y talentos 9/9/9"
+ },
+ "Discord-сервер": {
+  "en": "Discord server",
+  "es": "Servidor de Discord"
+ },
+ "Discord-сервер проекта": {
+  "en": "Project Discord server",
+  "es": "Servidor de Discord del proyecto"
+ },
+ "E (удерж.)": {
+  "en": "E (hold)",
+  "es": "E (mant.)"
+ },
+ "ELO по забегам": {
+  "en": "Clear-time ELO",
+  "es": "ELO por partidas"
+ },
+ "ELO сообщества": {
+  "en": "Community ELO",
+  "es": "ELO de la comunidad"
+ },
+ "Email": {
+  "en": "Email",
+  "es": "Correo electrónico"
+ },
+ "Game8 — этаж 10": {
+  "en": "Game8 — floor 10",
+  "es": "Game8 — piso 10"
+ },
+ "Game8 — этаж 11": {
+  "en": "Game8 — floor 11",
+  "es": "Game8 — piso 11"
+ },
+ "Game8 — этаж 9": {
+  "en": "Game8 — floor 9",
+  "es": "Game8 — piso 9"
+ },
+ "Genshin Impact, персонажи и арты © HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.": {
+  "en": "Genshin Impact, characters and artwork © HoYoverse. GenshinFlex is a fan project and is not affiliated with HoYoverse.",
+  "es": "Genshin Impact, sus personajes e ilustraciones © HoYoverse. GenshinFlex es un proyecto de fans y no está afiliado a HoYoverse."
+ },
+ "Genshin Impact, персонажи, изображения и игровые тексты принадлежат HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.": {
+  "en": "Genshin Impact, its characters, images and in-game texts belong to HoYoverse. GenshinFlex is a fan project and is not affiliated with HoYoverse.",
+  "es": "Genshin Impact, sus personajes, imágenes y textos del juego pertenecen a HoYoverse. GenshinFlex es un proyecto de fans y no está afiliado a HoYoverse."
+ },
+ "GenshinFlex — бесплатный справочник по Genshin Impact на русском: билды и команды для всех персонажей, текущие Бездна, Театр и Натиск, проверка команды, трекер круток и история баннеров. Без рекламы и регистрации.": {
+  "en": "GenshinFlex is a free Genshin Impact guide: builds and teams for every character, the current Abyss, Theater and Onslaught, a team checker, a wish tracker and banner history. No ads, no sign-up.",
+  "es": "GenshinFlex es una guía gratuita de Genshin Impact: builds y equipos para todos los personajes, el Abismo, el Teatro y la Embestida actuales, un comprobador de equipos, un rastreador de gachapón y el historial de gachapones. Sin anuncios ni registro."
+ },
+ "HEX": {
+  "en": "HEX",
+  "es": "HEX"
+ },
+ "HP {v}: для персонажа от HP нужно больше — ориентир от {target}": {
+  "en": "HP {v}: an HP scaler needs more — aim for {target}+",
+  "es": "Vida {v}: un personaje que escala con Vida necesita más — apunta a {target}+"
+ },
+ "Telegram, Discord или почта": {
+  "en": "Telegram, Discord or email",
+  "es": "Telegram, Discord o correo"
+ },
+ "Telegram, Discord или почта — если хотите ответ": {
+  "en": "Telegram, Discord or email — if you'd like a reply",
+  "es": "Telegram, Discord o correo, si quieres respuesta"
+ },
+ "Telegram-канал": {
+  "en": "Telegram channel",
+  "es": "Canal de Telegram"
+ },
+ "Telegram-канал проекта": {
+  "en": "Project Telegram channel",
+  "es": "Canal de Telegram del proyecto"
+ },
+ "UID": {
+  "en": "UID",
+  "es": "UID"
+ },
+ "UID {uid}": {
+  "en": "UID {uid}",
+  "es": "UID {uid}"
+ },
+ "UID — это 9 или 10 цифр": {
+  "en": "A UID is 9 or 10 digits",
+  "es": "El UID tiene 9 o 10 dígitos"
+ },
+ "UID — это 9 или 10 цифр из правого нижнего угла экрана в игре.": {
+  "en": "UID is the 9–10 digit number in the bottom-right corner of the game screen.",
+  "es": "El UID es el número de 9 o 10 dígitos de la esquina inferior derecha de la pantalla del juego."
+ },
+ "Wanderlust Invocation, постоянно": {
+  "en": "Wanderlust Invocation, permanent",
+  "es": "Invocación del Viajero, permanente"
+ },
+ "YouTube, по клику": {
+  "en": "YouTube, plays on click",
+  "es": "YouTube, se reproduce al hacer clic"
+ },
+ "enka.network временно недоступна": {
+  "en": "enka.network is temporarily unavailable",
+  "es": "enka.network no está disponible temporalmente"
+ },
+ "gcsim не принял конфиг: {message}": {
+  "en": "gcsim rejected the config: {message}",
+  "es": "gcsim rechazó la configuración: {message}"
+ },
+ "https://… или /characters/furina/": {
+  "en": "https://… or /characters/furina/",
+  "es": "https://… o /characters/furina/"
+ },
+ "timesaver.gg — этаж 11": {
+  "en": "timesaver.gg — floor 11",
+  "es": "timesaver.gg — piso 11"
+ },
+ "{mode} в Genshin Impact: текущий цикл, баффы и рекомендованные команды.": {
+  "en": "{mode} in Genshin Impact: current cycle, buffs and recommended teams.",
+  "es": "{mode} en Genshin Impact: ciclo actual, bonificaciones y equipos recomendados."
+ },
+ "{mode}: текущий цикл и команды": {
+  "en": "{mode}: current cycle and teams",
+  "es": "{mode}: ciclo actual y equipos"
+ },
+ "{name} (BETA): утечки — Genshin Impact": {
+  "en": "{name} (BETA): leaks — Genshin Impact",
+  "es": "{name} (BETA): filtraciones — Genshin Impact"
+ },
+ "{name} ({el}, {r}★) — гайд и билд: лучшее оружие — {weapon}, артефакты — {sets}, статы, команды и таланты. Актуально для патча {patch}.": {
+  "en": "{name} ({el}, {r}★) guide and build: best weapon — {weapon}, artifacts — {sets}, stats, teams and talents. Up to date for patch {patch}.",
+  "es": "Guía y build de {name} ({el}, {r}★): mejor arma — {weapon}, artefactos — {sets}, estadísticas, equipos y talentos. Actualizada para la versión {patch}."
+ },
+ "{name} ({stars}, {type}): статы на каждом уровне, эффект на всех пробуждениях R1–R5 и персонажи, которым оружие подходит лучше всего.": {
+  "en": "{name} ({stars}, {type}): stats at every level, the passive at every refinement R1–R5 and the characters it suits best.",
+  "es": "{name} ({stars}, {type}): estadísticas en cada nivel, el efecto en todos los refinamientos R1–R5 y los personajes a los que mejor les queda."
+ },
+ "{name} в Genshin Impact: {el}, {weapon}, таланты с множителями, созвездия и статы на любом уровне.": {
+  "en": "{name} in Genshin Impact: {el}, {weapon}, talents with scaling, constellations and stats at any level.",
+  "es": "{name} en Genshin Impact: {el}, {weapon}, talentos con multiplicadores, constelaciones y estadísticas a cualquier nivel."
+ },
+ "{name} добавлен": {
+  "en": "{name} added",
+  "es": "Se añadió a {name}"
+ },
+ "{name} добавлен с рекомендованным билдом — поправьте его под свой.": {
+  "en": "{name} added with the recommended build — adjust it to match yours.",
+  "es": "{name} añadido con la build recomendada: ajústala a la tuya."
+ },
+ "{name} нет в рекомендованном списке. Лучше: {list}": {
+  "en": "{name} isn't on the recommended list. Better: {list}",
+  "es": "{name} no está en la lista recomendada. Mejor: {list}"
+ },
+ "{name} убран": {
+  "en": "{name} removed",
+  "es": "Se quitó a {name}"
+ },
+ "{name} уже в списке — открыл его билд": {
+  "en": "{name} is already in the list — opened their build",
+  "es": "{name} ya está en la lista: se abrió su build"
+ },
+ "{name} — №{n} в рекомендованном списке": {
+  "en": "{name} — #{n} on the recommended list",
+  "es": "{name}: n.º {n} en la lista recomendada"
+ },
+ "{name}: гайд и билд — Genshin Impact {patch}": {
+  "en": "{name} Guide and Build — Genshin Impact {patch}",
+  "es": "{name}: guía y build — Genshin Impact {patch}"
+ },
+ "{name}: статы, эффект и кому подходит — Genshin Impact": {
+  "en": "{name}: Stats, Passive and Best Users — Genshin Impact",
+  "es": "{name}: estadísticas, efecto y a quién le queda — Genshin Impact"
+ },
+ "{name}: таланты и созвездия — Genshin Impact": {
+  "en": "{name}: Talents and Constellations — Genshin Impact",
+  "es": "{name}: talentos y constelaciones — Genshin Impact"
+ },
+ "{n} видов оружия. Наведите курсор или выделите карточку — появятся статы на 90 уровне и эффект.": {
+  "en": "{n} weapons. Hover or focus a card to see level 90 stats and the passive.",
+  "es": "{n} armas. Pasa el cursor o selecciona una tarjeta para ver las estadísticas a nivel 90 y el efecto."
+ },
+ "{n} из {total}": {
+  "en": "{n} of {total}",
+  "es": "{n} de {total}"
+ },
+ "{n} молитв": {
+  "en": "{n} wishes",
+  "es": "{n} deseos"
+ },
+ "{n} сетов артефактов с бонусами за 2 и 4 предмета. Под сетом — персонажи из наших билдов, которые его носят.": {
+  "en": "{n} artifact sets with 2- and 4-piece bonuses. Below each set — characters from our builds who use it.",
+  "es": "{n} conjuntos de artefactos con bonos de 2 y 4 piezas. Debajo de cada conjunto: personajes de nuestras builds que lo usan."
+ },
+ "{n}-й повтор": {
+  "en": "rerun #{n}",
+  "es": "reposición n.º {n}"
+ },
+ "{n}-я половина": {
+  "en": "Half {n}",
+  "es": "Mitad {n}"
+ },
+ "{slot}: {have}, а нужно {want}": {
+  "en": "{slot}: {have}, but it should be {want}",
+  "es": "{slot}: {have}, pero debería ser {want}"
+ },
+ "{slot}: не указан": {
+  "en": "{slot}: not set",
+  "es": "{slot}: sin indicar"
+ },
+ "«Раскольников»": {
+  "en": "\"Raskolnikov\"",
+  "es": "«Raskólnikov»"
+ },
+ "Аватар": {
+  "en": "Avatar",
+  "es": "Avatar"
+ },
+ "Аватар и рамка": {
+  "en": "Avatar and frame",
+  "es": "Avatar y marco"
+ },
+ "Автор (необязательно)": {
+  "en": "Author (optional)",
+  "es": "Autor (opcional)"
+ },
+ "Авторы гайда": {
+  "en": "Guide authors",
+  "es": "Autores de la guía"
+ },
+ "Адрес": {
+  "en": "URL",
+  "es": "Dirección"
+ },
+ "Азия": {
+  "en": "Asia",
+  "es": "Asia"
+ },
+ "Аккаунт": {
+  "en": "Account",
+  "es": "Cuenta"
+ },
+ "Аккаунт удалён": {
+  "en": "Account deleted",
+  "es": "Cuenta eliminada"
+ },
+ "Аккаунт уже существует.": {
+  "en": "An account already exists.",
+  "es": "Esta cuenta ya existe."
+ },
+ "Аккаунт, профиль, данные и аватары будут удалены. Это нельзя отменить.": {
+  "en": "Your account, profile, data, and avatars will be deleted. This cannot be undone.",
+  "es": "Se eliminarán tu cuenta, perfil, datos y avatares. Esta acción no se puede deshacer."
+ },
+ "Алый": {
+  "en": "Scarlet",
+  "es": "Escarlata"
+ },
+ "Алёша отвлекает врагов от монолита, Сахароза собирает их": {
+  "en": "Alyosha draws enemies away from the monolith, Sucrose groups them",
+  "es": "Aliosha aleja a los enemigos del monolito y Sacarosa los agrupa"
+ },
+ "Америка": {
+  "en": "America",
+  "es": "América"
+ },
+ "Анализ": {
+  "en": "Analysis",
+  "es": "Análisis"
+ },
+ "Анемо": {
+  "en": "Anemo",
+  "es": "Anemo"
+ },
+ "Аномалия": {
+  "en": "Disorder",
+  "es": "Anomalía"
+ },
+ "Артефакты": {
+  "en": "Artifacts",
+  "es": "Artefactos"
+ },
+ "Атака": {
+  "en": "ATK",
+  "es": "ATQ"
+ },
+ "Атака {v}: мало относительно базовой — нужно больше Силы атаки % в статах": {
+  "en": "ATK {v}: low compared to base — you need more ATK% in your stats",
+  "es": "ATQ {v}: baja respecto a la base — necesitas más ATQ % en tus estadísticas"
+ },
+ "Атака в падении": {
+  "en": "Plunge",
+  "es": "Ataque descendente"
+ },
+ "Бабл": {
+  "en": "Bubble",
+  "es": "Burbuja"
+ },
+ "Бабл: персонаж, оружие, сет, стихия или свой текст": {
+  "en": "Bubble: character, weapon, set, element or your own text",
+  "es": "Burbuja: personaje, arma, set, elemento o texto propio"
+ },
+ "База": {
+  "en": "Database",
+  "es": "Base de datos"
+ },
+ "Базовая атака": {
+  "en": "Base ATK",
+  "es": "ATQ base"
+ },
+ "Базовая защита": {
+  "en": "Base DEF",
+  "es": "DEF base"
+ },
+ "Базовое HP": {
+  "en": "Base HP",
+  "es": "Vida base"
+ },
+ "Баннер": {
+  "en": "Banner",
+  "es": "Gachapón"
+ },
+ "Баннер {v} фаза {p}": {
+  "en": "Banner {v}, phase {p}",
+  "es": "Banner {v}, fase {p}"
+ },
+ "Баннер оружия": {
+  "en": "Weapon banner",
+  "es": "Gachapón de armas"
+ },
+ "Баннеры": {
+  "en": "Banners",
+  "es": "Gachapones"
+ },
+ "Баннеры {v}, фаза {p}": {
+  "en": "Banners {v}, phase {p}",
+  "es": "Gachapones {v}, fase {p}"
+ },
+ "Баннеры, ивенты, обновления и сбросы эндгейма на одной шкале": {
+  "en": "Banners, events, updates and endgame resets on one timeline",
+  "es": "Gachapones, eventos, actualizaciones y reinicios del endgame en una sola línea de tiempo"
+ },
+ "Баннеры, ивенты, обновления и сбросы эндгейма на одной шкале. Время — по серверу выбранного региона.": {
+  "en": "Wishes, events, updates and endgame resets on one timeline. Times follow the selected region's server.",
+  "es": "Gachapones, eventos, actualizaciones y reinicios del contenido final en una sola línea de tiempo. Las horas corresponden al servidor elegido."
+ },
+ "Баннеры: текущие и следующие": {
+  "en": "Banners: current and upcoming",
+  "es": "Gachapones: actuales y próximos"
+ },
+ "Баффы и особенности": {
+  "en": "Buffs and mechanics",
+  "es": "Bonificaciones y mecánicas"
+ },
+ "Без аватара": {
+  "en": "No avatar",
+  "es": "Sin avatar"
+ },
+ "Без входа данные профиля хранятся только в этом браузере. После входа оформление, избранное, персонажи и UID синхронизируются с аккаунтом.": {
+  "en": "Without signing in, profile data stays in this browser. After signing in, customization, favorites, characters and UID sync with your account.",
+  "es": "Sin iniciar sesión, los datos del perfil se guardan solo en este navegador. Al iniciar sesión, la personalización, los favoritos, los personajes y el UID se sincronizan con tu cuenta."
+ },
+ "Без звука": {
+  "en": "Mute",
+  "es": "Silenciar"
+ },
+ "Без названия": {
+  "en": "Untitled",
+  "es": "Sin nombre"
+ },
+ "Без обложки": {
+  "en": "No cover",
+  "es": "Sin portada"
+ },
+ "Без рамки": {
+  "en": "No frame",
+  "es": "Sin marco"
+ },
+ "Без рекламы и регистрации.": {
+  "en": "No ads, no sign-up.",
+  "es": "Sin anuncios ni registro."
+ },
+ "Без титула": {
+  "en": "No title",
+  "es": "Sin título"
+ },
+ "Бездна": {
+  "en": "Abyss",
+  "es": "Abismo"
+ },
+ "Бесплатно: ивенты, задания, сундуки": {
+  "en": "Free: events, quests, chests",
+  "es": "Gratis: eventos, misiones, cofres"
+ },
+ "Бесплатный вариант Звёздного рассеивания": {
+  "en": "A free Stellar Swirl option",
+  "es": "Una opción gratuita de Torbellino Estelar"
+ },
+ "Билд": {
+  "en": "Build",
+  "es": "Build"
+ },
+ "Билд готовится": {
+  "en": "Build coming soon",
+  "es": "Build en preparación"
+ },
+ "Билд скоро": {
+  "en": "Build coming soon",
+  "es": "Build próximamente"
+ },
+ "Билд совпадает с рекомендованным": {
+  "en": "Build matches the recommendation",
+  "es": "La build coincide con la recomendada"
+ },
+ "Билда для этого персонажа пока нет — он появится в одном из ближайших обновлений.": {
+  "en": "There's no build for this character yet — it will arrive in an upcoming update.",
+  "es": "Todavía no hay build para este personaje: llegará en una próxima actualización."
+ },
+ "Билды и команды для всех персонажей: оружие, артефакты, статы и составы. Разборы постепенно дополняются.": {
+  "en": "Builds and teams for every character: weapons, artifacts, stats and lineups. Write-ups are being added over time.",
+  "es": "Builds y equipos para todos los personajes: armas, artefactos, estadísticas y formaciones. Los análisis se van ampliando."
+ },
+ "Билды — по данным сообщества (genshin.gg, Game8) с нашими правками; источники указаны в каждом гайде.": {
+  "en": "Builds — based on community data (genshin.gg, Game8) with our corrections; sources are listed in every guide.",
+  "es": "Builds: basadas en datos de la comunidad (genshin.gg, Game8) con nuestras correcciones; las fuentes aparecen en cada guía."
+ },
+ "Билды, команды и инструменты для Genshin Impact. Без рекламы и регистрации.": {
+  "en": "Builds, teams and tools for Genshin Impact. No ads, no sign-up.",
+  "es": "Builds, equipos y herramientas para Genshin Impact. Sin anuncios ni registro."
+ },
+ "Билды, команды и многое другое!": {
+  "en": "Builds, teams, and more!",
+  "es": "¡Guías de personajes, equipos y mucho más!"
+ },
+ "Билды, команды и рейтинг под текущие Бездну, Театр и Натиск": {
+  "en": "Builds, teams and ratings for the current Abyss, Theater and Onslaught",
+  "es": "Builds, equipos y clasificaciones para el Abismo, el Teatro y la Embestida actuales"
+ },
+ "Бирюзовый": {
+  "en": "Turquoise",
+  "es": "Turquesa"
+ },
+ "Блок-выноска": {
+  "en": "Callout block",
+  "es": "Bloque destacado"
+ },
+ "Боевой пропуск": {
+  "en": "Battle Pass",
+  "es": "Pase de batalla"
+ },
+ "Бонус Электро урона этажа ровно под него": {
+  "en": "The floor's Electro DMG Bonus fits it perfectly",
+  "es": "La bonificación de Daño Electro del piso le va perfecta"
+ },
+ "Бонус лечения": {
+  "en": "Healing Bonus",
+  "es": "Bono de Curación"
+ },
+ "Бонус урона": {
+  "en": "DMG Bonus",
+  "es": "Bono de Daño"
+ },
+ "Бонус урона стихии": {
+  "en": "Elemental DMG Bonus",
+  "es": "Bono de Daño Elemental"
+ },
+ "Бонус физ. урона": {
+  "en": "Physical DMG Bonus",
+  "es": "Bono de Daño Físico"
+ },
+ "Будет так:": {
+  "en": "Result:",
+  "es": "Resultado:"
+ },
+ "Быстро (100)": {
+  "en": "Fast (100)",
+  "es": "Rápido (100)"
+ },
+ "Быстрый выбор версии": {
+  "en": "Quick version pick",
+  "es": "Selección rápida de versión"
+ },
+ "В 1-ю половину": {
+  "en": "To the 1st half",
+  "es": "A la 1.ª mitad"
+ },
+ "В {n}-й половине уже 4 персонажа": {
+  "en": "The {n} half already has 4 characters",
+  "es": "La mitad {n} ya tiene 4 personajes"
+ },
+ "В игре с версии": {
+  "en": "Released in version",
+  "es": "En el juego desde la versión"
+ },
+ "В избранное": {
+  "en": "Add to favorites",
+  "es": "Añadir a favoritos"
+ },
+ "В избранном": {
+  "en": "In favorites",
+  "es": "En favoritos"
+ },
+ "В команде {name}: {n} из 4 участников.": {
+  "en": "Team {name}: {n} of 4 members.",
+  "es": "Equipo {name}: {n} de 4 miembros."
+ },
+ "В команде {n} из 4 — пустые слоты сильно снижают урон и выживаемость": {
+  "en": "Only {n} of 4 in the team — empty slots hurt damage and survival a lot",
+  "es": "Solo {n} de 4 en el equipo: los huecos vacíos reducen mucho el daño y la supervivencia"
+ },
+ "В команде нет саппорта или хилера — на 12-м этаже будет сложно выживать": {
+  "en": "No support or healer in the team — surviving Floor 12 will be hard",
+  "es": "No hay apoyo ni sanador en el equipo: sobrevivir en el piso 12 será difícil"
+ },
+ "В разработке": {
+  "en": "In development",
+  "es": "En desarrollo"
+ },
+ "В ссылке нет authkey — скопируйте ссылку заново": {
+  "en": "The link has no authkey — copy it again",
+  "es": "El enlace no tiene authkey: vuelve a copiarlo"
+ },
+ "В ссылке нет authkey. Откройте историю молитв в игре и запустите скрипт снова.": {
+  "en": "The link has no authkey. Open the wish history in the game and run the script again.",
+  "es": "El enlace no tiene authkey. Abre el historial de deseos en el juego y vuelve a ejecutar el script."
+ },
+ "В тексте гайдов": {
+  "en": "In guide texts",
+  "es": "En el texto de las guías"
+ },
+ "ВЭ, %": {
+  "en": "ER, %",
+  "es": "Recarga, %"
+ },
+ "Важно": {
+  "en": "Important",
+  "es": "Importante"
+ },
+ "Вариант сетов": {
+  "en": "Set option",
+  "es": "Opción de sets"
+ },
+ "Ваш аккаунт и связанные данные удалены.": {
+  "en": "Your account and its data have been deleted.",
+  "es": "Se han eliminado tu cuenta y sus datos."
+ },
+ "Ваша команда: {dps} урона в секунду": {
+  "en": "Your team: {dps} damage per second",
+  "es": "Tu equipo: {dps} de daño por segundo"
+ },
+ "Введите UID — возьмём персонажей с витрины профиля и посчитаем урон их команды с вашими билдами. Симуляция идёт у вас в браузере, данные никуда не отправляются.": {
+  "en": "Enter your UID to load your showcased characters and calculate their team's damage with your builds. The simulation runs in your browser; your data is not sent elsewhere.",
+  "es": "Introduce tu UID para cargar los personajes de tu escaparate y calcular el daño del equipo con tus builds. La simulación se ejecuta en tu navegador; tus datos no se envían a ningún otro lugar."
+ },
+ "Введите УДАЛИТЬ": {
+  "en": "Type DELETE",
+  "es": "Escribe ELIMINAR"
+ },
+ "Вернуться ко входу": {
+  "en": "Back to sign in",
+  "es": "Volver al inicio de sesión"
+ },
+ "Версии": {
+  "en": "Versions",
+  "es": "Versiones"
+ },
+ "Версия": {
+  "en": "Version",
+  "es": "Versión"
+ },
+ "Версия 7.0 — этажи 9–12": {
+  "en": "Version 7.0 — floors 9–12",
+  "es": "Versión 7.0 — pisos 9–12"
+ },
+ "Версия 7.1 · Снежная": {
+  "en": "Version 7.1 · Snezhnaya",
+  "es": "Versión 7.1 · Snezhnaya"
+ },
+ "Версия {n}": {
+  "en": "Version {n}",
+  "es": "Versión {n}"
+ },
+ "Версия {v}": {
+  "en": "Version {v}",
+  "es": "Versión {v}"
+ },
+ "Версия {v}, фаза {p}": {
+  "en": "Version {v}, phase {p}",
+  "es": "Versión {v}, fase {p}"
+ },
+ "Весь календарь →": {
+  "en": "Full calendar →",
+  "es": "Calendario completo →"
+ },
+ "Взрыв": {
+  "en": "Burst",
+  "es": "Definitiva"
+ },
+ "Взять": {
+  "en": "Use",
+  "es": "Usar"
+ },
+ "Вид": {
+  "en": "View",
+  "es": "Vista"
+ },
+ "Вид календаря": {
+  "en": "Calendar view",
+  "es": "Vista del calendario"
+ },
+ "Вид после возвышения": {
+  "en": "Ascended look",
+  "es": "Aspecto tras ascender"
+ },
+ "Видео": {
+  "en": "Videos",
+  "es": "Vídeos"
+ },
+ "Видео-гайды": {
+  "en": "Video guides",
+  "es": "Videoguías"
+ },
+ "Видео-гайды — ролики авторов с YouTube, ссылки ведут на оригиналы.": {
+  "en": "Video guides — creators' videos from YouTube; links point to the originals.",
+  "es": "Videoguías: vídeos de creadores de YouTube; los enlaces llevan a los originales."
+ },
+ "Витая бездна": {
+  "en": "Spiral Abyss",
+  "es": "Abismo de Espiral"
+ },
+ "Витая бездна: этажи 9–12, враги и команды": {
+  "en": "Spiral Abyss: floors 9–12, enemies and teams",
+  "es": "Abismo de Espiral: pisos 9–12, enemigos y equipos"
+ },
+ "Витрина": {
+  "en": "Showcase",
+  "es": "Escaparate"
+ },
+ "Витрина обновлена.": {
+  "en": "Showcase updated.",
+  "es": "Escaparate actualizado."
+ },
+ "Витрина пуста или скрыта.": {
+  "en": "The showcase is empty or hidden.",
+  "es": "El escaparate está vacío u oculto."
+ },
+ "Вклад персонажей": {
+  "en": "Character contributions",
+  "es": "Contribución de los personajes"
+ },
+ "Включить звук": {
+  "en": "Unmute",
+  "es": "Activar sonido"
+ },
+ "Включить музыку": {
+  "en": "Turn music on",
+  "es": "Activar música"
+ },
+ "Вместо тир-листа — два независимых рейтинга. Оба считаются отдельно для каждого режима и цикла.": {
+  "en": "Instead of a tier list — two independent ratings, each calculated separately for every mode and cycle.",
+  "es": "En lugar de una tier list, dos clasificaciones independientes, calculadas por separado para cada modo y ciclo."
+ },
+ "Вместо тир-листа: голоса сообщества и реальные забеги": {
+  "en": "Instead of a tier list: community votes and real clears",
+  "es": "En lugar de una tier list: votos de la comunidad y partidas reales"
+ },
+ "Во 2-ю половину": {
+  "en": "To the 2nd half",
+  "es": "A la 2.ª mitad"
+ },
+ "Войдите в свой аккаунт GenshinFlex.": {
+  "en": "Sign in to your GenshinFlex account.",
+  "es": "Inicia sesión en tu cuenta de GenshinFlex."
+ },
+ "Войти": {
+  "en": "Sign in",
+  "es": "Iniciar sesión"
+ },
+ "Войти заново": {
+  "en": "Sign in again",
+  "es": "Volver a iniciar sesión"
+ },
+ "Войти на сайт": {
+  "en": "Enter the site",
+  "es": "Entrar al sitio"
+ },
+ "Войти через Discord": {
+  "en": "Sign in with Discord",
+  "es": "Entrar con Discord"
+ },
+ "Войти через Google": {
+  "en": "Sign in with Google",
+  "es": "Entrar con Google"
+ },
+ "Восст. энергии": {
+  "en": "Energy Recharge",
+  "es": "Recarga de Energía"
+ },
+ "Восст. энергии {v}%: для этого персонажа лучше {target}%+, иначе взрыв стихии не будет готов к ротации": {
+  "en": "Energy Recharge {v}%: this character wants {target}%+, otherwise the burst won't be ready each rotation",
+  "es": "Recarga de Energía {v}%: este personaje necesita {target}%+, o la definitiva no estará lista en cada rotación"
+ },
+ "Восстановить пароль": {
+  "en": "Reset password",
+  "es": "Restablecer contraseña"
+ },
+ "Восстановлен черновик от {date}.": {
+  "en": "Draft from {date} restored.",
+  "es": "Se restauró el borrador del {date}."
+ },
+ "Враги и команды всех этажей": {
+  "en": "Enemies and teams for all floors",
+  "es": "Enemigos y equipos de todos los pisos"
+ },
+ "Враги, баффы и рекомендованные команды под текущие циклы.": {
+  "en": "Enemies, buffs and recommended teams for the current cycles.",
+  "es": "Enemigos, bonificaciones y equipos recomendados para los ciclos actuales."
+ },
+ "Время": {
+  "en": "Time",
+  "es": "Hora"
+ },
+ "Время — по серверу выбранного региона.": {
+  "en": "Times follow your selected server region.",
+  "es": "Las horas siguen la región de servidor elegida."
+ },
+ "Вручную": {
+  "en": "Manually",
+  "es": "Manualmente"
+ },
+ "Все {n}": {
+  "en": "All {n}",
+  "es": "Los {n}"
+ },
+ "Все {n} играбельных персонажей со статами, талантами и созвездиями. Наведите на карточку, чтобы увидеть роль, лучшее оружие и сеты.": {
+  "en": "All {n} playable characters with stats, talents and constellations. Hover over a card to see the role, best weapons and sets.",
+  "es": "Los {n} personajes jugables con estadísticas, talentos y constelaciones. Pasa el cursor sobre una tarjeta para ver el rol, las mejores armas y los sets."
+ },
+ "Все {n} играбельных персонажей со статами, талантами и созвездиями. Отметка «билд» — есть готовое руководство.": {
+  "en": "All {n} playable characters with stats, talents and constellations. The “build” badge means a guide is ready.",
+  "es": "Los {n} personajes jugables con estadísticas, talentos y constelaciones. La etiqueta «build» indica que hay guía."
+ },
+ "Все баннеры": {
+  "en": "All banners",
+  "es": "Todos los gachapones"
+ },
+ "Все данные профиля хранятся только в этом браузере и никуда не отправляются, кроме запроса витрины по UID.": {
+  "en": "All profile data is stored only in this browser and is never sent anywhere, except the showcase request by UID.",
+  "es": "Todos los datos del perfil se guardan solo en este navegador y no se envían a ningún sitio, salvo la consulta del escaparate por UID."
+ },
+ "Все молитвы, доступные прямо сейчас, — версия {v}, фаза {p}.": {
+  "en": "Every wish available right now — version {v}, phase {p}.",
+  "es": "Todos los gachapones disponibles ahora mismo: versión {v}, fase {p}."
+ },
+ "Все новости и обновления": {
+  "en": "All news and updates",
+  "es": "Todas las noticias y actualizaciones"
+ },
+ "Все персонажи": {
+  "en": "All characters",
+  "es": "Todos los personajes"
+ },
+ "Все режимы": {
+  "en": "All modes",
+  "es": "Todos los modos"
+ },
+ "Вставить": {
+  "en": "Insert",
+  "es": "Insertar"
+ },
+ "Вставьте ссылку сюда. Она действует сутки и даёт доступ только к истории молитв.": {
+  "en": "Paste the link here. It is valid for a day and only gives access to the wish history.",
+  "es": "Pega aquí el enlace. Es válido durante un día y solo da acceso al historial de deseos."
+ },
+ "Встречается в других командах": {
+  "en": "Also appears in other teams",
+  "es": "Aparece también en otros equipos"
+ },
+ "Всё готово к отправке.": {
+  "en": "Everything is ready to submit.",
+  "es": "Todo listo para enviar."
+ },
+ "Всё на максимум": {
+  "en": "Max everything",
+  "es": "Todo al máximo"
+ },
+ "Всё оружие": {
+  "en": "All weapons",
+  "es": "Todas las armas"
+ },
+ "Всё, что появляется и меняется на сайте. Свежие записи — сверху, история сохраняется здесь целиком.": {
+  "en": "Everything added and changed on the site. The newest entries come first, with the full history kept here.",
+  "es": "Todo lo que se añade y cambia en la web. Las entradas más recientes aparecen primero y aquí se conserva todo el historial."
+ },
+ "Второй сет (2 предмета)": {
+  "en": "Second set (2-piece)",
+  "es": "Segundo conjunto (2 piezas)"
+ },
+ "Второй сет (для 2 + 2)": {
+  "en": "Second set (for 2 + 2)",
+  "es": "Segundo set (para 2 + 2)"
+ },
+ "Вход на сайт": {
+  "en": "Site entrance",
+  "es": "Entrada al sitio"
+ },
+ "Вход через Telegram работает только на genshinflex.com.": {
+  "en": "Telegram sign-in works only on genshinflex.com.",
+  "es": "El acceso con Telegram solo funciona en genshinflex.com."
+ },
+ "Входя, вы соглашаетесь с": {
+  "en": "By signing in, you agree to the",
+  "es": "Al iniciar sesión, aceptas la"
+ },
+ "Вы вошли как": {
+  "en": "Signed in as",
+  "es": "Has iniciado sesión como"
+ },
+ "Выберите команду из гайда…": {
+  "en": "Pick a team from a guide…",
+  "es": "Elige un equipo de una guía…"
+ },
+ "Выберите персонажа": {
+  "en": "Choose a character",
+  "es": "Elige un personaje"
+ },
+ "Выберите персонажа и нажмите действие — шаг появится здесь.": {
+  "en": "Pick a character and press an action — the step will appear here.",
+  "es": "Elige un personaje y pulsa una acción: el paso aparecerá aquí."
+ },
+ "Выберите персонажа и оружие, укажите текущий и целевой уровень — посчитаем материалы, книги опыта и мору. Ссылкой на расчёт можно поделиться.": {
+  "en": "Pick a character and weapon, set the current and target levels — we'll count materials, EXP books and Mora. You can share the result as a link.",
+  "es": "Elige personaje y arma, indica el nivel actual y el objetivo: calcularemos materiales, libros de EXP y Moras. Puedes compartir el cálculo con un enlace."
+ },
+ "Выберите персонажа или оружие.": {
+  "en": "Choose a character or a weapon.",
+  "es": "Elige un personaje o un arma."
+ },
+ "Выберите персонажа — здесь появится превью.": {
+  "en": "Choose a character — the preview will appear here.",
+  "es": "Elige un personaje: aquí aparecerá la vista previa."
+ },
+ "Выберите персонажа.": {
+  "en": "Choose a character.",
+  "es": "Elige un personaje."
+ },
+ "Выберите тип сообщения": {
+  "en": "Choose a message type",
+  "es": "Elige el tipo de mensaje"
+ },
+ "Выберите, о чём гайд": {
+  "en": "Choose what the guide is about",
+  "es": "Elige de qué trata la guía"
+ },
+ "Выберите, о чём гайд — здесь появится превью.": {
+  "en": "Choose what the guide is about — the preview will appear here.",
+  "es": "Elige de qué trata la guía: aquí aparecerá la vista previa."
+ },
+ "Выберите, о чём гайд.": {
+  "en": "Choose what the guide is about.",
+  "es": "Elige de qué trata la guía."
+ },
+ "Выберите…": {
+  "en": "Choose…",
+  "es": "Elige…"
+ },
+ "Выбор запоминается и применяется ко всем таймерам сайта": {
+  "en": "Your choice is remembered and applies to every timer on the site",
+  "es": "La elección se recuerda y se aplica a todos los temporizadores del sitio"
+ },
+ "Выбрано: {n}": {
+  "en": "Selected: {n}",
+  "es": "Seleccionados: {n}"
+ },
+ "Выбрать из всех персонажей": {
+  "en": "Choose from all characters",
+  "es": "Elegir entre todos los personajes"
+ },
+ "Выбрать цвет": {
+  "en": "Pick a color",
+  "es": "Elegir color"
+ },
+ "Выбрать язык": {
+  "en": "Choose language",
+  "es": "Elegir idioma"
+ },
+ "Выд": {
+  "en": "Hl",
+  "es": "Res"
+ },
+ "Выдаётся почтой на PlayStation, на ПК и телефоне доступно через общий аккаунт.": {
+  "en": "Sent by mail on PlayStation; available on PC and mobile through cross-save.",
+  "es": "Se envía por correo en PlayStation; en PC y móvil está disponible con el guardado cruzado."
+ },
+ "Выделение цветом": {
+  "en": "Highlight",
+  "es": "Resaltado"
+ },
+ "Выиграно 50/50": {
+  "en": "50/50 won",
+  "es": "50/50 ganados"
+ },
+ "Выйти": {
+  "en": "Sign out",
+  "es": "Cerrar sesión"
+ },
+ "Выключить музыку": {
+  "en": "Turn music off",
+  "es": "Desactivar música"
+ },
+ "Выноска": {
+  "en": "Callout",
+  "es": "Recuadro"
+ },
+ "Выпадает в стандартной молитве и в молитвах событий — повтора ждать не нужно.": {
+  "en": "Drops from the standard wish and event wishes — no need to wait for a rerun.",
+  "es": "Sale en el gachapón estándar y en los de evento: no hace falta esperar a que vuelva."
+ },
+ "Выпадает из сундуков в открытом мире.": {
+  "en": "Found in open-world chests.",
+  "es": "Sale de los cofres del mundo abierto."
+ },
+ "Выше": {
+  "en": "Move up",
+  "es": "Subir"
+ },
+ "Гайд": {
+  "en": "Guide",
+  "es": "Guía"
+ },
+ "Гайд от сообщества": {
+  "en": "Community guide",
+  "es": "Guía de la comunidad"
+ },
+ "Гайд пока пустой: добавьте оружие, артефакты, команды или текст.": {
+  "en": "The guide is empty so far: add weapons, artifacts, teams or text.",
+  "es": "La guía está vacía: añade armas, artefactos, equipos o texto."
+ },
+ "Гайд пока пустой: добавьте текст, команды или ссылки.": {
+  "en": "The guide is empty so far: add text, teams or links.",
+  "es": "La guía está vacía: añade texto, equipos o enlaces."
+ },
+ "Гайд почти пустой: добавьте оружие, артефакты, команды или хотя бы пару абзацев текста": {
+  "en": "The guide is almost empty: add weapons, artifacts, teams or at least a couple of paragraphs",
+  "es": "La guía está casi vacía: añade armas, artefactos, equipos o al menos un par de párrafos"
+ },
+ "Гайд публикуется после проверки модератором, иногда с правками. Сохраняем только сам гайд, подпись и контакт, если вы его указали.": {
+  "en": "Guides are published after a moderator review, sometimes with edits. We only store the guide, your signature and your contact if you provided one.",
+  "es": "Las guías se publican tras la revisión de un moderador, a veces con cambios. Solo guardamos la guía, tu firma y tu contacto si lo indicaste."
+ },
+ "Гайд слишком большой — сократите текст": {
+  "en": "The guide is too large — shorten the text",
+  "es": "La guía es demasiado grande: acorta el texto"
+ },
+ "Гайда здесь ещё нет — вы можете написать первый.": {
+  "en": "There's no guide here yet — you can write the first one.",
+  "es": "Aún no hay guía aquí: puedes escribir la primera."
+ },
+ "Гайда на этого персонажа ещё нет — вы можете написать первый.": {
+  "en": "There's no guide for this character yet — you can write the first one.",
+  "es": "Aún no hay guía para este personaje: puedes escribir la primera."
+ },
+ "Гайды": {
+  "en": "Guides",
+  "es": "Guías"
+ },
+ "Гайды других авторов на сторонних сайтах — подробные разборы, написанные игроками.": {
+  "en": "Guides by other authors on other sites — in-depth breakdowns written by players.",
+  "es": "Guías de otros autores en otros sitios: análisis detallados escritos por jugadores."
+ },
+ "Гайды на других сайтах": {
+  "en": "Guides on other sites",
+  "es": "Guías en otros sitios"
+ },
+ "Галерея": {
+  "en": "Gallery",
+  "es": "Galería"
+ },
+ "Гарант": {
+  "en": "Pity",
+  "es": "Garantía"
+ },
+ "Гарант {a} из {b}": {
+  "en": "Pity {a} of {b}",
+  "es": "Garantía {a} de {b}"
+ },
+ "Где рекомендуют: {list}": {
+  "en": "Recommended in: {list}",
+  "es": "Recomendado en: {list}"
+ },
+ "Гео": {
+  "en": "Geo",
+  "es": "Geo"
+ },
+ "Гидро": {
+  "en": "Hydro",
+  "es": "Hydro"
+ },
+ "Главная": {
+  "en": "Home",
+  "es": "Inicio"
+ },
+ "Готова к 9★ в зале": {
+  "en": "Ready for 9★ in the chamber",
+  "es": "Lista para 9★ en la sala"
+ },
+ "Готово": {
+  "en": "Done",
+  "es": "Listo"
+ },
+ "Готово: добавлено {n} новых молитв.": {
+  "en": "Done: {n} new wishes added.",
+  "es": "Listo: se añadieron {n} deseos nuevos."
+ },
+ "Градиент": {
+  "en": "Gradient",
+  "es": "Degradado"
+ },
+ "Громкость": {
+  "en": "Volume",
+  "es": "Volumen"
+ },
+ "ДД, Саппорт, Хилер…": {
+  "en": "DPS, Support, Healer…",
+  "es": "DPS, Apoyo, Sanador…"
+ },
+ "Данные": {
+  "en": "Data",
+  "es": "Datos"
+ },
+ "Данные и конфиденциальность": {
+  "en": "Data and privacy",
+  "es": "Datos y privacidad"
+ },
+ "Данные ивентов — из официальных объявлений игры; даты будущих версий — ожидаемые.": {
+  "en": "Event data comes from official game announcements; future version dates are estimates.",
+  "es": "Los datos de los eventos proceden de anuncios oficiales del juego; las fechas de futuras versiones son estimadas."
+ },
+ "Даты баннеров, ивентов, версий и сбросов эндгейма Genshin Impact по времени выбранного сервера.": {
+  "en": "Dates of Genshin Impact wishes, events, versions and endgame resets in your selected server's time.",
+  "es": "Fechas de gachapones, eventos, versiones y reinicios del contenido final de Genshin Impact según la hora del servidor elegido."
+ },
+ "Действие": {
+  "en": "Action",
+  "es": "Acción"
+ },
+ "Дендро": {
+  "en": "Dendro",
+  "es": "Dendro"
+ },
+ "День рождения": {
+  "en": "Birthday",
+  "es": "Cumpleaños"
+ },
+ "Диск": {
+  "en": "Disc",
+  "es": "Disco"
+ },
+ "Для загрузки по UID в игре нужно выставить персонажей на витрину профиля и включить «Показывать подробности».": {
+  "en": "To load by UID, put characters in your in-game profile showcase and turn on “Show Character Details”.",
+  "es": "Para cargar por UID, coloca personajes en la vitrina de tu perfil del juego y activa «Mostrar detalles del personaje»."
+ },
+ "Для персонажей витрины пока нет эталонных команд.": {
+  "en": "There are no reference teams for your showcased characters yet.",
+  "es": "Aún no hay equipos de referencia para los personajes de tu escaparate."
+ },
+ "Для профиля нужен JavaScript": {
+  "en": "The profile needs JavaScript",
+  "es": "El perfil necesita JavaScript"
+ },
+ "Для удаления войдите заново.": {
+  "en": "Sign in again to delete your account.",
+  "es": "Vuelve a iniciar sesión para eliminar tu cuenta."
+ },
+ "До {date}. Осталось": {
+  "en": "Until {date}. Time left:",
+  "es": "Hasta el {date}. Queda:"
+ },
+ "До конца:": {
+  "en": "Ends in:",
+  "es": "Termina en:"
+ },
+ "До начала": {
+  "en": "Starts in",
+  "es": "Comienza en"
+ },
+ "До начала:": {
+  "en": "Starts in:",
+  "es": "Empieza en:"
+ },
+ "Добавить": {
+  "en": "Add",
+  "es": "Añadir"
+ },
+ "Добавить вручную": {
+  "en": "Add manually",
+  "es": "Añadir manualmente"
+ },
+ "Добавлено молитв: {n}.": {
+  "en": "Wishes added: {n}.",
+  "es": "Deseos añadidos: {n}."
+ },
+ "Добавлено: {name}.": {
+  "en": "Added: {name}.",
+  "es": "Añadido: {name}."
+ },
+ "Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.": {
+  "en": "Add characters and weapons to favorites with the ☆ button on their pages.",
+  "es": "Añade personajes y armas a favoritos con el botón ☆ en sus páginas."
+ },
+ "Добавьте персонажей в проверке команды или загрузите по UID.": {
+  "en": "Add characters in Team Check or load them by UID.",
+  "es": "Añade personajes en la comprobación de equipo o cárgalos por UID."
+ },
+ "Добавьте своих персонажей и узнайте, хватит ли их на текущую Бездну": {
+  "en": "Add your characters and find out if they can clear the current Abyss",
+  "es": "Añade tus personajes y descubre si pueden con el Abismo actual"
+ },
+ "Добавьте своих персонажей с их билдами и узнайте, хватит ли команды на текущую Витую бездну.": {
+  "en": "Add your characters with their builds and find out if your teams can clear the current Spiral Abyss.",
+  "es": "Añade tus personajes con sus builds y descubre si tus equipos pueden con el Abismo de Espiral actual."
+ },
+ "Добавьте своих персонажей — вручную или по UID из игры, — соберите по команде на каждую половину и узнайте, потянут ли они текущую Бездну.": {
+  "en": "Add your characters — manually or by in-game UID — build a team for each half and find out whether they can clear the current Abyss.",
+  "es": "Añade tus personajes (a mano o por UID del juego), arma un equipo para cada mitad y descubre si pueden con el Abismo actual."
+ },
+ "Добавьте хотя бы двух персонажей.": {
+  "en": "Add at least two characters.",
+  "es": "Añade al menos dos personajes."
+ },
+ "Доп. стат": {
+  "en": "Substat",
+  "es": "Estadística secundaria"
+ },
+ "Доп. статы": {
+  "en": "Substats",
+  "es": "Estadísticas secundarias"
+ },
+ "Доп. статы — по приоритету, через «>»": {
+  "en": "Substats — by priority, separated with \">\"",
+  "es": "Estadísticas secundarias: por prioridad, separadas con «>»"
+ },
+ "Дополнить гайд": {
+  "en": "Improve this guide",
+  "es": "Mejorar la guía"
+ },
+ "Другие персонажи": {
+  "en": "Other characters",
+  "es": "Otros personajes"
+ },
+ "Другое": {
+  "en": "Other",
+  "es": "Otro"
+ },
+ "Европа": {
+  "en": "Europe",
+  "es": "Europa"
+ },
+ "Если выбирать одно, оружие даёт больше, а крутки с оружейного баннера ещё и не отнимают гарант на персонажей.": {
+  "en": "If you pick one, the weapon gives more — and weapon banner pulls don't use up your character pity either.",
+  "es": "Si eliges uno, el arma aporta más, y las tiradas en el gachapón de armas no gastan tu garantía de personajes."
+ },
+ "Если выбирать одно, первое созвездие даёт больше, чем оружие.": {
+  "en": "If you pick one, the first constellation gives more than the weapon.",
+  "es": "Si eliges uno, la primera constelación aporta más que el arma."
+ },
+ "Если такой аккаунт есть, мы отправили письмо.": {
+  "en": "If an account exists, we sent an email.",
+  "es": "Si existe una cuenta, te hemos enviado un correo."
+ },
+ "Есть билд": {
+  "en": "Build available",
+  "es": "Build disponible"
+ },
+ "Ещё не утекло: {list}.": {
+  "en": "Not leaked yet: {list}.",
+  "es": "Aún no filtrado: {list}."
+ },
+ "Ж": {
+  "en": "B",
+  "es": "N"
+ },
+ "Жирный (Ctrl+B)": {
+  "en": "Bold (Ctrl+B)",
+  "es": "Negrita (Ctrl+B)"
+ },
+ "Забыли пароль?": {
+  "en": "Forgot your password?",
+  "es": "¿Olvidaste tu contraseña?"
+ },
+ "Заголовок": {
+  "en": "Heading",
+  "es": "Título"
+ },
+ "Загружаю «{type}», страница {page}…": {
+  "en": "Loading “{type}”, page {page}…",
+  "es": "Cargando «{type}», página {page}…"
+ },
+ "Загружаю витрину…": {
+  "en": "Loading showcase…",
+  "es": "Cargando vitrina…"
+ },
+ "Загружаю движок gcsim (≈10 МБ, один раз)…": {
+  "en": "Loading the gcsim engine (≈10 MB, once)…",
+  "es": "Cargando el motor gcsim (≈10 MB, una sola vez)…"
+ },
+ "Загружаю…": {
+  "en": "Loading…",
+  "es": "Cargando…"
+ },
+ "Загружен текущий гайд (патч {v}, обновлён {date}) — правьте и дополняйте что нужно.": {
+  "en": "The current guide is loaded (patch {v}, updated {date}) — edit and add whatever you need.",
+  "es": "Se cargó la guía actual (versión {v}, actualizada el {date}): edita y añade lo que haga falta."
+ },
+ "Загружен текущий гайд — правьте и дополняйте что нужно.": {
+  "en": "The current guide is loaded — edit and add whatever you need.",
+  "es": "Se cargó la guía actual: edita y añade lo que haga falta."
+ },
+ "Загружено персонажей: {n}.": {
+  "en": "Characters loaded: {n}.",
+  "es": "Personajes cargados: {n}."
+ },
+ "Загрузите историю по ссылке из игры или файлом — счётчики гаранта появятся здесь.": {
+  "en": "Load your history with the in-game link or a file — pity counters will appear here.",
+  "es": "Carga tu historial con el enlace del juego o un archivo: aquí aparecerán los contadores de garantía."
+ },
+ "Загрузить": {
+  "en": "Load",
+  "es": "Cargar"
+ },
+ "Загрузить витрину": {
+  "en": "Load showcase",
+  "es": "Cargar escaparate"
+ },
+ "Загрузить историю": {
+  "en": "Load history",
+  "es": "Cargar historial"
+ },
+ "Загрузка витрины": {
+  "en": "Load showcase",
+  "es": "Cargar escaparate"
+ },
+ "Задание": {
+  "en": "Quest",
+  "es": "Misión"
+ },
+ "Закончилось": {
+  "en": "Ended",
+  "es": "Finalizado"
+ },
+ "Закрыть": {
+  "en": "Close",
+  "es": "Cerrar"
+ },
+ "Закрыть меню": {
+  "en": "Close menu",
+  "es": "Cerrar menú"
+ },
+ "Зал {n}": {
+  "en": "Chamber {n}",
+  "es": "Sala {n}"
+ },
+ "Заменить мой профиль": {
+  "en": "Replace my profile",
+  "es": "Reemplazar mi perfil"
+ },
+ "Заметка (необязательно)": {
+  "en": "Note (optional)",
+  "es": "Nota (opcional)"
+ },
+ "Заметка к команде": {
+  "en": "Team note",
+  "es": "Nota del equipo"
+ },
+ "Заметка: «4 предмета» или «2 + 2»": {
+  "en": "Note: \"4-piece\" or \"2 + 2\"",
+  "es": "Nota: «4 piezas» o «2 + 2»"
+ },
+ "Заметка: пробуждение, условия…": {
+  "en": "Note: refinement, conditions…",
+  "es": "Nota: refinamiento, condiciones…"
+ },
+ "Запись и ссылка": {
+  "en": "Notation and link",
+  "es": "Notación y enlace"
+ },
+ "Запросить новую ссылку": {
+  "en": "Request a new link",
+  "es": "Solicitar otro enlace"
+ },
+ "Зарегистрироваться": {
+  "en": "Sign up",
+  "es": "Registrarse"
+ },
+ "Заряж. атака": {
+  "en": "Charged Attack",
+  "es": "Ataque Cargado"
+ },
+ "Затемнение": {
+  "en": "Dimming",
+  "es": "Oscurecimiento"
+ },
+ "Защита": {
+  "en": "DEF",
+  "es": "DEF"
+ },
+ "Защита %": {
+  "en": "DEF%",
+  "es": "DEF %"
+ },
+ "Защита {v}: для персонажа от защиты маловато, ориентир — от {target}": {
+  "en": "DEF {v}: low for a DEF scaler — aim for {target}+",
+  "es": "DEF {v}: baja para un personaje que escala con DEF — apunta a {target}+"
+ },
+ "Звёздное небо": {
+  "en": "Starry sky",
+  "es": "Cielo estrellado"
+ },
+ "Здесь появятся страницы, которые вы открывали.": {
+  "en": "Pages you've opened will appear here.",
+  "es": "Aquí aparecerán las páginas que has abierto."
+ },
+ "Здесь скоро появятся первые новости сайта.": {
+  "en": "The first site news will appear here soon.",
+  "es": "Las primeras noticias del sitio aparecerán aquí pronto."
+ },
+ "Золото": {
+  "en": "Gold",
+  "es": "Oro"
+ },
+ "Золото сайта": {
+  "en": "Site gold",
+  "es": "Oro del sitio"
+ },
+ "Золотой": {
+  "en": "Gold",
+  "es": "Dorada"
+ },
+ "Ивент": {
+  "en": "Event",
+  "es": "Evento"
+ },
+ "Ивенты": {
+  "en": "Events",
+  "es": "Eventos"
+ },
+ "Игрок с таким UID не найден": {
+  "en": "No player found with this UID",
+  "es": "No se encontró ningún jugador con ese UID"
+ },
+ "Игроки отправляют команду и время прохождения. Команда, прошедшая ту же комнату быстрее, «выигрывает». Рейтинг открывается, когда набирается достаточно забегов.": {
+  "en": "Players submit a team and clear time. The team that clears the same chamber faster “wins”. The rating unlocks once there are enough runs.",
+  "es": "Los jugadores envían un equipo y su tiempo. El equipo que supera la misma sala más rápido «gana». La clasificación se abre cuando hay suficientes partidas."
+ },
+ "Идея или пожелание": {
+  "en": "Idea or suggestion",
+  "es": "Idea o sugerencia"
+ },
+ "Идёт сейчас": {
+  "en": "Ongoing",
+  "es": "En curso"
+ },
+ "Из файла": {
+  "en": "From a file",
+  "es": "Desde un archivo"
+ },
+ "Избранное": {
+  "en": "Favorites",
+  "es": "Favoritos"
+ },
+ "Избранное, персонажи и история круток из этого браузера.": {
+  "en": "Favorites, characters and wish history from this browser.",
+  "es": "Favoritos, personajes e historial de gachapón de este navegador."
+ },
+ "Избранное, персонажи и история круток.": {
+  "en": "Favorites, characters and wish history.",
+  "es": "Favoritos, personajes e historial de deseos."
+ },
+ "Изменить в проверке команды": {
+  "en": "Edit in Team Check",
+  "es": "Editar en la comprobación de equipo"
+ },
+ "Изображения и витрина по UID —": {
+  "en": "Images and UID showcase —",
+  "es": "Imágenes y vitrina por UID:"
+ },
+ "Изумрудный": {
+  "en": "Emerald",
+  "es": "Esmeralda"
+ },
+ "Или по UID": {
+  "en": "Or by UID",
+  "es": "O por UID"
+ },
+ "Импорт будет применён после нажатия «Готово».": {
+  "en": "The import will be applied after you press “Done”.",
+  "es": "La importación se aplicará al pulsar «Listo»."
+ },
+ "Импорт из файла": {
+  "en": "Import from file",
+  "es": "Importar desde archivo"
+ },
+ "Имя или ник — подпишем гайд": {
+  "en": "Name or nickname — we'll credit the guide to you",
+  "es": "Nombre o apodo: firmaremos la guía con él"
+ },
+ "Имя персонажа": {
+  "en": "Character name",
+  "es": "Nombre del personaje"
+ },
+ "Имя персонажа или оружия": {
+  "en": "Character or weapon name",
+  "es": "Nombre de personaje o arma"
+ },
+ "Инструменты": {
+  "en": "Tools",
+  "es": "Herramientas"
+ },
+ "Интенсивность": {
+  "en": "Intensity",
+  "es": "Intensidad"
+ },
+ "Искры": {
+  "en": "Sparks",
+  "es": "Chispas"
+ },
+ "История": {
+  "en": "History",
+  "es": "Historial"
+ },
+ "История аккаунта удалена из браузера.": {
+  "en": "Account history deleted from this browser.",
+  "es": "Historial de la cuenta eliminado del navegador."
+ },
+ "История аккаунта удалена.": {
+  "en": "Account history deleted.",
+  "es": "Historial de la cuenta eliminado."
+ },
+ "История баннеров": {
+  "en": "Banner history",
+  "es": "Historial de gachapones"
+ },
+ "История баннеров — открытые данные": {
+  "en": "Banner history — open data from",
+  "es": "Historial de gachapones: datos abiertos de"
+ },
+ "История баннеров — по открытым данным": {
+  "en": "Banner history — based on open data from",
+  "es": "Historial de gachapones basado en datos abiertos de"
+ },
+ "История круток не загружена": {
+  "en": "Wish history not loaded",
+  "es": "Historial de gachapón no cargado"
+ },
+ "История молитв, ваши персонажи для проверки команды, избранное и недавние страницы —": {
+  "en": "Wish history, your characters for the team checker, favorites and recent pages are stored",
+  "es": "El historial de deseos, tus personajes del comprobador, favoritos y páginas recientes se guardan"
+ },
+ "История пуста: на этом аккаунте ещё не было молитв за последние 6 месяцев.": {
+  "en": "History is empty: this account has no wishes in the last 6 months.",
+  "es": "El historial está vacío: esta cuenta no tiene deseos en los últimos 6 meses."
+ },
+ "История хранится в вашем аккаунте.": {
+  "en": "Your history is stored in your account.",
+  "es": "Tu historial se guarda en tu cuenta."
+ },
+ "История хранится только в этом браузере. Войдите, чтобы сохранить её в аккаунт.": {
+  "en": "Your history is stored only in this browser. Sign in to save it to your account.",
+  "es": "Tu historial solo se guarda en este navegador. Inicia sesión para guardarlo en tu cuenta."
+ },
+ "Источник": {
+  "en": "Source",
+  "es": "Fuente"
+ },
+ "Источник ротации": {
+  "en": "Rotation source",
+  "es": "Fuente de la rotación"
+ },
+ "Источники": {
+  "en": "Sources",
+  "es": "Fuentes"
+ },
+ "Исходная симуляция": {
+  "en": "Original simulation",
+  "es": "Simulación original"
+ },
+ "Итоговые статы": {
+  "en": "Final stats",
+  "es": "Estadísticas finales"
+ },
+ "К": {
+  "en": "I",
+  "es": "C"
+ },
+ "К содержимому": {
+  "en": "Skip to content",
+  "es": "Ir al contenido"
+ },
+ "К списку новостей": {
+  "en": "Back to the news list",
+  "es": "Volver a la lista de noticias"
+ },
+ "Как получить": {
+  "en": "How to get",
+  "es": "Cómo conseguirla"
+ },
+ "Как с вами связаться": {
+  "en": "How to reach you",
+  "es": "Cómo contactarte"
+ },
+ "Как считали": {
+  "en": "How we calculated",
+  "es": "Cómo se calculó"
+ },
+ "Календарь": {
+  "en": "Calendar",
+  "es": "Calendario"
+ },
+ "Календарь Genshin Impact: баннеры, ивенты и обновления": {
+  "en": "Genshin Impact calendar: wishes, events and updates",
+  "es": "Calendario de Genshin Impact: gachapones, eventos y actualizaciones"
+ },
+ "Календарь событий": {
+  "en": "Events calendar",
+  "es": "Calendario de eventos"
+ },
+ "Калькулятор прокачки": {
+  "en": "Level-up calculator",
+  "es": "Calculadora de ascensión"
+ },
+ "Карта Тейвата": {
+  "en": "Map of Teyvat",
+  "es": "Mapa de Teyvat"
+ },
+ "Картинка слишком большая": {
+  "en": "The image is too large",
+  "es": "La imagen es demasiado grande"
+ },
+ "Категории календаря": {
+  "en": "Calendar categories",
+  "es": "Categorías del calendario"
+ },
+ "Квартал": {
+  "en": "Quarter",
+  "es": "Trimestre"
+ },
+ "Книги опыта и руда посчитаны самыми дорогими вариантами; мора включает прокачку уровня. Опыт — по игровым таблицам, материалы — по данным genshin-db.": {
+  "en": "EXP books and ore are counted in their highest tier; Mora includes leveling. EXP comes from the game tables, materials from genshin-db.",
+  "es": "Los libros de EXP y el mineral se cuentan en su calidad más alta; las Moras incluyen la subida de nivel. La EXP sale de las tablas del juego y los materiales, de genshin-db."
+ },
+ "Книги талантов: учение / руководство / философия": {
+  "en": "Talent books: Teachings / Guide / Philosophies",
+  "es": "Libros de talento: Enseñanzas / Guía / Filosofía"
+ },
+ "Кого ищем? Например, Коломбина или «Лунный заряд»": {
+  "en": "Who are we looking for? E.g. Columbina or “Lunar-Charged”",
+  "es": "¿A quién buscas? Por ejemplo, Columbina o «Carga Lunar»"
+ },
+ "Команда": {
+  "en": "Team",
+  "es": "Equipo"
+ },
+ "Команда «{name}» поставлена": {
+  "en": "Team “{name}” selected",
+  "es": "Se ha elegido el equipo «{name}»"
+ },
+ "Команда из открытой базы симуляций gcsim — самая близкая к командам из гайда. Меняли только созвездие этого персонажа; напарники, артефакты, статы и ротация — как в исходной симуляции. C0 с {four}: {dps} урона в секунду.": {
+  "en": "The team comes from the open gcsim simulation database — the one closest to the teams in this guide. Only this character's constellation was changed; teammates, artifacts, stats and rotation stay as in the original simulation. C0 with {four}: {dps} damage per second.",
+  "es": "El equipo sale de la base abierta de simulaciones de gcsim: el más parecido a los equipos de esta guía. Solo se cambió la constelación de este personaje; compañeros, artefactos, estadísticas y rotación quedan como en la simulación original. C0 con {four}: {dps} de daño por segundo."
+ },
+ "Команда из открытой базы симуляций gcsim — самая близкая к командам из гайда. Меняли только этого персонажа: созвездие и оружие. Напарники, сеты артефактов и ротация — как в исходной симуляции, доп. статы всей команды подобраны по стандарту KQM под каждое оружие отдельно. C0 с {four}: {dps} урона в секунду.": {
+  "en": "The team comes from the open gcsim simulation database — the one closest to the teams in this guide. Only this character was changed: constellation and weapon. Teammates, artifact sets and rotation stay as in the original simulation; the whole team's substats are optimized to KQM standards separately for each weapon. C0 with {four}: {dps} damage per second.",
+  "es": "El equipo sale de la base abierta de simulaciones de gcsim: el más parecido a los equipos de esta guía. Solo se cambió a este personaje: constelación y arma. Compañeros, sets de artefactos y rotación quedan como en la simulación original; las estadísticas secundarias de todo el equipo se optimizan según el estándar de KQM por separado para cada arma. C0 con {four}: {dps} de daño por segundo."
+ },
+ "Команда не собрана.": {
+  "en": "No team assembled.",
+  "es": "Equipo sin formar."
+ },
+ "Команда скопирована.": {
+  "en": "Command copied.",
+  "es": "Comando copiado."
+ },
+ "Команду и ротацию мы собрали сами по открытому гайду: в базе симуляций gcsim подходящей команды нет. Билды напарников — из наших гайдов, доп. статы всей команды подобраны по стандарту KQM под каждое оружие отдельно. C0 с {four}: {dps} урона в секунду.": {
+  "en": "We put this team and rotation together ourselves from an open guide, since the gcsim simulation database has no suitable team. Teammate builds come from our guides; the whole team's substats are tuned to the KQM standard for each weapon separately. C0 with {four}: {dps} damage per second.",
+  "es": "Armamos este equipo y su rotación a partir de una guía abierta, porque la base de simulaciones de gcsim no tiene un equipo adecuado. Las builds de los compañeros salen de nuestras guías; las estadísticas secundarias de todo el equipo se ajustan al estándar de KQM para cada arma por separado. C0 con {four}: {dps} de daño por segundo."
+ },
+ "Команды": {
+  "en": "Teams",
+  "es": "Equipos"
+ },
+ "Команды для {n} этажа": {
+  "en": "Teams for floor {n}",
+  "es": "Equipos para el piso {n}"
+ },
+ "Команды не добавлены": {
+  "en": "No teams added",
+  "es": "No se añadieron equipos"
+ },
+ "Комментарий для модератора": {
+  "en": "Note for the moderator",
+  "es": "Comentario para el moderador"
+ },
+ "Кому подходит": {
+  "en": "Best users",
+  "es": "A quién le queda"
+ },
+ "Конец": {
+  "en": "Ends",
+  "es": "Fin"
+ },
+ "Конструктор ротаций": {
+  "en": "Rotation builder",
+  "es": "Creador de rotaciones"
+ },
+ "Корона": {
+  "en": "Circlet",
+  "es": "Tiara"
+ },
+ "Корона прозрения": {
+  "en": "Crown of Insight",
+  "es": "Corona de la Sabiduría"
+ },
+ "Коснитесь звезды, чтобы войти": {
+  "en": "Touch the star to enter",
+  "es": "Toca la estrella para entrar"
+ },
+ "Коснитесь компаса Весны, чтобы войти": {
+  "en": "Touch Vesna's compass to enter",
+  "es": "Toca la brújula de Vesna para entrar"
+ },
+ "Коснитесь палочки Весны, чтобы войти": {
+  "en": "Touch Vesna's wand to enter",
+  "es": "Toca la varita de Vesna para entrar"
+ },
+ "Коснитесь пузырька": {
+  "en": "Touch the bubble",
+  "es": "Toca la burbuja"
+ },
+ "Коснитесь света, чтобы войти": {
+  "en": "Touch the light to enter",
+  "es": "Toca la luz para entrar"
+ },
+ "Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.": {
+  "en": "A short build based on community data: role — {role}, options go from best to fallback. A detailed guide hasn't been written yet.",
+  "es": "Build breve según datos de la comunidad: rol — {role}, las opciones van de la mejor a la alternativa. Aún no hay una guía detallada."
+ },
+ "Крио": {
+  "en": "Cryo",
+  "es": "Cryo"
+ },
+ "Крит {cr}% / {cd}% — хорошо": {
+  "en": "Crit {cr}% / {cd}% — good",
+  "es": "Crítico {cr}% / {cd}%: bien"
+ },
+ "Крит {cr}% / {cd}%: для {role} маловато, ориентир — {target}": {
+  "en": "Crit {cr}% / {cd}%: low for {role}, aim for {target}",
+  "es": "Crítico {cr}% / {cd}%: bajo para {role}, apunta a {target}"
+ },
+ "Крит. урон": {
+  "en": "CRIT DMG",
+  "es": "Daño CRIT"
+ },
+ "Крутки": {
+  "en": "Wishes",
+  "es": "Gachapón"
+ },
+ "Кто действует": {
+  "en": "Who acts",
+  "es": "Quién actúa"
+ },
+ "Кубок": {
+  "en": "Goblet",
+  "es": "Cáliz"
+ },
+ "Кузница": {
+  "en": "Forge",
+  "es": "Forja"
+ },
+ "Курсив (Ctrl+I)": {
+  "en": "Italic (Ctrl+I)",
+  "es": "Cursiva (Ctrl+I)"
+ },
+ "Куётся у кузнеца из заготовки оружия и руды; чертёж некоторых нужно сначала открыть.": {
+  "en": "Forged at the blacksmith from a weapon billet and ore; some blueprints must be unlocked first.",
+  "es": "Se forja en la herrería con un lingote de arma y mineral; algunos planos hay que desbloquearlos antes."
+ },
+ "Лавандовый": {
+  "en": "Lavender",
+  "es": "Lavanda"
+ },
+ "Лепестки": {
+  "en": "Petals",
+  "es": "Pétalos"
+ },
+ "Лучшее 5★ оружие (R1)": {
+  "en": "Best 5★ weapon (R1)",
+  "es": "Mejor arma 5★ (R1)"
+ },
+ "Любимые": {
+  "en": "Favorites",
+  "es": "Favoritos"
+ },
+ "Любимые персонажи": {
+  "en": "Favorite characters",
+  "es": "Personajes favoritos"
+ },
+ "Любой текст: «C2», «сигнатурное»": {
+  "en": "Any text: \"C2\", \"signature\"",
+  "es": "Cualquier texto: «C2», «exclusiva»"
+ },
+ "Лёд": {
+  "en": "Ice",
+  "es": "Hielo"
+ },
+ "Магазин Паймон": {
+  "en": "Paimon's Bargains",
+  "es": "Ofertas de Paimon"
+ },
+ "Мастерство стихий": {
+  "en": "Elemental Mastery",
+  "es": "Maestría Elemental"
+ },
+ "Мастерство стихий {v}: для реакционного персонажа ориентир — от 600": {
+  "en": "Elemental Mastery {v}: a reaction character should aim for 600+",
+  "es": "Maestría Elemental {v}: un personaje de reacciones debería apuntar a 600+"
+ },
+ "Масштаб": {
+  "en": "Scale",
+  "es": "Escala"
+ },
+ "Материал с босса": {
+  "en": "Boss material",
+  "es": "Material de jefe"
+ },
+ "Материал с еженедельного босса": {
+  "en": "Weekly boss material",
+  "es": "Material de jefe semanal"
+ },
+ "Материалы": {
+  "en": "Materials",
+  "es": "Materiales"
+ },
+ "Материалы с монстров: 1★ / 2★ / 3★": {
+  "en": "Common materials: 1★ / 2★ / 3★",
+  "es": "Materiales comunes: 1★ / 2★ / 3★"
+ },
+ "Местный диковинный материал (новый)": {
+  "en": "Local specialty (new)",
+  "es": "Especialidad local (nueva)"
+ },
+ "Месяц": {
+  "en": "Month",
+  "es": "Mes"
+ },
+ "Метель": {
+  "en": "Blizzard",
+  "es": "Ventisca"
+ },
+ "Минимум 8 символов.": {
+  "en": "At least 8 characters.",
+  "es": "Al menos 8 caracteres."
+ },
+ "Мне есть 13 лет и я соглашаюсь с": {
+  "en": "I am at least 13 and agree to the",
+  "es": "Tengo al menos 13 años y acepto la"
+ },
+ "Мне есть 13 лет и я соглашаюсь с тем, что сайт хранит мой email и данные аккаунта.": {
+  "en": "I am at least 13 and agree that the site stores my email and account data.",
+  "es": "Tengo al menos 13 años y acepto que el sitio guarde mi correo y los datos de mi cuenta."
+ },
+ "Множители": {
+  "en": "Scaling",
+  "es": "Multiplicadores"
+ },
+ "Мои персонажи": {
+  "en": "My characters",
+  "es": "Mis personajes"
+ },
+ "Мой профиль": {
+  "en": "My profile",
+  "es": "Mi perfil"
+ },
+ "Молитв": {
+  "en": "Wishes",
+  "es": "Deseos"
+ },
+ "Молитв: {total} · 5★: {fives}": {
+  "en": "Wishes: {total} · 5★: {fives}",
+  "es": "Tiradas: {total} · 5★: {fives}"
+ },
+ "Молитва события": {
+  "en": "Event Wish",
+  "es": "Gachapón de evento"
+ },
+ "Молитва события оружия": {
+  "en": "Weapon Event Wish",
+  "es": "Gachapón de evento de armas"
+ },
+ "Молитва события персонажа": {
+  "en": "Character Event Wish",
+  "es": "Gachapón de evento de personaje"
+ },
+ "Молитвы оружия": {
+  "en": "Weapon wishes",
+  "es": "Gachapones de armas"
+ },
+ "Молитвы персонажей": {
+  "en": "Character wishes",
+  "es": "Gachapones de personajes"
+ },
+ "Мора": {
+  "en": "Mora",
+  "es": "Moras"
+ },
+ "Музыка Снежной": {
+  "en": "Snezhnaya music",
+  "es": "Música de Snezhnaya"
+ },
+ "Музыка недоступна в этом браузере или регионе": {
+  "en": "Music is unavailable in this browser or region",
+  "es": "La música no está disponible en este navegador o región"
+ },
+ "Музыка: HOYO-MiX — «Where Mercy Endures» · официальный канал Genshin Impact": {
+  "en": "Music: HOYO-MiX — “Where Mercy Endures” · official Genshin Impact channel",
+  "es": "Música: HOYO-MiX — «Where Mercy Endures» · canal oficial de Genshin Impact"
+ },
+ "Мы сохраняем только текст сообщения, страницу и контакт, если вы его указали.": {
+  "en": "We only store the message, the page and your contact if you left one.",
+  "es": "Solo guardamos el mensaje, la página y tu contacto si lo indicaste."
+ },
+ "Мягкий гарант с {n}-й молитвы": {
+  "en": "Soft pity from wish {n}",
+  "es": "Garantía suave desde el deseo {n}"
+ },
+ "На enka.network идут технические работы": {
+  "en": "enka.network is under maintenance",
+  "es": "enka.network está en mantenimiento"
+ },
+ "На витрине нет знакомых персонажей.": {
+  "en": "No known characters in the showcase.",
+  "es": "No hay personajes conocidos en el escaparate."
+ },
+ "На витрине нет персонажей или скрыты подробности. Включите «Показывать подробности» в профиле игры.": {
+  "en": "The showcase is empty or details are hidden. Turn on “Show Character Details” in your in-game profile.",
+  "es": "La vitrina está vacía o los detalles están ocultos. Activa «Mostrar detalles del personaje» en tu perfil del juego."
+ },
+ "На главную": {
+  "en": "Go to home page",
+  "es": "Ir al inicio"
+ },
+ "На заметку": {
+  "en": "Note",
+  "es": "Nota"
+ },
+ "На поле": {
+  "en": "On-field",
+  "es": "En campo"
+ },
+ "Навигация": {
+  "en": "Navigation",
+  "es": "Navegación"
+ },
+ "Навык": {
+  "en": "Skill",
+  "es": "Habilidad"
+ },
+ "Навык (удерж.)": {
+  "en": "Skill (hold)",
+  "es": "Habilidad (mantener)"
+ },
+ "Награда временного ивента — после его окончания получить нельзя.": {
+  "en": "A limited-time event reward — can't be obtained after the event ends.",
+  "es": "Recompensa de un evento temporal: no se puede conseguir cuando termina."
+ },
+ "Награда за задание или прогресс в мире.": {
+  "en": "A reward for a quest or world progress.",
+  "es": "Recompensa de una misión o del progreso en el mundo."
+ },
+ "Награда на PlayStation": {
+  "en": "PlayStation reward",
+  "es": "Recompensa de PlayStation"
+ },
+ "Награда на выбор в платной части боевого пропуска.": {
+  "en": "A selectable reward in the paid Battle Pass.",
+  "es": "Recompensa a elegir en el pase de batalla de pago."
+ },
+ "Надёжный": {
+  "en": "Strong",
+  "es": "Segura"
+ },
+ "Нажмите «В избранное» на странице персонажа, чтобы он был под рукой.": {
+  "en": "Press “Add to favorites” on a character page to keep it handy.",
+  "es": "Pulsa «Añadir a favoritos» en la página de un personaje para tenerlo a mano."
+ },
+ "Название": {
+  "en": "Name",
+  "es": "Nombre"
+ },
+ "Название команды": {
+  "en": "Team name",
+  "es": "Nombre del equipo"
+ },
+ "Название оружия": {
+  "en": "Weapon name",
+  "es": "Nombre del arma"
+ },
+ "Название сета": {
+  "en": "Set name",
+  "es": "Nombre del set"
+ },
+ "Название: «Гайд на Фурину от …»": {
+  "en": "Title: \"Furina guide by …\"",
+  "es": "Título: «Guía de Furina de …»"
+ },
+ "Найти оружие": {
+  "en": "Find a weapon",
+  "es": "Buscar arma"
+ },
+ "Найти персонажа": {
+  "en": "Find a character",
+  "es": "Buscar personaje"
+ },
+ "Найти сет": {
+  "en": "Find a set",
+  "es": "Buscar conjunto"
+ },
+ "Намкарта": {
+  "en": "Namecard",
+  "es": "Tarjeta de presentación"
+ },
+ "Написать гайд": {
+  "en": "Write a guide",
+  "es": "Escribir una guía"
+ },
+ "Написать нам": {
+  "en": "Contact us",
+  "es": "Escríbenos"
+ },
+ "Напишите новый гайд или дополните существующий. Слева — редактор, справа — как гайд будет выглядеть на сайте. Всё сохраняется в черновик в этом браузере. После отправки гайд проверяет модератор и только потом публикует.": {
+  "en": "Write a new guide or improve an existing one. The editor is on the left, and on the right you see how the guide will look on the site. Everything is saved as a draft in this browser. After you submit, a moderator reviews the guide before publishing it.",
+  "es": "Escribe una guía nueva o mejora una existente. A la izquierda está el editor y a la derecha, cómo se verá la guía en el sitio. Todo se guarda como borrador en este navegador. Después del envío, un moderador revisa la guía antes de publicarla."
+ },
+ "Напишите свой": {
+  "en": "Write your own",
+  "es": "Escribe la tuya"
+ },
+ "Напишите свой гайд на персонажа Genshin Impact или дополните существующий: билд, команды, текст с превью.": {
+  "en": "Write your own Genshin Impact character guide or improve an existing one: build, teams and text with a live preview.",
+  "es": "Escribe tu propia guía de un personaje de Genshin Impact o mejora una existente: build, equipos y texto con vista previa."
+ },
+ "Напишите хотя бы пару предложений — от 10 символов": {
+  "en": "Write at least a couple of sentences — 10 characters minimum",
+  "es": "Escribe al menos un par de frases: mínimo 10 caracteres"
+ },
+ "Напишите хотя бы пару предложений — от 10 символов.": {
+  "en": "Write at least a couple of sentences — 10 characters minimum.",
+  "es": "Escribe al menos un par de frases: mínimo 10 caracteres."
+ },
+ "Например, /characters/vesna/": {
+  "en": "E.g. /characters/vesna/",
+  "es": "Por ejemplo, /characters/vesna/"
+ },
+ "Например, Лунный заряд Флинса": {
+  "en": "E.g. Flins Lunar-Charged",
+  "es": "Por ejemplo, Carga Lunar de Flins"
+ },
+ "Например, разбор ротации": {
+  "en": "For example, rotation breakdown",
+  "es": "Por ejemplo, análisis de la rotación"
+ },
+ "Насколько вырастет урон всей команды по сравнению с C0 и оружием {four} (R{r}). Считается с нарастанием: C2 включает C1.": {
+  "en": "How much the whole team's damage grows compared to C0 with {four} (R{r}). Gains are cumulative: C2 includes C1.",
+  "es": "Cuánto crece el daño de todo el equipo frente a C0 con {four} (R{r}). Los aumentos son acumulativos: C2 incluye C1."
+ },
+ "Настроить профиль": {
+  "en": "Customize profile",
+  "es": "Personalizar perfil"
+ },
+ "Настройки аккаунта": {
+  "en": "Account settings",
+  "es": "Configuración de la cuenta"
+ },
+ "Натиск": {
+  "en": "Stygian Onslaught",
+  "es": "Embestida Estigia"
+ },
+ "Начало": {
+  "en": "Starts",
+  "es": "Inicio"
+ },
+ "Начать с готовой команды": {
+  "en": "Start from a ready-made team",
+  "es": "Empezar con un equipo preparado"
+ },
+ "Начать с текущего гайда": {
+  "en": "Start from the current guide",
+  "es": "Empezar desde la guía actual"
+ },
+ "Начать с чистого листа": {
+  "en": "Start from scratch",
+  "es": "Empezar desde cero"
+ },
+ "Начните вводить имя": {
+  "en": "Start typing a name",
+  "es": "Empieza a escribir un nombre"
+ },
+ "Начните вводить имя — например, Фурина": {
+  "en": "Start typing a name — for example, Furina",
+  "es": "Empieza a escribir un nombre, por ejemplo, Furina"
+ },
+ "Начните вводить имя, оружие или реакцию.": {
+  "en": "Start typing a name, weapon or reaction.",
+  "es": "Empieza a escribir un nombre, arma o reacción."
+ },
+ "Начнётся через {time}": {
+  "en": "Starts in {time}",
+  "es": "Empieza en {time}"
+ },
+ "Нашли ошибку в билде, устаревшие данные или есть идея? Напишите — мы читаем каждое сообщение.": {
+  "en": "Found a build mistake, outdated data or have an idea? Write to us — we read every message.",
+  "es": "¿Has visto un error en una build, datos desactualizados o tienes una idea? Escríbenos: leemos todos los mensajes."
+ },
+ "Нашли ошибку в билде?": {
+  "en": "Found a mistake in this build?",
+  "es": "¿Has visto un error en la build?"
+ },
+ "Не выбран сет артефактов": {
+  "en": "No artifact set selected",
+  "es": "No hay conjunto de artefactos elegido"
+ },
+ "Не выбрано оружие": {
+  "en": "No weapon selected",
+  "es": "No hay arma elegida"
+ },
+ "Не нашли в списке: {list} — выберите вариант из подсказок.": {
+  "en": "Not found in the list: {list} — pick an option from the suggestions.",
+  "es": "No se encontró en la lista: {list}. Elige una opción de las sugerencias."
+ },
+ "Не нашёл такой предмет — выберите из подсказок.": {
+  "en": "Item not found — pick one from the suggestions.",
+  "es": "No encontré ese objeto: elige uno de las sugerencias."
+ },
+ "Не получилось прочитать файл. Нужен JSON в формате UIGF.": {
+  "en": "Couldn't read the file. A UIGF JSON file is required.",
+  "es": "No se pudo leer el archivo. Se necesita un JSON en formato UIGF."
+ },
+ "Не удалось войти. Попробуйте ещё раз.": {
+  "en": "Could not sign in. Please try again.",
+  "es": "No se pudo iniciar sesión. Inténtalo de nuevo."
+ },
+ "Не удалось воспроизвести трек, пропускаем…": {
+  "en": "Could not play the track, skipping…",
+  "es": "No se pudo reproducir la pista, pasamos a la siguiente…"
+ },
+ "Не удалось загрузить данные персонажей.": {
+  "en": "Could not load character data.",
+  "es": "No se pudieron cargar los datos de personajes."
+ },
+ "Не удалось загрузить историю.": {
+  "en": "Couldn't load the history.",
+  "es": "No se pudo cargar el historial."
+ },
+ "Не удалось загрузить капчу. Попробуйте ещё раз.": {
+  "en": "Could not load the captcha. Please try again.",
+  "es": "No se pudo cargar el captcha. Inténtalo de nuevo."
+ },
+ "Не удалось загрузить профиль.": {
+  "en": "Couldn't load the profile.",
+  "es": "No se pudo cargar el perfil."
+ },
+ "Не удалось зарегистрироваться. Попробуйте ещё раз.": {
+  "en": "Could not sign up. Please try again.",
+  "es": "No se pudo crear la cuenta. Inténtalo de nuevo."
+ },
+ "Не удалось изменить пароль. Попробуйте ещё раз.": {
+  "en": "Could not change the password. Please try again.",
+  "es": "No se pudo cambiar la contraseña. Inténtalo de nuevo."
+ },
+ "Не удалось обработать картинку.": {
+  "en": "Could not process the image.",
+  "es": "No se pudo procesar la imagen."
+ },
+ "Не удалось отправить письмо. Попробуйте позже.": {
+  "en": "Could not send the email. Please try later.",
+  "es": "No se pudo enviar el correo. Inténtalo más tarde."
+ },
+ "Не удалось отправить — попробуйте позже": {
+  "en": "Couldn't send — try again later",
+  "es": "No se pudo enviar: inténtalo más tarde"
+ },
+ "Не удалось отправить. Попробуйте ещё раз.": {
+  "en": "Couldn't send. Please try again.",
+  "es": "No se pudo enviar. Inténtalo de nuevo."
+ },
+ "Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.": {
+  "en": "Could not confirm sign-in. Request a new link or sign in again.",
+  "es": "No se pudo confirmar el acceso. Solicita otro enlace o vuelve a iniciar sesión."
+ },
+ "Не удалось применить билд {name}.": {
+  "en": "Could not apply {name}'s build.",
+  "es": "No se pudo aplicar la build de {name}."
+ },
+ "Не удалось применить билд {name}: в конфиге нет персонажа или оружия.": {
+  "en": "Could not apply {name}'s build: the config has no character or weapon entry.",
+  "es": "No se pudo aplicar la build de {name}: falta el personaje o el arma en la configuración."
+ },
+ "Не удалось прочитать гайд": {
+  "en": "Couldn't read the guide",
+  "es": "No se pudo leer la guía"
+ },
+ "Не удалось прочитать картинку в этом браузере": {
+  "en": "Could not read the image in this browser",
+  "es": "No se pudo leer la imagen en este navegador"
+ },
+ "Не удалось прочитать форму": {
+  "en": "Couldn't read the form",
+  "es": "No se pudo leer el formulario"
+ },
+ "Не удалось разобрать данные витрины: {list}.": {
+  "en": "Couldn't read the showcase data for: {list}.",
+  "es": "No se pudieron leer los datos del escaparate de: {list}."
+ },
+ "Не удалось связаться с аккаунтом — показана история из этого браузера.": {
+  "en": "Couldn't reach your account — showing the history from this browser.",
+  "es": "No se pudo conectar con tu cuenta: se muestra el historial de este navegador."
+ },
+ "Не удалось связаться с сервером. Проверьте интернет и попробуйте ещё раз.": {
+  "en": "Couldn't reach the server. Check your connection and try again.",
+  "es": "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo."
+ },
+ "Не удалось синхронизировать профиль с аккаунтом": {
+  "en": "Couldn't sync your profile with your account",
+  "es": "No se pudo sincronizar el perfil con tu cuenta"
+ },
+ "Не удалось скачать данные. Попробуйте позже.": {
+  "en": "Could not download your data. Please try later.",
+  "es": "No se pudieron descargar tus datos. Inténtalo más tarde."
+ },
+ "Не удалось скопировать — выделите ссылку вручную.": {
+  "en": "Couldn't copy — select the link manually.",
+  "es": "No se pudo copiar: selecciona el enlace manualmente."
+ },
+ "Не удалось сохранить историю в аккаунте. Попробуйте ещё раз.": {
+  "en": "Couldn't save the history to your account. Try again.",
+  "es": "No se pudo guardar el historial en tu cuenta. Inténtalo de nuevo."
+ },
+ "Не удалось сохранить картинку в этом браузере": {
+  "en": "Could not save the image in this browser",
+  "es": "No se pudo guardar la imagen en este navegador"
+ },
+ "Не удалось сохранить профиль в этом браузере": {
+  "en": "Could not save the profile in this browser",
+  "es": "No se pudo guardar el perfil en este navegador"
+ },
+ "Не удалось удалить аккаунт. Попробуйте позже.": {
+  "en": "Could not delete your account. Please try later.",
+  "es": "No se pudo eliminar la cuenta. Inténtalo más tarde."
+ },
+ "Не хватает стихии: {list}.": {
+  "en": "Missing element: {list}.",
+  "es": "Falta elemento: {list}."
+ },
+ "Неверный email или пароль.": {
+  "en": "Incorrect email or password.",
+  "es": "Correo o contraseña incorrectos."
+ },
+ "Неверный файл профиля.": {
+  "en": "Invalid profile file.",
+  "es": "Archivo de perfil no válido."
+ },
+ "Неверный формат UID": {
+  "en": "Invalid UID format",
+  "es": "Formato de UID no válido"
+ },
+ "Неверный цвет HEX.": {
+  "en": "Invalid HEX color.",
+  "es": "Color HEX no válido."
+ },
+ "Недавние": {
+  "en": "Recent",
+  "es": "Recientes"
+ },
+ "Недавно закончилось": {
+  "en": "Recently ended",
+  "es": "Terminados recientemente"
+ },
+ "Недавно просмотренное": {
+  "en": "Recently viewed",
+  "es": "Vistos recientemente"
+ },
+ "Неделя": {
+  "en": "Week",
+  "es": "Semana"
+ },
+ "Неизвестный тип баннера": {
+  "en": "Unknown banner type",
+  "es": "Tipo de gachapón desconocido"
+ },
+ "Некоторые повреждённые записи не вошли в экспорт.": {
+  "en": "Some damaged entries were not included in the export.",
+  "es": "Algunas entradas dañadas no se incluyeron en la exportación."
+ },
+ "Нет": {
+  "en": "None",
+  "es": "Ninguno"
+ },
+ "Нет аккаунта?": {
+  "en": "New here?",
+  "es": "¿Aún no tienes cuenta?"
+ },
+ "Нет в ваших персонажах": {
+  "en": "Not in your roster",
+  "es": "No está en tu lista de personajes"
+ },
+ "Нет записей для выбранных категорий.": {
+  "en": "No entries in the selected categories.",
+  "es": "No hay entradas en las categorías seleccionadas."
+ },
+ "Нет рекомендованного билда — проверка будет общей": {
+  "en": "No recommended build — the check will be general",
+  "es": "No hay build recomendada: la comprobación será general"
+ },
+ "Нет связи с сервером — черновик сохранён, попробуйте позже": {
+  "en": "Can't reach the server — your draft is saved, try again later",
+  "es": "No hay conexión con el servidor: el borrador está guardado, inténtalo más tarde"
+ },
+ "Ни оружие, ни первое созвездие почти ничего не добавляют — крутки лучше сберечь для новых персонажей.": {
+  "en": "Neither the weapon nor the first constellation adds much — better save your pulls for new characters.",
+  "es": "Ni el arma ni la primera constelación aportan mucho: mejor guarda las tiradas para personajes nuevos."
+ },
+ "Ниже": {
+  "en": "Move down",
+  "es": "Bajar"
+ },
+ "Ник": {
+  "en": "Nickname",
+  "es": "Apodo"
+ },
+ "Никого не нашлось. Сбросьте часть фильтров.": {
+  "en": "Nobody found. Clear some filters.",
+  "es": "No se encontró a nadie. Quita algunos filtros."
+ },
+ "Ничего не найдено": {
+  "en": "Nothing found",
+  "es": "No se encontró nada"
+ },
+ "Ничего не нашлось — попробуйте имя на английском": {
+  "en": "Nothing found — try the English name",
+  "es": "No se encontró nada: prueba con el nombre en inglés"
+ },
+ "Ничего не нашлось.": {
+  "en": "Nothing found.",
+  "es": "No se encontró nada."
+ },
+ "Ничего не нашлось. Сбросьте фильтры.": {
+  "en": "Nothing found. Clear the filters.",
+  "es": "No se encontró nada. Quita los filtros."
+ },
+ "Ничего не нужно — цель уже достигнута.": {
+  "en": "Nothing needed — the target is already reached.",
+  "es": "No hace falta nada: el objetivo ya está cumplido."
+ },
+ "Новичка": {
+  "en": "Beginner",
+  "es": "Principiante"
+ },
+ "Новое оружие": {
+  "en": "New weapons",
+  "es": "Armas nuevas"
+ },
+ "Новости GenshinFlex и полная история обновлений сайта — от открытия до последних изменений.": {
+  "en": "GenshinFlex news and the full website update history, from launch to the latest changes.",
+  "es": "Noticias de GenshinFlex y el historial completo de actualizaciones, desde el lanzamiento hasta los últimos cambios."
+ },
+ "Новости сайта": {
+  "en": "Site news",
+  "es": "Noticias del sitio"
+ },
+ "Новые персонажи": {
+  "en": "New characters",
+  "es": "Personajes nuevos"
+ },
+ "Новый гайд": {
+  "en": "New guide",
+  "es": "Guía nueva"
+ },
+ "Новый пароль": {
+  "en": "New password",
+  "es": "Nueva contraseña"
+ },
+ "Новый пароль совпадает со старым.": {
+  "en": "Choose a different password.",
+  "es": "Elige otra contraseña."
+ },
+ "Нормальный": {
+  "en": "Fair",
+  "es": "Aceptable"
+ },
+ "Нужен адрес вида https://… или /путь на сайте": {
+  "en": "Use an address like https://… or a /path on this site",
+  "es": "Usa una dirección como https://… o una /ruta del sitio"
+ },
+ "Нужно": {
+  "en": "Needs",
+  "es": "Necesita"
+ },
+ "Нумерованный список": {
+  "en": "Numbered list",
+  "es": "Lista numerada"
+ },
+ "О сайте": {
+  "en": "About",
+  "es": "Acerca de"
+ },
+ "О себе": {
+  "en": "About me",
+  "es": "Sobre mí"
+ },
+ "О чём гайд": {
+  "en": "Guide topic",
+  "es": "Tema de la guía"
+ },
+ "О чём сообщение": {
+  "en": "What is it about",
+  "es": "Sobre qué es el mensaje"
+ },
+ "Обложка": {
+  "en": "Cover",
+  "es": "Portada"
+ },
+ "Обмен на звёздный блеск в магазине Паймон.": {
+  "en": "Exchanged for Starglitter in Paimon's Bargains.",
+  "es": "Se canjea por Brillo Estelar en las Ofertas de Paimon."
+ },
+ "Обмен на рыбу в Ассоциации рыболовов.": {
+  "en": "Exchanged for fish at the Fishing Association.",
+  "es": "Se canjea por peces en la Asociación de Pesca."
+ },
+ "Обновится через": {
+  "en": "Resets in",
+  "es": "Se reinicia en"
+ },
+ "Обновить": {
+  "en": "Refresh",
+  "es": "Actualizar"
+ },
+ "Обновлено {date}": {
+  "en": "Updated {date}",
+  "es": "Actualizado {date}"
+ },
+ "Обозначения: E — навык, E (удерж.) — удержание навыка, Q — взрыв стихии, M1-M2-M3 — серия обычных атак, CA — заряженная атака.": {
+  "en": "Legend: E — Skill, E (hold) — hold Skill, Q — Burst, M1-M2-M3 — Normal Attack string, CA — Charged Attack.",
+  "es": "Leyenda: E — Habilidad, E (mant.) — mantener Habilidad, Q — Definitiva, M1-M2-M3 — cadena de Ataques Normales, CA — Ataque Cargado."
+ },
+ "Обратная связь": {
+  "en": "Feedback",
+  "es": "Comentarios"
+ },
+ "Обычная атака": {
+  "en": "Normal Attack",
+  "es": "Ataque Normal"
+ },
+ "Обычно (300)": {
+  "en": "Normal (300)",
+  "es": "Normal (300)"
+ },
+ "Описание": {
+  "en": "Description",
+  "es": "Descripción"
+ },
+ "Описания навыков": {
+  "en": "Skill descriptions",
+  "es": "Descripciones de habilidades"
+ },
+ "Опыт героя": {
+  "en": "Hero's Wit",
+  "es": "Experiencia de héroe"
+ },
+ "Опыт оружия": {
+  "en": "Weapon EXP",
+  "es": "EXP de arma"
+ },
+ "Опыт персонажа": {
+  "en": "Character EXP",
+  "es": "EXP de personaje"
+ },
+ "Оружие": {
+  "en": "Weapons",
+  "es": "Armas"
+ },
+ "Оружие 3★": {
+  "en": "3★ weapon",
+  "es": "Arma 3★"
+ },
+ "Оружие {name} пока не поддерживается в gcsim — в симуляции эталонное.": {
+  "en": "{name}'s weapon isn't supported by gcsim yet, so the simulation uses the reference one.",
+  "es": "El arma de {name} aún no es compatible con gcsim, así que la simulación usa la de referencia."
+ },
+ "Оружие {r}★": {
+  "en": "{r}★ weapons",
+  "es": "Armas {r}★"
+ },
+ "Оружие не добавлено": {
+  "en": "No weapons added",
+  "es": "No se añadieron armas"
+ },
+ "Основное": {
+  "en": "Basics",
+  "es": "Lo básico"
+ },
+ "Оставшееся время": {
+  "en": "Time remaining",
+  "es": "Tiempo restante"
+ },
+ "Осталось {time}": {
+  "en": "{time} left",
+  "es": "Quedan {time}"
+ },
+ "Осталось больше 180 / 300 / 420 с.": {
+  "en": "Time left over 180 / 300 / 420 s",
+  "es": "Tiempo restante de más de 180 / 300 / 420 s"
+ },
+ "Осталось больше 60 / 180 / 300 с.": {
+  "en": "Time left over 60 / 180 / 300 s",
+  "es": "Tiempo restante de más de 60 / 180 / 300 s"
+ },
+ "Остальные созвездия ещё не утекли.": {
+  "en": "The remaining constellations haven't leaked yet.",
+  "es": "El resto de constelaciones aún no se ha filtrado."
+ },
+ "Остановить": {
+  "en": "Stop",
+  "es": "Detener"
+ },
+ "Откройте PowerShell (Win + X → «Терминал») и выполните команду — она найдёт ссылку в кэше игры и скопирует её:": {
+  "en": "Open PowerShell (Win + X → “Terminal”) and run this command — it finds the link in the game cache and copies it:",
+  "es": "Abre PowerShell (Win + X → «Terminal») y ejecuta este comando: encuentra el enlace en la caché del juego y lo copia:"
+ },
+ "Откройте игру на ПК и зайдите в «Молитва» → «История».": {
+  "en": "Open the game on PC and go to “Wish” → “History”.",
+  "es": "Abre el juego en PC y ve a «Gachapón» → «Historial»."
+ },
+ "Открыть": {
+  "en": "Open",
+  "es": "Abrir"
+ },
+ "Открыть меню": {
+  "en": "Open menu",
+  "es": "Abrir menú"
+ },
+ "Открыть поиск": {
+  "en": "Open search",
+  "es": "Abrir búsqueda"
+ },
+ "Открыть полный календарь": {
+  "en": "Open the full calendar",
+  "es": "Abrir el calendario completo"
+ },
+ "Открыть трекер круток": {
+  "en": "Open the wish tracker",
+  "es": "Abrir el rastreador de gachapón"
+ },
+ "Откуда данные": {
+  "en": "Where the data comes from",
+  "es": "De dónde vienen los datos"
+ },
+ "Отмена": {
+  "en": "Cancel",
+  "es": "Cancelar"
+ },
+ "Отображаемое имя": {
+  "en": "Display name",
+  "es": "Nombre público"
+ },
+ "Отправить": {
+  "en": "Send",
+  "es": "Enviar"
+ },
+ "Отправить гайд": {
+  "en": "Submit guide",
+  "es": "Enviar guía"
+ },
+ "Отправить ещё раз": {
+  "en": "Send again",
+  "es": "Enviar de nuevo"
+ },
+ "Отправить письмо": {
+  "en": "Send email",
+  "es": "Enviar correo"
+ },
+ "Отправка на проверку": {
+  "en": "Submit for review",
+  "es": "Enviar a revisión"
+ },
+ "Отправляем…": {
+  "en": "Sending…",
+  "es": "Enviando…"
+ },
+ "Отправляю…": {
+  "en": "Sending…",
+  "es": "Enviando…"
+ },
+ "Официальная, от HoYoLAB": {
+  "en": "Official, by HoYoLAB",
+  "es": "Oficial, de HoYoLAB"
+ },
+ "Оценка складывается из уровня, оружия, сета, основных и итоговых статов (до 100 баллов на персонажа) и того, закрывает ли команда требования половины. Реальный урон зависит ещё от ротации и созвездий.": {
+  "en": "The score combines level, weapon, set, main and final stats (up to 100 points per character) and whether the team meets the half's requirements. Real damage also depends on rotation and constellations.",
+  "es": "La puntuación combina nivel, arma, conjunto, estadísticas principales y finales (hasta 100 puntos por personaje) y si el equipo cumple los requisitos de la mitad. El daño real también depende de la rotación y las constelaciones."
+ },
+ "Оценка сравнивает ваш билд с рекомендованным и проверяет требования этажа; это ориентир, а не симуляция урона.": {
+  "en": "The score compares your build with the recommended one and checks the floor's requirements; it's a guideline, not a damage simulation.",
+  "es": "La puntuación compara tu build con la recomendada y revisa los requisitos del piso; es una orientación, no una simulación de daño."
+ },
+ "Очистить": {
+  "en": "Clear",
+  "es": "Borrar"
+ },
+ "Очистить список": {
+  "en": "Clear roster",
+  "es": "Vaciar lista"
+ },
+ "Ошибка в билде или данных": {
+  "en": "Mistake in a build or data",
+  "es": "Error en una build o en los datos"
+ },
+ "Ошибка симуляции: {message}": {
+  "en": "Simulation error: {message}",
+  "es": "Error de simulación: {message}"
+ },
+ "Пароли не совпадают.": {
+  "en": "Passwords do not match.",
+  "es": "Las contraseñas no coinciden."
+ },
+ "Пароль": {
+  "en": "Password",
+  "es": "Contraseña"
+ },
+ "Пароль изменён.": {
+  "en": "Password changed.",
+  "es": "Contraseña cambiada."
+ },
+ "Пароль слишком слабый.": {
+  "en": "This password is too weak.",
+  "es": "La contraseña es demasiado débil."
+ },
+ "Пассивные таланты": {
+  "en": "Passive talents",
+  "es": "Talentos pasivos"
+ },
+ "Патч": {
+  "en": "Patch",
+  "es": "Versión"
+ },
+ "Первое созвездие": {
+  "en": "First constellation",
+  "es": "Primera constelación"
+ },
+ "Перейти в аккаунт": {
+  "en": "Go to account",
+  "es": "Ir a mi cuenta"
+ },
+ "Переместить влево": {
+  "en": "Move left",
+  "es": "Mover a la izquierda"
+ },
+ "Переместить вправо": {
+  "en": "Move right",
+  "es": "Mover a la derecha"
+ },
+ "Перемешать": {
+  "en": "Shuffle",
+  "es": "Aleatorio"
+ },
+ "Перенос": {
+  "en": "Transfer",
+  "es": "Transferencia"
+ },
+ "Перенос профиля": {
+  "en": "Transfer profile",
+  "es": "Transferir perfil"
+ },
+ "Персонаж": {
+  "en": "Character",
+  "es": "Personaje"
+ },
+ "Персонаж {i}, {h}-я половина": {
+  "en": "Character {i}, half {h}",
+  "es": "Personaje {i}, mitad {h}"
+ },
+ "Персонаж {n}": {
+  "en": "Character {n}",
+  "es": "Personaje {n}"
+ },
+ "Персонаж из утечек бета-версии. Имя, стихия, характеристики и материалы могут измениться к релизу.": {
+  "en": "A character from beta leaks. The name, element, stats and materials may change before release.",
+  "es": "Personaje de filtraciones de la beta. El nombre, el elemento, las estadísticas y los materiales pueden cambiar antes del lanzamiento."
+ },
+ "Персонаж из утечек бета-версии: имя, стихия, характеристики и материалы предварительные и могут измениться к релизу.": {
+  "en": "This character comes from beta leaks: the name, element, stats and materials are preliminary and may change before release.",
+  "es": "Este personaje procede de filtraciones de la beta: el nombre, el elemento, las estadísticas y los materiales son provisionales y pueden cambiar antes del lanzamiento."
+ },
+ "Персонаж, оружие, артефакт…": {
+  "en": "Character, weapon, artifact…",
+  "es": "Personaje, arma, artefacto…"
+ },
+ "Персонажей: {n}": {
+  "en": "Characters: {n}",
+  "es": "Personajes: {n}"
+ },
+ "Персонажи": {
+  "en": "Characters",
+  "es": "Personajes"
+ },
+ "Персонажи витрины": {
+  "en": "Showcased characters",
+  "es": "Personajes del escaparate"
+ },
+ "Пиро": {
+  "en": "Pyro",
+  "es": "Pyro"
+ },
+ "Пиро быстро снимает щиты Стражника льдов в зале 10-3": {
+  "en": "Pyro quickly breaks the Glacial Warden's shields in chamber 10-3",
+  "es": "El Pyro rompe rápido los escudos del Guardián Glacial en la sala 10-3"
+ },
+ "Пламя": {
+  "en": "Flame",
+  "es": "Llama"
+ },
+ "По версиям": {
+  "en": "By version",
+  "es": "Por versión"
+ },
+ "По запросу «{q}» ничего нет. Попробуйте имя на английском.": {
+  "en": "Nothing for “{q}”. Try the English name.",
+  "es": "No hay nada para «{q}». Prueba con el nombre en inglés."
+ },
+ "По имени": {
+  "en": "By name",
+  "es": "Por nombre"
+ },
+ "По оружию": {
+  "en": "By weapon",
+  "es": "Por arma"
+ },
+ "По редкости": {
+  "en": "By rarity",
+  "es": "Por rareza"
+ },
+ "По ссылке из игры": {
+  "en": "Via in-game link",
+  "es": "Con el enlace del juego"
+ },
+ "По стихии": {
+  "en": "By element",
+  "es": "Por elemento"
+ },
+ "Повторите пароль": {
+  "en": "Confirm password",
+  "es": "Repite la contraseña"
+ },
+ "Повторить через": {
+  "en": "Try again in",
+  "es": "Reintentar en"
+ },
+ "Поддержка": {
+  "en": "Support",
+  "es": "Apoyo"
+ },
+ "Поднять выше": {
+  "en": "Move up",
+  "es": "Subir"
+ },
+ "Подобрать из моих персонажей": {
+  "en": "Auto-pick from my characters",
+  "es": "Elegir entre mis personajes"
+ },
+ "Подробнее": {
+  "en": "Details",
+  "es": "Detalles"
+ },
+ "Подставлены текущие рекомендованные команды — поправьте их и добавьте свои советы.": {
+  "en": "The current recommended teams are filled in — adjust them and add your own tips.",
+  "es": "Se rellenaron los equipos recomendados actuales: ajústalos y añade tus consejos."
+ },
+ "Подтвердить сброс оформления": {
+  "en": "Confirm appearance reset",
+  "es": "Confirmar restablecimiento"
+ },
+ "Подтверждаем вход…": {
+  "en": "Confirming sign-in…",
+  "es": "Confirmando acceso…"
+ },
+ "Подтверждение входа": {
+  "en": "Confirm sign-in",
+  "es": "Confirmar acceso"
+ },
+ "Позже": {
+  "en": "Later",
+  "es": "Después"
+ },
+ "Поиск": {
+  "en": "Search",
+  "es": "Buscar"
+ },
+ "Поиск обложки": {
+  "en": "Search cover",
+  "es": "Buscar portada"
+ },
+ "Поиск персонажа": {
+  "en": "Search character",
+  "es": "Buscar personaje"
+ },
+ "Поиск по имени": {
+  "en": "Search by name",
+  "es": "Buscar por nombre"
+ },
+ "Поиск по сайту": {
+  "en": "Search the site",
+  "es": "Buscar en el sitio"
+ },
+ "Пока не входит ни в один наш билд.": {
+  "en": "Not part of any of our builds yet.",
+  "es": "Todavía no aparece en ninguna de nuestras builds."
+ },
+ "Пока никого. Добавьте персонажа по имени или загрузите витрину по UID.": {
+  "en": "Nobody yet. Add a character by name or load your showcase by UID.",
+  "es": "Aún no hay nadie. Añade un personaje por nombre o carga tu vitrina por UID."
+ },
+ "Пока пусто": {
+  "en": "Nothing here yet",
+  "es": "Todavía vacío"
+ },
+ "Показано: {a} из {b}": {
+  "en": "Showing {a} of {b}",
+  "es": "Mostrando {a} de {b}"
+ },
+ "Политика конфиденциальности": {
+  "en": "Privacy policy",
+  "es": "Política de privacidad"
+ },
+ "Положение обложки": {
+  "en": "Cover position",
+  "es": "Posición de la portada"
+ },
+ "Понадобится": {
+  "en": "You'll need",
+  "es": "Necesitarás"
+ },
+ "Последние — в версии {v} ({date}): можно было выбрать любого персонажа или оружие из пула.": {
+  "en": "The last ones were in version {v} ({date}): you could pick any character or weapon from the pool.",
+  "es": "Los últimos fueron en la versión {v} ({date}): podías elegir cualquier personaje o arma del conjunto."
+ },
+ "Последний раз — версия {v}, {date}.": {
+  "en": "Last time — version {v}, {date}.",
+  "es": "La última vez: versión {v}, {date}."
+ },
+ "Поставлено {n} из 4. Нет: {list}": {
+  "en": "Added {n} of 4. Missing: {list}",
+  "es": "Se añadieron {n} de 4. Faltan: {list}"
+ },
+ "Посчитайте материалы для прокачки.": {
+  "en": "Calculate upgrade materials.",
+  "es": "Calcula los materiales de mejora."
+ },
+ "Почта подтверждена.": {
+  "en": "Email confirmed.",
+  "es": "Correo confirmado."
+ },
+ "Почти совпадает с рекомендованной командой «{name}»": {
+  "en": "Nearly matches the recommended team “{name}”",
+  "es": "Casi coincide con el equipo recomendado «{name}»"
+ },
+ "Появлений на баннере оружия: {n}.": {
+  "en": "Weapon banner appearances: {n}.",
+  "es": "Apariciones en el gachapón de armas: {n}."
+ },
+ "Права": {
+  "en": "Rights",
+  "es": "Derechos"
+ },
+ "Правка существующего гайда": {
+  "en": "Editing an existing guide",
+  "es": "Edición de una guía existente"
+ },
+ "Превью": {
+  "en": "Preview",
+  "es": "Vista previa"
+ },
+ "Превью гайда": {
+  "en": "Guide preview",
+  "es": "Vista previa de la guía"
+ },
+ "Предложить гайд": {
+  "en": "Suggest a guide",
+  "es": "Proponer una guía"
+ },
+ "Предложить правку или написать гайд": {
+  "en": "Suggest an edit or write a guide",
+  "es": "Proponer un cambio o escribir una guía"
+ },
+ "Предмет": {
+  "en": "Item",
+  "es": "Objeto"
+ },
+ "Предметов": {
+  "en": "Pieces",
+  "es": "Piezas"
+ },
+ "Предыдущее оружие": {
+  "en": "Previous weapons",
+  "es": "Armas anteriores"
+ },
+ "Предыдущие персонажи": {
+  "en": "Previous characters",
+  "es": "Personajes anteriores"
+ },
+ "Предыдущий баннер": {
+  "en": "Previous banner",
+  "es": "Banner anterior"
+ },
+ "Предыдущий трек": {
+  "en": "Previous track",
+  "es": "Pista anterior"
+ },
+ "Пригодится для консоли и телефона, где ссылку не достать. Добавляйте молитвы в том порядке, в каком они выпадали.": {
+  "en": "Handy on console and mobile where the link isn't available. Add wishes in the order you got them.",
+  "es": "Útil en consola y móvil, donde no se puede obtener el enlace. Añade los deseos en el orden en que salieron."
+ },
+ "Примогемов": {
+  "en": "Primogems",
+  "es": "Protogemas"
+ },
+ "Прирост зависит от команды и вложений: это ориентир, а не точное число для вашего аккаунта.": {
+  "en": "The gain depends on the team and investment: treat it as a guideline, not an exact number for your account.",
+  "es": "El aumento depende del equipo y de la inversión: es una referencia, no una cifra exacta para tu cuenta."
+ },
+ "Пробуждение": {
+  "en": "Refinement",
+  "es": "Refinamiento"
+ },
+ "Проверить команды": {
+  "en": "Check teams",
+  "es": "Comprobar equipos"
+ },
+ "Проверить свои команды": {
+  "en": "Check your teams",
+  "es": "Comprobar tus equipos"
+ },
+ "Проверка капчи не пройдена.": {
+  "en": "Captcha verification failed.",
+  "es": "No se pudo verificar el captcha."
+ },
+ "Проверка команды": {
+  "en": "Team checker",
+  "es": "Comprobador de equipos"
+ },
+ "Проверка команды для Бездны": {
+  "en": "Abyss team checker",
+  "es": "Comprobador de equipos para el Abismo"
+ },
+ "Проверьте отряд для текущей Бездны.": {
+  "en": "Check your team for the current Abyss.",
+  "es": "Comprueba tu equipo para el Abismo actual."
+ },
+ "Проверьте почту: мы отправили ссылку на": {
+  "en": "Check your inbox: we sent a link to",
+  "es": "Revisa tu correo: enviamos un enlace a"
+ },
+ "Проверяем ссылку…": {
+  "en": "Checking the link…",
+  "es": "Comprobando el enlace…"
+ },
+ "Прогон {done} из {total}": {
+  "en": "Run {done} of {total}",
+  "es": "Ejecución {done} de {total}"
+ },
+ "Пройдёт, но впритык": {
+  "en": "Should clear, but barely",
+  "es": "Pasará, pero justo"
+ },
+ "Прокачка талантов": {
+  "en": "Talent priority",
+  "es": "Prioridad de talentos"
+ },
+ "Пропущены: {list} — добавьте вручную.": {
+  "en": "Skipped: {list} — add them manually.",
+  "es": "Omitidos: {list}; añádelos a mano."
+ },
+ "Профиль": {
+  "en": "Profile",
+  "es": "Perfil"
+ },
+ "Профиль и синхронизация — скоро.": {
+  "en": "Profiles and syncing are coming soon.",
+  "es": "Los perfiles y la sincronización llegarán pronto."
+ },
+ "Профиль хранится в этом браузере. Войдите, чтобы сохранить его в аккаунте — синхронизация между устройствами скоро.": {
+  "en": "Your profile is stored in this browser. Sign in to save it to your account — syncing across devices is coming soon.",
+  "es": "Tu perfil se guarda en este navegador. Inicia sesión para guardarlo en tu cuenta; la sincronización entre dispositivos llegará pronto."
+ },
+ "Прочность монолита выше 20 / 40 / 60%": {
+  "en": "Monolith durability above 20 / 40 / 60%",
+  "es": "Durabilidad del monolito superior al 20 / 40 / 60 %"
+ },
+ "Прыжок": {
+  "en": "Jump",
+  "es": "Salto"
+ },
+ "Прямо под аномалию этажа": {
+  "en": "Built right for the floor's disorder",
+  "es": "Justo para la anomalía del piso"
+ },
+ "Пусто": {
+  "en": "Empty",
+  "es": "Vacío"
+ },
+ "Путешественник": {
+  "en": "Traveler",
+  "es": "Viajero"
+ },
+ "Путь": {
+  "en": "Breadcrumbs",
+  "es": "Ruta"
+ },
+ "Разбор написан ИИ по утёкшим описаниям навыков, без симуляций. Релизная версия персонажа может отличаться.": {
+  "en": "This breakdown was written by AI from leaked skill descriptions, without simulations. The released character may differ.",
+  "es": "Este análisis lo ha escrito una IA a partir de las descripciones filtradas, sin simulaciones. La versión final del personaje puede ser distinta."
+ },
+ "Развернуть": {
+  "en": "Expand",
+  "es": "Expandir"
+ },
+ "Раздел": {
+  "en": "Section",
+  "es": "Sección"
+ },
+ "Разделы баннеров": {
+  "en": "Banner sections",
+  "es": "Secciones de gachapones"
+ },
+ "Разделы профиля": {
+  "en": "Profile sections",
+  "es": "Secciones del perfil"
+ },
+ "Разделы страницы": {
+  "en": "Page sections",
+  "es": "Secciones de la página"
+ },
+ "Размытие": {
+  "en": "Blur",
+  "es": "Desenfoque"
+ },
+ "Рамка": {
+  "en": "Frame",
+  "es": "Marco"
+ },
+ "Ранг приключений {level} · Уровень мира {world}": {
+  "en": "Adventure Rank {level} · World Level {world}",
+  "es": "Rango de aventura {level} · Nivel de mundo {world}"
+ },
+ "Раньше": {
+  "en": "Earlier",
+  "es": "Antes"
+ },
+ "Расскажите, как играть персонажем: суть, ротация, на что обратить внимание. Пустая строка — новый абзац.": {
+  "en": "Explain how to play the character: the core idea, the rotation, what to watch out for. An empty line starts a new paragraph.",
+  "es": "Explica cómo jugar con el personaje: la idea principal, la rotación y a qué prestar atención. Una línea vacía empieza un párrafo nuevo."
+ },
+ "Регион": {
+  "en": "Region",
+  "es": "Región"
+ },
+ "Регион сервера": {
+  "en": "Server region",
+  "es": "Región del servidor"
+ },
+ "Регистрация": {
+  "en": "Sign up",
+  "es": "Registrarse"
+ },
+ "Редактировать": {
+  "en": "Edit",
+  "es": "Editar"
+ },
+ "Редактировать гайд": {
+  "en": "Edit guide",
+  "es": "Editar guía"
+ },
+ "Редактор": {
+  "en": "Editor",
+  "es": "Editor"
+ },
+ "Редактор гайдов": {
+  "en": "Guide editor",
+  "es": "Editor de guías"
+ },
+ "Редакция от 28 сентября 2026": {
+  "en": "Revised September 28, 2026",
+  "es": "Revisión del 28 de septiembre de 2026"
+ },
+ "Редкость": {
+  "en": "Rarity",
+  "es": "Rareza"
+ },
+ "Режимы эндгейма": {
+  "en": "Endgame modes",
+  "es": "Modos de endgame"
+ },
+ "Результат": {
+  "en": "Result",
+  "es": "Resultado"
+ },
+ "Результаты": {
+  "en": "Results",
+  "es": "Resultados"
+ },
+ "Рейтинг": {
+  "en": "Rating",
+  "es": "Clasificación"
+ },
+ "Рейтинг ELO": {
+  "en": "ELO rating",
+  "es": "Clasificación ELO"
+ },
+ "Рейтинг персонажей от сообщества и по забегам.": {
+  "en": "Character ratings from the community and from runs.",
+  "es": "Clasificación de personajes según la comunidad y las partidas."
+ },
+ "Рекомендованные составы на эту половину: {list}": {
+  "en": "Recommended lineups for this half: {list}",
+  "es": "Formaciones recomendadas para esta mitad: {list}"
+ },
+ "Рекомендованный билд": {
+  "en": "Recommended build",
+  "es": "Build recomendada"
+ },
+ "Рекомендуем": {
+  "en": "Recommended",
+  "es": "Recomendamos"
+ },
+ "Розовый": {
+  "en": "Pink",
+  "es": "Rosa"
+ },
+ "Роль": {
+  "en": "Role",
+  "es": "Rol"
+ },
+ "Ротация": {
+  "en": "Rotation",
+  "es": "Rotación"
+ },
+ "Ротация — порядок, в котором команда тратит навыки. Выберите до четырёх персонажей (первый — тот, кто дольше всех на поле), затем добавляйте шаги. Всё сохраняется в ссылке: скопируйте её, чтобы поделиться.": {
+  "en": "A rotation is the order in which a team uses its abilities. Pick up to four characters (the first is the one on-field the longest), then add steps. Everything is saved in the link — copy it to share.",
+  "es": "Una rotación es el orden en que el equipo usa sus habilidades. Elige hasta cuatro personajes (el primero es el que más tiempo está en campo) y añade pasos. Todo se guarda en el enlace: cópialo para compartirlo."
+ },
+ "Ротация — эталонная для этой команды. Если восстановления энергии не хватает, gcsim ждёт энергию на взрыв стихии — как пришлось бы и в игре. Эталон: C0, 4★ оружие, доп. статы по стандарту KQM.": {
+  "en": "The rotation is the reference for this team. If Energy Recharge is insufficient, gcsim waits for enough energy to use the Elemental Burst, just as you would in game. Reference: C0, 4★ weapons and KQM standard substats.",
+  "es": "La rotación es la de referencia para este equipo. Si falta Recarga de Energía, gcsim espera a reunir energía para usar la Habilidad Definitiva, igual que en el juego. Referencia: C0, armas de 4★ y estadísticas secundarias según el estándar KQM."
+ },
+ "Руководства": {
+  "en": "Guides",
+  "es": "Guías"
+ },
+ "Ручной ввод": {
+  "en": "Manual entry",
+  "es": "Entrada manual"
+ },
+ "Рыбалка": {
+  "en": "Fishing",
+  "es": "Pesca"
+ },
+ "Рывок": {
+  "en": "Dash",
+  "es": "Esprint"
+ },
+ "Сайт": {
+  "en": "Site",
+  "es": "Sitio"
+ },
+ "Сайт показывает двух персонажей или две команды под конкретную комнату текущего цикла, вы выбираете, кто лучше. Каждый голос — «матч» для рейтинга.": {
+  "en": "The site shows two characters or two teams for a specific chamber of the current cycle, and you pick the better one. Every vote is a “match” for the rating.",
+  "es": "El sitio muestra dos personajes o dos equipos para una sala concreta del ciclo actual y tú eliges el mejor. Cada voto es un «enfrentamiento» para la clasificación."
+ },
+ "Самоцветы: осколок / фрагмент / кусок / камень": {
+  "en": "Gems: sliver / fragment / chunk / gemstone",
+  "es": "Gemas: astilla / fragmento / trozo / piedra"
+ },
+ "Сбросить": {
+  "en": "Reset",
+  "es": "Restablecer"
+ },
+ "Сбросить оформление": {
+  "en": "Reset appearance",
+  "es": "Restablecer apariencia"
+ },
+ "Сбросить составы": {
+  "en": "Reset teams",
+  "es": "Restablecer equipos"
+ },
+ "Сбросить черновик": {
+  "en": "Discard draft",
+  "es": "Descartar borrador"
+ },
+ "Свернуть": {
+  "en": "Minimize",
+  "es": "Minimizar"
+ },
+ "Светлячки": {
+  "en": "Fireflies",
+  "es": "Luciérnagas"
+ },
+ "Своя картинка": {
+  "en": "Own image",
+  "es": "Imagen propia"
+ },
+ "Сегодня": {
+  "en": "Today",
+  "es": "Hoy"
+ },
+ "Сейчас": {
+  "en": "Now",
+  "es": "Ahora"
+ },
+ "Сейчас идёт: {name}.": {
+  "en": "Running now: {name}.",
+  "es": "En curso: {name}."
+ },
+ "Сейчас между фазами — загляните позже.": {
+  "en": "Between phases right now — check back later.",
+  "es": "Ahora mismo estamos entre fases: vuelve más tarde."
+ },
+ "Сейчас на баннере": {
+  "en": "On the banner now",
+  "es": "En el gachapón ahora"
+ },
+ "Сейчас не проводятся.": {
+  "en": "Not running right now.",
+  "es": "No hay ninguno activo ahora."
+ },
+ "Сервер": {
+  "en": "Server",
+  "es": "Servidor"
+ },
+ "Сервер не ответил. Попробуйте ещё раз через минуту.": {
+  "en": "The server didn't respond. Try again in a minute.",
+  "es": "El servidor no respondió. Inténtalo de nuevo en un minuto."
+ },
+ "Серебро": {
+  "en": "Silver",
+  "es": "Plata"
+ },
+ "Сессия изменилась. Проверьте данные аккаунта и повторите действие.": {
+  "en": "The session changed. Check your account details and try again.",
+  "es": "La sesión ha cambiado. Comprueba los datos de tu cuenta e inténtalo de nuevo."
+ },
+ "Сет": {
+  "en": "Set",
+  "es": "Conjunto"
+ },
+ "Сет {sets} не из рекомендованных. Лучше: {best}": {
+  "en": "{sets} isn't a recommended set. Better: {best}",
+  "es": "{sets} no es un conjunto recomendado. Mejor: {best}"
+ },
+ "Сет {sets} — {rank}": {
+  "en": "{sets} — {rank}",
+  "es": "{sets}: {rank}"
+ },
+ "Сет артефактов {name} пока не поддерживается в gcsim — учтены только статы, без бонуса сета.": {
+  "en": "{name}'s artifact set isn't supported by gcsim yet: only the stats count, without the set bonus.",
+  "es": "El set de artefactos de {name} aún no es compatible con gcsim: solo cuentan las estadísticas, sin el bono del set."
+ },
+ "Сетка": {
+  "en": "Grid",
+  "es": "Cuadrícula"
+ },
+ "Сеты не добавлены": {
+  "en": "No sets added",
+  "es": "No se añadieron sets"
+ },
+ "Сила атаки %": {
+  "en": "ATK%",
+  "es": "ATQ %"
+ },
+ "Символов: {n}/300": {
+  "en": "Characters: {n}/300",
+  "es": "Caracteres: {n}/300"
+ },
+ "Симулировать": {
+  "en": "Simulate",
+  "es": "Simular"
+ },
+ "Симулятор команды": {
+  "en": "Team Simulator",
+  "es": "Simulador de equipos"
+ },
+ "Симулятор команды: урон по данным аккаунта": {
+  "en": "Team Simulator: damage based on your account",
+  "es": "Simulador de equipos: daño según tu cuenta"
+ },
+ "Симулятору нужен JavaScript.": {
+  "en": "The simulator requires JavaScript.",
+  "es": "El simulador necesita JavaScript."
+ },
+ "Симуляции — gcsim v{version} (AGPL-3.0), исходный код:": {
+  "en": "Simulations — gcsim v{version} (AGPL-3.0), source code:",
+  "es": "Simulaciones — gcsim v{version} (AGPL-3.0), código fuente:"
+ },
+ "Симуляция завершена.": {
+  "en": "Simulation complete.",
+  "es": "Simulación completada."
+ },
+ "Симуляция остановлена.": {
+  "en": "Simulation stopped.",
+  "es": "Simulación detenida."
+ },
+ "Симуляция урона вашей команды в Genshin Impact по данным витрины: ваши созвездия, оружие и артефакты против эталонного билда. Считается прямо в браузере движком gcsim.": {
+  "en": "Simulate your Genshin Impact team's damage using your showcased characters, constellations, weapons and artifacts against a reference build. Runs in your browser with gcsim.",
+  "es": "Simula el daño de tu equipo de Genshin Impact con los personajes de tu escaparate, sus constelaciones, armas y artefactos frente a una build de referencia. gcsim se ejecuta en tu navegador."
+ },
+ "Скачать UIGF": {
+  "en": "Download UIGF",
+  "es": "Descargar UIGF"
+ },
+ "Скачать мои данные": {
+  "en": "Download my data",
+  "es": "Descargar mis datos"
+ },
+ "Сколько до гаранта, выиграны ли 50/50 и сколько ушло примогемов": {
+  "en": "How far to pity, whether you won the 50/50 and how many primogems you spent",
+  "es": "Cuánto falta para la garantía, si ganaste el 50/50 y cuántas protogemas gastaste"
+ },
+ "Сколько материалов, книг опыта и моры нужно, чтобы прокачать персонажа, таланты и оружие в Genshin Impact.": {
+  "en": "How many materials, EXP books and Mora you need to level up a character, talents and weapon in Genshin Impact.",
+  "es": "Cuántos materiales, libros de EXP y Moras necesitas para subir de nivel a un personaje, sus talentos y su arma en Genshin Impact."
+ },
+ "Сколько молитв без 4★ и 5★": {
+  "en": "Wishes without a 4★ or 5★",
+  "es": "Deseos sin 4★ ni 5★"
+ },
+ "Скопировать": {
+  "en": "Copy",
+  "es": "Copiar"
+ },
+ "Скопировать ссылку": {
+  "en": "Copy link",
+  "es": "Copiar enlace"
+ },
+ "Скорее не хватит": {
+  "en": "Probably not enough",
+  "es": "Probablemente no alcance"
+ },
+ "Скоро": {
+  "en": "Coming soon",
+  "es": "Próximamente"
+ },
+ "Скрыть список": {
+  "en": "Hide list",
+  "es": "Ocultar lista"
+ },
+ "Слабый": {
+  "en": "Weak",
+  "es": "Débil"
+ },
+ "Следите за гарантом и историей круток.": {
+  "en": "Track your pity and wish history.",
+  "es": "Sigue el garantizado y tu historial de deseos."
+ },
+ "Следующее оружие": {
+  "en": "Next weapons",
+  "es": "Armas siguientes"
+ },
+ "Следующие": {
+  "en": "Upcoming",
+  "es": "Próximos"
+ },
+ "Следующие баннеры ещё не объявлены.": {
+  "en": "Next banners haven't been announced yet.",
+  "es": "Los próximos gachapones aún no se han anunciado."
+ },
+ "Следующие персонажи": {
+  "en": "Next characters",
+  "es": "Personajes siguientes"
+ },
+ "Следующий 5★ — 50/50": {
+  "en": "Next 5★ — 50/50",
+  "es": "Próximo 5★: 50/50"
+ },
+ "Следующий 5★ — гарант": {
+  "en": "Next 5★ — guaranteed",
+  "es": "Próximo 5★: garantizado"
+ },
+ "Следующий баннер": {
+  "en": "Next banner",
+  "es": "Banner siguiente"
+ },
+ "Следующий трек": {
+  "en": "Next track",
+  "es": "Pista siguiente"
+ },
+ "Слишком длинно: до 3000 символов": {
+  "en": "Too long: 3000 characters max",
+  "es": "Demasiado largo: máximo 3000 caracteres"
+ },
+ "Слишком много гайдов подряд — попробуйте через час": {
+  "en": "Too many guides in a row — try again in an hour",
+  "es": "Demasiadas guías seguidas: inténtalo dentro de una hora"
+ },
+ "Слишком много запросов — подождите минуту": {
+  "en": "Too many requests — wait a minute",
+  "es": "Demasiadas solicitudes: espera un minuto"
+ },
+ "Слишком много попыток. Попробуйте позже.": {
+  "en": "Too many attempts. Please try later.",
+  "es": "Demasiados intentos. Inténtalo más tarde."
+ },
+ "Слишком много сообщений подряд — попробуйте через час": {
+  "en": "Too many messages in a row — try again in an hour",
+  "es": "Demasiados mensajes seguidos: inténtalo dentro de una hora"
+ },
+ "Сменить пароль": {
+  "en": "Change password",
+  "es": "Cambiar contraseña"
+ },
+ "Сменить тему": {
+  "en": "Toggle theme",
+  "es": "Cambiar tema"
+ },
+ "Сменить язык": {
+  "en": "Change language",
+  "es": "Cambiar idioma"
+ },
+ "Смотреть: {title}": {
+  "en": "Watch: {title}",
+  "es": "Ver: {title}"
+ },
+ "Сначала добавьте персонажей в состав": {
+  "en": "Add characters to the team first",
+  "es": "Primero añade personajes al equipo"
+ },
+ "Сначала новые": {
+  "en": "Newest first",
+  "es": "Más nuevos primero"
+ },
+ "Сначала подтвердите email.": {
+  "en": "Please confirm your email first.",
+  "es": "Confirma primero tu correo."
+ },
+ "Сначала старые": {
+  "en": "Oldest first",
+  "es": "Más antiguos primero"
+ },
+ "Снегопад": {
+  "en": "Snowfall",
+  "es": "Nevada"
+ },
+ "Соберите команду и порядок действий в Genshin Impact и поделитесь ротацией одной ссылкой.": {
+  "en": "Build a team and its action order in Genshin Impact and share the rotation with one link.",
+  "es": "Arma un equipo y su orden de acciones en Genshin Impact y comparte la rotación con un enlace."
+ },
+ "Соберите команду и порядок действий, поделитесь ссылкой": {
+  "en": "Build a team and action order, share it as a link",
+  "es": "Arma un equipo y su orden de acciones y compártelo con un enlace"
+ },
+ "Соберите отряд и сравните варианты.": {
+  "en": "Build a team and compare options.",
+  "es": "Crea un equipo y compara opciones."
+ },
+ "Соберите хотя бы одну команду: выберите персонажей в слотах половин или нажмите «Подобрать из моих персонажей».": {
+  "en": "Build at least one team: pick characters in the half slots or press “Auto-pick from my characters”.",
+  "es": "Arma al menos un equipo: elige personajes en las mitades o pulsa «Elegir entre mis personajes»."
+ },
+ "Событие": {
+  "en": "Event",
+  "es": "Evento"
+ },
+ "Событие 2": {
+  "en": "Event 2",
+  "es": "Evento 2"
+ },
+ "Событие персонажа": {
+  "en": "Character event",
+  "es": "Evento de personaje"
+ },
+ "Совет": {
+  "en": "Tip",
+  "es": "Consejo"
+ },
+ "Советы сообщества": {
+  "en": "Community tips",
+  "es": "Consejos de la comunidad"
+ },
+ "Созвездие": {
+  "en": "Constellation",
+  "es": "Constelación"
+ },
+ "Созвездия": {
+  "en": "Constellations",
+  "es": "Constelaciones"
+ },
+ "Создайте аккаунт GenshinFlex.": {
+  "en": "Create your GenshinFlex account.",
+  "es": "Crea tu cuenta de GenshinFlex."
+ },
+ "Сообщение": {
+  "en": "Message",
+  "es": "Mensaje"
+ },
+ "Сообщите об ошибке в билде, предложите идею или расскажите о проблеме на сайте GenshinFlex.": {
+  "en": "Report a build mistake, suggest an idea or tell us about a problem on GenshinFlex.",
+  "es": "Informa de un error en una build, propón una idea o cuéntanos un problema en GenshinFlex."
+ },
+ "Сообщить об ошибке": {
+  "en": "Report a mistake",
+  "es": "Informar de un error"
+ },
+ "Сортировка": {
+  "en": "Sorting",
+  "es": "Orden"
+ },
+ "Состав": {
+  "en": "Lineup",
+  "es": "Formación"
+ },
+ "Составы подобраны — поправьте их, если нужно, и нажмите «Проверить».": {
+  "en": "Teams picked — adjust them if needed and press “Check”.",
+  "es": "Equipos elegidos: ajústalos si hace falta y pulsa «Comprobar»."
+ },
+ "Составьте порядок действий отряда.": {
+  "en": "Plan your team's action order.",
+  "es": "Planifica el orden de acciones del equipo."
+ },
+ "Сохранить пароль": {
+  "en": "Save password",
+  "es": "Guardar contraseña"
+ },
+ "Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации гайд появится на странице персонажа.": {
+  "en": "Thanks! Your guide has been sent for review. The draft has been cleared — once published, the guide will appear on the character page.",
+  "es": "¡Gracias! Tu guía se ha enviado a revisión. El borrador se ha borrado: cuando se publique, la guía aparecerá en la página del personaje."
+ },
+ "Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации он появится на сайте.": {
+  "en": "Thanks! Your guide has been sent for review. The draft has been cleared — once published, it will appear on the site.",
+  "es": "¡Gracias! Tu guía se ha enviado a revisión. El borrador se ha borrado: cuando se publique, aparecerá en el sitio."
+ },
+ "Спасибо! Сообщение отправлено.": {
+  "en": "Thanks! Your message has been sent.",
+  "es": "¡Gracias! Mensaje enviado."
+ },
+ "Список": {
+  "en": "List",
+  "es": "Lista"
+ },
+ "Список всего оружия": {
+  "en": "All weapons",
+  "es": "Todas las armas"
+ },
+ "Список всех артефактов": {
+  "en": "All artifacts",
+  "es": "Todos los artefactos"
+ },
+ "Список всех персонажей": {
+  "en": "All characters",
+  "es": "Todos los personajes"
+ },
+ "Список персонажей очищен.": {
+  "en": "Character roster cleared.",
+  "es": "Se ha vaciado la lista de personajes."
+ },
+ "Список под поиском": {
+  "en": "List under search",
+  "es": "Lista bajo la búsqueda"
+ },
+ "Способ импорта": {
+  "en": "Import method",
+  "es": "Método de importación"
+ },
+ "Способы входа": {
+  "en": "Sign-in methods",
+  "es": "Métodos de acceso"
+ },
+ "Справочник по Genshin Impact на русском: билды, команды, проверка команды для Бездны и трекер круток.": {
+  "en": "A Genshin Impact guide: builds, teams, an Abyss team checker and a wish tracker.",
+  "es": "Guía de Genshin Impact en español: builds, equipos, comprobador de equipos para el Abismo y rastreador de gachapón."
+ },
+ "Средний 5★": {
+  "en": "Average 5★",
+  "es": "5★ promedio"
+ },
+ "Ссылка": {
+  "en": "Link",
+  "es": "Enlace"
+ },
+ "Ссылка (Ctrl+K)": {
+  "en": "Link (Ctrl+K)",
+  "es": "Enlace (Ctrl+K)"
+ },
+ "Ссылка «{name}»: нужны название и адрес https://…": {
+  "en": "Link \"{name}\": needs a title and an https://… address",
+  "es": "Enlace «{name}»: necesita título y una dirección https://…"
+ },
+ "Ссылка из игры для загрузки истории молитв передаётся через наш сервер напрямую в HoYoverse и нигде не сохраняется.": {
+  "en": "The in-game link used to load wish history goes through our server straight to HoYoverse and is never stored.",
+  "es": "El enlace del juego para cargar el historial de deseos pasa por nuestro servidor directamente a HoYoverse y no se guarda en ningún sitio."
+ },
+ "Ссылка на ротацию": {
+  "en": "Rotation link",
+  "es": "Enlace a la rotación"
+ },
+ "Ссылка на эту новость": {
+  "en": "Link to this post",
+  "es": "Enlace a esta noticia"
+ },
+ "Ссылка скопирована": {
+  "en": "Link copied",
+  "es": "Enlace copiado"
+ },
+ "Ссылка скопирована.": {
+  "en": "Link copied.",
+  "es": "Enlace copiado."
+ },
+ "Ссылка устарела (живёт сутки). Откройте историю в игре и получите новую.": {
+  "en": "The link has expired (it lasts a day). Open the history in the game and get a new one.",
+  "es": "El enlace ha caducado (dura un día). Abre el historial en el juego y consigue uno nuevo."
+ },
+ "Ссылка устарела.": {
+  "en": "This link has expired.",
+  "es": "Este enlace ha caducado."
+ },
+ "Стандарт": {
+  "en": "Standard",
+  "es": "Estándar"
+ },
+ "Стандартная молитва": {
+  "en": "Standard Wish",
+  "es": "Gachapón estándar"
+ },
+ "Стандартный": {
+  "en": "Standard",
+  "es": "Estándar"
+ },
+ "Статы и таланты": {
+  "en": "Stats and talents",
+  "es": "Estadísticas y talentos"
+ },
+ "Статы на уровне": {
+  "en": "Stats at level",
+  "es": "Estadísticas al nivel"
+ },
+ "Статы не указаны — оценка неполная. Впишите их с экрана персонажа или загрузите по UID": {
+  "en": "No stats entered — the score is incomplete. Enter them from the character screen or load by UID",
+  "es": "No hay estadísticas: la evaluación es incompleta. Introdúcelas desde la pantalla del personaje o cárgalas por UID"
+ },
+ "Статы, таланты, созвездия, оружие и артефакты — открытая база": {
+  "en": "Stats, talents, constellations, weapons and artifacts — the open database",
+  "es": "Estadísticas, talentos, constelaciones, armas y artefactos: la base de datos abierta"
+ },
+ "Стихии подходят под бафф этажа: {label}": {
+  "en": "Elements fit the floor buff: {label}",
+  "es": "Los elementos encajan con la bonificación del piso: {label}"
+ },
+ "Стихия": {
+  "en": "Element",
+  "es": "Elemento"
+ },
+ "Стоит ли выбивать": {
+  "en": "Is it worth pulling",
+  "es": "¿Vale la pena tirar?"
+ },
+ "Страница": {
+  "en": "Page",
+  "es": "Página"
+ },
+ "Стримы": {
+  "en": "Livestreams",
+  "es": "Directos"
+ },
+ "Сундуки": {
+  "en": "Chests",
+  "es": "Cofres"
+ },
+ "Считаем по Glicko-2: вместе с рейтингом хранится неуверенность, поэтому у персонажа с малым числом матчей видно «±», а не случайную цифру.": {
+  "en": "We use Glicko-2: each rating stores its uncertainty, so a character with few matches shows “±” rather than a random number.",
+  "es": "Usamos Glicko-2: cada clasificación guarda su incertidumbre, así que un personaje con pocos enfrentamientos muestra «±» en lugar de una cifra al azar."
+ },
+ "Считает, сколько молитв осталось до гаранта, выиграны ли 50/50 и сколько примогемов ушло на каждого 5★.": {
+  "en": "Tracks wishes until pity, 50/50 wins and Primogems spent on each 5★.",
+  "es": "Cuenta los deseos hasta el garantizado, los 50/50 ganados y las Protogemas gastadas en cada 5★."
+ },
+ "Считает, сколько молитв осталось до гаранта, выиграны ли 50/50 и сколько примогемов ушло на каждого 5★. История хранится только в вашем браузере — на сервер она не отправляется.": {
+  "en": "Tracks how many wishes are left until pity, whether you won the 50/50 and how many primogems each 5★ cost. The history stays in your browser only — it's never sent to a server.",
+  "es": "Cuenta cuántos deseos faltan para la garantía, si ganaste el 50/50 y cuántas protogemas costó cada 5★. El historial se queda solo en tu navegador: nunca se envía a un servidor."
+ },
+ "Счётчик гаранта, история молитв и статистика 50/50 в Genshin Impact.": {
+  "en": "Pity counter, wish history and 50/50 stats for Genshin Impact.",
+  "es": "Contador de pity, historial de deseos y estadísticas de 50/50 en Genshin Impact."
+ },
+ "Счётчик гаранта, история молитв и статистика 50/50 в Genshin Impact. Данные хранятся только в вашем браузере.": {
+  "en": "Pity counter, wish history and 50/50 stats for Genshin Impact. Data stays in your browser.",
+  "es": "Contador de garantía, historial de deseos y estadísticas del 50/50 en Genshin Impact. Los datos se quedan en tu navegador."
+ },
+ "Таймлайн": {
+  "en": "Timeline",
+  "es": "Cronología"
+ },
+ "Также можете посмотреть": {
+  "en": "You can also check",
+  "es": "También puedes ver"
+ },
+ "Таланты": {
+  "en": "Talents",
+  "es": "Talentos"
+ },
+ "Таланты (атака / навык / взрыв)": {
+  "en": "Talents (attack / skill / burst)",
+  "es": "Talentos (ataque / habilidad / definitiva)"
+ },
+ "Таланты ниже 8 — прокачка основного таланта даст заметный прирост урона": {
+  "en": "Talents below 8 — leveling the main talent will noticeably boost damage",
+  "es": "Talentos por debajo de 8: subir el talento principal aumentará bastante el daño"
+ },
+ "Таланты: {n}-й": {
+  "en": "Talents: #{n}",
+  "es": "Talentos: n.º {n}"
+ },
+ "Театр": {
+  "en": "Theater",
+  "es": "Teatro"
+ },
+ "Театр воображариума": {
+  "en": "Imaginarium Theater",
+  "es": "Teatro Imaginario"
+ },
+ "Текст": {
+  "en": "Text",
+  "es": "Texto"
+ },
+ "Текст выноски": {
+  "en": "Callout text",
+  "es": "Texto del recuadro"
+ },
+ "Текст гайда": {
+  "en": "Guide text",
+  "es": "Texto de la guía"
+ },
+ "Текст ещё не написан": {
+  "en": "No text yet",
+  "es": "Aún no hay texto"
+ },
+ "Текст золотого бабла": {
+  "en": "Gold bubble text",
+  "es": "Texto de la burbuja dorada"
+ },
+ "Текст ссылки": {
+  "en": "Link text",
+  "es": "Texto del enlace"
+ },
+ "Тексты — наш пересказ.": {
+  "en": "Texts are our own summary.",
+  "es": "Los textos son nuestro resumen."
+ },
+ "Текущая ротация": {
+  "en": "Current rotation",
+  "es": "Rotación actual"
+ },
+ "Текущая ротация: Бездна, Театр, Натиск": {
+  "en": "Current rotation: Abyss, Theater, Onslaught",
+  "es": "Rotación actual: Abismo, Teatro, Embestida"
+ },
+ "Текущие и объявленные баннеры персонажей и оружия. Таймеры считают время вашего сервера.": {
+  "en": "Current and announced character and weapon banners. Timers use your server's time.",
+  "es": "Gachapones de personajes y armas actuales y anunciados. Los temporizadores usan la hora de tu servidor."
+ },
+ "Текущие и следующие баннеры Genshin Impact с таймерами по времени вашего сервера.": {
+  "en": "Current and upcoming Genshin Impact banners with timers in your server's time.",
+  "es": "Gachapones actuales y próximos de Genshin Impact con temporizadores en la hora de tu servidor."
+ },
+ "Текущие циклы всех режимов. Откройте режим, чтобы увидеть врагов, баффы и команды.": {
+  "en": "Current cycles of every mode. Open a mode to see its enemies, buffs and teams.",
+  "es": "Ciclos actuales de todos los modos. Abre un modo para ver enemigos, bonificaciones y equipos."
+ },
+ "Текущие циклы эндгейма Genshin Impact: Витая бездна, Театр воображариума и Натиск — враги, баффы и команды.": {
+  "en": "Current Genshin Impact endgame cycles: Spiral Abyss, Imaginarium Theater and Stygian Onslaught — enemies, buffs and teams.",
+  "es": "Ciclos actuales del endgame de Genshin Impact: Abismo de Espiral, Teatro Imaginario y Embestida Estigia: enemigos, bonificaciones y equipos."
+ },
+ "Текущий гарант: {n}": {
+  "en": "Current pity: {n}",
+  "es": "Pity actual: {n}"
+ },
+ "Текущий цикл Витой бездны: враги на этажах 9–12 по залам и половинам, аномалии, условия звёзд и команды для 12 этажа.": {
+  "en": "The current Spiral Abyss cycle: enemies on floors 9–12 by chamber and half, ley line disorders, star conditions and teams for floor 12.",
+  "es": "El ciclo actual del Abismo de Espiral: enemigos de los pisos 9–12 por sala y mitad, anomalías, condiciones de estrellas y equipos para el piso 12."
+ },
+ "Текущий цикл — до {date}.": {
+  "en": "Current cycle — until {date}.",
+  "es": "Ciclo actual: hasta el {date}."
+ },
+ "Тип бабла": {
+  "en": "Bubble type",
+  "es": "Tipo de burbuja"
+ },
+ "Титул": {
+  "en": "Title",
+  "es": "Título"
+ },
+ "Титулы выдаются за ивенты и участие в жизни сайта.": {
+  "en": "Titles are awarded for events and taking part in the site community.",
+  "es": "Los títulos se otorgan por eventos y por participar en la comunidad del sitio."
+ },
+ "Только на баннерах событий: если его нет сейчас, остаётся ждать повтора.": {
+  "en": "Only on event banners: if it isn't running now, you have to wait for a rerun.",
+  "es": "Solo en gachapones de evento: si no está ahora, toca esperar a que vuelva."
+ },
+ "Только с билдом": {
+  "en": "With build only",
+  "es": "Solo con build"
+ },
+ "Точно (1000)": {
+  "en": "Precise (1000)",
+  "es": "Preciso (1000)"
+ },
+ "Точно очистить? Нажмите ещё раз": {
+  "en": "Clear for sure? Click again",
+  "es": "¿Seguro que quieres vaciarla? Haz clic otra vez"
+ },
+ "Точно удалить? Нажмите ещё раз": {
+  "en": "Really delete? Press again",
+  "es": "¿Seguro que quieres borrarlo? Pulsa otra vez"
+ },
+ "Точность": {
+  "en": "Accuracy",
+  "es": "Precisión"
+ },
+ "Требования и рекомендации — для 12-го этажа текущей Бездны.": {
+  "en": "Requirements and recommendations are for Floor 12 of the current Abyss.",
+  "es": "Los requisitos y recomendaciones son para el piso 12 del Abismo actual."
+ },
+ "Трекер круток": {
+  "en": "Wish tracker",
+  "es": "Rastreador de gachapón"
+ },
+ "Трекер круток: гарант и 50/50": {
+  "en": "Wish tracker: pity and 50/50",
+  "es": "Rastreador de gachapón: garantía y 50/50"
+ },
+ "У {name} в витрине нет уровней талантов — в симуляции таланты 1/1/1.": {
+  "en": "{name} has no talent levels in the showcase — the simulation uses talents 1/1/1.",
+  "es": "{name} no tiene niveles de talentos en el escaparate: la simulación usa talentos 1/1/1."
+ },
+ "У {name} нет статов артефактов.": {
+  "en": "{name} has no artifact stats.",
+  "es": "{name} no tiene estadísticas de artefactos."
+ },
+ "У этого оружия нет пассивного эффекта.": {
+  "en": "This weapon has no passive.",
+  "es": "Esta arma no tiene efecto pasivo."
+ },
+ "УДАЛИТЬ": {
+  "en": "DELETE",
+  "es": "ELIMINAR"
+ },
+ "Убрать {name}": {
+  "en": "Remove {name}",
+  "es": "Quitar a {name}"
+ },
+ "Убрать из моих персонажей": {
+  "en": "Remove from my characters",
+  "es": "Quitar de mis personajes"
+ },
+ "Удалить": {
+  "en": "Remove",
+  "es": "Eliminar"
+ },
+ "Удалить аккаунт": {
+  "en": "Delete account",
+  "es": "Eliminar cuenta"
+ },
+ "Удалить историю аккаунта": {
+  "en": "Delete account history",
+  "es": "Borrar historial de la cuenta"
+ },
+ "Удалить шаг": {
+  "en": "Delete step",
+  "es": "Borrar paso"
+ },
+ "Уже есть аккаунт?": {
+  "en": "Already have an account?",
+  "es": "¿Ya tienes cuenta?"
+ },
+ "Укажите email аккаунта.": {
+  "en": "Enter your account email.",
+  "es": "Introduce el correo de tu cuenta."
+ },
+ "Укажите имя или ник для подписи.": {
+  "en": "Enter a name or nickname for the credit.",
+  "es": "Indica un nombre o apodo para la firma."
+ },
+ "Укажите имя или ник — так мы подпишем гайд": {
+  "en": "Enter a name or nickname — we'll use it to credit the guide",
+  "es": "Indica un nombre o apodo: lo usaremos para firmar la guía"
+ },
+ "Уровень": {
+  "en": "Level",
+  "es": "Nivel"
+ },
+ "Уровень {lvl}: для 12-го этажа (враги 95–100 ур.) стоит поднять хотя бы до 80": {
+  "en": "Level {lvl}: for Floor 12 (enemies Lv. 95–100) raise it to at least 80",
+  "es": "Nivel {lvl}: para el piso 12 (enemigos de nivel 95–100) súbelo al menos a 80"
+ },
+ "Уровень сейчас": {
+  "en": "Current level",
+  "es": "Nivel actual"
+ },
+ "Уровень таланта {n}": {
+  "en": "Talent level {n}",
+  "es": "Nivel de talento {n}"
+ },
+ "Урон Звёздного проводника +50%": {
+  "en": "Stellar-Conduct DMG +50%",
+  "es": "Daño de Superconductor Estelar +50%"
+ },
+ "Урон Звёздного рассеивания +50%": {
+  "en": "Stellar Swirl DMG +50%",
+  "es": "Daño de Torbellino Estelar +50%"
+ },
+ "Утечка из бета-версии": {
+  "en": "Beta leak",
+  "es": "Filtración de la beta"
+ },
+ "Утечки и бета": {
+  "en": "Leaks and beta",
+  "es": "Filtraciones y beta"
+ },
+ "Уточните запрос — показаны первые {n}": {
+  "en": "Refine your search — showing the first {n}",
+  "es": "Afina la búsqueda: se muestran los primeros {n}"
+ },
+ "Участник {n}": {
+  "en": "Member {n}",
+  "es": "Miembro {n}"
+ },
+ "Файл в формате": {
+  "en": "A file in",
+  "es": "Un archivo en formato"
+ },
+ "Файл готов к импорту.": {
+  "en": "The file is ready to import.",
+  "es": "El archivo está listo para importar."
+ },
+ "Файл готов к импорту. Некоторые повреждённые записи будут пропущены.": {
+  "en": "The file is ready to import. Some damaged entries will be skipped.",
+  "es": "El archivo está listo para importar. Se omitirán algunas entradas dañadas."
+ },
+ "Файл загружен: добавлено {n} новых молитв.": {
+  "en": "File loaded: {n} new wishes added.",
+  "es": "Archivo cargado: se añadieron {n} deseos nuevos."
+ },
+ "Файл слишком большой (максимум {n} МБ)": {
+  "en": "File is too large (max {n} MB)",
+  "es": "El archivo es demasiado grande (máx. {n} MB)"
+ },
+ "Фон и эффекты": {
+  "en": "Background and effects",
+  "es": "Fondo y efectos"
+ },
+ "Фон страницы": {
+  "en": "Page background",
+  "es": "Fondo de la página"
+ },
+ "Форма обратной связи": {
+  "en": "Feedback form",
+  "es": "Formulario de contacto"
+ },
+ "Форма обратной связи сохраняет текст сообщения, страницу и контакт, если вы его указали.": {
+  "en": "The feedback form stores the message, the page and your contact if you left one.",
+  "es": "El formulario de comentarios guarda el mensaje, la página y tu contacto si lo indicaste."
+ },
+ "Форматирование текста": {
+  "en": "Text formatting",
+  "es": "Formato del texto"
+ },
+ "Функционал сайта": {
+  "en": "Explore the site",
+  "es": "Explora el sitio"
+ },
+ "Хроники": {
+  "en": "Chronicled",
+  "es": "Crónica"
+ },
+ "Цвет": {
+  "en": "Color",
+  "es": "Color"
+ },
+ "Цвет профиля": {
+  "en": "Profile color",
+  "es": "Color del perfil"
+ },
+ "Цвет фона": {
+  "en": "Background color",
+  "es": "Color de fondo"
+ },
+ "Цель": {
+  "en": "Target",
+  "es": "Objetivo"
+ },
+ "Цикл «{c}» ещё не заполнен: нужны враги, баффы и команды.": {
+  "en": "The “{c}” cycle isn't filled in yet: enemies, buffs and teams are needed.",
+  "es": "El ciclo «{c}» aún no está completo: faltan enemigos, bonificaciones y equipos."
+ },
+ "Цитата": {
+  "en": "Quote",
+  "es": "Cita"
+ },
+ "Часы": {
+  "en": "Sands",
+  "es": "Reloj"
+ },
+ "Что делает скрипт": {
+  "en": "What the script does",
+  "es": "Qué hace el script"
+ },
+ "Что изменили и почему, откуда данные": {
+  "en": "What you changed and why, where the data comes from",
+  "es": "Qué cambiaste y por qué, de dónde salen los datos"
+ },
+ "Что не так и как должно быть. Если это ошибка в билде — укажите источник, если знаете.": {
+  "en": "What's wrong and how it should be. If it's a build mistake, mention a source if you know one.",
+  "es": "Qué está mal y cómo debería ser. Si es un error en una build, indica la fuente si la conoces."
+ },
+ "Что показать": {
+  "en": "What to show",
+  "es": "Qué mostrar"
+ },
+ "Что такое GenshinFlex, откуда данные и что сайт хранит у вас в браузере.": {
+  "en": "What GenshinFlex is, where the data comes from and what the site stores in your browser.",
+  "es": "Qué es GenshinFlex, de dónde vienen los datos y qué guarda el sitio en tu navegador."
+ },
+ "Что хранится у вас": {
+  "en": "What's stored on your side",
+  "es": "Qué se guarda en tu equipo"
+ },
+ "Что-то не работает на сайте": {
+  "en": "Something on the site is broken",
+  "es": "Algo no funciona en el sitio"
+ },
+ "Шагов: {n}": {
+  "en": "Steps: {n}",
+  "es": "Pasos: {n}"
+ },
+ "Шанс / Крит. урон > Восст. энергии > Сила атаки %": {
+  "en": "CRIT Rate / DMG > Energy Recharge > ATK%",
+  "es": "Prob. / Daño CRIT > Recarga de Energía > ATQ %"
+ },
+ "Шанс крит. попадания": {
+  "en": "CRIT Rate",
+  "es": "Prob. CRIT"
+ },
+ "Шанс крита": {
+  "en": "CRIT Rate",
+  "es": "Prob. CRIT"
+ },
+ "Шанс крита выше 85% — часть статов уходит впустую, можно перекинуть в крит. урон": {
+  "en": "CRIT Rate above 85% — some stats are wasted, consider shifting them into CRIT DMG",
+  "es": "Prob. CRIT por encima del 85%: parte de las estadísticas se desperdician, pásalas a Daño CRIT"
+ },
+ "Шкала": {
+  "en": "Timeline",
+  "es": "Línea de tiempo"
+ },
+ "Шкала календаря": {
+  "en": "Calendar timeline",
+  "es": "Línea de tiempo del calendario"
+ },
+ "Шпаргалка по разметке": {
+  "en": "Formatting cheat sheet",
+  "es": "Chuleta de formato"
+ },
+ "Экспорт в файл": {
+  "en": "Export to file",
+  "es": "Exportar a archivo"
+ },
+ "Электро": {
+  "en": "Electro",
+  "es": "Electro"
+ },
+ "Эндгейм": {
+  "en": "Endgame",
+  "es": "Endgame"
+ },
+ "Эндгейм: Бездна, Театр и Натиск": {
+  "en": "Endgame: Abyss, Theater and Onslaught",
+  "es": "Endgame: Abismo, Teatro y Embestida"
+ },
+ "Этаж {n}": {
+  "en": "Floor {n}",
+  "es": "Piso {n}"
+ },
+ "Этаж или режим": {
+  "en": "Floor or mode",
+  "es": "Piso o modo"
+ },
+ "Этажи": {
+  "en": "Floors",
+  "es": "Pisos"
+ },
+ "Эталон: {dps}": {
+  "en": "Reference: {dps}",
+  "es": "Referencia: {dps}"
+ },
+ "Эталонная команда": {
+  "en": "Reference team",
+  "es": "Equipo de referencia"
+ },
+ "Это не похоже на ссылку. Скопируйте её скриптом ещё раз.": {
+  "en": "That doesn't look like a link. Copy it with the script again.",
+  "es": "Eso no parece un enlace. Cópialo de nuevo con el script."
+ },
+ "Эффект": {
+  "en": "Effect",
+  "es": "Efecto"
+ },
+ "Эффекты отключены настройками системы": {
+  "en": "Effects are disabled by system settings",
+  "es": "Los efectos están desactivados por la configuración del sistema"
+ },
+ "Язык": {
+  "en": "Language",
+  "es": "Idioma"
+ },
+ "анализ ИИ": {
+  "en": "AI analysis",
+  "es": "análisis de IA"
+ },
+ "бабл с иконкой и ссылкой — удобнее через кнопку «Бабл»": {
+  "en": "bubble with an icon and a link — easier with the \"Bubble\" button",
+  "es": "burbuja con icono y enlace: más fácil con el botón «Burbuja»"
+ },
+ "без аномалий": {
+  "en": "no disorders",
+  "es": "sin anomalías"
+ },
+ "без статов": {
+  "en": "no stats",
+  "es": "sin estadísticas"
+ },
+ "билд": {
+  "en": "build",
+  "es": "build"
+ },
+ "билды и команды Genshin Impact под текущую Бездну": {
+  "en": "Genshin Impact builds and teams for the current Abyss",
+  "es": "builds y equipos de Genshin Impact para el Abismo actual"
+ },
+ "в разработке": {
+  "en": "in development",
+  "es": "en desarrollo"
+ },
+ "важное": {
+  "en": "important",
+  "es": "importante"
+ },
+ "вариант №{n}": {
+  "en": "option #{n}",
+  "es": "opción n.º {n}"
+ },
+ "ваш билд": {
+  "en": "your build",
+  "es": "tu build"
+ },
+ "впервые": {
+  "en": "debut",
+  "es": "estreno"
+ },
+ "второй сет — для вариантов 2 + 2": {
+  "en": "the second set is for 2 + 2 options",
+  "es": "el segundo set es para opciones 2 + 2"
+ },
+ "выберите из подсказок": {
+  "en": "pick from the suggestions",
+  "es": "elige entre las sugerencias"
+ },
+ "выделение": {
+  "en": "highlight",
+  "es": "resaltado"
+ },
+ "выиграл 50/50": {
+  "en": "won 50/50",
+  "es": "50/50 ganado"
+ },
+ "выноска: tip — совет, warn — важно, info — на заметку": {
+  "en": "callout: tip — tip, warn — important, info — note",
+  "es": "recuadro: tip — consejo, warn — importante, info — nota"
+ },
+ "до {date}": {
+  "en": "until {date}",
+  "es": "hasta el {date}"
+ },
+ "до гаранта 5★: {n}": {
+  "en": "to 5★ pity: {n}",
+  "es": "para la garantía 5★: {n}"
+ },
+ "до нового сезона": {
+  "en": "until the new season",
+  "es": "hasta la nueva temporada"
+ },
+ "до обновления": {
+  "en": "until reset",
+  "es": "hasta el reinicio"
+ },
+ "ещё одна копия персонажа": {
+  "en": "one more copy of the character",
+  "es": "una copia más del personaje"
+ },
+ "жирный": {
+  "en": "bold",
+  "es": "negrita"
+ },
+ "жирный текст": {
+  "en": "bold text",
+  "es": "texto en negrita"
+ },
+ "заголовок раздела": {
+  "en": "section heading",
+  "es": "título de sección"
+ },
+ "закалённая": {
+  "en": "hardened",
+  "es": "endurecida"
+ },
+ "закалённый": {
+  "en": "hardened",
+  "es": "endurecido"
+ },
+ "закончился": {
+  "en": "ended",
+  "es": "terminado"
+ },
+ "заметный прирост": {
+  "en": "big boost",
+  "es": "gran mejora"
+ },
+ "защита монолита": {
+  "en": "monolith defense",
+  "es": "defensa del monolito"
+ },
+ "защита монолита, 10 волн": {
+  "en": "monolith defense, 10 waves",
+  "es": "defensa del monolito, 10 oleadas"
+ },
+ "и": {
+  "en": "and",
+  "es": "y"
+ },
+ "изображения": {
+  "en": "images",
+  "es": "imágenes"
+ },
+ "или": {
+  "en": "or",
+  "es": "o"
+ },
+ "история баннеров": {
+  "en": "banner history",
+  "es": "historial de gachapones"
+ },
+ "к прошлому": {
+  "en": "vs previous",
+  "es": "respecto al anterior"
+ },
+ "как в игре на экране персонажа": {
+  "en": "as shown on the in-game character screen",
+  "es": "como en la pantalla del personaje en el juego"
+ },
+ "курсив": {
+  "en": "italic",
+  "es": "cursiva"
+ },
+ "лучший вариант": {
+  "en": "best option",
+  "es": "la mejor opción"
+ },
+ "любой текст": {
+  "en": "any text",
+  "es": "cualquier texto"
+ },
+ "множители на {n} уровне таланта": {
+  "en": "multipliers at talent level {n}",
+  "es": "multiplicadores con talento al nivel {n}"
+ },
+ "можно пропустить": {
+  "en": "safe to skip",
+  "es": "se puede saltar"
+ },
+ "на возвышение и все таланты до 10 уровня": {
+  "en": "for ascension and all talents to level 10",
+  "es": "para la ascensión y todos los talentos a nivel 10"
+ },
+ "необязательно": {
+  "en": "optional",
+  "es": "opcional"
+ },
+ "нет данных": {
+  "en": "no data",
+  "es": "sin datos"
+ },
+ "нет эталонной команды": {
+  "en": "no reference team",
+  "es": "sin equipo de referencia"
+ },
+ "новое": {
+  "en": "new",
+  "es": "nuevo"
+ },
+ "новый": {
+  "en": "new",
+  "es": "nuevo"
+ },
+ "обновилось": {
+  "en": "reset",
+  "es": "reiniciado"
+ },
+ "обновлено": {
+  "en": "updated",
+  "es": "actualizado"
+ },
+ "ожидается": {
+  "en": "estimated",
+  "es": "estimado"
+ },
+ "основного ДД": {
+  "en": "a main DPS",
+  "es": "un DPS principal"
+ },
+ "от лучшего к запасному": {
+  "en": "from best to fallback",
+  "es": "de la mejor a la alternativa"
+ },
+ "откроется через": {
+  "en": "opens in",
+  "es": "abre en"
+ },
+ "оформление текста": {
+  "en": "text styling",
+  "es": "estilo del texto"
+ },
+ "патч {v}": {
+  "en": "patch {v}",
+  "es": "versión {v}"
+ },
+ "патч {v}, обновлено {date}": {
+  "en": "patch {v}, updated {date}",
+  "es": "versión {v}, actualizado el {date}"
+ },
+ "перерыв": {
+  "en": "break",
+  "es": "pausa"
+ },
+ "по гаранту": {
+  "en": "guaranteed",
+  "es": "garantizado"
+ },
+ "повтор": {
+  "en": "rerun",
+  "es": "reposición"
+ },
+ "подробные разборы других авторов": {
+  "en": "in-depth breakdowns by other authors",
+  "es": "análisis detallados de otros autores"
+ },
+ "политикой конфиденциальности": {
+  "en": "privacy policy",
+  "es": "política de privacidad"
+ },
+ "поменьше": {
+  "en": "smaller",
+  "es": "más pequeño"
+ },
+ "появляются одновременно": {
+  "en": "appear at the same time",
+  "es": "aparecen a la vez"
+ },
+ "появляются по очереди": {
+  "en": "appear one after another",
+  "es": "aparecen uno tras otro"
+ },
+ "прирост урона команды, симуляция gcsim": {
+  "en": "team damage gain, gcsim simulation",
+  "es": "aumento de daño del equipo, simulación de gcsim"
+ },
+ "приятно, но не обязательно": {
+  "en": "nice, not essential",
+  "es": "útil, pero no imprescindible"
+ },
+ "проиграл 50/50": {
+  "en": "lost 50/50",
+  "es": "50/50 perdido"
+ },
+ "простой и золотой бабл": {
+  "en": "plain and gold bubble",
+  "es": "burbuja simple y dorada"
+ },
+ "пункт": {
+  "en": "item",
+  "es": "elemento"
+ },
+ "с {date}": {
+  "en": "from {date}",
+  "es": "desde el {date}"
+ },
+ "скоро": {
+  "en": "soon",
+  "es": "pronto"
+ },
+ "списки": {
+  "en": "lists",
+  "es": "listas"
+ },
+ "ссылка": {
+  "en": "link",
+  "es": "enlace"
+ },
+ "так гайд будет выглядеть на сайте": {
+  "en": "this is how the guide will look on the site",
+  "es": "así se verá la guía en el sitio"
+ },
+ "так гайд будет выглядеть на странице персонажа": {
+  "en": "this is how the guide will look on the character page",
+  "es": "así se verá la guía en la página del personaje"
+ },
+ "текст": {
+  "en": "text",
+  "es": "texto"
+ },
+ "только 4★ и 5★": {
+  "en": "4★ and 5★ only",
+  "es": "solo 4★ y 5★"
+ },
+ "только в вашем браузере": {
+  "en": "only in your browser",
+  "es": "solo en tu navegador"
+ },
+ "уже закончился": {
+  "en": "already ended",
+  "es": "ya terminó"
+ },
+ "уже идёт": {
+  "en": "already running",
+  "es": "ya en curso"
+ },
+ "ур.": {
+  "en": "Lv.",
+  "es": "Nv."
+ },
+ "уровни врагов {lv}": {
+  "en": "enemy levels {lv}",
+  "es": "enemigos de nivel {lv}"
+ },
+ "цитата": {
+  "en": "quote",
+  "es": "cita"
+ },
+ "шанс 5★ уже повышен": {
+  "en": "5★ odds already boosted",
+  "es": "probabilidad de 5★ ya aumentada"
+ },
+ "эталон": {
+  "en": "reference",
+  "es": "referencia"
+ },
+ "этой роли": {
+  "en": "this role",
+  "es": "este rol"
+ },
+ "— после проверки он появится здесь.": {
+  "en": "— once reviewed, it will appear here.",
+  "es": "— tras la revisión aparecerá aquí."
+ }
+}
