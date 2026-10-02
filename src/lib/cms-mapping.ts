@@ -6,6 +6,7 @@ const objectTypes: Record<string, string> = {
   'build:artifacts[]': 'artifactChoice',
   'build:mainStats': 'mainStats',
   'build:teams[]': 'team',
+  'build:rotations[]': 'buildRotation',
   'build:sources[]': 'source',
   'build:external[]': 'externalLink',
   'build:videos[]': 'video',

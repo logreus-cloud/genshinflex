@@ -348,7 +348,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss';
   type Effect = 'none' | 'snow' | 'sparks' | 'petals' | 'stars' | 'fireflies' | 'blizzard';
   type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
-  type ImportData = { custom: Custom; favs: Entry[]; roster: { s: string }[]; uid: string | null; media: Partial<Record<MediaKey, Blob>> };
+  type ImportData = { custom: Custom; favs: Entry[]; roster: RosterEntry[]; uid: string | null; media: Partial<Record<MediaKey, Blob>> };
+  // Запись «Моих персонажей» целиком: прокачку проверяет и нормализует team-check, профиль её только переносит
+  type RosterEntry = Record<string, unknown> & { s: string };
   type StagedMedia = { blob: Blob; url: string };
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const read = (key: string): unknown => { try { return store.get<unknown>(key, null); } catch { return null; } };
@@ -466,11 +468,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   }
   function validRoster(value: unknown) {
     if (!Array.isArray(value)) return null;
-    const list: { s: string }[] = [];
+    const list: RosterEntry[] = [];
     let valid = true;
     for (const item of value) {
       if (!isRecord(item) || typeof item.s !== 'string' || !pickerBySlug.has(item.s)) { valid = false; continue; }
-      list.push({ s: item.s });
+      list.push({ ...item, s: item.s });
     }
     return { value: list, valid };
   }

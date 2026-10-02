@@ -54,7 +54,7 @@ if (g.kind === 'weapon' || g.kind === 'endgame') {
 }
 
 const file = `src/content/builds/${g.character}.md`;
-// Источники и видео из старого билда сохраняем — редактор их не трогает
+// Ротации, источники и видео из старого билда сохраняем — редактор их не трогает
 const previous = await store.readEntry('builds', g.character);
 const old = previous?.text.replace(/\r\n/g, '\n') ?? '';
 const oldParsed = old ? matter(old, { engines: { yaml: (source) => YAML.parse(source) } }) : null;
@@ -81,7 +81,7 @@ const lines = [
   ...(g.external?.length ? ['external:', ...g.external.flatMap((x) => [`  - title: ${q(x.title)}`, `    url: ${x.url}`, ...(x.author ? [`    author: ${q(x.author)}`] : []), `    lang: ${x.lang}`])] : []),
 ].join('\n');
 const lang = g.lang ?? 'ru';
-const md = `${lines}\n${keep('sources')}${keep('videos')}${g.external?.length ? '' : keep('external')}---\n\n${g.body}\n`;
+const md = `${lines}\n${keep('rotations')}${keep('sources')}${keep('videos')}${g.external?.length ? '' : keep('external')}---\n\n${g.body}\n`;
 const i18nFile = `src/content/builds-i18n/${lang}/${g.character}.md`;
 if (process.argv.includes('--dry')) {
   console.log(`# заявка ${id} · ${lang} · ${row.mode === 'edit' ? 'правка' : 'новый гайд'} · ${row.author} · ${row.contact ?? 'без контакта'} · ${row.status}`);

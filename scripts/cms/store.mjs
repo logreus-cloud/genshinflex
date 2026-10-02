@@ -17,7 +17,7 @@ const collections = {
 };
 
 const fieldOrder = {
-  builds: ['character', 'role', 'updated', 'patch', 'weapons', 'artifacts', 'mainStats', 'substats', 'talents', 'teams', 'sources', 'external', 'authors', 'videos'],
+  builds: ['character', 'role', 'updated', 'patch', 'weapons', 'artifacts', 'mainStats', 'substats', 'talents', 'teams', 'rotations', 'sources', 'external', 'authors', 'videos'],
   buildsI18n: [],
   news: ['lang', 'anchor', 'title', 'summary', 'date', 'draft'],
   weaponGuides: ['updated', 'authors', 'external'],
