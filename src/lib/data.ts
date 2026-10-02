@@ -8,6 +8,7 @@ import charactersEs from '../data/generated/characters.es.json';
 import weaponsEs from '../data/generated/weapons.es.json';
 import artifactsEs from '../data/generated/artifacts.es.json';
 import { translate, type Lang } from '../i18n';
+import { MODE_SECTIONS } from './sections';
 
 import beta from '../data/beta-characters.json';
 
@@ -44,11 +45,6 @@ const WEAPON_TYPES: Record<Lang, Record<string, string>> = {
   ru: { sword: 'Одноручный меч', claymore: 'Двуручный меч', polearm: 'Древковое', bow: 'Лук', catalyst: 'Катализатор' },
   en: { sword: 'Sword', claymore: 'Claymore', polearm: 'Polearm', bow: 'Bow', catalyst: 'Catalyst' },
   es: { sword: 'Espada ligera', claymore: 'Mandoble', polearm: 'Lanza', bow: 'Arco', catalyst: 'Catalizador' },
-};
-const MODES: Record<Lang, Record<string, { title: string; short: string }>> = {
-  ru: { abyss: { title: 'Витая бездна', short: 'Бездна' }, theater: { title: 'Театр воображариума', short: 'Театр' }, onslaught: { title: 'Натиск', short: 'Натиск' } },
-  en: { abyss: { title: 'Spiral Abyss', short: 'Abyss' }, theater: { title: 'Imaginarium Theater', short: 'Theater' }, onslaught: { title: 'Stygian Onslaught', short: 'Onslaught' } },
-  es: { abyss: { title: 'Abismo de Espiral', short: 'Abismo' }, theater: { title: 'Teatro Imaginario', short: 'Teatro' }, onslaught: { title: 'Embestida Estigia', short: 'Embestida' } },
 };
 const TALENTS: Record<Lang, { normal: string; skill: string; burst: string }> = {
   ru: { normal: 'Обычная атака', skill: 'Элементальный навык', burst: 'Взрыв стихии' },
@@ -120,17 +116,22 @@ export function useData(locale: string | undefined) {
   const lang = toLang(locale);
   const src = SOURCES[lang];
   const tag = LOCALE_TAG[lang];
+  const t = translate(lang);
+  const modes = Object.fromEntries(Object.entries(MODE_SECTIONS).map(([mode, section]) => {
+    const title = t(section.label);
+    return [mode, { title, short: section.shortByLang?.[lang] ?? t(section.short ?? section.label) }];
+  })) as Record<string, { title: string; short: string }>;
   return {
     lang,
     base: prefixOf(lang),
-    t: translate(lang),
+    t,
     ...src,
     getCharacter: must(index(src.characters), 'персонаж'),
     getWeapon: must(index(src.weapons), 'оружие'),
     getArtifact: must(index(src.artifacts), 'сет артефактов'),
     ELEMENTS: ELEMENTS[lang],
     WEAPON_TYPES: WEAPON_TYPES[lang],
-    MODES: MODES[lang],
+    MODES: modes,
     TALENTS: TALENTS[lang],
     fmtDate: (d: Date) => d.toLocaleDateString(tag, { day: 'numeric', month: 'long' }),
     fmtFullDate: (d: Date) => d.toLocaleDateString(tag),

@@ -1,21 +1,20 @@
 ---
-import { calendarItems } from '../lib/calendar';
+import { calendarItems, serverTime } from '../lib/calendar';
 import { useData } from '../lib/data';
 
 const { lang, base, t, fmtServerDate } = useData(Astro.currentLocale);
 const now = Date.now();
-const moment = (value: string) => Date.parse(`${value.replace(' ', 'T').slice(0, 16)}+01:00`);
 const shown = (await calendarItems(lang)).filter((item) =>
   item.kind !== 'abyss' && item.kind !== 'theater' && item.kind !== 'onslaught' && item.kind !== 'version' &&
-  moment(item.end ?? item.start) + 6 * 3_600_000 > now - 86_400_000 &&
-  moment(item.start) - 7 * 3_600_000 <= now + 60 * 86_400_000);
+  serverTime(item.end ?? item.start) + 6 * 3_600_000 > now - 86_400_000 &&
+  serverTime(item.start) - 7 * 3_600_000 <= now + 60 * 86_400_000);
 ---
 {shown.length > 0 && (
   <section class="calendar-widget" data-ended={t('Закончилось')} data-ongoing={t('Идёт сейчас')}>
     <h2 class="h-sec">{t('Календарь')} <small><a href={`${base}/calendar/`}>{t('Весь календарь →')}</a></small></h2>
     <div class="calendar-cards">
       {shown.map((item) => {
-        const active = moment(item.start) <= now;
+        const active = serverTime(item.start) <= now;
         const until = active && item.end ? item.end : item.start;
         return (
           <a class="calendar-card" href={`${base}/calendar/`} data-id={item.id} data-start={item.start} data-end={item.end ?? ''}

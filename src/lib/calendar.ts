@@ -12,7 +12,8 @@ type Localized = Record<Lang, string>;
 type Manual = { id: string; kind: 'version' | 'livestream' | 'banner' | 'event'; start: string; end?: string; estimated?: boolean; title: Localized; note?: Localized; source?: { title: string; url: string } };
 type Phase = { version: string; phase?: number; start: string; end: string; featured?: { slug: string }[]; weapons?: unknown; characters?: { five?: string[] }[] };
 const normalize = (value: string) => value.replace(' ', 'T').slice(0, 16);
-const dateValue = (value: string) => Date.parse(`${normalize(value)}+01:00`);
+// Время событий при сборке считаем по европейскому серверу.
+export const serverTime = (value: string) => Date.parse(`${normalize(value)}+01:00`);
 const monthStart = (date: Date, delta: number) => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + delta, 1));
 const nextCycle = (date: Date, day: number) => `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T04:00`;
 const cycleEnd = (date: Date, day: number) => `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T03:59`;
@@ -56,7 +57,7 @@ export const calendarItems = async (lang: Lang): Promise<CalItem[]> => {
   const current = (await getCollection('banners')).map((entry) => entry.data as unknown as Phase);
   const archived = history as unknown as Phase[];
   const seen = new Set(current.map((phase) => normalize(phase.start).slice(0, 10)));
-  const phases = [...current, ...archived.filter((phase) => !seen.has(normalize(phase.start).slice(0, 10)))].filter((phase) => dateValue(phase.end) >= cutoff).sort((a, b) => dateValue(a.start) - dateValue(b.start));
+  const phases = [...current, ...archived.filter((phase) => !seen.has(normalize(phase.start).slice(0, 10)))].filter((phase) => serverTime(phase.end) >= cutoff).sort((a, b) => serverTime(a.start) - serverTime(b.start));
   const phaseNumber = new Map<string, number>();
   for (const phase of phases) {
     const number = phase.phase ?? (phaseNumber.get(phase.version) ?? 0) + 1;
@@ -77,7 +78,7 @@ export const calendarItems = async (lang: Lang): Promise<CalItem[]> => {
     const row = entry.data;
     const start = `${row.start.toISOString().slice(0, 10)}T04:00`;
     const end = `${row.end.toISOString().slice(0, 10)}T04:00`;
-    if (dateValue(end) < cutoff) continue;
+    if (serverTime(end) < cutoff) continue;
     items.push({ id: `rotation-${entry.id}`, kind: row.mode, start, end, title: data.MODES[row.mode].title, note: data.t(row.cycle), href: `/${row.mode}/` });
   }
 
@@ -89,10 +90,10 @@ export const calendarItems = async (lang: Lang): Promise<CalItem[]> => {
       const following = monthStart(today, delta + 1);
       const start = nextCycle(month, day);
       const end = cycleEnd(following, day);
-      if (dateValue(start) > now + 62 * 86_400_000 || dateValue(end) < now) continue;
-      if (items.some((item) => item.kind === mode && dateValue(item.start) < dateValue(end) && (!item.end || dateValue(item.end) > dateValue(start)))) continue;
+      if (serverTime(start) > now + 62 * 86_400_000 || serverTime(end) < now) continue;
+      if (items.some((item) => item.kind === mode && serverTime(item.start) < serverTime(end) && (!item.end || serverTime(item.end) > serverTime(start)))) continue;
       items.push({ id: `forecast-${mode}-${start}`, kind: mode, start, end, title: data.MODES[mode].title, estimated: true, href: `/${mode}/` });
     }
   }
-  return items.sort((a, b) => dateValue(a.start) - dateValue(b.start));
+  return items.sort((a, b) => serverTime(a.start) - serverTime(b.start));
 };
