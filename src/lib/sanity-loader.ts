@@ -1,8 +1,8 @@
 import { createClient } from '@sanity/client';
+import { collections, entryId, type Collection } from '@genshinflex/content-model';
 import { bodyHash, fromSanityData } from './cms-mapping';
 import { portableTextToMarkdown } from './portable-text-md';
 
-type Collection = 'builds' | 'buildsI18n' | 'rotations' | 'banners' | 'news' | 'weaponGuides' | 'endgameGuides';
 type Document = Record<string, unknown> & {
   _id: string;
   _type: string;
@@ -14,16 +14,6 @@ type Document = Record<string, unknown> & {
   bodyHash?: string;
 };
 
-const types: Record<Collection, string> = {
-  builds: 'build',
-  buildsI18n: 'build',
-  rotations: 'rotation',
-  banners: 'banner',
-  news: 'news',
-  weaponGuides: 'weaponGuide',
-  endgameGuides: 'endgameGuide',
-};
-
 const client = createClient({
   projectId: '6qrew4ya',
   dataset: 'production',
@@ -33,20 +23,8 @@ const client = createClient({
   token: process.env.SANITY_READ_TOKEN || undefined,
 });
 
-function entryId(collection: Collection, document: Document): string {
-  const slug = typeof document.slug === 'string' ? document.slug : document.slug?.current;
-  const part = collection === 'builds' || collection === 'buildsI18n' ? document.character : slug;
-  const parts = collection === 'builds' || collection === 'rotations' || collection === 'banners'
-    ? [part]
-    : [document.lang, part];
-  if (parts.some((value) => typeof value !== 'string' || !value.trim() || value.includes('/'))) {
-    throw new Error(`Sanity: неверный id в коллекции ${collection}, документ ${document._id}`);
-  }
-  return parts.join('/');
-}
-
 export function sanityLoader(collection: Collection) {
-  const type = types[collection];
+  const type = collections[collection].type;
   return {
     name: `sanity-${collection}`,
     async load({ store, parseData, generateDigest, renderMarkdown, logger }: {

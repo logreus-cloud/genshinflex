@@ -6,12 +6,14 @@
     "node": ">=22.12.0"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "cms:export": "node --import tsx scripts/cms/export-to-sanity.mjs",
     "cms:test": "node --import tsx scripts/cms/roundtrip-test.mjs",
     "cms:store-test": "node --import tsx --test scripts/cms/store.test.mjs",
+    "cms:model-test": "node --import tsx --test packages/content-model/test/*.test.ts",
     "cms:push": "node --import tsx scripts/cms/push.mjs",
     "build:sanity": "node scripts/cms/build-sanity.mjs",
     "import": "node scripts/import-data.mjs && node scripts/import-wiki-enemies.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/add-beta-levelup.mjs && node scripts/import-weapon-sources.mjs && python scripts/import-weapon-art.py && node scripts/import-calendar.mjs",

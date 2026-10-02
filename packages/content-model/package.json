@@ -1,0 +1,9 @@
+{
+  "name": "@genshinflex/content-model",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@sanity/schema": "^4.0.0"
+  }
+}

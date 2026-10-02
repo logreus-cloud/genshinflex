@@ -5,34 +5,11 @@ import YAML from 'yaml';
 import { marked } from 'marked';
 import { JSDOM } from 'jsdom';
 import { htmlToBlocks } from '@portabletext/block-tools';
-import { Schema } from '@sanity/schema';
-import { schemaTypes } from '../../apps/studio/schemas/index.ts';
+import { buildBodyType, collections, documentId } from '@genshinflex/content-model';
 import { bodyHash, fromSanityData, toSanityData } from '../../src/lib/cms-mapping.ts';
 import { portableTextToMarkdown } from '../../src/lib/portable-text-md.ts';
 
 export { fromSanityData, portableTextToMarkdown };
-
-const schema = Schema.compile({ name: 'migration', types: schemaTypes });
-// htmlToBlocks ждёт тип-массив (поле body), а не сам тип блока
-const blockType = schema.get('build').fields.find((field) => field.name === 'body').type;
-const folders = {
-  builds: 'builds',
-  buildsI18n: 'builds-i18n',
-  rotations: 'rotations',
-  banners: 'banners',
-  news: 'news',
-  weaponGuides: 'weapon-guides',
-  endgameGuides: 'endgame-guides',
-};
-const types = {
-  builds: 'build',
-  buildsI18n: 'build',
-  rotations: 'rotation',
-  banners: 'banner',
-  news: 'news',
-  weaponGuides: 'weaponGuide',
-  endgameGuides: 'endgameGuide',
-};
 
 async function walk(folder) {
   const entries = await readdir(folder, { withFileTypes: true });
@@ -45,8 +22,8 @@ async function walk(folder) {
 
 export async function files() {
   const result = [];
-  for (const [collection, folder] of Object.entries(folders)) {
-    const base = join('src', 'content', folder);
+  for (const [collection, config] of Object.entries(collections)) {
+    const base = join('src', 'content', config.folder);
     for (const path of await walk(base)) {
       if (!['.md', '.json'].includes(extname(path))) continue;
       result.push({ collection, path, id: relative(base, path).replaceAll('\\', '/').replace(/\.(md|json)$/, '') });
@@ -79,7 +56,7 @@ export function markdownToPortableText(markdown, path) {
   const html = marked.parse(markdown, { breaks: true });
   try {
     let key = 0;
-    return htmlToBlocks(html, blockType, {
+    return htmlToBlocks(html, buildBodyType, {
       parseHtml: (input) => new JSDOM(input).window.document,
       keyGenerator: () => String(key++),
     });
@@ -89,17 +66,19 @@ export function markdownToPortableText(markdown, path) {
 }
 
 export function toDocument(file, data, body) {
-  const type = types[file.collection];
+  const type = collections[file.collection].type;
   const name = basename(file.id);
   const lang = file.id.includes('/') ? file.id.split('/')[0] : 'ru';
+  // _id из данных файла не должен перебить вычисленный: он назначается после разворачивания данных
   const document = { _id: '', _type: type, ...toSanityData(type, data) };
-  if (file.collection === 'builds') Object.assign(document, { _id: `build.ru.${name}`, lang: 'ru' });
-  if (file.collection === 'buildsI18n') Object.assign(document, { _id: `build.${lang}.${name}`, lang, character: name });
-  if (file.collection === 'news') Object.assign(document, { _id: `news.${lang}.${name}`, lang, slug: { _type: 'slug', current: name } });
-  if (file.collection === 'rotations') Object.assign(document, { _id: `rotation.${name}`, slug: { _type: 'slug', current: name } });
-  if (file.collection === 'banners') Object.assign(document, { _id: `banner.${name}`, slug: { _type: 'slug', current: name } });
+  document._id = documentId(file.collection, file.id);
+  if (file.collection === 'builds') Object.assign(document, { lang: 'ru' });
+  if (file.collection === 'buildsI18n') Object.assign(document, { lang, character: name });
+  if (file.collection === 'news') Object.assign(document, { lang, slug: { _type: 'slug', current: name } });
+  if (file.collection === 'rotations') Object.assign(document, { slug: { _type: 'slug', current: name } });
+  if (file.collection === 'banners') Object.assign(document, { slug: { _type: 'slug', current: name } });
   if (file.collection === 'weaponGuides' || file.collection === 'endgameGuides') {
-    Object.assign(document, { _id: `${type}.${lang}.${name}`, lang, slug: name });
+    Object.assign(document, { lang, slug: name });
   }
   if (body !== undefined) {
     document.body = markdownToPortableText(body, file.path);
@@ -110,5 +89,5 @@ export function toDocument(file, data, body) {
 }
 
 export function fromDocument(file, document) {
-  return file.collection === 'buildsI18n' ? {} : fromSanityData(types[file.collection], document);
+  return file.collection === 'buildsI18n' ? {} : fromSanityData(collections[file.collection].type, document);
 }

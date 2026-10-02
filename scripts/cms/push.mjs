@@ -1,20 +1,13 @@
 import { isDeepStrictEqual } from 'node:util';
 import { readFile, readdir, mkdir, writeFile, stat } from 'node:fs/promises';
 import { resolve, relative, sep, extname, join } from 'node:path';
+import { collections } from '@genshinflex/content-model';
 import matter from 'gray-matter';
 import YAML from 'yaml';
 import { toDocument } from './mapping.mjs';
 import { createStore } from './store.mjs';
 
-const folders = {
-  builds: 'builds',
-  'builds-i18n': 'buildsI18n',
-  rotations: 'rotations',
-  banners: 'banners',
-  news: 'news',
-  'weapon-guides': 'weaponGuides',
-  'endgame-guides': 'endgameGuides',
-};
+const folders = Object.fromEntries(Object.entries(collections).map(([collection, config]) => [config.folder, collection]));
 const base = resolve('src/content');
 const stateFile = '.cache/cms-push.json';
 const force = process.argv.includes('--force');
@@ -42,7 +35,7 @@ function identify(path) {
   const [folder, ...parts] = name.split('/');
   const collection = folders[folder];
   const extension = extname(name);
-  if (!collection || !parts.length || extension !== (['rotations', 'banners'].includes(collection) ? '.json' : '.md'))
+  if (!collection || !parts.length || extension !== collections[collection].extension)
     throw new Error(`Неизвестный файл контента: ${name}`);
   return { collection, id: parts.join('/').slice(0, -extension.length), path };
 }

@@ -2,27 +2,10 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createClient } from '@sanity/client';
+import { collections, documentId, entryIdFromId, fieldOrder, isDocumentId } from '@genshinflex/content-model';
 import matter from 'gray-matter';
 import YAML from 'yaml';
 import { fromDocument, portableTextToMarkdown, toDocument } from './mapping.mjs';
-
-const collections = {
-  builds: { folder: 'builds', type: 'build', extension: '.md' },
-  buildsI18n: { folder: 'builds-i18n', type: 'build', extension: '.md' },
-  rotations: { folder: 'rotations', type: 'rotation', extension: '.json' },
-  banners: { folder: 'banners', type: 'banner', extension: '.json' },
-  news: { folder: 'news', type: 'news', extension: '.md' },
-  weaponGuides: { folder: 'weapon-guides', type: 'weaponGuide', extension: '.md' },
-  endgameGuides: { folder: 'endgame-guides', type: 'endgameGuide', extension: '.md' },
-};
-
-const fieldOrder = {
-  builds: ['character', 'role', 'updated', 'patch', 'weapons', 'artifacts', 'mainStats', 'substats', 'talents', 'teams', 'rotations', 'sources', 'external', 'authors', 'videos'],
-  buildsI18n: [],
-  news: ['lang', 'anchor', 'title', 'summary', 'date', 'draft'],
-  weaponGuides: ['updated', 'authors', 'external'],
-  endgameGuides: ['cycle', 'updated', 'teams', 'authors', 'external'],
-};
 
 function entry(collection, id, root) {
   const config = collections[collection];
@@ -30,13 +13,6 @@ function entry(collection, id, root) {
     throw new Error(`Недопустимый контент: ${collection}/${id}`);
   const path = join(root, 'src', 'content', config.folder, `${id}${config.extension}`);
   return { collection, id, path, ...config };
-}
-
-function documentId(file) {
-  const name = file.id.split('/').at(-1);
-  const lang = file.id.includes('/') ? file.id.split('/')[0] : 'ru';
-  if (file.collection === 'builds' || file.collection === 'buildsI18n') return `build.${lang}.${name}`;
-  return `${file.type}.${['news', 'weaponGuides', 'endgameGuides'].includes(file.collection) ? `${lang}.` : ''}${name}`;
 }
 
 function parseText(file, text) {
@@ -51,9 +27,10 @@ function parseText(file, text) {
 function renderText(file, document) {
   const data = fromDocument(file, document);
   if (file.extension === '.json') return `${JSON.stringify(data, null, 2)}\n`;
+  const order = fieldOrder(file.collection);
   const ordered = Object.fromEntries([
-    ...(fieldOrder[file.collection] ?? []).filter((key) => key in data).map((key) => [key, data[key]]),
-    ...Object.entries(data).filter(([key]) => !(fieldOrder[file.collection] ?? []).includes(key)),
+    ...order.filter((key) => key in data).map((key) => [key, data[key]]),
+    ...Object.entries(data).filter(([key]) => !order.includes(key)),
   ]);
   const yaml = Object.keys(ordered).length ? YAML.stringify(ordered).trimEnd() + '\n' : '';
   const body = document.bodyMarkdown ?? portableTextToMarkdown(document.body ?? []);
@@ -94,7 +71,7 @@ export function createStore({ client, root = process.cwd(), source } = {}) {
       try { return { text: await readFile(file.path, 'utf8'), rev: null }; }
       catch (error) { if (error.code === 'ENOENT') return null; throw error; }
     }
-    const document = await getClient().fetch('*[_id == $id][0]', { id: documentId(file) });
+    const document = await getClient().fetch('*[_id == $id][0]', { id: documentId(file.collection, file.id) });
     return document ? { text: renderText(file, document), rev: document._rev } : null;
   }
 
@@ -116,15 +93,9 @@ export function createStore({ client, root = process.cwd(), source } = {}) {
       return (await walk(base)).sort();
     }
     const ids = await getClient().fetch('*[_type == $type]._id', { type: file.type });
-    return ids.filter((id) => {
-      if (collection === 'builds') return id.startsWith('build.ru.');
-      if (collection === 'buildsI18n') return /^build\.(en|es)\./.test(id);
-      return id.startsWith(`${file.type}.`);
-    }).map((id) => {
-      const parts = id.split('.');
-      return ['buildsI18n', 'news', 'weaponGuides', 'endgameGuides'].includes(collection)
-        ? `${parts[1]}/${parts.slice(2).join('.')}` : parts.slice(collection === 'builds' ? 2 : 1).join('.');
-    }).sort();
+    return ids.filter((id) => isDocumentId(collection, id))
+      .map((id) => entryIdFromId(collection, id))
+      .sort();
   }
 
   async function writeEntry(collection, id, text, { ifRevision, mustNotExist = false } = {}) {
