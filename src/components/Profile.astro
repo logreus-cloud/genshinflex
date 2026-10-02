@@ -341,7 +341,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { BASE, t } from '../scripts/search';
   import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
   import { onPage, cleanup } from '../scripts/router';
-  import { markChanged, syncNow, type SyncResult } from '../scripts/profile-sync';
+  import { syncNow, type SyncResult } from '../scripts/profile-sync';
+  import { userData, userDataKey } from '../scripts/user-data';
   import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
   import { onSessionChange } from '../scripts/user-data/session';
 
@@ -619,7 +620,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const box = $('roster-list');
     box.replaceChildren();
     if (!charsReady) { box.textContent = t('Не удалось загрузить данные персонажей.'); return; }
-    const raw = read('gf:roster');
+    // Для показа читаем мягко: validRoster отбрасывает только повреждённые записи, а не весь список
+    const raw = read(userDataKey('roster'));
     const seen = new Set<string>();
     const valid = validRoster(raw)?.value ?? [];
     const list = valid.filter((item) => charsBySlug.has(item.s) && !seen.has(item.s) && !!seen.add(item.s));
@@ -914,7 +916,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   onSessionChange(() => { void loadWishes(); }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
-    let raw = read('gf:profile-custom');
+    // Сырое значение: старый формат аватара мигрирует ниже, глубокую проверку делает validCustom
+    let raw = read(userDataKey('profileCustom'));
     if (isRecord(raw) && isRecord(raw.avatar) && raw.avatar.type === 'upload' && typeof raw.avatar.data === 'string') {
       try {
         const blob = await dataUrlToBlob(raw.avatar.data, 'avatar');
@@ -923,7 +926,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         if (!blob || !await commitMedia({ avatar: blob }, version)) throw new Error();
         if (signal.aborted) { await deleteMedia('avatar', version); return; }
         const migrated = { ...raw, avatar: { type: 'upload' }, media: { ...(isRecord(raw.media) ? raw.media : {}), avatar: version } };
-        try { localStorage.setItem('gf:profile-custom', JSON.stringify(migrated)); raw = migrated; }
+        // Миграция формата, а не правка пользователя — без отметки изменений
+        try { localStorage.setItem(userDataKey('profileCustom'), JSON.stringify(migrated)); raw = migrated; }
         catch { await deleteMedia('avatar', version); throw new Error(); }
         await deleteMedia('avatar');
         if (signal.aborted) return;
@@ -944,8 +948,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   void initCustom().then(() => { if (!signal.aborted) void syncNow(); });
   const cachedProfile = validCache(read('gf:profile-cache'));
   const uidInput = $<HTMLInputElement>('profile-uid');
-  const storedUid = read('gf:profile-uid');
-  const uidCleared = (() => { try { return localStorage.getItem('gf:profile-uid') === 'null'; } catch { return false; } })();
+  const storedUid = userData.get('profileUid');
+  // Сохранённый null — пользователь сам стёр UID; отсутствие ключа — UID ещё не задавали
+  const uidCleared = (() => { try { return localStorage.getItem(userDataKey('profileUid')) === 'null'; } catch { return false; } })();
   const selectedUid = uidCleared ? null : uidOk(storedUid) ? storedUid : cachedProfile?.uid;
   if (selectedUid) uidInput.value = selectedUid;
   else if (!uidCleared) for (const key of ['gf:sim-uid', 'gf:wish-uid']) { const value = read(key); if (uidOk(value)) { uidInput.value = value; break; } }
@@ -968,8 +973,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
         renderRoster();
         cancelShowcase();
-        const uid = read('gf:profile-uid');
-        const nextUid = uidOk(uid) ? uid : null;
+        const nextUid = userData.get('profileUid');
         const cached = validCache(read('gf:profile-cache'));
         if (!nextUid || cached?.uid !== nextUid) try { localStorage.removeItem('gf:profile-cache'); } catch {}
         uidInput.value = nextUid ?? '';
@@ -1022,9 +1026,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const picture = isRecord(player.profilePicture) ? num(player.profilePicture.avatarId ?? player.profilePicture.id) : null;
       const shown = Array.isArray(player.showAvatarInfoList) && player.showAvatarInfoList.length ? player.showAvatarInfoList : body.avatarInfoList;
       const showcase = Array.isArray(shown) ? shown.map((item) => isRecord(item) ? num(item.avatarId) : null).filter((id): id is number => id !== null) : [];
+      // UID не сохранился (например, нет места) — витрину не подменяем, чтобы кеш не разошёлся с UID
+      if (!userData.set('profileUid', uid)) return status(t('Не удалось сохранить профиль в этом браузере'), true);
       currentProfile = { uid, time: Date.now(), player: { nickname: typeof player.nickname === 'string' ? player.nickname : '', level: num(player.level) ?? 0,
         worldLevel: num(player.worldLevel) ?? 0, signature: typeof player.signature === 'string' ? player.signature : '', profilePictureId: picture ?? undefined }, showcase };
-      if (store.set('gf:profile-uid', uid)) markChanged('data');
       store.set('gf:profile-cache', currentProfile);
       renderProfile();
       status(t('Витрина обновлена.'));
@@ -1080,9 +1085,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       if (!await commitMedia(changes, version)) throw new Error();
       if (signal.aborted) throw new Error();
       if (!dialog.open || session !== editorSession) throw new Error();
-      localStorage.setItem('gf:profile-custom', JSON.stringify(snapshot));
+      if (!userData.set('profileCustom', snapshot)) throw new Error();
       switched = true;
-      markChanged('custom');
       const previous = saved;
       saved = structuredClone(snapshot);
       const previousUrls = new Map(committedUrls);
@@ -1092,8 +1096,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       }
       if (importSnapshot) {
         cancelShowcase();
-        const imported = [store.set('gf:favs', importSnapshot.favs), store.set('gf:roster', importSnapshot.roster), store.set('gf:profile-uid', importSnapshot.uid)];
-        if (imported.every(Boolean)) markChanged('data');
+        // Импорт целиком (атомарно, все языки избранного) переделывается следующим шагом — из снимка модуля
+        userData.set('favorites', importSnapshot.favs);
+        userData.set('roster', importSnapshot.roster);
+        userData.set('profileUid', importSnapshot.uid);
         if (importSnapshot.uid === null) try { localStorage.removeItem('gf:profile-cache'); } catch {}
         uidInput.value = importSnapshot.uid ?? '';
         const cached = validCache(read('gf:profile-cache'));

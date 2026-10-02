@@ -2,7 +2,6 @@ import { getMedia, type MediaKey } from './profile-media';
 import { hasSession, onSessionChange } from './user-data/session';
 import { cancelScheduledSync, hasStoredUserData, readStrict, userDataKey, validUserData, writePulled, type Kind, type UserDataWrite } from './user-data';
 import type { Entry } from './common';
-export { markChanged } from './user-data';
 
 type Result = 'pulled' | 'pushed' | 'same' | 'skipped';
 export type SyncResult = Record<Kind, Result>;
