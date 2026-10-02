@@ -35,6 +35,7 @@
     "guide:md": "node --import tsx scripts/guide-to-md.mjs",
     "sim": "node --import tsx scripts/sim-investments.mjs",
     "sim:presets": "node scripts/export-sim-presets.mjs",
+    "test": "npm run cms:test && npm run cms:store-test && npm run cms:model-test && npm run api:test",
     "test:sim": "node --experimental-strip-types scripts/test-enka-gcsim.mjs",
     "test:discord": "node --experimental-strip-types scripts/test-discord.mjs",
     "test:reminders": "node --experimental-strip-types scripts/test-reminders.mjs",
