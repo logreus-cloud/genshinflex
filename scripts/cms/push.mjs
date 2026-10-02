@@ -1,4 +1,4 @@
-import { isDeepStrictEqual } from 'node:util';
+import { contentHash } from '../../src/lib/cms-mapping.ts';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { resolve, relative, sep, extname, join } from 'node:path';
 import { collections } from '@genshinflex/content-model';
@@ -59,7 +59,8 @@ for (const path of [...new Set(paths)].sort()) {
   const text = await readFile(path, 'utf8');
   const current = await store.readEntry(file.collection, file.id);
   const document = content(file, text);
-  if (current && isDeepStrictEqual(content(file, current.text), document)) { totals.same++; continue; }
+  // Сравнение без _key и порядка ключей: _key — хеш JSON элемента, а данные из Sanity приходят с другим порядком ключей
+  if (current && contentHash(content(file, current.text)) === contentHash(document)) { totals.same++; continue; }
   if (current?.studioEdited && !force) {
     console.log(`изменён в Studio: ${file.id}`);
     totals.studio++;
