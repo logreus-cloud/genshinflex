@@ -10,6 +10,9 @@ export function parallax(element: HTMLElement, maxX: number, maxY: number): () =
     element.style.setProperty('--py', '0px');
     element.style.willChange = '';
   }
+  function activate() {
+    if (enabled() && element.style.willChange !== 'transform') element.style.willChange = 'transform';
+  }
   function tick() {
     frame = 0;
     if (!enabled()) { stop(); return; }
@@ -20,21 +23,28 @@ export function parallax(element: HTMLElement, maxX: number, maxY: number): () =
     element.style.setProperty('--px', x + 'px');
     element.style.setProperty('--py', y + 'px');
     if (x !== targetX || y !== targetY) start();
-    else element.style.willChange = '';
   }
   function start() {
     if (frame || !enabled()) return;
-    element.style.willChange = 'transform';
     frame = requestAnimationFrame(tick);
   }
   function move(event: PointerEvent) {
     if (!enabled()) return;
-    targetX = Math.max(-1, Math.min(1, event.clientX / innerWidth * 2 - 1)) * maxX;
-    targetY = Math.max(-1, Math.min(1, event.clientY / innerHeight * 2 - 1)) * maxY;
+    activate();
+    var nextX = Math.max(-1, Math.min(1, event.clientX / innerWidth * 2 - 1)) * maxX;
+    var nextY = Math.max(-1, Math.min(1, event.clientY / innerHeight * 2 - 1)) * maxY;
+    if (Math.abs(nextX - targetX) < .5 && Math.abs(nextY - targetY) < .5) return;
+    targetX = nextX;
+    targetY = nextY;
     start();
   }
-  function center() { targetX = targetY = 0; start(); }
-  function check() { if (!enabled()) stop(); }
+  function center() {
+    activate();
+    targetX = targetY = 0;
+    start();
+  }
+  function check() { if (!enabled()) stop(); else activate(); }
+  activate();
   window.addEventListener('pointermove', move, { passive: true });
   // pointerleave у window не срабатывает при уходе курсора со страницы — слушаем корневой элемент
   document.documentElement.addEventListener('pointerleave', center);
