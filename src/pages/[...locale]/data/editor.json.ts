@@ -1,12 +1,11 @@
 import { getCollection } from 'astro:content';
 import { useData, LANGS } from '../../../lib/data';
 import { cycleKey, endgameKey } from '../../../lib/community-guides';
+import { editorBuild } from '../../../lib/editor-build';
 
 // Данные для редактора гайдов: справочники для выбора и баблов + текущие билды, чтобы править существующий гайд.
 // Роли, статы и заметки билдов отдаём уже на языке страницы — человек правит то, что видит на сайте.
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-
-const TEMPLATED = 'Краткий билд по данным сообщества';
 
 export async function GET({ params }: { params: { locale?: string } }) {
   const { lang, characters, weapons, artifacts, ELEMENTS, WEAPON_TYPES, TALENTS, MODES, t, stat } = useData(params.locale);
@@ -14,16 +13,7 @@ export async function GET({ params }: { params: { locale?: string } }) {
   const note = (s?: string) => (s ? t(s) : '');
   const builds = Object.fromEntries((await getCollection('builds')).map(({ data: b, body }) => {
     const text = lang === 'ru' ? body?.trim() ?? '' : i18n.get(b.character) ?? '';
-    return [b.character, {
-      character: b.character, role: t(b.role), patch: b.patch, updated: b.updated.toISOString().slice(0, 10),
-      weapons: b.weapons.map((w) => ({ slug: w.slug, note: note(w.note) })),
-      artifacts: b.artifacts.map((a) => ({ sets: a.sets, note: note(a.note) })),
-      mainStats: { sands: stat(b.mainStats.sands), goblet: stat(b.mainStats.goblet), circlet: stat(b.mainStats.circlet) },
-      substats: b.substats.map(stat), talents: b.talents,
-      teams: b.teams.map((tm) => ({ name: note(tm.name), members: tm.members, note: note(tm.note) })),
-      external: b.external,
-      body: text.startsWith(TEMPLATED) ? '' : text,
-    }];
+    return [b.character, editorBuild(b, text, { t, stat, lang })];
   }));
   // Гайды сообщества на оружие — на языке страницы
   const weaponGuides = Object.fromEntries((await getCollection('weaponGuides')).filter((e) => e.id.startsWith(`${lang}/`)).map((e) => [
