@@ -65,7 +65,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   import { BASE, t, LANG } from '../../../scripts/search';
   import { combobox, norm } from '../../../scripts/combobox';
   import { onPage, cleanup } from '../../../scripts/router';
-  import { markChanged } from '../../../scripts/profile-sync';
+  import { userData } from '../../../scripts/user-data';
 
   // ---------- Данные ----------
   type Build = { role: string; healer: boolean; cls: 'dps' | 'sub' | 'support'; weapons: string[]; sets: string[][]; main: Record<'sands' | 'goblet' | 'circlet', string[]>; subs: string[] };
@@ -112,7 +112,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
 
   // ---------- Состояние: ростер и составы живут в браузере ----------
   // Сохранённые данные могут быть старыми или повреждёнными.
-  const rawRoster: unknown = store.get('gf:roster', []);
+  const rawRoster: unknown = userData.get('roster');
   const rawTeams: unknown = store.get('gf:abyss-teams', { 1: [], 2: [] });
   const validInt = (v: unknown, min: number, max: number, fallback: number) => typeof v === 'number' && Number.isFinite(v) ? Math.max(min, Math.min(max, Math.trunc(v))) : fallback;
   const validSetCount = (v: unknown): 4 | 2 => v === 2 ? 2 : 4;
@@ -173,7 +173,7 @@ const abyss = (await getCollection('rotations')).find((r) => r.data.mode === 'ab
   let savedRoster = JSON.stringify(roster);
   const persist = () => {
     const next = JSON.stringify(roster);
-    if (next !== savedRoster && store.set('gf:roster', roster)) { savedRoster = next; markChanged('data'); }
+    if (next !== savedRoster && userData.set('roster', roster)) savedRoster = next;
     store.set('gf:abyss-teams', teams);
     if (checked) renderResult(false);
   };
