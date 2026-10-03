@@ -3,18 +3,18 @@
   --snow: #f4f8ff; --aurora-a: #2fd3c5; --aurora-b: #5a7dff; --royal: #9b2335;
   --bg: #1f2330; --bg-deep: #171a24; --surface: #141722; --surface-2: #272c3b; --surface-3: #323849; --border: #313a4d;
   --scene-shade: linear-gradient(180deg, rgb(13 18 32 / .5) 0, rgb(15 20 34 / .55) 55vh, rgb(20 24 36 / .68) 100%);
-  --top-glass: rgb(20 24 36 / .72); --feature-glass: linear-gradient(115deg, rgb(31 38 54 / .82) 0%, rgb(26 42 65 / .78) 45%, rgb(45 38 68 / .8) 100%); --collection-glass: linear-gradient(115deg, rgb(13 26 48 / .85) 0%, rgb(14 42 62 / .8) 50%, rgb(30 29 66 / .85) 100%);
+  --top-glass: rgb(20 24 36 / .72); --feature-glass: linear-gradient(115deg, rgb(31 38 54 / .9) 0%, rgb(26 42 65 / .86) 45%, rgb(45 38 68 / .88) 100%); --collection-glass: linear-gradient(115deg, rgb(13 26 48 / .93) 0%, rgb(14 42 62 / .88) 50%, rgb(30 29 66 / .93) 100%);
 }
 :root[data-season="snezhnaya"][data-theme="light"] {
   --bg: #eef3f9; --bg-deep: #e2eaf4; --surface: #fff; --surface-2: #e4ebf5; --surface-3: #d8e1ec; --border: #cdd8e6; --frost: #2f7fc9;
   --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .6) 0, rgb(238 243 249 / .65) 55vh, rgb(238 243 249 / .78) 100%);
-  --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .85) 0%, rgb(225 237 248 / .8) 45%, rgb(235 232 248 / .85) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .88) 0%, rgb(211 235 244 / .85) 50%, rgb(227 228 247 / .88) 100%);
+  --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .93) 0%, rgb(225 237 248 / .88) 45%, rgb(235 232 248 / .93) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .95) 0%, rgb(211 235 244 / .93) 50%, rgb(227 228 247 / .95) 100%);
 }
 @media (prefers-color-scheme: light) {
   :root[data-season="snezhnaya"]:not([data-theme]) {
     --bg: #eef3f9; --bg-deep: #e2eaf4; --surface: #fff; --surface-2: #e4ebf5; --surface-3: #d8e1ec; --border: #cdd8e6; --frost: #2f7fc9;
     --scene-shade: linear-gradient(180deg, rgb(238 243 249 / .6) 0, rgb(238 243 249 / .65) 55vh, rgb(238 243 249 / .78) 100%);
-    --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .85) 0%, rgb(225 237 248 / .8) 45%, rgb(235 232 248 / .85) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .88) 0%, rgb(211 235 244 / .85) 50%, rgb(227 228 247 / .88) 100%);
+    --top-glass: rgb(244 247 251 / .75); --feature-glass: linear-gradient(115deg, rgb(236 243 250 / .93) 0%, rgb(225 237 248 / .88) 45%, rgb(235 232 248 / .93) 100%); --collection-glass: linear-gradient(115deg, rgb(221 235 247 / .95) 0%, rgb(211 235 244 / .93) 50%, rgb(227 228 247 / .95) 100%);
   }
 }
 :root[data-season="snezhnaya"] .snow-divider { --snow-shadow: rgb(30 74 145 / .42); }
@@ -40,10 +40,20 @@
   }
 }
 
+/* Фон по ширине окна в физических пикселях: image-set смотрит только на плотность, и широкий монитор при 100 % получил бы 1920 px.
+   2560 и 3840 — увеличение исходного скриншота Real-ESRGAN (x4plus) */
+:root[data-season="snezhnaya"] { --scene-img: url('/img/season/snezhnaya-bg.webp'); }
+@media (min-width: 1921px), (min-width: 1300px) and (min-resolution: 1.4dppx) {
+  :root[data-season="snezhnaya"] { --scene-img: url('/img/season/snezhnaya-bg-2560.webp'); }
+}
+@media (min-width: 2561px), (min-width: 1700px) and (min-resolution: 1.4dppx), (min-width: 1300px) and (min-resolution: 1.9dppx) {
+  :root[data-season="snezhnaya"] { --scene-img: url('/img/season/snezhnaya-bg-3840.webp'); }
+}
+
 :root[data-season="snezhnaya"] .season-scene {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: var(--scene-shade), url('/img/season/snezhnaya-bg.webp') 71.9% top / cover no-repeat;
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06);
+  background: var(--scene-shade), var(--scene-img) 71.9% top / cover no-repeat;
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06); will-change: transform;
 }
 :root[data-season="snezhnaya"] :is(body, .shell, .content) { background: transparent; }
 :root[data-season="snezhnaya"] .promo-card { background: linear-gradient(90deg, var(--surface-2), var(--surface)); }
@@ -62,8 +72,8 @@
 :root[data-season="snezhnaya"] .top-logo svg { filter: drop-shadow(0 0 6px rgb(169 220 255 / .45)); }
 
 :root[data-season="snezhnaya"] .season-snow {
-  --flake-small: rgb(255 255 255 / .5); --flake-medium: rgb(255 255 255 / .65); --flake-large: rgb(255 255 255 / .8);
-  position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; contain: strict; opacity: .55;
+  --flake-small: rgb(255 255 255 / .275); --flake-medium: rgb(255 255 255 / .3575);
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; contain: strict;
 }
 /* Запас слоя покрывает экран на всём пути движения. */
 :root[data-season="snezhnaya"] .season-snow span {
@@ -79,20 +89,14 @@
   background: radial-gradient(circle at 95px 72px, var(--flake-medium) 2.5px, transparent 3px) 0 0 / 260px 260px;
   animation: snezhnaya-snow-medium 26s linear infinite;
 }
-:root[data-season="snezhnaya"] .season-snow .snow-large {
-  top: -1020px; right: 0; bottom: 0; left: -340px;
-  background: radial-gradient(circle at 180px 110px, var(--flake-large) 3.5px, transparent 4px) 0 0 / 340px 340px;
-  animation: snezhnaya-snow-large 34s linear infinite;
-}
 @keyframes snezhnaya-snow-small { to { transform: translate3d(180px, 720px, 0); } }
 @keyframes snezhnaya-snow-medium { to { transform: translate3d(-260px, 780px, 0); } }
-@keyframes snezhnaya-snow-large { to { transform: translate3d(340px, 1020px, 0); } }
 :root[data-season="snezhnaya"][data-theme="light"] .season-snow {
-  --flake-small: rgb(111 160 210 / .6); --flake-medium: rgb(111 160 210 / .6); --flake-large: rgb(111 160 210 / .6); opacity: .35;
+  --flake-small: rgb(111 160 210 / .21); --flake-medium: rgb(111 160 210 / .21);
 }
 @media (prefers-color-scheme: light) {
   :root[data-season="snezhnaya"]:not([data-theme]) .season-snow {
-    --flake-small: rgb(111 160 210 / .6); --flake-medium: rgb(111 160 210 / .6); --flake-large: rgb(111 160 210 / .6); opacity: .35;
+    --flake-small: rgb(111 160 210 / .21); --flake-medium: rgb(111 160 210 / .21);
   }
 }
 
@@ -108,36 +112,35 @@
 }
 :root[data-season="snezhnaya"] .carousel .copy { z-index: 1; }
 :root[data-season="snezhnaya"] .pill-title {
-  background: rgb(169 220 255 / .08); border: 1px solid rgb(169 220 255 / .25); backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--surface) 82%, rgb(169 220 255) 8%); border: 1px solid rgb(169 220 255 / .25);
 }
 :root[data-season="snezhnaya"] .pill-title::before {
   content: ""; display: inline-block; width: 1em; height: 1em; margin-right: .55em; vertical-align: -.12em; background: var(--frost);
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1v14M1.94 4.5l12.12 7M1.94 11.5l12.12-7' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 :root[data-season="snezhnaya"] .tabs {
-  background: rgb(169 220 255 / .08); border: 1px solid rgb(169 220 255 / .25); backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--surface) 82%, rgb(169 220 255) 8%); border: 1px solid rgb(169 220 255 / .25);
 }
 :root[data-season="snezhnaya"] .feature-band {
   background: transparent;
 }
 :root[data-season="snezhnaya"] .feature-band::before {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"), var(--feature-glass);
-  background-size: 140px 140px, auto; backdrop-filter: blur(8px);
+  background-size: 140px 140px, auto;
 }
 /* Светлая тема: базовое правило index.astro специфичнее — повторяем сезонный фон с явным селектором темы */
 :root[data-season="snezhnaya"][data-theme="light"] .feature-band::before {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"), var(--feature-glass);
-  background-size: 140px 140px, auto; backdrop-filter: blur(8px);
+  background-size: 140px 140px, auto;
 }
 @media (prefers-color-scheme: light) {
   :root[data-season="snezhnaya"]:not([data-theme]) .feature-band::before {
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpath d='M70 58v24M59.61 64l20.78 12M59.61 76l20.78-12' fill='none' stroke='%23a9dcff' stroke-opacity='.06' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"), var(--feature-glass);
-    background-size: 140px 140px, auto; backdrop-filter: blur(8px);
+    background-size: 140px 140px, auto;
   }
 }
 :root[data-season="snezhnaya"] .collection-band::before {
   background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .22), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .25), transparent 50%), var(--collection-glass);
-  backdrop-filter: blur(8px);
 }
 :root[data-season="snezhnaya"][data-theme="light"] .collection-band::before {
   background: radial-gradient(ellipse at 20% 0%, rgb(47 211 197 / .12), transparent 55%), radial-gradient(ellipse at 80% 10%, rgb(90 125 255 / .14), transparent 50%), var(--collection-glass);
@@ -157,7 +160,6 @@
 }
 
 @media (max-width: 700px) {
-  :root[data-season="snezhnaya"] .season-snow .snow-large { display: none; }
   :root[data-season="snezhnaya"] .shell > .top::after { height: 6px; background-size: 120px 6px; }
 }
 @media (prefers-reduced-motion: reduce) {

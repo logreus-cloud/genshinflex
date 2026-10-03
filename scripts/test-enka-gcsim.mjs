@@ -86,7 +86,9 @@ for (const [slug, preset] of Object.entries(presets.presets)) {
     check(globalThis.initializeAggregator(config));
     check(globalThis.initializeWorker(config));
     for (let i = 0; i < 20; i++) check(globalThis.aggregate(check(globalThis.simulate())));
-    const { stats } = JSON.parse(check(globalThis.flush()));
+    // gcsim ≥ 2.48: flush() отдаёт { result: JSON полного результата, hash } или строку с ошибкой
+    const flushed = check(globalThis.flush());
+    const stats = JSON.parse(flushed.result).statistics;
     console.log(`✓ ${slug}: эталон ${preset.dps} DPS → билд ${Math.round(stats.dps.mean)} DPS`);
     tested++;
   } catch (error) {

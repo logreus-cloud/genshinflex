@@ -38,6 +38,15 @@ for (const lang of ['ru', 'en', 'es']) {
   document.querySelector = node;
   node('picker').hidden = true;
   const saved = new Map();
+  const controller = new AbortController();
+  const userData = {
+    get: (key) => { assert.equal(key, 'roster'); return saved.get('gf:roster') ?? []; },
+    set: (key, value) => {
+      assert.equal(key, 'roster');
+      saved.set('gf:roster', structuredClone(value));
+      return true;
+    },
+  };
   const dict = lang === 'ru' ? {} : Object.fromEntries(Object.entries(ui).map(([ru, row]) => [ru, row[lang]]));
   if (lang !== 'ru') {
     const placeholders = (text) => [...new Set(text.match(/\{\w+\}/g) ?? [])].sort();
@@ -58,12 +67,20 @@ for (const lang of ['ru', 'en', 'es']) {
   const context = vm.createContext({
     document, LANG: lang, BASE: lang === 'ru' ? '' : `/${lang}`, t,
     store: { get: (key, fallback) => saved.get(key) ?? fallback, set: (key, value) => saved.set(key, structuredClone(value)) },
+    userData, onPage: (init) => init(controller.signal), cleanup() {},
+    navigate: async () => {}, combobox() {}, norm: (s) => s.toLowerCase().replace(/ё/g, 'е').trim(),
     setTimeout: () => 1, clearTimeout() {},
-    fetch: async (url) => ({ ok: true, json: async () => url.includes('/api/enka/')
-      ? { avatarInfoList: [{ avatarId: 1, propMap: { 4001: { val: 80 } }, fightPropMap: {} }] }
-      : fixture }),
+    fetch: async (url, { signal } = {}) => {
+      assert.equal(signal, controller.signal);
+      return { ok: true, json: async () => url.includes('/api/enka/')
+        ? { avatarInfoList: [{ avatarId: 1, propMap: { 4001: { val: 80 } }, fightPropMap: {} }] }
+        : fixture };
+    },
   });
   await new vm.Script(`(async () => { ${js}\n })()`).runInContext(context);
+  for (let attempt = 0; attempt < 10 && !node('open-picker').listeners.has('click'); attempt++)
+    await new Promise(setImmediate);
+  assert.ok(node('open-picker').listeners.has('click'), `${lang}: page did not initialize`);
   const click = async (dataset) => {
     const button = new Element(); button.dataset = dataset;
     await document.emit('click', button);

@@ -169,8 +169,9 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   };
   const savedUid = store.get<string>('gf:wish-uid', '');
   const uids = wishStore.uids();
-  let uid = uids.includes(savedUid) ? savedUid : uids[0] ?? (!savedUid ? userData.toolUid(savedUid) : '');
-  if (uid !== savedUid && (uids.length || savedUid)) store.set('gf:wish-uid', uid);
+  // Пустой список аккаунтов (новый аккаунт, история ещё не загружена) не сбрасывает сохранённый выбор, в том числе 'manual'
+  let uid = uids.includes(savedUid) ? savedUid : uids[0] ?? (savedUid || userData.toolUid(''));
+  if (uid && uid !== savedUid) store.set('gf:wish-uid', uid);
 
   let wipeArmedUid = '';
   let wipeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -394,7 +395,8 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   function render() {
     const uids = wishStore.uids();
     const sel = $<HTMLSelectElement>('uid-select');
-    sel.innerHTML = uids.map((u) => `<option value="${esc(u)}" ${u === uid ? 'selected' : ''}>${u === 'manual' ? t('Ручной ввод') : `UID ${esc(u)}`}</option>`).join('');
+    // Выбранный UID без истории (например, после импорта пустого файла) тоже в списке, иначе селектор покажет чужой аккаунт
+    sel.innerHTML = (uid && !uids.includes(uid) ? [uid, ...uids] : uids).map((u) => `<option value="${esc(u)}" ${u === uid ? 'selected' : ''}>${u === 'manual' ? t('Ручной ввод') : `UID ${esc(u)}`}</option>`).join('');
     const list = uid ? wishStore.list(uid) : [];
     $('empty').hidden = list.length > 0;
     document.querySelector<HTMLElement>('.toolbar')!.hidden = !uids.length;

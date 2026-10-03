@@ -85,6 +85,19 @@ test('subscribe receives values until unsubscribed', () => {
   assert.deepEqual(values, ['123456789']);
 });
 
+test('set stops notifying an old value after a subscriber overwrites it', () => {
+  const storage = memoryStorage();
+  const data = createUserData({ storage });
+  const seen: (string | null)[] = [];
+  data.subscribe('profileUid', (value) => {
+    if (value === '123456789') data.set('profileUid', '987654321');
+  });
+  data.subscribe('profileUid', (value) => seen.push(value));
+  assert.equal(data.set('profileUid', '123456789'), true);
+  assert.deepEqual(seen, ['987654321']);
+  assert.equal(storage.getItem(userDataKey('profileUid')), JSON.stringify('987654321'));
+});
+
 test('strict reads reject damaged data and storage failures', () => {
   const storage = memoryStorage();
   assert.deepEqual(readStrict('favorites', 'ru', storage), []);
@@ -105,6 +118,15 @@ test('set validates the serialized value before writing', () => {
   assert.equal(data.set('roster', [{ s: 'amber', toJSON: () => ({ s: 3 }) }] as never), false);
   assert.equal(storage.getItem(userDataKey('favorites')), before);
   assert.equal(storage.getItem(userDataKey('roster')), null);
+});
+
+test('throwing getter leaves favorites unchanged', () => {
+  const storage = memoryStorage();
+  const data = createUserData({ storage });
+  assert.equal(data.set('favorites', [{ href: '/a', name: 'A', kind: 'character' }]), true);
+  const before = storage.getItem(userDataKey('favorites'));
+  assert.equal(data.set('favorites', [{ get href() { throw new Error('x'); }, name: 'n', kind: 'k' }]), false);
+  assert.equal(storage.getItem(userDataKey('favorites')), before);
 });
 
 test('failed marker write restores data without notifying', () => {
@@ -159,6 +181,30 @@ test('pulled writes notify only after the whole batch succeeds', () => {
   assert.equal(changed, 0);
 });
 
+test('pulled writes skip notifications replaced by a subscriber', () => {
+  const storage = memoryStorage();
+  const data = createUserData({ storage });
+  const seen: (string | null)[] = [];
+  data.subscribe('roster', () => { data.set('profileUid', '987654321'); });
+  data.subscribe('profileUid', (value) => seen.push(value));
+  writePulled([['roster', [{ s: 'amber' }]], ['profileUid', '123456789']], storage);
+  assert.deepEqual(seen, ['987654321']);
+  assert.equal(storage.getItem(userDataKey('profileUid')), JSON.stringify('987654321'));
+});
+
+test('pulled writes stop notifying an old value after a subscriber overwrites it', () => {
+  const storage = memoryStorage();
+  const data = createUserData({ storage });
+  const seen: (string | null)[] = [];
+  data.subscribe('profileUid', (value) => {
+    if (value === '123456789') data.set('profileUid', '987654321');
+  });
+  data.subscribe('profileUid', (value) => seen.push(value));
+  writePulled([['profileUid', '123456789']], storage);
+  assert.deepEqual(seen, ['987654321']);
+  assert.equal(storage.getItem(userDataKey('profileUid')), JSON.stringify('987654321'));
+});
+
 test('snapshot keeps valid entries and reports damaged data', () => {
   const storage = memoryStorage();
   const data = createUserData({ storage });
@@ -210,6 +256,29 @@ test('restore writes data and custom with one marker and one callback per kind',
   assert.equal(markerWrites, 1);
   assert.deepEqual(changed, ['data', 'custom']);
   assert.deepEqual(seen, ['ru', 'en', 'es', 'roster', 'profileUid', 'profileCustom']);
+});
+
+test('restore skips notifications replaced by a subscriber', () => {
+  const storage = memoryStorage();
+  const data = createUserData({ storage });
+  const seen: (string | null)[] = [];
+  data.subscribe('roster', () => { data.set('profileUid', '987654321'); });
+  data.subscribe('profileUid', (value) => seen.push(value));
+  assert.equal(data.restore({ favorites: {}, roster: [{ s: 'amber' }], profileUid: '123456789' }), true);
+  assert.deepEqual(seen, ['987654321']);
+  assert.equal(storage.getItem(userDataKey('profileUid')), JSON.stringify('987654321'));
+});
+
+test('restore rejects a throwing property getter without changing storage', () => {
+  const storage = memoryStorage();
+  const data = createUserData({ storage });
+  assert.equal(data.set('profileUid', '123456789'), true);
+  const uid = storage.getItem(userDataKey('profileUid'));
+  const marker = storage.getItem('gf:sync');
+  assert.equal(data.restore({ favorites: {}, get roster() { throw new Error('x'); }, profileUid: null }), false);
+  assert.equal(storage.getItem(userDataKey('profileUid')), uid);
+  assert.equal(storage.getItem(userDataKey('roster')), null);
+  assert.equal(storage.getItem('gf:sync'), marker);
 });
 
 test('restore leaves languages absent from an older export untouched', () => {

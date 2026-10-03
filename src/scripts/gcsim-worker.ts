@@ -6,7 +6,8 @@ type Api = typeof globalThis & {
   initializeAggregator: (config: string) => string;
   simulate: () => Uint8Array | string;
   aggregate: (bytes: Uint8Array) => null | string;
-  flush: () => string;
+  // gcsim ≥ 2.48: { result: JSON полного результата, hash } или строка с ошибкой
+  flush: () => { result: string; hash: string } | string;
 };
 type Request = { id: number; action: string; config?: string; count?: number; bytes?: Uint8Array[] };
 const api = globalThis as Api;
@@ -68,7 +69,12 @@ self.onmessage = async (event: MessageEvent<Request>) => {
       transfer = batch.map((value) => value.buffer);
     } else if (action === 'aggregate') {
       for (const value of bytes ?? []) check(api.aggregate(value));
-    } else if (action === 'flush') result = JSON.parse(check(api.flush()));
+    } else if (action === 'flush') {
+      const flushed = check(api.flush());
+      if (typeof flushed === 'string') throw new Error('Некорректный ответ gcsim при сборке результата');
+      // Прежний вид ответа для страницы: статистика и подпись
+      result = { stats: JSON.parse(flushed.result).statistics, hash: flushed.hash };
+    }
     else throw new Error(`Неизвестное действие: ${action}`);
     self.postMessage({ id, result }, { transfer });
   } catch (error) {

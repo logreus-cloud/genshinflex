@@ -12,14 +12,14 @@
 ## Исходный код (Corresponding Source)
 
 - Репозиторий: https://github.com/genshinsim/gcsim
-- Версия: тег `v2.47.6`, коммит `3d48bd5044b2841d840d59888b48f4483252ff8d`
-- Исходник этой версии: https://github.com/genshinsim/gcsim/tree/3d48bd5044b2841d840d59888b48f4483252ff8d
+- Версия: тег `v2.48.8`, коммит `1f9c1f2e9698239a24b44e38a21358a00fd16bff`
+- Исходник этой версии: https://github.com/genshinsim/gcsim/tree/1f9c1f2e9698239a24b44e38a21358a00fd16bff
 
 Сборка (Go 1.27.0):
 
 ```bash
 git clone https://github.com/genshinsim/gcsim && cd gcsim
-git checkout 3d48bd5044b2841d840d59888b48f4483252ff8d
+git checkout 1f9c1f2e9698239a24b44e38a21358a00fd16bff
 GOOS=js GOARCH=wasm go build -trimpath -o gcsim.wasm ./cmd/wasm
 gzip -9 -c gcsim.wasm > gcsim.wasm.gz
 cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" .
@@ -27,7 +27,7 @@ cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" .
 
 Контрольные суммы SHA-256:
 
-- `gcsim.wasm` (распакованный): `75288a81263522375ba0fd27861a2f2f56647e36030f7f97603bd35fbfa65ddc`
-- `gcsim.wasm.gz`: `d3b89137fb16f82fda47b31ebb7eb14088d22c17f511a432d3f1ee1fa6462bb2`
+- `gcsim.wasm` (распакованный): `ef043a1a9d404cb860704a533683db948a9867594c9efd77b125cbbe7db4c072`
+- `gcsim.wasm.gz`: `ce99e8917c786979a7e44d75438dbe9c3d28dc69fdb1389f639969b3933c8ae3`
 
 При обновлении движка на новую версию обновите тег, коммит и суммы в этом файле.

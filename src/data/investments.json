@@ -21,8 +21,8 @@
   "dps": 60112
  },
  "_meta": {
-  "gcsim": "3d48bd5",
-  "date": "2026-09-25",
+  "gcsim": "1f9c1f2",
+  "date": "2026-10-03",
   "iterations": 500
  },
  "albedo": {
@@ -2679,6 +2679,30 @@
   ],
   "weapon": 29.1,
   "dps": 71388,
+  "optimized": true
+ },
+ "illuga": {
+  "team": [
+   "illuga",
+   "navia",
+   "columbina",
+   "yelan"
+  ],
+  "source": "https://keqingmains.com/q/illuga-quickguide/",
+  "own": true,
+  "four": "favonius-lance",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   2.6,
+   4,
+   4.9,
+   5,
+   4.9,
+   12.3
+  ],
+  "weapon": 0.7,
+  "dps": 58058,
   "optimized": true
  }
 }
