@@ -11,8 +11,22 @@ const { weapons, fmtStat, stars, base, t, lang } = useData(Astro.currentLocale);
 // Полный арт с баннера (scripts/import-weapon-art.py): игровая иконка обрезает длинное оружие
 const withArt = new Set<string>(weaponArt);
 const pic = (w: { slug: string; icon: string }) => (withArt.has(w.slug) ? `/img/weapons/${w.slug}.webp` : w.icon);
-const groups = [5, 4, 3].map((r) => ({ r, list: weapons.filter((w) => w.rarity === r) }));
-const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
+const compareVersions = (a: string, b: string) => {
+  const left = a.split('.').map(Number);
+  const right = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(left.length, right.length); i++) {
+    const diff = (left[i] ?? 0) - (right[i] ?? 0);
+    if (diff) return diff;
+  }
+  return 0;
+};
+const byName = (a: typeof weapons[number], b: typeof weapons[number]) => a.name.localeCompare(b.name, lang);
+const groups = [5, 4, 3].map((r) => ({
+  r,
+  list: weapons.filter((w) => w.rarity === r).sort((a, b) => compareVersions(b.version, a.version) || byName(a, b))
+}));
+const versions = [...new Set(weapons.map((w) => w.version))].sort((a, b) => compareVersions(b, a));
+const latest = versions[0];
 ---
 <Layout title={t('Оружие')} wide>
   <h1>{t('Оружие')}</h1>
@@ -21,63 +35,212 @@ const latest = Math.max(...weapons.map((w) => parseFloat(w.version)));
   <FilterBar target=".wlist" placeholder={t('Найти оружие')} groups={['rarity', 'weapon']} rarities={[5, 4, 3]}
     choices={{ key: 'source', label: t('Как получить'), values: [['event-wish', t('Молитва события')], ['wish', t('Стандартная молитва')], ['forge', t('Кузница')], ['bp', t('Боевой пропуск')], ['starglitter', t('Магазин Паймон')], ['free', t('Бесплатно: ивенты, задания, сундуки')]] }} />
 
-  {groups.map(({ r, list }) => (
-    <section>
-      <h2 class="h-sec">{t('Оружие {r}★', { r })} <small>{list.length}</small></h2>
-      <div class="wlist">
-        {list.map((w) => {
-          const top = w.stats.at(-1)!;
-          return (
-            <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
-              <a class:list={['wc', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
-                <span class="pic">
-                  <img src={pic(w)} alt="" width="96" height="96" loading="lazy" />
-                  {parseFloat(w.version) === latest && <span class="badge">{t('новое')}</span>}
-                </span>
-                <span class="nm">{w.name}</span>
-                <span class="tip" role="tooltip">
-                  <b>{w.name}</b>
-                  <span class="muted small">{stars(w.rarity)} {w.weaponText}</span>
-                  <span class="kv"><span>{t('Атака')}</span><b>{top.atk}</b></span>
-                  {w.mainStat && <span class="kv"><span>{w.mainStat}</span><b>{fmtStat(top.sub, w.mainStatPercent)}</b></span>}
-                  {w.effectName && <span class="eff"><b>{w.effectName}.</b> {w.refinements[0]}</span>}
-                </span>
-              </a>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  ))}
-  <p class="empty muted" hidden>{t('Ничего не нашлось. Сбросьте фильтры.')}</p>
+  <div class="toolbar">
+    <div class="sort" role="group" aria-label={t('Сортировка')}>
+      <button type="button" data-sort="new" aria-pressed="true">{t('Сначала новые')}</button>
+      <button type="button" data-sort="old" aria-pressed="false">{t('Сначала старые')}</button>
+      <button type="button" data-sort="name" aria-pressed="false">{t('По имени')}</button>
+      <button type="button" data-sort="version" aria-pressed="false">{t('По версиям')}</button>
+    </div>
+  </div>
+
+  <div class="weapon-groups" lang={lang}>
+    {groups.map(({ r, list }) => (
+      <section data-rarity-group={r}>
+        <h2 class="h-sec">{t('Оружие {r}★', { r })} <small>{list.length}</small></h2>
+        <div class="wlist" data-rarity-list={r}>
+          {list.map((w) => {
+            const top = w.stats.at(-1)!;
+            return (
+              <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={w.name} data-version={w.version} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
+                <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
+                  <span class="wc-glow" aria-hidden="true"></span>
+                  {w.version === latest && <span class="wc-badge">{t('новое')}</span>}
+                  <img class="wc-img" src={pic(w)} alt="" width="96" height="96" loading="lazy" />
+                  <span class="wc-body">
+                    <span class="wc-name">{w.name}</span>
+                    <span class="wc-more">
+                      <span class="wc-more-in">
+                        <span class="wc-stars">{stars(w.rarity)}</span>
+                        <span class="wc-stats">
+                          <span class="wc-stat">
+                            <span class="wc-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14.5 3H21v6.5L9 21.5 2.5 15z" /><path d="M5 19l-2 2" /></svg>{t('Атака')}</span><b>{top.atk}</b>
+                          </span>
+                          {w.mainStat && (
+                            <span class="wc-stat">
+                              <span class="wc-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" /></svg>{w.mainStat}</span><b>{fmtStat(top.sub, w.mainStatPercent)}</b>
+                            </span>
+                          )}
+                        </span>
+                        {w.effectName && (
+                          <span class="wc-effect">
+                            <b class="wc-passive">{w.effectName}</b>
+                            <span class="wc-description">{w.refinements[0]}</span>
+                          </span>
+                        )}
+                        <span class="wc-footer"><span>{w.weaponText}</span><span>v{w.version}</span></span>
+                      </span>
+                    </span>
+                  </span>
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+    {versions.map((version) => (
+      <section data-version-group={version}>
+        <h2 class="h-sec">{t('Версия {n}', { n: version })} <small>0</small></h2>
+        <div class="wlist" data-version-list={version}></div>
+      </section>
+    ))}
+    <p class="empty muted" hidden>{t('Ничего не нашлось. Сбросьте фильтры.')}</p>
+  </div>
 </Layout>
 
 <style>
-  .wlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .toolbar { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0 0 1.2rem; }
+  .sort { display: flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .sort button { border: 0; border-radius: 7px; padding: .35rem .6rem; background: none; color: var(--muted); font-size: .85rem; cursor: pointer; }
+  .sort button:hover { color: var(--text); background: var(--surface-2); }
+  .sort button[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+  .wlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 16px; }
   section:has(.wlist > :not([hidden])) ~ .empty { display: none; }
   section:not(:has(.wlist > :not([hidden]))) { display: none; }
-  .wc { position: relative; display: grid; gap: .35rem; text-decoration: none; transition: transform var(--dur) var(--ease); }
-  .wc:hover { transform: translateY(-2px); }
-  .pic { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: var(--radius); background: linear-gradient(170deg, #36436a, #4b7aa6); }
-  .r4 .pic { background: linear-gradient(170deg, #4a3d6d, #9679c4); }
-  .r5 .pic { background: linear-gradient(170deg, #6b4520, #d1953f); }
-  /* Абсолютно внутри квадрата: процентная высота в сетке с aspect-ratio не работает, и высокий арт растягивал плитку */
-  .pic img { position: absolute; inset: 7%; width: 86%; height: 86%; object-fit: contain; }
-  .badge { position: absolute; top: 5px; right: 5px; background: var(--accent); color: var(--accent-ink); font-size: .66rem; font-weight: 600; padding: 0 .35rem; border-radius: 4px; }
-  .nm { font-size: .8rem; text-align: center; line-height: 1.2; }
-  .wc:hover .pic, .wc:focus-visible .pic { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .wc .pic { transition: box-shadow var(--dur) var(--ease); }
-  .wc:hover .pic { box-shadow: 0 6px 16px rgb(0 0 0 / .2); }
-
-  .tip {
-    position: absolute; z-index: 20; left: 50%; bottom: calc(100% + 8px); translate: -50% 0; width: 300px; display: none; gap: .35rem;
-    padding: .8rem .9rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 16px 40px rgb(0 0 0 / .45);
-    font-size: .85rem; text-align: left;
+  .h-sec { font-family: var(--font-display); }
+  .wcard { position: relative; display: flex; flex-direction: column; justify-content: flex-end; box-sizing: border-box; width: 100%; height: 330px; min-width: 0; overflow: hidden; border: 1px solid rgb(240 180 76 / .22); border-radius: 12px; background: linear-gradient(180deg, #6a4415 0%, #3a2a17 38%, #1d1c26 72%, #151826 100%); color: #fff; text-decoration: none; transition: transform .38s cubic-bezier(.2,.8,.2,1), box-shadow .38s, border-color .38s; }
+  .wcard.r4 { border-color: rgb(178 132 236 / .25); background: linear-gradient(180deg, #4b2f73 0%, #2e2244 40%, #1b1b2c 72%, #151826 100%); }
+  .wcard.r3 { border-color: rgb(110 160 230 / .25); background: linear-gradient(180deg, #24467a 0%, #1d2e4c 40%, #181d2e 72%, #151826 100%); }
+  .wc-glow { position: absolute; inset: 0; background: radial-gradient(120% 60% at 50% 0%, rgb(255 206 120 / .22), transparent 60%); opacity: .6; pointer-events: none; transition: opacity .38s; }
+  .r4 .wc-glow { background: radial-gradient(120% 60% at 50% 0%, rgb(178 132 236 / .24), transparent 60%); }
+  .r3 .wc-glow { background: radial-gradient(120% 60% at 50% 0%, rgb(110 160 230 / .24), transparent 60%); }
+  .wc-img { position: absolute; top: 14px; left: 6%; width: 88%; height: 74%; object-fit: contain; filter: drop-shadow(0 10px 18px rgb(0 0 0 / .45)); transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+  .wc-badge { position: absolute; z-index: 3; top: 10px; right: 10px; padding: 3px 7px; border-radius: 5px; background: var(--accent); color: var(--accent-ink); font-size: 10.5px; font-weight: 800; letter-spacing: .02em; }
+  .wc-body { position: relative; z-index: 2; display: flex; flex-direction: column; padding: 42px 12px 12px; background: linear-gradient(180deg, rgb(17 19 31 / 0) 0%, rgb(17 19 31 / .82) 42%, rgb(17 19 31 / .97) 100%); }
+  .wc-name { font-size: 14px; font-weight: 700; line-height: 1.22; color: #fff; text-align: center; text-shadow: 0 2px 8px rgb(0 0 0 / .6); overflow-wrap: anywhere; hyphens: auto; }
+  .wc-more { display: grid; min-height: 0; grid-template-rows: 0fr; transition: grid-template-rows .42s cubic-bezier(.2,.8,.2,1); }
+  .wc-more-in { display: flex; flex-direction: column; min-height: 0; overflow: hidden; opacity: 0; transform: translateY(6px); transition: opacity .3s .05s, transform .35s; }
+  .wcard:is(:focus-visible, .is-open) { z-index: 5; transform: translateY(-8px) scale(1.045); border-color: var(--accent); box-shadow: 0 22px 44px rgb(0 0 0 / .6), 0 0 30px color-mix(in srgb, var(--accent) 20%, transparent); }
+  .wcard.r4:is(:focus-visible, .is-open) { border-color: rgb(178 132 236 / .75); }
+  .wcard:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wcard:is(:focus-visible, .is-open) .wc-glow { opacity: 1; }
+  .wcard:is(:focus-visible, .is-open) .wc-img { transform: translateY(-34px) scale(.84); }
+  .wcard:is(:focus-visible, .is-open) .wc-more { grid-template-rows: 1fr; }
+  .wcard:is(:focus-visible, .is-open) .wc-more-in { opacity: 1; transform: none; }
+  .wcard:is(:focus-visible, .is-open) .wc-body { box-sizing: border-box; max-height: 100%; min-height: 0; }
+  .wcard:is(:focus-visible, .is-open) :is(.wc-name, .wc-stars, .wc-stats, .wc-footer) { flex: none; }
+  .wcard:is(:focus-visible, .is-open) .wc-name { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .wc-stars { display: block; flex: none; margin-top: 6px; color: var(--accent); font-size: 11px; letter-spacing: 2px; text-align: center; }
+  .wc-stats { display: flex; flex: none; flex-direction: column; gap: 4px; margin-top: 8px; }
+  .wc-stat { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 5px 8px; border-radius: 6px; background: rgb(255 255 255 / .06); color: #c9cee0; font-size: 11.5px; }
+  .wc-stat b { color: #fff; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+  .wc-label { display: -webkit-box; min-width: 0; overflow: hidden; font-size: 11px; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .wc-label svg { width: 13px; height: 13px; margin-right: 5px; vertical-align: -2px; }
+  .wc-effect { display: flex; flex-direction: column; min-height: 0; overflow: hidden; margin-top: 9px; }
+  .wc-passive { display: block; flex: none; color: var(--accent); font-size: 11.5px; }
+  .wc-description { display: -webkit-box; min-height: 0; overflow: hidden; margin-top: 3px; color: #b8bed2; font-size: 11.5px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 5; padding-bottom: 12px; mask-image: linear-gradient(#000 calc(100% - 14px), transparent); }
+  /* Когда описание не влезает, строка обрезается внутри нижнего отступа и затухает, а не рвётся пополам */
+  .wc-effect + .wc-footer { margin-top: 0; }
+  .wc-footer { display: flex; flex: none; justify-content: space-between; gap: 6px; margin-top: 9px; padding-top: 8px; border-top: 1px solid rgb(255 255 255 / .08); color: #b8bed2; font-size: 10.5px; }
+  @media (hover: hover) {
+    .wcard:hover { z-index: 5; transform: translateY(-8px) scale(1.045); border-color: var(--accent); box-shadow: 0 22px 44px rgb(0 0 0 / .6), 0 0 30px color-mix(in srgb, var(--accent) 20%, transparent); }
+    .wcard.r4:hover { border-color: rgb(178 132 236 / .75); }
+    .wcard:hover .wc-glow { opacity: 1; }
+    .wcard:hover .wc-img { transform: translateY(-34px) scale(.84); }
+    .wcard:hover .wc-more { grid-template-rows: 1fr; }
+    .wcard:hover .wc-more-in { opacity: 1; transform: none; }
+    .wcard:hover .wc-body { box-sizing: border-box; max-height: 100%; min-height: 0; }
+    .wcard:hover :is(.wc-name, .wc-stars, .wc-stats, .wc-footer) { flex: none; }
+    .wcard:hover .wc-name { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
   }
-  .wc:hover .tip, .wc:focus-visible .tip { display: grid; }
-  .kv { display: flex; justify-content: space-between; background: var(--surface-2); padding: .25rem .5rem; border-radius: 6px; }
-  .kv span { color: var(--muted); }
-  .eff { color: var(--muted); max-height: 12em; overflow: hidden; }
-  .eff b { color: var(--text); }
-  @media (hover: none) { .tip { display: none !important; } }
+  @media (max-width: 700px) {
+    .wlist { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wcard, .wc-glow, .wc-img, .wc-more, .wc-more-in { transition: none; }
+    .wcard:is(:focus-visible, .is-open), .wcard:is(:focus-visible, .is-open) .wc-img, .wcard:is(:focus-visible, .is-open) .wc-more-in { transform: none; }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: reduce) {
+    .wcard:hover, .wcard:hover .wc-img, .wcard:hover .wc-more-in { transform: none; }
+  }
 </style>
+
+<script>
+  import { onPage, cleanup } from '../../../scripts/router';
+  type Sort = 'new' | 'old' | 'name' | 'version';
+  const compareVersions = (a: string, b: string) => {
+    const left = a.split('.').map(Number);
+    const right = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(left.length, right.length); i++) {
+      const diff = (left[i] ?? 0) - (right[i] ?? 0);
+      if (diff) return diff;
+    }
+    return 0;
+  };
+
+  onPage((signal) => {
+    const container = document.querySelector<HTMLElement>('.weapon-groups');
+    const controls = document.querySelector<HTMLElement>('.sort');
+    if (!container || !controls) return;
+    const cards = [...container.querySelectorAll<HTMLElement>('.wlist > [data-name]')];
+    const links = cards.map((card) => card.querySelector<HTMLAnchorElement>('.wcard')!);
+    const rarityLists = [...container.querySelectorAll<HTMLElement>('[data-rarity-list]')];
+    const versionLists = [...container.querySelectorAll<HTMLElement>('[data-version-list]')];
+    const buttons = [...controls.querySelectorAll<HTMLButtonElement>('button[data-sort]')];
+    const empty = container.querySelector<HTMLElement>('.empty');
+    const byName = (a: HTMLElement, b: HTMLElement) => (a.dataset.sortName ?? '').localeCompare(b.dataset.sortName ?? '', container.lang);
+    const byRarity = (a: HTMLElement, b: HTMLElement) => Number(b.dataset.rarity) - Number(a.dataset.rarity) || byName(a, b);
+    const updateCounts = () => {
+      for (const list of [...rarityLists, ...versionLists]) {
+        const count = list.querySelectorAll(':scope > [data-name]:not([hidden])').length;
+        list.parentElement!.querySelector('h2 small')!.textContent = String(count);
+      }
+      if (empty) empty.hidden = cards.some((card) => !card.hidden);
+    };
+    const observer = new MutationObserver((records) => {
+      if (records.some(({ target }) => (target as HTMLElement).hasAttribute('data-name'))) updateCounts();
+    });
+    observer.observe(container, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    cleanup(signal, () => observer.disconnect());
+
+    const render = (sort: Sort) => {
+      if (sort === 'version') {
+        for (const list of versionLists) {
+          const version = list.dataset.versionList;
+          for (const card of cards.filter((item) => item.dataset.version === version).sort(byRarity)) list.append(card);
+        }
+      } else {
+        for (const list of rarityLists) {
+          const rarity = list.dataset.rarityList;
+          const ordered = cards.filter((item) => item.dataset.rarity === rarity).sort((a, b) =>
+            sort === 'name' ? byName(a, b) : (sort === 'new' ? compareVersions(b.dataset.version ?? '', a.dataset.version ?? '') : compareVersions(a.dataset.version ?? '', b.dataset.version ?? '')) || byName(a, b));
+          list.append(...ordered);
+        }
+      }
+      for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.sort === sort));
+      updateCounts();
+      const url = new URL(location.href);
+      url.searchParams.set('sort', sort);
+      history.replaceState(history.state, '', url);
+      try { localStorage.setItem('gf-weapons-sort', sort); } catch {}
+    };
+    let requested = new URLSearchParams(location.search).get('sort');
+    if (requested !== 'new' && requested !== 'old' && requested !== 'name' && requested !== 'version') {
+      try { requested = localStorage.getItem('gf-weapons-sort'); } catch {}
+    }
+    render(requested === 'old' || requested === 'name' || requested === 'version' ? requested : 'new');
+    for (const button of buttons) button.addEventListener('click', () => render(button.dataset.sort as Sort), { signal });
+    document.addEventListener('click', (event) => {
+      if (!matchMedia('(hover: none)').matches || event.detail === 0) return;
+      const card = (event.target as Element).closest<HTMLAnchorElement>('a.wcard');
+      if (!card || !container.contains(card)) {
+        for (const link of links) link.classList.remove('is-open');
+      } else if (!card.classList.contains('is-open')) {
+        event.preventDefault();
+        for (const link of links) link.classList.remove('is-open');
+        card.classList.add('is-open');
+      }
+    }, { signal });
+  });
+</script>
