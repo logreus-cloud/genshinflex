@@ -8,12 +8,12 @@ on:
       ref:
         description: Git ref для сборки
         required: false
-        default: platform
+        default: main
         type: string
       branch:
-        description: Ветка Pages; пусто для основного сайта
+        description: Ветка Pages; пусто для основного сайта (пустое значение из gh CLI заменяется значением по умолчанию)
         required: false
-        default: platform
+        default: ''
         type: string
 
 permissions:
