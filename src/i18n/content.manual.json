@@ -163,9 +163,17 @@
   "en": "R5, accessible option",
   "es": "R5, opción accesible"
  },
+ "Акт 10: Автоматон таинственного источника: Надсмотрщик — в режиме зачистки копит импульс и бьёт всё сильнее; прерывайте его частым Крио": {
+  "en": "Act 10: Secret Source Automaton: Overseer Device — in Sweeper Mode it builds Flow Momentum and hits harder; interrupt it with frequent Cryo",
+  "es": "Acto 10: Autómata Fuentenigma - Máquina de control — en modo barrido acumula impulso y golpea cada vez más fuerte; interrúmpelo con Cryo frecuente"
+ },
  "Акт 10: Лучезарный мотылёк-призрак — нужен хилер на всю команду": {
   "en": "Act 10: Radiant Moonfly — bring a team-wide healer",
   "es": "Acto 10: Selenimariposa Radiante — lleva un sanador para todo el equipo"
+ },
+ "Акт 3: Бесконечный механический массив — уязвим к любой стихии отряда, решает чистый урон": {
+  "en": "Act 3: Perpetual Mechanical Array — weak to every element in your party, raw damage decides it",
+  "es": "Acto 3: Maquinaria Eterna — débil a cualquier elemento del equipo, lo que cuenta es el daño puro"
  },
  "Акт 3: Пернатый плесенник — уязвим к Электро": {
   "en": "Act 3: Jadeplume Terrorshroom — weak to Electro",
@@ -175,9 +183,17 @@
   "en": "Act 6: Emperor of Fire and Iron — Pyro shield, bring Hydro",
   "es": "Acto 6: Emperador Piroacorazado — escudo Pyro, lleva Hydro"
  },
+ "Акт 6: Фуриоса — призывает корни: уничтожайте их и чаще меняйте позицию": {
+  "en": "Act 6: Furiosa — summons roots: destroy them and reposition often",
+  "es": "Acto 6: Furiosa — invoca raíces: destrúyelas y cambia de posición a menudo"
+ },
  "Акт 8: Pipilpan Idol (закалённый) — уязвим к Заряду / Лунному заряду": {
   "en": "Act 8: Battle-Hardened Pipilpan Idol — weak to Electro-Charged / Lunar-Charged",
   "es": "Acto 8: Pipilpan Idol (curtido) — débil a Electrocargado / Electrocargado Lunar"
+ },
+ "Акт 8: Крылатая химера-лев — закрывается щитом (снимайте Звёздным сиянием или частым Крио) и поглощает Анемо-сферы для заряженной атаки": {
+  "en": "Act 8: Chimeric Winged Lion — raises a ward (break it with Stellar Glimmer or frequent Cryo) and absorbs Anemo orbs to charge an attack",
+  "es": "Acto 8: León Quimérico Alado — se cubre con un escudo (rómpelo con Destello Estelar o Cryo frecuente) y absorbe orbes Anemo para cargar un ataque"
  },
  "Алёша желателен на C6": {
   "en": "Alyosha preferably at C6",
@@ -278,10 +294,6 @@
  "Водяница лечит и снижает сопротивление": {
   "en": "Vodyanitsa heals and shreds resistance",
   "es": "Vodyanitsa cura y reduce la resistencia"
- },
- "Враги актов пока не объявлены — дополним, когда появятся": {
-  "en": "Act enemies aren't announced yet — we'll add them once they are",
-  "es": "Los enemigos de los actos aún no se han anunciado; los añadiremos cuando se publiquen"
  },
  "Гидро": {
   "en": "Hydro",
@@ -486,6 +498,10 @@
  "Инеффа и Яэ Мико допускаются как особые гости, хотя они Электро": {
   "en": "Ineffa and Yae Miko are allowed as special guests even though they're Electro",
   "es": "Ineffa y Yae Miko se permiten como estrellas invitadas aunque son Electro"
+ },
+ "Испытания Арканы: Гончая Разрыва: Камнегрыз (I) — постоянно ранит активного персонажа, нужен хилер; механизмы руин (II) — пригодятся лучники и щиты": {
+  "en": "Arcana challenges: Rockfond Rifthound (I) — keeps damaging the active character, bring a healer; Ruin machines (II) — bow users and shields help",
+  "es": "Desafíos de Arcanos: Sabueso Acechador Lítico (I) — daña sin parar al personaje activo, lleva un sanador; máquinas de las ruinas (II) — ayudan arqueros y escudos"
  },
  "Испытания Арканы: Чёрный доспех (I), Вишап глубин: Исток (II)": {
   "en": "Arcana Challenges: Shadowy Husks (I), Primordial Bathysmal Vishap (II)",
