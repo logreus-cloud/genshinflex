@@ -40,9 +40,19 @@
   }
 }
 
+/* Фон по ширине окна в физических пикселях: image-set смотрит только на плотность, и широкий монитор при 100 % получил бы 1920 px.
+   2560 и 3840 — увеличение исходного скриншота Real-ESRGAN (x4plus) */
+:root[data-season="snezhnaya"] { --scene-img: url('/img/season/snezhnaya-bg.webp'); }
+@media (min-width: 1921px), (min-width: 1300px) and (min-resolution: 1.4dppx) {
+  :root[data-season="snezhnaya"] { --scene-img: url('/img/season/snezhnaya-bg-2560.webp'); }
+}
+@media (min-width: 2561px), (min-width: 1700px) and (min-resolution: 1.4dppx), (min-width: 1300px) and (min-resolution: 1.9dppx) {
+  :root[data-season="snezhnaya"] { --scene-img: url('/img/season/snezhnaya-bg-3840.webp'); }
+}
+
 :root[data-season="snezhnaya"] .season-scene {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: var(--scene-shade), url('/img/season/snezhnaya-bg.webp') 71.9% top / cover no-repeat;
+  background: var(--scene-shade), var(--scene-img) 71.9% top / cover no-repeat;
   transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06); will-change: transform;
 }
 :root[data-season="snezhnaya"] :is(body, .shell, .content) { background: transparent; }
