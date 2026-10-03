@@ -19,11 +19,60 @@ test('ручные переводы контента полны и сохран�
 });
 function placeholders(value) { return [...new Set(value.match(/\{\w+\}/g) ?? [])].sort(); }
 const cyrillic = /[А-Яа-яЁё]/;
-const translations = /\bt\('((?:[^'\\]|\\.)*)'/g;
+
+function extractKeys(source) {
+  const keys = [];
+  let dynamic = 0;
+  for (const match of source.matchAll(/\bt\(\s*/g)) {
+    const start = match.index + match[0].length;
+    const quote = source[start];
+    if (!["'", '"', '`'].includes(quote)) { dynamic++; continue; }
+
+    let end = start + 1;
+    let interpolated = false;
+    while (end < source.length) {
+      if (source[end] === '\\') { end += 2; continue; }
+      if (quote === '`' && source.startsWith('${', end)) interpolated = true;
+      if (source[end] === quote) break;
+      end++;
+    }
+    // Литерал должен быть всем первым аргументом: t('а' + name) или t('а'.repeat(2)) — уже выражение
+    const next = source.slice(end + 1).match(/^\s*(.)/s)?.[1];
+    if (end >= source.length || interpolated || (next !== ',' && next !== ')')) { dynamic++; continue; }
+    try { keys.push(new Function(`return ${source.slice(start, end + 1)}`)()); }
+    catch { dynamic++; }
+  }
+  return { keys, dynamic };
+}
 
 const files = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
   const path = new URL(entry.name + (entry.isDirectory() ? '/' : ''), dir);
   return entry.isDirectory() ? files(path) : /\.(astro|ts)$/.test(entry.name) ? [path] : [];
+});
+
+test('извлечение ключей t()', () => {
+  const source = [
+    "t('один')",
+    't("два")',
+    't(`три`)',
+    't(`значение ${x}`)',
+    't(name)',
+    String.raw`t('\'')`,
+    String.raw`t("\"")`,
+    String.raw`t('\n')`,
+    String.raw`t('\ж')`,
+    String.raw`t('ж\u{436}')`,
+    "t( 'а' )",
+    "t('б' + name)",
+    't("в".repeat(2))',
+    "t('г', { n })",
+    "format('x')",
+    "alt('x')",
+  ].join('\n');
+  assert.deepEqual(extractKeys(source), {
+    keys: ['один', 'два', 'три', "'", '"', '\n', 'ж', 'жж', 'а', 'г'],
+    dynamic: 4,
+  });
 });
 
 test('словарь интерфейса', () => {
@@ -38,8 +87,7 @@ test('словарь интерфейса', () => {
   }
 
   const check = (source, path, client) => {
-    for (const [, raw] of source.matchAll(translations)) {
-      const key = raw.replace(/\\'/g, "'");
+    for (const key of extractKeys(source).keys) {
       if (!cyrillic.test(key)) continue;
       const inContent = ['en', 'es'].every((lang) => typeof content[lang][key] === 'string' && content[lang][key].trim());
       if (!ui[key] && (client || !inContent)) errors.push(`${path}: нет перевода: ${key}`);
