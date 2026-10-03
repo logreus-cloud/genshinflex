@@ -703,6 +703,10 @@
   "en": "Calendar view",
   "es": "Vista del calendario"
  },
+ "Вид полосок": {
+  "en": "Bar style",
+  "es": "Estilo de barras"
+ },
  "Вид после возвышения": {
   "en": "Ascended look",
   "es": "Aspecto tras ascender"
@@ -1787,6 +1791,10 @@
   "en": "Petals",
   "es": "Pétalos"
  },
+ "Линия": {
+  "en": "Line",
+  "es": "Línea"
+ },
  "Лучшее 5★ оружие (R1)": {
   "en": "Best 5★ weapon (R1)",
   "es": "Mejor arma 5★ (R1)"
@@ -1838,6 +1846,10 @@
  "Материалы с монстров: 1★ / 2★ / 3★": {
   "en": "Common materials: 1★ / 2★ / 3★",
   "es": "Materiales comunes: 1★ / 2★ / 3★"
+ },
+ "Мелкий": {
+  "en": "Compact",
+  "es": "Compacto"
  },
  "Местный диковинный материал (новый)": {
   "en": "Local specialty (new)",
@@ -3062,6 +3074,10 @@
  "Расскажите, как играть персонажем: суть, ротация, на что обратить внимание. Пустая строка — новый абзац.": {
   "en": "Explain how to play the character: the core idea, the rotation, what to watch out for. An empty line starts a new paragraph.",
   "es": "Explica cómo jugar con el personaje: la idea principal, la rotación y a qué prestar atención. Una línea vacía empieza un párrafo nuevo."
+ },
+ "Расширенный": {
+  "en": "Expanded",
+  "es": "Ampliado"
  },
  "Регион": {
   "en": "Region",
