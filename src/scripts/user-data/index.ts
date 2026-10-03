@@ -55,8 +55,11 @@ const browserStorage: KeyValueStorage = {
 
 type Listener = (value: unknown, lang: Lang) => void;
 const subscribers = new WeakMap<KeyValueStorage, Map<Key, Set<Listener>>>();
-function notifySubscribers(storage: KeyValueStorage, key: Key, value: unknown, lang: Lang) {
-  for (const listener of subscribers.get(storage)?.get(key) ?? []) try { listener(value, lang); } catch {}
+function notifySubscribers(storage: KeyValueStorage, key: Key, value: unknown, lang: Lang, path: string, raw: string) {
+  for (const listener of subscribers.get(storage)?.get(key) ?? []) {
+    try { if (storage.getItem(path) !== raw) break; } catch { break; }
+    try { listener(value, lang); } catch {}
+  }
 }
 
 export function memoryStorage(): KeyValueStorage {
@@ -85,8 +88,8 @@ export function readStrict<K extends Key>(key: K, lang: Lang = 'ru', storage: Ke
 }
 
 function serializeValue<K extends Key>(key: K, value: Values[K]): { raw: string; value: Values[K] } | null {
-  if (!validUserData(key, value)) return null;
   try {
+    if (!validUserData(key, value)) return null;
     const raw = JSON.stringify(value);
     if (typeof raw !== 'string') return null;
     const parsed: unknown = JSON.parse(raw);
@@ -177,7 +180,7 @@ export function createUserData({ storage = browserStorage, onChanged }: {
         } catch {}
         return false;
       }
-      notifySubscribers(storage, key, serialized.value, lang);
+      notifySubscribers(storage, key, serialized.value, lang, path, serialized.raw);
       try { onChanged?.(registry[key].kind); } catch {}
       return true;
     },
@@ -210,20 +213,24 @@ export function createUserData({ storage = browserStorage, onChanged }: {
       };
     },
     restore(data: { favorites: Partial<Record<Lang, Entry[]>>; roster: Record<string, unknown>[]; profileUid: string | null; profileCustom?: Record<string, unknown> }): boolean {
-      if (!record(data) || !record(data.favorites) ||
-        Object.keys(data.favorites).some((lang) => !['ru', 'en', 'es'].includes(lang))) return false;
       const entries = new Map<string, { key: Key; lang: Lang; raw: string; value: unknown }>();
-      const add = <K extends Key>(key: K, value: Values[K], lang: Lang = 'ru') => {
-        const serialized = serializeValue(key, value);
-        if (!serialized) return false;
-        entries.set(userDataKey(key, lang), { key, lang, ...serialized });
-        return true;
-      };
-      for (const lang of ['ru', 'en', 'es'] as const) {
-        if (Object.prototype.hasOwnProperty.call(data.favorites, lang) && !add('favorites', data.favorites[lang]!, lang)) return false;
+      try {
+        if (!record(data) || !record(data.favorites) ||
+          Object.keys(data.favorites).some((lang) => !['ru', 'en', 'es'].includes(lang))) return false;
+        const add = <K extends Key>(key: K, value: Values[K], lang: Lang = 'ru') => {
+          const serialized = serializeValue(key, value);
+          if (!serialized) return false;
+          entries.set(userDataKey(key, lang), { key, lang, ...serialized });
+          return true;
+        };
+        for (const lang of ['ru', 'en', 'es'] as const) {
+          if (Object.prototype.hasOwnProperty.call(data.favorites, lang) && !add('favorites', data.favorites[lang]!, lang)) return false;
+        }
+        if (!add('roster', data.roster) || !add('profileUid', data.profileUid)) return false;
+        if (Object.prototype.hasOwnProperty.call(data, 'profileCustom') && !add('profileCustom', data.profileCustom!)) return false;
+      } catch {
+        return false;
       }
-      if (!add('roster', data.roster) || !add('profileUid', data.profileUid)) return false;
-      if (Object.prototype.hasOwnProperty.call(data, 'profileCustom') && !add('profileCustom', data.profileCustom!)) return false;
       let previous: (readonly [string, string | null])[];
       try { previous = [...entries.keys(), 'gf:sync'].map((path) => [path, storage.getItem(path)] as const); }
       catch { return false; }
@@ -248,7 +255,9 @@ export function createUserData({ storage = browserStorage, onChanged }: {
       }
       for (const [path, value] of previous) {
         const entry = entries.get(path);
-        if (entry && value !== entry.raw) notifySubscribers(storage, entry.key, entry.value, entry.lang);
+        if (entry && value !== entry.raw) {
+          notifySubscribers(storage, entry.key, entry.value, entry.lang, path, entry.raw);
+        }
       }
       for (const kind of kinds) try { onChanged?.(kind); } catch {}
       return true;
@@ -294,7 +303,9 @@ export function writePulled(writes: UserDataWrite[], storage: KeyValueStorage = 
   }
   for (const [path, value] of previous) {
     const entry = entries.get(path)!;
-    if (value !== entry.raw) notifySubscribers(storage, entry.key, entry.value, entry.lang);
+    if (value !== entry.raw) {
+      notifySubscribers(storage, entry.key, entry.value, entry.lang, path, entry.raw);
+    }
   }
 }
 

@@ -309,6 +309,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
     select.dataset.none = select.dataset.none || document.getElementById('title-field')?.dataset.none || '';
     select.addEventListener('change', async () => {
+      const request = loadRequest;
+      const accessToken = token;
+      if (!accessToken) { select.value = active ?? ''; return; }
       const next = select.value || null;
       const previous = active;
       active = next;
@@ -317,17 +320,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       try {
         const response = await fetch(`${API_URL}/me/title`, {
           method: 'POST', signal,
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: next }),
         });
         if (!response.ok) throw new Error();
       } catch {
-        if (signal.aborted) return;
+        if (signal.aborted || loadRequest !== request) return;
         active = previous;
         renderChip();
         select.value = active ?? '';
       } finally {
-        if (!signal.aborted) select.disabled = !owned.length;
+        if (!signal.aborted && loadRequest === request) select.disabled = !owned.length;
       }
     }, { signal });
 
@@ -403,6 +406,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   let saved = emptyCustom(), draft = emptyCustom(), avatarTab: Avatar['type'] = 'character';
   let pendingImport: ImportData | null = null, confirmedImport: ImportData | null = null, keepChanges = false;
   let editorSession = 0, importSelection = 0, saving = false, exporting = false;
+  let sessionGeneration = 0, editorGeneration = 0;
+  // Снять блокировку элементов редактора текущей операции сохранения (и при успехе, и при смене аккаунта)
+  let releaseControls: (() => void) | null = null;
   const exportUrls = new Set<string>();
   let exportTimer: number | undefined;
   const mediaOperations: Record<MediaKey, number> = { avatar: 0, cover: 0, background: 0 };
@@ -820,6 +826,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   }
   function closeEditor() { if (saving) return; for (const key of mediaKeys) mediaOperations[key]++; importSelection++; editorSession++; dialog.close(); }
   function openEditor() {
+    editorGeneration = sessionGeneration;
     editorSession++; for (const key of mediaKeys) mediaOperations[key]++; importSelection++;
     draft = structuredClone(saved);
     revokeStaged(clearStaged());
@@ -916,7 +923,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }
   };
   void loadWishes();
-  onSessionChange(() => { void loadWishes(); }, { signal });
+  onSessionChange(() => {
+    sessionGeneration++;
+    cancelShowcase();
+    if (dialog.open) { saving = false; releaseControls?.(); closeEditor(); }
+    void loadWishes();
+  }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
     // Сырое значение: старый формат аватара мигрирует ниже, глубокую проверку делает validCustom
@@ -1015,7 +1027,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const controller = new AbortController();
     showcaseController = controller;
     const turn = showcaseRequest;
-    const active = () => !signal.aborted && turn === showcaseRequest && !controller.signal.aborted;
+    const generation = sessionGeneration;
+    const active = () => !signal.aborted && turn === showcaseRequest && generation === sessionGeneration && !controller.signal.aborted;
     const button = $<HTMLButtonElement>('load-showcase');
     button.disabled = true;
     status(t('Загружаю витрину…'));
@@ -1058,14 +1071,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   $('cancel-editor').addEventListener('click', closeEditor);
   for (const button of document.querySelectorAll<HTMLButtonElement>('[data-editor-tab]')) button.addEventListener('click', () => setEditorTab(button.dataset.editorTab!));
   $('save-editor').addEventListener('click', async () => {
-    if (saving || exporting) return;
+    if (saving || exporting || !dialog.open || editorGeneration !== sessionGeneration) return;
     saving = true;
     const session = editorSession;
+    const generation = editorGeneration;
     const snapshot = structuredClone(draft);
     const mediaSnapshot = new Map<MediaKey, Blob>([...stagedMedia].map(([key, entry]) => [key, entry.blob]));
     const importSnapshot = confirmedImport ? structuredClone(confirmedImport) : null;
     const controls = [...dialog.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement>('button, input, textarea')]
       .map((control) => [control, control.disabled] as const);
+    const release = () => { if (releaseControls !== release) return; for (const [control, disabled] of controls) control.disabled = disabled; releaseControls = null; };
+    releaseControls = release;
     for (const [control] of controls) control.disabled = true;
     for (const key of mediaKeys) mediaOperations[key]++;
     importSelection++;
@@ -1087,7 +1103,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       written = Object.keys(changes) as MediaKey[];
       if (!await commitMedia(changes, version)) throw new Error();
       if (signal.aborted) throw new Error();
-      if (!dialog.open || session !== editorSession) throw new Error();
+      if (!dialog.open || session !== editorSession || generation !== sessionGeneration) throw new Error();
       // Импорт: данные из файла и оформление — одной атомарной записью; при сбое ничего не меняется, медиа откатываются в catch
       const stored = importSnapshot
         ? userData.restore({ favorites: importSnapshot.favs, roster: importSnapshot.roster, profileUid: importSnapshot.uid, profileCustom: snapshot })
@@ -1118,16 +1134,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       revokeStaged(urls.filter((url) => !activeUrls.has(url)));
       for (const [key, url] of previousUrls) if (committedUrls.get(key) !== url) URL.revokeObjectURL(url);
       for (const key of mediaKeys) if (usesMedia(previous, key) && (!usesMedia(snapshot, key) || previous.media[key] !== snapshot.media[key])) await deleteMedia(key, previous.media[key]);
-      if (signal.aborted) return;
+      if (signal.aborted || generation !== sessionGeneration || session !== editorSession) return;
       keepChanges = true;
+      release();
       saving = false;
       closeEditor();
     } catch {
       if (!switched) for (const key of written) await deleteMedia(key, version);
-      if (!signal.aborted) { $('import-status').textContent = t('Не удалось сохранить профиль в этом браузере'); setEditorTab('transfer'); }
+      if (!signal.aborted && generation === sessionGeneration && session === editorSession) { $('import-status').textContent = t('Не удалось сохранить профиль в этом браузере'); setEditorTab('transfer'); }
     } finally {
-      if (!signal.aborted) for (const [control, disabled] of controls) control.disabled = disabled;
-      saving = false;
+      if (!signal.aborted && generation === sessionGeneration && session === editorSession) release();
+      if (generation === sessionGeneration && session === editorSession) saving = false;
     }
   });
   $<HTMLInputElement>('editor-name').addEventListener('input', (event) => { draft.nick = (event.target as HTMLInputElement).value; renderPersonal(); });

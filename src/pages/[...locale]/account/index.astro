@@ -125,7 +125,12 @@ const { base, t } = useData(Astro.currentLocale);
       showDataStatus(root.dataset.sessionChanged || '');
       void load();
     };
-    onSessionChange(() => { if (!leaving && root.isConnected) refreshAccount(); });
+    const controller = new AbortController();
+    document.addEventListener('astro:before-swap', () => controller.abort(), { once: true, signal: controller.signal });
+    onSessionChange(() => {
+      if (!root.isConnected) { controller.abort(); return; }
+      if (!leaving) refreshAccount();
+    }, { signal: controller.signal });
     // Пользователь фиксируется до первого await: пока ждём сессию, страница может успеть загрузить другой аккаунт
     const accessToken = async () => {
       const expected = loadedUserId;
