@@ -58,6 +58,18 @@ test('проверяет доступ на каждом закрытом мар�
   }
 });
 
+test('отдаёт профиль с титулами и ролями', async () => {
+  const { client } = fakeClient();
+  const app = createApp({ adminClient: () => client, claims });
+  const response = await send(app, { method: 'GET', path: '/me' }, 'user');
+  assert.equal(response.status, 200);
+  const me = await response.json();
+  assert.equal(me.id, userId);
+  assert.equal(me.nickname, 'traveler');
+  assert.ok(Array.isArray(me.titles));
+  assert.ok(Array.isArray(me.roles));
+});
+
 test('выгружает данные через подставленный клиент', async () => {
   const { client } = fakeClient();
   const app = createApp({ adminClient: () => client, claims });

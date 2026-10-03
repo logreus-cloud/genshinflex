@@ -11,6 +11,7 @@ type Query = {
   order: (column: string) => Query;
   range: (start: number, end: number) => Promise<Result>;
   maybeSingle: () => Promise<Result>;
+  single: () => Promise<Result>;
   insert: (value: unknown) => Promise<{ error: null }>;
   update: (value: unknown) => Query;
   then: (resolve: (result: Result) => unknown) => Promise<unknown>;
@@ -39,6 +40,7 @@ export function fakeClient() {
         data: table === 'roles' ? (selectedUser === adminId ? { role: 'admin' } : null) : data(),
         error: null,
       }),
+      single: async () => ({ data: data(), error: null }),
       insert: async () => ({ error: null }),
       update: () => query,
       then: (resolve) => Promise.resolve(resolve(result())),
