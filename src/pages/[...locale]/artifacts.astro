@@ -2,34 +2,86 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import FilterBar from '../../components/FilterBar.astro';
-import CharacterIcon from '../../components/CharacterIcon.astro';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { artifacts, t } = useData(Astro.currentLocale);
+const { artifacts, getCharacter, base, stars, lang, t } = useData(Astro.currentLocale);
 
 // Кто носит сет: по билдам, где он встречается
 const builds = await getCollection('builds');
-const users = new Map(artifacts.map((a) => [a.slug, builds.filter((b) => b.data.artifacts.some((x) => x.sets.includes(a.slug))).map((b) => b.data.character)]));
+const users = new Map(artifacts.map((a) => [a.slug, builds.flatMap((b) => {
+  if (!b.data.artifacts.some((x) => x.sets.includes(a.slug))) return [];
+  try { return [{ c: getCharacter(b.data.character), main: b.data.artifacts[0]?.sets.includes(a.slug) ?? false }]; }
+  catch { return []; }
+}).sort((x, y) => Number(y.main) - Number(x.main) || x.c.name.localeCompare(y.c.name, lang))]));
 ---
 <Layout title={t('Артефакты')} wide>
   <h1>{t('Артефакты')}</h1>
-  <p class="lead">{t('{n} сетов артефактов с бонусами за 2 и 4 предмета. Под сетом — персонажи из наших билдов, которые его носят.', { n: artifacts.length })}</p>
+  <p class="lead">{t('{n} сетов артефактов. Наведите на сет — увидите, кто его носит. Нажмите — откроется полное описание.', { n: artifacts.length })}</p>
 
   <FilterBar target="#sets" placeholder={t('Найти сет')} groups={['rarity']} rarities={[5, 4]} />
 
   <div class="sets" id="sets">
     {artifacts.map((a) => {
       const who = users.get(a.slug) ?? [];
+      const rarityClass = `r${a.rarity >= 5 ? 5 : a.rarity === 4 ? 4 : 3}`;
       return (
-        <div data-name={`${a.name} ${a.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-rarity={String(a.rarity)} id={a.slug} class="panel set">
-          <div class="set-head">
-            <img class:list={[`r${a.rarity}`]} src={a.icon} alt="" width="56" height="56" loading="lazy" />
-            <h2>{a.name}</h2>
-          </div>
-          {a.bonus2 && <p><span class="chip gold">{t('2 предмета')}</span> {a.bonus2}</p>}
-          {a.bonus4 && <p><span class="chip gold">{t('4 предмета')}</span> {a.bonus4}</p>}
-          {who.length > 0 && <div class="who">{who.map((s) => <CharacterIcon slug={s} size={36} label={false} />)}</div>}
+        <div class:list={['aset', rarityClass]} data-name={`${a.name} ${a.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-rarity={String(a.rarity)} id={a.slug}>
+          <button type="button" class:list={['acard', rarityClass]} aria-expanded="false" aria-controls={`${a.slug}-d`}>
+            <span class="ac-top">
+              <img class="set-icon" src={a.icon} alt="" width="60" height="60" loading="lazy" />
+              <span class="ac-heading"><span class="ac-name">{a.name}</span><span class="ac-stars">{stars(a.rarity)}</span></span>
+            </span>
+            {a.bonus2 && <span class="ac-bonus"><span class="chip gold">{t('2 предмета')}</span><span class="ac-copy">{a.bonus2}</span></span>}
+            {a.bonus4 && <span class="ac-bonus"><span class="chip gold">{t('4 предмета')}</span><span class="ac-copy">{a.bonus4}</span></span>}
+            <span class="ac-footer">
+              {who.length > 0 ? (
+                <span class="avatars">
+                  {who.slice(0, 5).map(({ c }) => <img class="avatar" src={c.icon} alt="" aria-hidden="true" width="32" height="32" loading="lazy" style={`--el: var(--${c.element})`} />)}
+                  {who.length > 5 && <span class="avatar-more">+{who.length - 5}</span>}
+                </span>
+              ) : <span class="muted">{t('Пока нет в наших билдах')}</span>}
+              <span class="ac-more">{t('Подробнее')}</span>
+            </span>
+            {who.length > 0 && (
+              <span class="atip" aria-hidden="true">
+                <span class="atip-title">{t('Носят')}</span>
+                <span class="atip-list">
+                  {who.slice(0, 8).map(({ c }) => <span class="atip-chip"><img class="avatar" src={c.icon} alt="" aria-hidden="true" width="26" height="26" loading="lazy" style={`--el: var(--${c.element})`} />{c.name}</span>)}
+                  {who.length > 8 && <span class="atip-extra">+{who.length - 8}</span>}
+                </span>
+              </span>
+            )}
+          </button>
+          <section class="sdetail" id={`${a.slug}-d`} hidden aria-labelledby={`${a.slug}-h`}>
+            <div class="sd-left">
+              <div class="sd-head">
+                <img class="set-icon" src={a.icon} alt="" width="88" height="88" loading="lazy" />
+                <div class="sd-title"><h2 id={`${a.slug}-h`}>{a.name}</h2><span class="sd-stars">{stars(a.rarity)}</span></div>
+                <button type="button" class="sd-close" aria-label={t('Свернуть')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 6-6 6 6" /></svg></button>
+              </div>
+              {a.bonus2 && <div class="sd-bonus"><h3>{t('Бонус 2 предметов')}</h3><p>{a.bonus2}</p></div>}
+              {a.bonus4 && <div class="sd-bonus"><h3>{t('Бонус 4 предметов')}</h3><p>{a.bonus4}</p></div>}
+              <div class="sd-meta">
+                <span>{t('Версия {n}', { n: a.version })}</span>
+                {who.length > 0 && <span>{t('В билдах: {n}', { n: who.length })}</span>}
+              </div>
+            </div>
+            <div class="sd-right">
+              <h3>{t('Кому подходит')}</h3>
+              {who.length > 0 ? (
+                <div class="sd-users">
+                  {who.map(({ c, main }) => (
+                    <a class="sd-user" href={`${base}/characters/${c.slug}`} style={`--el: var(--${c.element})`}>
+                      <img class="avatar" src={c.icon} alt="" width="48" height="48" loading="lazy" />
+                      <span class="sd-user-name"><b>{c.name}</b><small class:list={{ main }}>{t(main ? 'Основной сет' : 'Запасной вариант')}</small></span>
+                    </a>
+                  ))}
+                </div>
+              ) : <p class="muted sd-hint">{t('Пока нет в наших билдах')}</p>}
+              {who.length > 0 && <p class="muted sd-hint">{t('Нажмите на персонажа — откроется его билд.')}</p>}
+            </div>
+          </section>
         </div>
       );
     })}
@@ -38,16 +90,147 @@ const users = new Map(artifacts.map((a) => [a.slug, builds.filter((b) => b.data.
 </Layout>
 
 <style>
-  .sets { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; align-items: start; }
-  .set { scroll-margin-top: calc(var(--top-h) + 16px); }
-  .set:target { border-color: var(--accent); }
-  .set-head { display: flex; align-items: center; gap: .8rem; margin-bottom: .6rem; }
-  .set-head h2 { margin: 0; font-size: 1rem; }
-  .set-head img { border-radius: 10px; background: linear-gradient(170deg, #4a3d6d, #9679c4); flex: none; }
-  .set-head img.r5 { background: linear-gradient(170deg, #6b4520, #d1953f); }
-  .set p { font-size: .88rem; color: var(--muted); margin: 0 0 .5rem; }
-  .set .chip { margin-right: .3rem; }
-  .who { display: flex; flex-wrap: wrap; gap: 4px; margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--border); }
+  .sets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); grid-auto-flow: dense; gap: 16px; padding-top: 8px; }
+  .aset { position: relative; min-width: 0; scroll-margin-top: calc(var(--top-h) + 16px); }
+  .aset.is-open { grid-column: 1 / -1; }
+  .aset:is(:hover, :focus-within) { z-index: 2; }
+  .acard { position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; height: 100%; min-width: 0; gap: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease); }
+  .acard:focus-visible { transform: translateY(-2px); border-color: color-mix(in srgb, var(--text) 25%, var(--border)); background: var(--surface-2); }
+  .acard:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .acard[hidden], .sdetail[hidden] { display: none; }
+  .r5 { --rarity: var(--r5); }
+  .r4 { --rarity: var(--r4); }
+  .r3 { --rarity: var(--r3); }
+  .ac-top { display: flex; align-items: center; min-width: 0; gap: 12px; }
+  .set-icon { display: block; flex: none; width: 60px; height: 60px; border-radius: 10px; object-fit: contain; }
+  .r5 .set-icon { background: linear-gradient(170deg, #6b4520, #d1953f); }
+  .r4 .set-icon { background: linear-gradient(170deg, #4a3d6d, #9679c4); }
+  .r3 .set-icon { background: linear-gradient(170deg, color-mix(in srgb, var(--r3) 45%, var(--surface-3)), var(--r3)); }
+  .ac-heading { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+  .ac-name { font-family: var(--font-display); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+  .ac-stars { color: var(--rarity); font-size: .85rem; letter-spacing: 1px; }
+  .ac-bonus { display: flex; align-items: flex-start; min-width: 0; gap: 8px; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+  .ac-bonus .chip { flex: none; white-space: nowrap; }
+  .ac-copy { display: -webkit-box; min-width: 0; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .ac-footer { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); font-size: .78rem; }
+  .avatars { display: flex; align-items: center; min-width: 0; }
+  .avatar { display: block; flex: none; width: 32px; height: 32px; border: 2px solid var(--el, var(--border)); border-radius: 50%; background: var(--surface-3); object-fit: cover; }
+  .avatars .avatar + .avatar { margin-left: -6px; }
+  .avatar-more { margin-left: 5px; color: var(--muted); white-space: nowrap; }
+  .ac-more { flex: none; margin-left: auto; color: var(--muted); }
+  .atip { position: absolute; bottom: calc(100% + 10px); left: 0; display: none; box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-3); box-shadow: 0 12px 30px rgb(0 0 0 / .24); pointer-events: none; }
+  .atip::after { position: absolute; bottom: -5px; left: 24px; width: 9px; height: 9px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface-3); content: ''; transform: rotate(45deg); }
+  .atip-title { display: block; margin-bottom: 8px; font-weight: 700; }
+  .atip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .atip-chip { display: inline-flex; align-items: center; min-width: 0; gap: 5px; padding: 3px 7px 3px 3px; border-radius: 100px; background: var(--surface-2); font-size: .75rem; }
+  .atip-chip .avatar { width: 26px; height: 26px; }
+  .atip-extra { align-self: center; color: var(--muted); font-size: .75rem; }
+  .sdetail { display: flex; flex-wrap: wrap; gap: 28px; padding: 24px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius-lg); background: var(--surface); animation: sd-in .25s var(--ease) both; }
+  .sd-left, .sd-right { min-width: 0; }
+  .sd-left { flex: 1 1 420px; }
+  .sd-right { flex: 1 1 380px; }
+  .sd-head { display: flex; align-items: center; min-width: 0; gap: 14px; margin-bottom: 18px; }
+  .sd-head .set-icon { width: 88px; height: 88px; }
+  .sd-title { min-width: 0; }
+  .sd-title h2 { margin: 0 0 5px; font-family: var(--font-display); font-size: 1.3rem; overflow-wrap: anywhere; }
+  .sd-stars { color: var(--rarity); letter-spacing: 1px; }
+  .sd-close { display: grid; flex: none; place-items: center; width: 44px; height: 44px; margin-left: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); color: var(--text); cursor: pointer; }
+  .sd-close:hover { background: var(--surface-3); }
+  .sd-close:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .sd-close svg { width: 20px; height: 20px; }
+  .sd-bonus { margin-top: 10px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); }
+  .sd-bonus h3 { margin: 0 0 6px; color: var(--accent-text); font-size: 13px; font-weight: 700; }
+  .sd-bonus p { margin: 0; overflow-wrap: anywhere; }
+  .sd-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .sd-meta span { padding: 5px 9px; border-radius: 100px; background: var(--surface-3); color: var(--muted); font-size: .8rem; }
+  .sd-right h3 { margin: 0 0 14px; font-family: var(--font-display); font-size: 1rem; }
+  .sd-users { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .sd-user { display: flex; align-items: center; min-width: 0; gap: 10px; padding: 9px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); color: var(--text); text-decoration: none; }
+  .sd-user:hover { border-color: var(--accent); background: var(--surface-3); }
+  .sd-user:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .sd-user .avatar { width: 48px; height: 48px; }
+  .sd-user-name { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+  .sd-user-name b { font-size: .85rem; overflow-wrap: anywhere; }
+  .sd-user-name small { color: var(--muted); font-size: .73rem; }
+  .sd-user-name .main { color: var(--accent-text); }
+  .sd-hint { margin: 12px 0 0; font-size: .85rem; }
   .empty { text-align: center; margin: 3rem 0; }
-  @media (max-width: 420px) { .sets { grid-template-columns: 1fr; } }
+  @keyframes sd-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (hover: hover) {
+    .acard:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--text) 25%, var(--border)); background: var(--surface-2); }
+    .acard:hover .atip { display: block; }
+  }
+  .acard:focus-visible .atip { display: block; }
+  @media (max-width: 640px) {
+    .sdetail { flex-direction: column; }
+    .sd-left, .sd-right { flex-basis: auto; width: 100%; }
+    .sd-users { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sdetail { animation: none; }
+    .acard { transition: none; }
+    .acard:hover, .acard:focus-visible { transform: none; }
+  }
 </style>
+
+<script>
+  import { onPage } from '../../scripts/router';
+
+  onPage((signal) => {
+    const container = document.querySelector<HTMLElement>('#sets');
+    if (!container) return;
+    let current: HTMLElement | null = null;
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const collapse = (item: HTMLElement) => {
+      const card = item.querySelector<HTMLButtonElement>('.acard')!;
+      const detail = item.querySelector<HTMLElement>('.sdetail')!;
+      item.classList.remove('is-open');
+      card.hidden = false;
+      card.setAttribute('aria-expanded', 'false');
+      detail.hidden = true;
+    };
+    const open = (item: HTMLElement, initial = false) => {
+      if (current && current !== item) collapse(current);
+      const card = item.querySelector<HTMLButtonElement>('.acard')!;
+      const detail = item.querySelector<HTMLElement>('.sdetail')!;
+      item.classList.add('is-open');
+      card.hidden = true;
+      card.setAttribute('aria-expanded', 'true');
+      detail.hidden = false;
+      current = item;
+      if (!initial) {
+        detail.querySelector<HTMLButtonElement>('.sd-close')!.focus({ preventScroll: true });
+        const url = new URL(location.href);
+        url.hash = item.id;
+        history.replaceState(history.state, '', url);
+      }
+      item.scrollIntoView({ block: initial ? 'start' : 'nearest', behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+    };
+    const close = () => {
+      if (!current) return;
+      const item = current;
+      collapse(item);
+      current = null;
+      item.querySelector<HTMLButtonElement>('.acard')!.focus({ preventScroll: true });
+      const url = new URL(location.href);
+      url.hash = '';
+      history.replaceState(history.state, '', url);
+    };
+    container.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const card = target.closest<HTMLButtonElement>('.acard');
+      if (card && container.contains(card)) {
+        open(card.closest<HTMLElement>('.aset')!);
+        return;
+      }
+      if (target.closest('.sd-close')) close();
+    }, { signal });
+    container.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && current) { event.preventDefault(); close(); }
+    }, { signal });
+    const requested = location.hash.slice(1);
+    const item = [...container.querySelectorAll<HTMLElement>('.aset')].find((set) => set.id === requested);
+    if (item) open(item, true);
+  });
+</script>

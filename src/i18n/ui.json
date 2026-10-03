@@ -4470,5 +4470,41 @@
  "— после проверки он появится здесь.": {
   "en": "— once reviewed, it will appear here.",
   "es": "— tras la revisión aparecerá aquí."
+ },
+ "{n} сетов артефактов. Наведите на сет — увидите, кто его носит. Нажмите — откроется полное описание.": {
+  "en": "{n} artifact sets. Hover a set to see who wears it. Click it to open the full description.",
+  "es": "{n} sets de artefactos. Pasa el cursor sobre un set para ver quién lo usa. Haz clic para abrir la descripción completa."
+ },
+ "Носят": {
+  "en": "Worn by",
+  "es": "Lo usan"
+ },
+ "Пока нет в наших билдах": {
+  "en": "Not in our builds yet",
+  "es": "Aún no está en nuestras builds"
+ },
+ "Бонус 2 предметов": {
+  "en": "2-piece bonus",
+  "es": "Bonificación de 2 piezas"
+ },
+ "Бонус 4 предметов": {
+  "en": "4-piece bonus",
+  "es": "Bonificación de 4 piezas"
+ },
+ "Основной сет": {
+  "en": "Main set",
+  "es": "Set principal"
+ },
+ "Запасной вариант": {
+  "en": "Alternative",
+  "es": "Alternativa"
+ },
+ "Нажмите на персонажа — откроется его билд.": {
+  "en": "Click a character to open their build.",
+  "es": "Haz clic en un personaje para abrir su build."
+ },
+ "В билдах: {n}": {
+  "en": "In builds: {n}",
+  "es": "En builds: {n}"
  }
 }
