@@ -28,12 +28,16 @@ $cacheDir = if ($versioned.Count) {
 }
 if (-not $cacheDir) { Write-Host 'Game browser cache not found. Open the wish history in the game.' -ForegroundColor Red; return }
 $cacheFile = Join-Path $cacheDir.FullName 'Cache\Cache_Data\data_2'
+if (-not (Test-Path $cacheFile)) { Write-Host 'Wish history cache not found. Open Wish -> History in the game and run this again.' -ForegroundColor Red; return }
 
-# The game keeps the file open, so read a copy
-$tmp = Join-Path $env:TEMP 'gf_data_2'
-Copy-Item $cacheFile $tmp -Force
-$text = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($tmp))
-Remove-Item $tmp -Force
+# The game keeps the file open, so read a copy (unique name: two windows at once do not clash)
+$tmp = Join-Path $env:TEMP "gf_data_2_$([guid]::NewGuid().ToString('N'))"
+try {
+  Copy-Item $cacheFile $tmp -Force
+  $text = [System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes($tmp))
+} finally {
+  Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+}
 
 $seen = New-Object 'System.Collections.Generic.HashSet[string]'
 $urls = @(($text -split '1/0/') | Where-Object { $_ -match 'webview_gacha' -and $_ -match 'authkey=' } |
@@ -41,7 +45,12 @@ $urls = @(($text -split '1/0/') | Where-Object { $_ -match 'webview_gacha' -and 
 if (-not $urls.Count) { Write-Host 'Link not found. Open Wish -> History in the game and run this again.' -ForegroundColor Red; return }
 [array]::Reverse($urls)
 
-$candidates = @($urls | Select-Object -First 30)
+# Only well-formed absolute links with an authkey: the network fallback below copies one unverified
+$candidates = @($urls | Where-Object {
+  $parsedUri = $null
+  [uri]::TryCreate($_, [UriKind]::Absolute, [ref]$parsedUri) -and $parsedUri.Query -match '(^|[?&])authkey=[^&]+'
+} | Select-Object -First 30)
+if (-not $candidates.Count) { Write-Host 'Link not found. Open Wish -> History in the game and run this again.' -ForegroundColor Red; return }
 Write-Host "Checking $($candidates.Count) cached links..." -ForegroundColor Gray
 $responses = 0
 $expired = 0
@@ -49,8 +58,7 @@ $networkErrors = 0
 $requests = 0
 $validUrl = $null
 foreach ($url in $candidates) {
-  try { $uri = [uri]$url } catch { continue }
-  if (-not $uri.IsAbsoluteUri) { continue }
+  $uri = [uri]$url
 
   $apiHost = 'https://public-operation-hk4e-sg.hoyoverse.com'
   if ($uri.Host -match 'mihoyo\.com') { $apiHost = 'https://public-operation-hk4e.mihoyo.com' }
