@@ -66,7 +66,7 @@ function ownTeam(slug, cks) {
 // ck — список возможных ключей персонажа; в найденной записи он подменяется на тот, что в ней встретился
 async function pickTeam(cks, teams) {
   const q = { query: { 'summary.char_names': { $in: cks }, is_db_valid: true }, limit: 100, skip: 0 };
-  const res = await fetch(`https://simpact.app/api/db?q=${encodeURIComponent(JSON.stringify(q))}`, { signal: AbortSignal.timeout(30_000) }).then((r) => r.json());
+  const res = await fetch(`https://db.kqm.gg/api/db?q=${encodeURIComponent(JSON.stringify(q))}`, { signal: AbortSignal.timeout(30_000) }).then((r) => r.json());
   const list = (res.data ?? []).filter((e) => e.summary?.target_count === 1);
   const own = (e) => cks.find((k) => e.summary.char_names.includes(k));
   const cons = (e) => e.summary.team.find((m) => m.name === own(e))?.cons ?? 0;
