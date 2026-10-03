@@ -32,6 +32,7 @@ const users = new Map(artifacts.map((a) => [a.slug, builds.flatMap((b) => {
               <img class="set-icon" src={a.icon} alt="" width="60" height="60" loading="lazy" />
               <span class="ac-heading"><span class="ac-name">{a.name}</span><span class="ac-stars">{stars(a.rarity)}</span></span>
             </span>
+            {a.bonus1 && <span class="ac-bonus"><span class="chip gold">{t('1 предмет')}</span><span class="ac-copy">{a.bonus1}</span></span>}
             {a.bonus2 && <span class="ac-bonus"><span class="chip gold">{t('2 предмета')}</span><span class="ac-copy">{a.bonus2}</span></span>}
             {a.bonus4 && <span class="ac-bonus"><span class="chip gold">{t('4 предмета')}</span><span class="ac-copy">{a.bonus4}</span></span>}
             <span class="ac-footer">
@@ -60,6 +61,7 @@ const users = new Map(artifacts.map((a) => [a.slug, builds.flatMap((b) => {
                 <div class="sd-title"><h2 id={`${a.slug}-h`}>{a.name}</h2><span class="sd-stars">{stars(a.rarity)}</span></div>
                 <button type="button" class="sd-close" aria-label={t('Свернуть')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 6-6 6 6" /></svg></button>
               </div>
+              {a.bonus1 && <div class="sd-bonus"><h3>{t('Бонус 1 предмета')}</h3><p>{a.bonus1}</p></div>}
               {a.bonus2 && <div class="sd-bonus"><h3>{t('Бонус 2 предметов')}</h3><p>{a.bonus2}</p></div>}
               {a.bonus4 && <div class="sd-bonus"><h3>{t('Бонус 4 предметов')}</h3><p>{a.bonus4}</p></div>}
               <div class="sd-meta">

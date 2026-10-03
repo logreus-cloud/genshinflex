@@ -91,6 +91,10 @@
   "en": "15 enemies, 3 waves",
   "es": "15 enemigos, 3 oleadas"
  },
+ "1 предмет": {
+  "en": "1-piece",
+  "es": "1 pieza"
+ },
  "2 предмета": {
   "en": "2-piece",
   "es": "2 piezas"
@@ -4546,6 +4550,10 @@
  "Пока нет в наших билдах": {
   "en": "Not in our builds yet",
   "es": "Aún no está en nuestras builds"
+ },
+ "Бонус 1 предмета": {
+  "en": "1-piece bonus",
+  "es": "Bonificación de 1 pieza"
  },
  "Бонус 2 предметов": {
   "en": "2-piece bonus",

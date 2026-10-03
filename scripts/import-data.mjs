@@ -170,6 +170,7 @@ const artifacts = names(genshin.artifacts)
       nameEn: en,
       name: a.name,
       rarity: Math.max(...(a.rarityList ?? [0])),
+      bonus1: a.effect1Pc ?? null,
       bonus2: a.effect2Pc ?? null,
       bonus4: a.effect4Pc ?? null,
       version: a.version,
