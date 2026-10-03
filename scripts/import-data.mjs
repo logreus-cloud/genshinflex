@@ -173,7 +173,7 @@ const artifacts = names(genshin.artifacts)
       bonus2: a.effect2Pc ?? null,
       bonus4: a.effect4Pc ?? null,
       version: a.version,
-      icon: img(a.images?.filename_flower),
+      icon: img(a.images?.filename_flower ?? a.images?.filename_circlet),
     };
   })
   .filter((a) => a.rarity >= 4)
