@@ -1,40 +1,52 @@
 ---
 character: furina
-role: "Саб-ДД"
-updated: 2026-09-24
+role: "Гидро саб-ДД и баффер"
+updated: 2026-10-04
 patch: "7.1"
 weapons:
   - slug: splendor-of-tranquil-waters
+    note: "Сигнатурка"
+  - slug: key-of-khaj-nisut
   - slug: primordial-jade-cutter
   - slug: festering-desire
-  - slug: key-of-khaj-nisut
+    note: "Ивентовое"
   - slug: favonius-sword
+    note: "Если не хватает энергии"
+  - slug: the-dockhand-s-assistant
 artifacts:
   - sets: [golden-troupe]
-    note: "4 предмета"
+    note: "4 предмета — лучший вариант"
   - sets: [tenacity-of-the-millelith]
+    note: "4 предмета, если отряду важнее бафф атаки"
+  - sets: [scroll-of-the-hero-of-cinder-city]
     note: "4 предмета"
-  - sets: [golden-troupe, tenacity-of-the-millelith]
-    note: "2 + 2"
   - sets: [golden-troupe, heart-of-depth]
-    note: "2 + 2"
-  - sets: [tenacity-of-the-millelith, heart-of-depth]
-    note: "2 + 2"
+    note: "2 + 2, временно"
 mainStats:
-  sands: "HP %"
+  sands: "HP % / Восст. энергии"
   goblet: "HP % / Бонус Гидро урона"
   circlet: "Шанс / Крит. урон"
-substats: ["Шанс / Крит. урон", "HP %", "Восст. энергии"]
+substats: ["HP %", "Восст. энергии", "Крит. урон", "Шанс крит. попадания"]
+talents: [burst, skill, normal]
 teams:
-  - name: "Пар (Сян Лин)"
-    members: [xiangling, xingqiu, bennett, furina]
-  - name: "Пар (Мавуика)"
-    members: [mavuika, bennett, xilonen, furina]
+  - name: "Заморозка (Скирк)"
+    members: [skirk, furina, escoffier, shenhe]
   - name: "Команда Нёвиллет"
     members: [neuvillette, furina, xilonen, kaedehara-kazuha]
+  - name: "Пар (Мавуика)"
+    members: [mavuika, bennett, xilonen, furina]
+  - name: "Заряд (Клоринда)"
+    members: [clorinde, fischl, furina, xilonen]
+  - name: "Лунная бутонизация (Нефер)"
+    members: [nefer, jahoda, lauma, furina]
+rotations:
+  - steps: "Q → E → смена персонажа"
+    note: "Q первым — фанфары начинают копиться сразу. Навык в Усии призывает участников салона: они бьют и тратят HP отряда, что тоже даёт фанфары. Нужен хилер: без лечения фанфары копятся медленно, а HP проседает."
 sources:
-  - title: genshin.gg
-    url: https://genshin.gg/characters/furina/
+  - title: Game8
+    url: https://game8.co/games/Genshin-Impact/archives/417212
+  - title: genshin.guru
+    url: https://genshin.guru/character/furina/
 external:
   - title: "KeqingMains Quick Guide"
     url: https://keqingmains.com/q/furina-quickguide/
@@ -42,4 +54,16 @@ external:
     lang: en
 ---
 
-Урон и лечение Фурины зависят от HP, поэтому HP % в часах. Кубок на HP % или Гидро урон — если HP уже много. Главный сет — Золотая труппа.
+**Суть:** Фурина — один из самых универсальных саппортов: она усиливает урон всего отряда и сама заметно бьёт Гидро с поля. Её урон и баффы растут от макс. HP, поэтому HP% в часах и кубке. Главный сет — Золотая труппа: почти весь её урон идёт от навыка.
+
+**Как играет:** навык «Салон одиноких сердец» в Усии призывает трёх участников салона. Они бьют Гидро и берут HP у союзников с HP выше 50%: чем больше «доноров», тем сильнее удары, до 140%. В Пневме вместо них появляется Певец Потоков, который лечит. В бою почти всегда используют Усию. Взрыв стихии «Да возрадуются люди» включает Всемирное веселье: каждое изменение HP союзников даёт фанфары, а фанфары повышают урон и получаемое лечение всего отряда.
+
+**Почему нужен хилер:** фанфары копятся и от потери HP, и от лечения, поэтому лучше всего Фурина работает с сильным хилером. Без него HP отряда проседает, а бафф растёт медленно.
+
+**Статы:** HP — 35–40 тыс. (до 40 тыс. растёт её второй пассивный талант), шанс крит. попадания — 60–80%, крит. урон — 160–200%+, восстановление энергии — от 180%.
+
+**Партнёры:** подходит почти любому ДД. В Заморозке она стоит рядом со Скирк, Эскофье и Шэнь Хэ, в гиперкэрри — с Нёвиллетом, Шилонен и Кадзухой, в Паре — с Мавуикой и Беннетом. Хорошие хилеры для неё — Эскофье, Шилонен, Беннет и Кокоми.
+
+**Созвездия:** C1 даёт 150 фанфар сразу и поднимает их предел. C2 — самое сильное: фанфары копятся на 250% быстрее, а излишек повышает HP Фурины. C6 превращает её атаки в Гидро и делает из неё полноценного главного ДД.
+
+**Слабые стороны:** без хилера она теряет большую часть баффа, а смена архэ убирает с поля текущих призванных.

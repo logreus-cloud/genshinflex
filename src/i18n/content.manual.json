@@ -1882,5 +1882,149 @@
  "Долгое нажатие даёт щит на 75% прочнее. Поле взрыва стихии стоит на месте, поэтому ставьте его там, где будет драться активный персонаж.": {
   "en": "Holding E gives a 75% stronger shield. The Burst field doesn't move, so place it where the active character will fight.",
   "es": "Mantener E da un escudo un 75 % más resistente. El campo de la definitiva no se mueve, así que colócalo donde vaya a luchar el personaje activo."
+ },
+ "2 + 2, больше HP": {
+  "en": "2 + 2, more HP",
+  "es": "2 + 2, más Vida"
+ },
+ "2 + 2, в Пиро-отрядах": {
+  "en": "2 + 2, in Pyro teams",
+  "es": "2 + 2, en equipos Pyro"
+ },
+ "3★, бафф атаки главному ДД": {
+  "en": "3★, ATK buff for the main DPS",
+  "es": "3★, bonus de ATQ para el DPS principal"
+ },
+ "4 предмета, в Заморозке без Ведьмовства": {
+  "en": "4-piece, in Freeze without Hexerei",
+  "es": "4 piezas, en Congelación sin Hexerei"
+ },
+ "4 предмета, в Лунных отрядах": {
+  "en": "4-piece, in Lunar teams",
+  "es": "4 piezas, en equipos Lunares"
+ },
+ "4 предмета, в отрядах Ведьмовства": {
+  "en": "4-piece, in Hexerei teams",
+  "es": "4 piezas, en equipos Hexerei"
+ },
+ "4 предмета, если отряду важнее бафф атаки": {
+  "en": "4-piece, if the team benefits more from an ATK buff",
+  "es": "4 piezas, si al equipo le sirve más un bonus de ATQ"
+ },
+ "Анемо-саппорт и хилер Лунного знамения": {
+  "en": "Anemo support and healer for Moonsign teams",
+  "es": "Apoyo Anemo y sanadora para equipos de Presagio lunar"
+ },
+ "Белая форма": {
+  "en": "White form",
+  "es": "Forma blanca"
+ },
+ "Чёрная форма": {
+  "en": "Dark form",
+  "es": "Forma oscura"
+ },
+ "Бесплатное, нужна Фурина": {
+  "en": "Free, needs Furina",
+  "es": "Gratuita, necesita a Furina"
+ },
+ "Буря и натиск": {
+  "en": "Sturm und Drang",
+  "es": "Sturm und Drang"
+ },
+ "Ведьмовство (Варка)": {
+  "en": "Hexerei (Varka)",
+  "es": "Hexerei (Varka)"
+ },
+ "Ведьмовство (Венти)": {
+  "en": "Hexerei (Venti)",
+  "es": "Hexerei (Venti)"
+ },
+ "Вместо Ситлали подойдёт Сахароза": {
+  "en": "Sucrose can replace Citlali",
+  "es": "Sacarosa puede sustituir a Citlalí"
+ },
+ "Гидро саб-ДД и баффер": {
+  "en": "Hydro sub DPS and buffer",
+  "es": "DPS secundario Hydro y potenciadora"
+ },
+ "Главный ДД моноэлементных отрядов": {
+  "en": "Main DPS for mono-element teams",
+  "es": "DPS principal de equipos monoelementales"
+ },
+ "Главный Крио ДД": {
+  "en": "Cryo main DPS",
+  "es": "DPS principal Cryo"
+ },
+ "Дурин в чёрной форме": {
+  "en": "Durin in his dark form",
+  "es": "Durin en su forma oscura"
+ },
+ "Лучший 4★, нужен щит": {
+  "en": "Best 4★, needs a shield",
+  "es": "La mejor 4★, necesita escudo"
+ },
+ "Мастерский ход": {
+  "en": "Masterstroke",
+  "es": "Maestro estratega"
+ },
+ "Пиро саб-ДД с поля": {
+  "en": "Off-field Pyro sub DPS",
+  "es": "DPS secundario Pyro fuera del campo"
+ },
+ "Саб-ДД и баффер Ведьмовства": {
+  "en": "Hexerei sub DPS and buffer",
+  "es": "DPS secundario y potenciadora Hexerei"
+ },
+ "Саппорт со щитом": {
+  "en": "Shield support",
+  "es": "Apoyo con escudo"
+ },
+ "Сигнатурка, важнее созвездий": {
+  "en": "Signature, more important than constellations",
+  "es": "Arma exclusiva, más importante que las constelaciones"
+ },
+ "Сигнатурка, лучший вариант с большим отрывом": {
+  "en": "Signature, best by a wide margin",
+  "es": "Arma exclusiva, la mejor con diferencia"
+ },
+ "Сигнатурка, сильнее с Ведьмовством": {
+  "en": "Signature, stronger with Hexerei",
+  "es": "Arma exclusiva, más fuerte con Hexerei"
+ },
+ "серия обычных атак": {
+  "en": "Normal Attack combo",
+  "es": "cadena de ataques normales"
+ },
+ "Q первым — фанфары начинают копиться сразу. Навык в Усии призывает участников салона: они бьют и тратят HP отряда, что тоже даёт фанфары. Нужен хилер: без лечения фанфары копятся медленно, а HP проседает.": {
+  "en": "Q first so Fanfare starts building right away. Her Ousia Skill summons the Salon Members: they attack and drain the team's HP, which also grants Fanfare. Bring a healer: without healing, Fanfare builds slowly and HP drops.",
+  "es": "Q primero para que la algarabía empiece a acumularse enseguida. Su habilidad en usía invoca a los miembros del salón: atacan y consumen Vida del equipo, lo que también da algarabía. Lleva un sanador: sin curación, la algarabía sube despacio y la Vida cae."
+ },
+ "Второе E — Утверждение чистоты, затем Q призывает Дракона белого пламени. Он бьёт с поля и снижает сопротивление, когда отряд вызывает Горение, Перегрузку или Пиро-рассеивание.": {
+  "en": "The second E is Confirmation of Purity, then Q summons the Dragon of White Flame. It attacks off-field and shreds RES when the team triggers Burning, Overloaded or Pyro Swirl.",
+  "es": "La segunda E es Confirmación de la pureza; después Q invoca al dragón alboflamígero. Ataca fuera del campo y reduce la RES cuando el equipo provoca Quemadura, Sobrecarga o Torbellino Pyro."
+ },
+ "Обычная атака после E — Отрицание тьмы. Дракон чёрного разложения бьёт одну цель, а Пар и Таяние Дурина наносят на 40% больше урона.": {
+  "en": "A Normal Attack after E is Denial of Darkness. The Dragon of Dark Decay hits a single target, and Durin's Vaporize and Melt deal 40% more damage.",
+  "es": "Un ataque normal tras la E es Negación de la oscuridad. El dragón de corrosión sombría golpea a un solo objetivo, y la Vaporización y el Derretido de Durin infligen un 40 % más de daño."
+ },
+ "Между сериями тратьте попытки особого навыка «Восхождение четырёх ветров» или особой заряженной атаки — она не расходует выносливость. Взрыв стихии слабый, его можно пропускать.": {
+  "en": "Between combos, spend Four Winds' Ascension charges or the special Charged Attack — it costs no Stamina. His Burst is weak and can be skipped.",
+  "es": "Entre cadenas, gasta los usos de Alzamiento de los Cuatro Vientos o del ataque cargado especial: no consume aguante. Su definitiva es débil y se puede omitir."
+ },
+ "Первое E включает Мастерский ход, следующие три — особый навык «Врезано в кость и сердце», когда накопится Ликование. Q тратит всю Жажду победы и продлевает режим. Против групп обычные атаки можно заменить заряженными.": {
+  "en": "The first E enters Masterstroke; the next three are the special Skill Etched Into Bone and Soul, once Joy builds up. Q spends all Will to Win and extends the mode. Against groups, swap Normal Attacks for Charged Attacks.",
+  "es": "La primera E activa el maestro estratega; las tres siguientes son la habilidad especial Grabado hasta la médula, cuando se acumula exultación. La Q gasta toda el ansia de victoria y prolonga el modo. Contra grupos, cambia los ataques normales por cargados."
+ },
+ "Первое E вызывает Рассеивание и окутывает молот стихией, второе бросает его: попадание даёт отряду Вдохновение колоколов. Колокольчик из Q сам вызывает Рассеивание и призывает молоты.": {
+  "en": "The first E triggers Swirl and infuses the hammer with that element; the second throws it, and the hit buffs the team. The bell from Q triggers Swirl on its own and summons hammers.",
+  "es": "La primera E provoca Torbellino e infunde el martillo con ese elemento; la segunda lo lanza, y el impacto potencia al equipo. La campanilla de la Q provoca Torbellino por sí sola e invoca martillos."
+ },
+ "После E Ягода носится по полю и наполняет фляжку стихией врагов рядом. При Высшем сиянии полная фляжка не опустошается сразу, а долго стреляет котошариками. Роботы из Q лечат активного персонажа, а при HP выше 70% дают ему +100 к мастерству стихий.": {
+  "en": "After E, Jahoda dashes around and fills her flask with the element of nearby enemies. With Ascendant Gleam, a full flask isn't emptied at once but keeps firing Fluffy Meowballs. The robots from Q heal the active character and give +100 Elemental Mastery above 70% HP.",
+  "es": "Tras la E, Jahoda corretea por el campo y llena su frasco con el elemento de los enemigos cercanos. Con resplandor ascendente, el frasco lleno no se vacía de golpe, sino que dispara bolas gatunas durante un tiempo. Los robots de la Q curan al personaje activo y le dan +100 de Maestría Elemental con más del 70 % de Vida."
+ },
+ "Щит обновляется сам: активный персонаж копит Бенедикцию каждыми 4 обычными атаками, а Заморозка сразу даёт 2 уровня. Скорость атаки растёт от макс. HP Далии — до +20% при 40 тыс. HP.": {
+  "en": "The shield refreshes on its own: every 4 Normal Attack hits by the active character grant Benison, and Freeze grants 2 stacks at once. ATK SPD scales with Dahlia's Max HP — up to +20% at 40k HP.",
+  "es": "El escudo se renueva solo: cada 4 golpes de ataque normal del personaje activo dan beatitud, y la Congelación da 2 cargas de golpe. La Velocidad de ATQ escala con la Vida Máx. de Dahlia: hasta +20 % con 40 000 de Vida."
  }
 }
