@@ -170,6 +170,7 @@ export const rotationHalf = defineType({
 export const rotationEnemyHalf = defineType({
   name: 'rotationEnemyHalf', title: 'Враги половины', type: 'object',
   fields: [
+    defineField({ name: 'label', title: 'Название', type: 'localeString' }),
     defineField({
       name: 'enemies', title: 'Враги', type: 'array',
       description: 'Название врага или ID из enemies.json, количество и примечание.',
@@ -219,11 +220,26 @@ export const rotationFloor = defineType({
   ],
 });
 
+export const rotationDifficulty = defineType({
+  name: 'rotationDifficulty', title: 'Уровень сложности', type: 'object',
+  fields: [
+    defineField({ name: 'name', title: 'Название', type: 'localeString', validation: required }),
+    defineField({ name: 'levels', title: 'Уровни врагов', type: 'string' }),
+    defineField({ name: 'note', title: 'Особенности', type: 'localeString' }),
+  ],
+});
+
 export const rotationStage = defineType({
   name: 'rotationStage', title: 'Этап', type: 'object',
   fields: [
     defineField({ name: 'name', title: 'Название', type: 'localeString', validation: required }),
-    defineField({ name: 'halves', title: 'Половины', type: 'array', of: [{ type: 'rotationEnemyHalf' }], validation: required }),
+    defineField({ name: 'kind', title: 'Тип', type: 'localeString' }),
+    defineField({ name: 'modes', title: 'Уровни сложности', type: 'localeString' }),
+    defineField({ name: 'weak', title: 'Преимущества', type: 'array', of: [{ type: 'localeString' }], initialValue: [] }),
+    defineField({ name: 'effects', title: 'Эффекты', type: 'array', of: [{ type: 'localeString' }], initialValue: [] }),
+    defineField({ name: 'halves', title: 'Половины', type: 'array', of: [{ type: 'rotationEnemyHalf' }], initialValue: [] }),
+    defineField({ name: 'guide', title: 'Советы', type: 'array', of: [{ type: 'localeString' }], initialValue: [] }),
+    defineField({ name: 'teams', title: 'Команды', type: 'array', of: [rotationTeam], initialValue: [] }),
   ],
 });
 

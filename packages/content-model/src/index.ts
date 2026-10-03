@@ -83,8 +83,11 @@ function model(type: string) {
     }
   }
   visit(schema.get(type) as unknown as Shape, '');
-  // Схема допускает enemy и enemyText в обоих массивах; для этажей прежний выбор — enemy.
-  if (type === 'rotation') objects['rotation:floors[].chambers[].halves[].enemies[]'] = 'enemy';
+  // Строковые враги превращаются в enemyText отдельно; враги с ID — в enemy.
+  if (type === 'rotation') {
+    objects['rotation:floors[].chambers[].halves[].enemies[]'] = 'enemy';
+    objects['rotation:stages[].halves[].enemies[]'] = 'enemy';
+  }
   const result = { objects, localized, translatable };
   models.set(type, result);
   return result;

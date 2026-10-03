@@ -2,6 +2,8 @@ import { z } from 'astro/zod';
 import type { Collection } from '@genshinflex/content-model';
 
 const source = z.object({ title: z.string(), url: z.url() });
+const enemy = z.union([z.string(), z.object({ id: z.string(), n: z.number().int().optional(), note: z.string().optional() })]);
+const team4 = z.object({ name: z.string().optional(), members: z.array(z.string()).length(4), note: z.string().optional() });
 
 // Билд персонажа: слаги ссылаются на src/data/generated/*.json
 const builds = z.object({
@@ -56,20 +58,31 @@ const rotations = z.object({
       name: z.string(),
       stars: z.string(),
       halves: z.array(z.object({
-        enemies: z.array(z.union([z.string(), z.object({ id: z.string(), n: z.number().int().optional(), note: z.string().optional() })])),
+        enemies: z.array(enemy),
         note: z.string().optional(),
       })),
     })),
     // Команды для этажа (у верхнего этажа — общие teams режима)
-    teams: z.array(z.object({ name: z.string().optional(), members: z.array(z.string()).length(4), note: z.string().optional() })).default([]),
+    teams: z.array(team4).default([]),
+  })).default([]),
+  difficulties: z.array(z.object({
+    name: z.string(), levels: z.string().optional(), note: z.string().optional(),
   })).default([]),
   stages: z.array(z.object({
     name: z.string(),
-    halves: z.array(z.object({ enemies: z.array(z.string()), note: z.string().optional() })),
+    kind: z.string().optional(),
+    modes: z.string().optional(),
+    weak: z.array(z.string()).default([]),
+    effects: z.array(z.string()).default([]),
+    halves: z.array(z.object({ label: z.string().optional(), enemies: z.array(enemy), note: z.string().optional() })).default([]),
+    guide: z.array(z.string()).default([]),
+    teams: z.array(team4).default([]),
   })).default([]),
-  teams: z.array(z.object({
-    name: z.string().optional(), members: z.array(z.string()).length(4), note: z.string().optional(),
+  teams: z.array(team4).default([]),
+  videos: z.array(z.object({
+    id: z.string().regex(/^[\w-]{11}$/), title: z.string(), author: z.string(), lang: z.enum(['ru', 'en']).default('ru'),
   })).default([]),
+  external: z.array(z.object({ title: z.string(), url: z.url(), author: z.string().optional(), lang: z.enum(['ru', 'en', 'es']) })).default([]),
   sources: z.array(source).default([]),
 });
 

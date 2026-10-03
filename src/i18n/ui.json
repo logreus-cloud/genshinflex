@@ -1,4 +1,52 @@
 {
+ "{mode} в Genshin Impact — текущий цикл: враги по актам и сложностям, слабости, команды, советы и видео.": {
+  "en": "{mode} in Genshin Impact — current cycle: enemies by act and difficulty, weaknesses, teams, tips and videos.",
+  "es": "{mode} en Genshin Impact — ciclo actual: enemigos por acto y dificultad, debilidades, equipos, consejos y vídeos."
+ },
+ "{mode} в Genshin Impact — текущий цикл: враги по боям и сложностям, слабости, команды, советы и видео.": {
+  "en": "{mode} in Genshin Impact — current cycle: enemies by battle and difficulty, weaknesses, teams, tips and videos.",
+  "es": "{mode} en Genshin Impact — ciclo actual: enemigos por combate y dificultad, debilidades, equipos, consejos y vídeos."
+ },
+ "Дополнительные гайды": {
+  "en": "Additional guides",
+  "es": "Guías adicionales"
+ },
+ "Как проходить": {
+  "en": "How to clear",
+  "es": "Cómo superarlo"
+ },
+ "Команды на этап": {
+  "en": "Teams for this stage",
+  "es": "Equipos para esta etapa"
+ },
+ "Особенности": {
+  "en": "Features",
+  "es": "Características"
+ },
+ "Преимущество:": {
+  "en": "Advantage:",
+  "es": "Ventaja:"
+ },
+ "Сложность": {
+  "en": "Difficulty",
+  "es": "Dificultad"
+ },
+ "Универсальные команды": {
+  "en": "General teams",
+  "es": "Equipos generales"
+ },
+ "Уровень врагов": {
+  "en": "Enemy levels",
+  "es": "Niveles de enemigos"
+ },
+ "Уровни сложности": {
+  "en": "Difficulty levels",
+  "es": "Niveles de dificultad"
+ },
+ "Этапы и враги": {
+  "en": "Stages and enemies",
+  "es": "Etapas y enemigos"
+ },
  "(версии 3 и 4) — его выгружают paimon.moe, Starward, SnapHutao и другие трекеры. Новые записи добавятся к уже загруженным без дублей.": {
   "en": "(versions 3 and 4) — exported by paimon.moe, Starward, SnapHutao and other trackers. New entries are merged with what you already have, without duplicates.",
   "es": "(versiones 3 y 4): lo exportan paimon.moe, Starward, SnapHutao y otros rastreadores. Las entradas nuevas se suman a las ya cargadas, sin duplicados."

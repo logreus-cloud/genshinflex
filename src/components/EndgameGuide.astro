@@ -1,0 +1,137 @@
+---
+// Гайд по этапам Театра и Натиска: сложности, враги, советы и материалы авторов
+import type { CollectionEntry } from 'astro:content';
+import Enemy from './Enemy.astro';
+import Team from './Team.astro';
+import VideoGuides from './VideoGuides.astro';
+import { useData } from '../lib/data';
+
+type Rotation = CollectionEntry<'rotations'>['data'];
+interface Props {
+  part: 'difficulties' | 'stages' | 'media';
+  difficulties?: Rotation['difficulties'];
+  stages?: Rotation['stages'];
+  videos?: Rotation['videos'];
+  external?: Rotation['external'];
+}
+const { part, difficulties = [], stages = [], videos = [], external = [] } = Astro.props;
+const { t } = useData(Astro.currentLocale);
+---
+{part === 'difficulties' && difficulties.length > 0 && (
+  <section>
+    <h2 class="h-sec">{t('Уровни сложности')}</h2>
+    <div class="panel table-scroll">
+      <table>
+        <thead><tr><th scope="col">{t('Сложность')}</th><th scope="col">{t('Уровень врагов')}</th><th scope="col">{t('Особенности')}</th></tr></thead>
+        <tbody>{difficulties.map((d) => <tr><th scope="row">{t(d.name)}</th><td>{d.levels && t(d.levels)}</td><td>{d.note && t(d.note)}</td></tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+)}
+{part === 'stages' && stages.length > 0 && (
+  <section>
+    <h2 class="h-sec">{t('Этапы и враги')}</h2>
+    <nav class="floor-nav" aria-label={t('Этапы и враги')}>
+      {stages.map((s, i) => <a href={`#stage-${i + 1}`}>{t(s.name)}</a>)}
+    </nav>
+    <div class="stages">
+      {stages.map((s, i) => (
+        <article id={`stage-${i + 1}`} class="panel stage">
+          <header>
+            <div class="stage-title">
+              <h3>{t(s.name)}</h3>
+              {s.kind && <span class="chip">{t(s.kind)}</span>}
+            </div>
+            {s.modes && <p class="muted small">{t(s.modes)}</p>}
+          </header>
+          {s.weak.length > 0 && (
+            <div class="weak">
+              <span class="muted small">{t('Преимущество:')}</span>
+              {s.weak.map((w) => <span class="chip gold">{t(w)}</span>)}
+            </div>
+          )}
+          {s.effects.length > 0 && <ul class="effects small">{s.effects.map((e) => <li>{t(e)}</li>)}</ul>}
+          <div class="halves">
+            {s.halves.map((h) => (
+              <div class="half">
+                {h.label && <span class="hl">{t(h.label)}</span>}
+                <ul>{h.enemies.map((e) => <Enemy e={e} />)}</ul>
+                {h.note && <p class="muted small">{t(h.note)}</p>}
+              </div>
+            ))}
+          </div>
+          {(s.guide.length > 0 || s.teams.length > 0) && (
+            <details class="how">
+              <summary class="btn">{t('Как проходить')}</summary>
+              {s.guide.length > 0 && <ol class="small">{s.guide.map((step) => <li>{t(step)}</li>)}</ol>}
+              {s.teams.length > 0 && (
+                <div class="stage-teams">
+                  <h4>{t('Команды на этап')}</h4>
+                  <div class="grid">{s.teams.map((tm) => <Team {...tm} />)}</div>
+                </div>
+              )}
+            </details>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+)}
+{part === 'media' && videos.length > 0 && (
+  <section>
+    <h2 class="h-sec">{t('Видео-гайды')}</h2>
+    <VideoGuides videos={videos} />
+  </section>
+)}
+{part === 'media' && external.length > 0 && (
+  <section>
+    <h2 class="h-sec">{t('Дополнительные гайды')}</h2>
+    <ul class="panel more">
+      {external.map((g) => (
+        <li>
+          <a href={g.url} target="_blank" rel="noopener">{t(g.title)}</a>
+          {g.author && <span class="muted small"> — {t(g.author)}</span>}
+          <span class="chip">{g.lang.toUpperCase()}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  section { margin-top: 1.6rem; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; min-width: 36rem; border-collapse: collapse; }
+  th, td { padding: .6rem .8rem; text-align: left; vertical-align: top; }
+  tr + tr th, tr + tr td { border-top: 1px solid var(--border); }
+  .floor-nav { position: sticky; top: var(--top-h); z-index: 5; display: flex; gap: .4rem; padding: .6rem 0; background: var(--bg); overflow-x: auto; scrollbar-width: none; }
+  .floor-nav a { flex: none; padding: .4rem .9rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); text-decoration: none; font-size: .9rem; }
+  .floor-nav a:hover { border-color: var(--accent); color: var(--accent-text); }
+  .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 12px; }
+  .stage { scroll-margin-top: calc(var(--top-h) + 56px); display: grid; align-content: start; gap: .8rem; }
+  .stage header { display: grid; gap: .25rem; }
+  .stage-title { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .stage h3 { margin: 0; }
+  .stage header p { margin: 0; }
+  .weak { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+  .weak .chip { font-size: .8rem; }
+  .effects { margin: 0; padding-left: 1.2rem; display: grid; gap: .3rem; }
+  .halves { display: grid; gap: .8rem; }
+  .half { display: grid; gap: .45rem; padding-top: .7rem; border-top: 1px solid var(--border); }
+  .hl { font: 600 .78rem var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .half ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+  .half p { margin: 0; }
+  .how { margin-top: .2rem; }
+  .how summary { display: inline-flex; align-items: center; gap: .6rem; list-style: none; cursor: pointer; }
+  .how summary::after { content: '⌄'; display: inline-block; transition: transform .2s; }
+  .how[open] summary::after { transform: rotate(180deg); }
+  .how ol { margin: .8rem 0 0; padding-left: 1.3rem; display: grid; gap: .4rem; }
+  .stage-teams h4 { margin: .9rem 0 .6rem; }
+  .stage-teams .grid { margin-top: .6rem; }
+  .more { margin: 0; padding-left: 2.2rem; display: grid; gap: .35rem; }
+  .more li .chip { margin-left: .4rem; font-size: .7rem; }
+  @media (max-width: 640px) {
+    .floor-nav { flex-wrap: nowrap; }
+    .floor-nav a { flex: 0 0 auto; white-space: nowrap; }
+  }
+</style>
