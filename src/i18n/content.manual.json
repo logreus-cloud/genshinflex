@@ -1770,5 +1770,117 @@
  "Звёздный блеск нужен в первом и третьем бою, Крио — во втором. С зловещей сложности персонажей нельзя повторять: заранее соберите три разных отряда.": {
   "en": "Stellar Glimmer is needed in fights 1 and 3, Cryo in fight 2. From Menacing difficulty characters cannot repeat: build three different teams in advance.",
   "es": "El Destello Estelar se necesita en los combates 1 y 3, y Cryo en el 2. Desde Amenazante los personajes no pueden repetirse: prepara tres equipos distintos con antelación."
+ },
+ "Главный ДД Заморозки": {
+  "en": "Freeze main DPS",
+  "es": "DPS principal de Congelación"
+ },
+ "Саб-ДД и хилер Заморозки": {
+  "en": "Freeze sub DPS and healer",
+  "es": "DPS secundario y sanadora de Congelación"
+ },
+ "Саппорт: щит, лечение и Крио": {
+  "en": "Support: shield, healing and Cryo",
+  "es": "Apoyo: escudo, curación y Cryo"
+ },
+ "Сигнатурка, есть на баннере оружия 7.1 (фаза 2)": {
+  "en": "Signature, on the 7.1 weapon banner (phase 2)",
+  "es": "Arma exclusiva, en el gachapón de armas 7.1 (fase 2)"
+ },
+ "Лучший 4★": {
+  "en": "Best 4★",
+  "es": "La mejor 4★"
+ },
+ "Крафтовое": {
+  "en": "Craftable",
+  "es": "Forjable"
+ },
+ "Если не хватает энергии": {
+  "en": "If you're short on energy",
+  "es": "Si te falta energía"
+ },
+ "Лучший для отряда: частицы энергии": {
+  "en": "Best for the team: energy particles",
+  "es": "La mejor para el equipo: partículas de energía"
+ },
+ "5★, усиливает отряд": {
+  "en": "5★, buffs the team",
+  "es": "5★, potencia al equipo"
+ },
+ "3★, прочнее щит и сильнее лечение": {
+  "en": "3★, stronger shield and healing",
+  "es": "3★, escudo más resistente y más curación"
+ },
+ "4 предмета, если в отряде Фурина": {
+  "en": "4-piece, if Furina is in the team",
+  "es": "4 piezas, si Furina está en el equipo"
+ },
+ "4 предмета, против замораживаемых врагов": {
+  "en": "4-piece, against enemies that can be frozen",
+  "es": "4 piezas, contra enemigos que se pueden congelar"
+ },
+ "4 предмета, если больше никто в отряде её не носит": {
+  "en": "4-piece, if no one else in the team wears it",
+  "es": "4 piezas, si nadie más del equipo lo lleva"
+ },
+ "2 + 2, больше лечения": {
+  "en": "2 + 2, more healing",
+  "es": "2 + 2, más curación"
+ },
+ "2 + 2, если не хватает энергии": {
+  "en": "2 + 2, if you're short on energy",
+  "es": "2 + 2, si te falta energía"
+ },
+ "Заморозка с Водяницей": {
+  "en": "Freeze with Vodyanitsa",
+  "es": "Congelación con Vodyanitsa"
+ },
+ "Заморозка с Е Лань": {
+  "en": "Freeze with Yelan",
+  "es": "Congelación con Yelan"
+ },
+ "Заморозка без Эскофье": {
+  "en": "Freeze without Escoffier",
+  "es": "Congelación sin Escoffier"
+ },
+ "Бюджетная Заморозка (Скирк)": {
+  "en": "Budget Freeze (Skirk)",
+  "es": "Congelación económica (Skirk)"
+ },
+ "Вместо Далии подойдёт Барбара": {
+  "en": "Barbara can replace Dahlia",
+  "es": "Barbara puede sustituir a Dahlia"
+ },
+ "Звёздный проводник Сандроне с Дионой": {
+  "en": "Sandrone Stellar-Conduct with Diona",
+  "es": "Superconductor Estelar de Sandrone con Diona"
+ },
+ "Вместо Ци Ци: щит и лечение в Крио-слоте": {
+  "en": "Replaces Qiqi: shield and healing in the Cryo slot",
+  "es": "En lugar de Qiqi: escudo y curación en el hueco Cryo"
+ },
+ "Здесь в основном лечит: снижение сопротивления слабое": {
+  "en": "Mostly heals here: her RES shred is weak",
+  "es": "Aquí sobre todo cura: su reducción de RES es débil"
+ },
+ "Семифазная вспышка": {
+  "en": "Seven-Phase Flash",
+  "es": "Distorsión heptafásica"
+ },
+ "E (долгое нажатие)": {
+  "en": "E (hold)",
+  "es": "E (mantener)"
+ },
+ "E — быстрое нажатие. Q в режиме вспышки бесплатный и поглощает Разрывы пустоты, заряженная атака поглощает следующий. Серию не обрывать до пятого удара: у него самый большой множитель.": {
+  "en": "Tap E. During Seven-Phase Flash her Q is free and absorbs Void Rifts; the Charged Attack absorbs the next one. Don't cut the combo before the fifth hit: it has the biggest multiplier.",
+  "es": "E con toque. Durante la distorsión heptafásica su Q es gratuita y absorbe las fisuras del vacío; el ataque cargado absorbe la siguiente. No cortes la cadena antes del quinto golpe: tiene el mayor multiplicador."
+ },
+ "Навык — каждый раз по откату: кулинарный мек бьёт с поля. Взрыв стихии — когда отряду нужно лечение; после него Эскофье ещё 9 сек. лечит активного персонажа.": {
+  "en": "Use the Skill on cooldown: the Cooking Mek attacks off-field. Use the Burst when the team needs healing; afterwards Escoffier keeps healing the active character for 9 s.",
+  "es": "Usa la habilidad cada vez que se recargue: el mecachef ataca fuera del campo. Usa la definitiva cuando el equipo necesite curación; después Escoffier sigue curando al personaje activo durante 9 s."
+ },
+ "Долгое нажатие даёт щит на 75% прочнее. Поле взрыва стихии стоит на месте, поэтому ставьте его там, где будет драться активный персонаж.": {
+  "en": "Holding E gives a 75% stronger shield. The Burst field doesn't move, so place it where the active character will fight.",
+  "es": "Mantener E da un escudo un 75 % más resistente. El campo de la definitiva no se mueve, así que colócalo donde vaya a luchar el personaje activo."
  }
 }

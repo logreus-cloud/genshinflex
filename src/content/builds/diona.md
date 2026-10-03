@@ -1,40 +1,57 @@
 ---
 character: diona
-role: "Саппорт"
-updated: 2026-09-24
+role: "Саппорт: щит, лечение и Крио"
+updated: 2026-10-03
 patch: "7.1"
 weapons:
   - slug: favonius-warbow
+    note: "Лучший для отряда: частицы энергии"
   - slug: sacrificial-bow
   - slug: elegy-for-the-end
+    note: "5★, усиливает отряд"
   - slug: recurve-bow
-  - slug: end-of-the-line
+    note: "3★, прочнее щит и сильнее лечение"
 artifacts:
   - sets: [noblesse-oblige]
+    note: "4 предмета, если больше никто в отряде её не носит"
+  - sets: [tenacity-of-the-millelith]
     note: "4 предмета"
-  - sets: [tenacity-of-the-millelith, emblem-of-severed-fate]
-    note: "2 + 2"
   - sets: [tenacity-of-the-millelith, maiden-beloved]
-    note: "2 + 2"
-  - sets: [maiden-beloved]
-    note: "4 предмета"
-  - sets: [maiden-beloved, emblem-of-severed-fate]
-    note: "2 + 2"
+    note: "2 + 2, больше лечения"
+  - sets: [tenacity-of-the-millelith, emblem-of-severed-fate]
+    note: "2 + 2, если не хватает энергии"
+  - sets: [instructor]
+    note: "4 предмета, бюджетно"
 mainStats:
-  sands: "Восст. энергии / HP %"
+  sands: "HP % / Восст. энергии"
   goblet: "HP %"
   circlet: "HP % / Бонус лечения"
-substats: ["HP %", "Восст. энергии", "HP"]
+substats: ["Восст. энергии", "HP %", "Шанс крит. попадания"]
+talents: [burst, skill, normal]
 teams:
+  - name: "Заморозка (Аяка)"
+    members: [kamisato-ayaka, mona, diona, venti]
   - name: "Заморозка (Гань Юй)"
     members: [ganyu, mona, diona, venti]
-  - name: "Сверхпроводник (Эола)"
-    members: [eula, fischl, rosaria, diona]
   - name: "Моно-Крио (Аяка)"
     members: [kamisato-ayaka, shenhe, diona, kaedehara-kazuha]
+  - name: "Звёздный проводник Сандроне с Дионой"
+    members: [sandrone, odette, yae-miko, diona]
+    note: "Вместо Ци Ци: щит и лечение в Крио-слоте"
+  - name: "Сверхпроводник (Эола)"
+    members: [eula, fischl, rosaria, diona]
+rotations:
+  - steps: "E (долгое нажатие) → Q → смена персонажа"
+    note: "Долгое нажатие даёт щит на 75% прочнее. Поле взрыва стихии стоит на месте, поэтому ставьте его там, где будет драться активный персонаж."
 sources:
-  - title: genshin.gg
-    url: https://genshin.gg/characters/diona/
+  - title: Game8
+    url: https://game8.co/games/Genshin-Impact/archives/305872
+  - title: genshin.guru
+    url: https://genshin.guru/character/diona/
+  - title: Genshin-info.ru
+    url: https://genshin-info.ru/wiki/personazhi/diona/
+  - title: Wotpack
+    url: https://wotpack.ru/luchshij-bild-dlja-diony-v-genshin-impact/
 external:
   - title: "KeqingMains Quick Guide"
     url: https://keqingmains.com/q/diona-quickguide/
@@ -42,4 +59,16 @@ external:
     lang: en
 ---
 
-Краткий билд по данным сообщества: роль — саппорт, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.
+**Суть:** Диона — универсальный четырёхзвёздочный саппорт: даёт щит, лечит и накладывает Крио. Щит и лечение масштабируются от HP, поэтому её легко собрать: HP% в главных статах, восстановление энергии в допах, и почти любые артефакты подойдут.
+
+**Как играет:** навык «Морозные коготочки» бьёт Крио и создаёт щит, который поглощает Крио-урон с эффективностью 250%. Долгое нажатие выпускает пять коготочков вместо двух и даёт щит на 75% прочнее; чем больше коготочков попало, тем дольше держится щит. Взрыв стихии «Авторский коктейль» создаёт область Прохладительной дымки: она наносит Крио урон и лечит персонажей внутри. Пассивный талант снижает атаку врагов в дымке на 10%.
+
+**Статы:** HP — чем больше, тем лучше, ориентир 20–25 тыс. Восстановление энергии — 150–180%: взрыв стихии стоит 80 ед. энергии. Шанс крит. попадания нужен только с Боевым луком Фавония.
+
+**Партнёры:** классика — Заморозка с Аякой или Гань Юй, где Диона закрывает слот хилера и даёт Крио-резонанс. В 7.x она подходит отрядам Звёздного проводника Сандроне на место Ци Ци: Крио-хилер со щитом. В Сверхпроводнике с Эолой щит защищает от прерываний.
+
+**Созвездия:** C1 возвращает 15 ед. энергии после взрыва стихии — хорошая точка для лёгких вложений. C2 раздаёт щит союзникам рядом. C6 даёт персонажам в дымке +200 к мастерству стихий при HP выше 50% и +30% к получаемому лечению при HP ниже 50% — сильный бафф для отрядов на реакциях.
+
+**Слабые стороны:** поле взрыва стихии стоит на месте, против подвижных и крупных врагов это неудобно. Собственный урон у Дионы низкий, поэтому дамагера с поля она не заменит.
+
+**В баннерах:** Диона — одна из четырёхзвёздочных персонажей первой фазы 7.1 (до 13 октября), и это удобный момент добрать ей созвездия.
