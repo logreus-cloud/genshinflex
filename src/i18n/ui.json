@@ -1,4 +1,52 @@
 {
+ "{mode} в Genshin Impact — текущий цикл: враги по актам и сложностям, слабости, команды, советы и видео.": {
+  "en": "{mode} in Genshin Impact — current cycle: enemies by act and difficulty, weaknesses, teams, tips and videos.",
+  "es": "{mode} en Genshin Impact — ciclo actual: enemigos por acto y dificultad, debilidades, equipos, consejos y vídeos."
+ },
+ "{mode} в Genshin Impact — текущий цикл: враги по боям и сложностям, слабости, команды, советы и видео.": {
+  "en": "{mode} in Genshin Impact — current cycle: enemies by battle and difficulty, weaknesses, teams, tips and videos.",
+  "es": "{mode} en Genshin Impact — ciclo actual: enemigos por combate y dificultad, debilidades, equipos, consejos y vídeos."
+ },
+ "Дополнительные гайды": {
+  "en": "Additional guides",
+  "es": "Guías adicionales"
+ },
+ "Как проходить": {
+  "en": "How to clear",
+  "es": "Cómo superarlo"
+ },
+ "Команды на этап": {
+  "en": "Teams for this stage",
+  "es": "Equipos para esta etapa"
+ },
+ "Особенности": {
+  "en": "Features",
+  "es": "Características"
+ },
+ "Преимущество:": {
+  "en": "Advantage:",
+  "es": "Ventaja:"
+ },
+ "Сложность": {
+  "en": "Difficulty",
+  "es": "Dificultad"
+ },
+ "Универсальные команды": {
+  "en": "General teams",
+  "es": "Equipos generales"
+ },
+ "Уровень врагов": {
+  "en": "Enemy levels",
+  "es": "Niveles de enemigos"
+ },
+ "Уровни сложности": {
+  "en": "Difficulty levels",
+  "es": "Niveles de dificultad"
+ },
+ "Этапы и враги": {
+  "en": "Stages and enemies",
+  "es": "Etapas y enemigos"
+ },
  "(версии 3 и 4) — его выгружают paimon.moe, Starward, SnapHutao и другие трекеры. Новые записи добавятся к уже загруженным без дублей.": {
   "en": "(versions 3 and 4) — exported by paimon.moe, Starward, SnapHutao and other trackers. New entries are merged with what you already have, without duplicates.",
   "es": "(versiones 3 y 4): lo exportan paimon.moe, Starward, SnapHutao y otros rastreadores. Las entradas nuevas se suman a las ya cargadas, sin duplicados."
@@ -702,6 +750,10 @@
  "Вид календаря": {
   "en": "Calendar view",
   "es": "Vista del calendario"
+ },
+ "Вид полосок": {
+  "en": "Bar style",
+  "es": "Estilo de barras"
  },
  "Вид после возвышения": {
   "en": "Ascended look",
@@ -1787,6 +1839,10 @@
   "en": "Petals",
   "es": "Pétalos"
  },
+ "Линия": {
+  "en": "Line",
+  "es": "Línea"
+ },
  "Лучшее 5★ оружие (R1)": {
   "en": "Best 5★ weapon (R1)",
   "es": "Mejor arma 5★ (R1)"
@@ -1838,6 +1894,10 @@
  "Материалы с монстров: 1★ / 2★ / 3★": {
   "en": "Common materials: 1★ / 2★ / 3★",
   "es": "Materiales comunes: 1★ / 2★ / 3★"
+ },
+ "Мелкий": {
+  "en": "Compact",
+  "es": "Compacto"
  },
  "Местный диковинный материал (новый)": {
   "en": "Local specialty (new)",
@@ -3062,6 +3122,10 @@
  "Расскажите, как играть персонажем: суть, ротация, на что обратить внимание. Пустая строка — новый абзац.": {
   "en": "Explain how to play the character: the core idea, the rotation, what to watch out for. An empty line starts a new paragraph.",
   "es": "Explica cómo jugar con el personaje: la idea principal, la rotación y a qué prestar atención. Una línea vacía empieza un párrafo nuevo."
+ },
+ "Расширенный": {
+  "en": "Expanded",
+  "es": "Ampliado"
  },
  "Регион": {
   "en": "Region",

@@ -926,5 +926,849 @@
  "смена персонажа": {
   "en": "switch",
   "es": "cambio"
+ },
+ "Особые гости — Инеффа, Яэ Мико, Тома и Тиори: их можно взять, если они есть у вас, хотя их стихии не входят в сезон": {
+  "en": "Special guests — Ineffa, Yae Miko, Thoma and Chiori: you can use them if you own them, even though their elements are not part of the season",
+  "es": "Invitados especiales — Ineffa, Yae Miko, Thoma y Chiori: puedes usarlos si los tienes, aunque sus elementos no formen parte de la temporada"
+ },
+ "Главные злодеи: акт 3 — Бесконечный механический массив, акт 6 — Фуриоса, акт 8 — Надсмотрщик (сложный режим) или Крылатая химера-лев (визионерский и лунный), акт 10 — Надсмотрщик": {
+  "en": "Main villains: Act 3 — Perpetual Mechanical Array, Act 6 — Furiosa, Act 8 — Overseer Device (Hard mode) or Chimeric Winged Lion (Visionary and Lunar), Act 10 — Overseer Device",
+  "es": "Villanos principales: Acto 3 — Maquinaria Eterna, Acto 6 — Furiosa, Acto 8 — Máquina de control (modo Difícil) o León Quimérico Alado (Visionario y Lunar), Acto 10 — Máquina de control"
+ },
+ "Лёгкий": {
+  "en": "Easy",
+  "es": "Fácil"
+ },
+ "Акты 1–3. Нужно 8 персонажей 60+ уровня": {
+  "en": "Acts 1–3. Requires 8 characters at level 60+",
+  "es": "Actos 1–3. Se necesitan 8 personajes de nivel 60+"
+ },
+ "Обычный": {
+  "en": "Normal",
+  "es": "Normal"
+ },
+ "Акты 1–6. Нужно 12 персонажей 60+ уровня": {
+  "en": "Acts 1–6. Requires 12 characters at level 60+",
+  "es": "Actos 1–6. Se necesitan 12 personajes de nivel 60+"
+ },
+ "Сложный": {
+  "en": "Hard",
+  "es": "Difícil"
+ },
+ "Акты 1–8, в акте 8 — Надсмотрщик. Нужно 16 персонажей 70+ уровня": {
+  "en": "Acts 1–8, Act 8 is the Overseer Device. Requires 16 characters at level 70+",
+  "es": "Actos 1–8; en el acto 8, la Máquina de control. Se necesitan 16 personajes de nivel 70+"
+ },
+ "Визионерский": {
+  "en": "Visionary",
+  "es": "Visionario"
+ },
+ "Акты 1–10, в акте 8 — Крылатая химера-лев. Нужно 22 персонажа 70+ уровня (можно до 26)": {
+  "en": "Acts 1–10, Act 8 is the Chimeric Winged Lion. Requires 22 characters at level 70+ (up to 26 allowed)",
+  "es": "Actos 1–10; en el acto 8, el León Quimérico Alado. Se necesitan 22 personajes de nivel 70+ (hasta 26)"
+ },
+ "Лунный": {
+  "en": "Lunar",
+  "es": "Lunar"
+ },
+ "Акты 1–10 и два испытания Арканы (враги 100 уровня). Нужно 28 персонажей 70+ уровня (можно до 32)": {
+  "en": "Acts 1–10 plus two Arcana Challenges (level 100 enemies). Requires 28 characters at level 70+ (up to 32 allowed)",
+  "es": "Actos 1–10 y dos Desafíos Arcanos (enemigos de nivel 100). Se necesitan 28 personajes de nivel 70+ (hasta 32)"
+ },
+ "Акт 1": {
+  "en": "Act 1",
+  "es": "Acto 1"
+ },
+ "Обычный бой или натиск элиты": {
+  "en": "Normal battle or Elite Assault",
+  "es": "Combate normal o Asalto de élite"
+ },
+ "Все сложности · враги 75 / 80 / 85 уровня": {
+  "en": "All difficulties · enemies Lv. 75 / 80 / 85",
+  "es": "Todas las dificultades · enemigos de nv. 75 / 80 / 85"
+ },
+ "Враги легко собрать в кучу": {
+  "en": "Enemies are easy to group",
+  "es": "Enemigos fáciles de agrupar"
+ },
+ "Лучники и щиты — в натиске элиты": {
+  "en": "Bows and shields — in Elite Assault",
+  "es": "Arcos y escudos — en el Asalto de élite"
+ },
+ "Коварный гром: через некоторое время после начала боя по персонажам бьют молнии": {
+  "en": "Treacherous Thunder: some time after the battle starts, lightning strikes your characters",
+  "es": "Trueno traicionero: un tiempo después de empezar el combate, caen rayos sobre tus personajes"
+ },
+ "Запретная зона (натиск элиты): по арене ползут опасные зоны, внутри них каждые 2 с. наносится чистый урон": {
+  "en": "Performance Restricted Zone (Elite Assault): moving danger zones cross the arena and deal True DMG every 2 s while you stand in them",
+  "es": "Zona restringida (Asalto de élite): zonas peligrosas se mueven por la arena e infligen daño verdadero cada 2 s si estás dentro"
+ },
+ "Обычный бой, часть 1": {
+  "en": "Normal battle, part 1",
+  "es": "Combate normal, parte 1"
+ },
+ "Две волны: сначала слаймы. Звезда — за 65 с.": {
+  "en": "Two waves: slimes first. Star — within 65 s.",
+  "es": "Dos oleadas: primero los slimes. Estrella — en 65 s."
+ },
+ "Обычный бой, часть 2": {
+  "en": "Normal battle, part 2",
+  "es": "Combate normal, parte 2"
+ },
+ "Звезда — за 65 с.": {
+  "en": "Star — within 65 s.",
+  "es": "Estrella — en 65 s."
+ },
+ "Натиск элиты": {
+  "en": "Elite Assault",
+  "es": "Asalto de élite"
+ },
+ "Три волны. Звезда — за 80 с.": {
+  "en": "Three waves. Star — within 80 s.",
+  "es": "Tres oleadas. Estrella — en 80 s."
+ },
+ "Гидро-ДД с уроном по площади (Нёвиллет, Мона) снимает первую волну за пару ударов": {
+  "en": "A Hydro DPS with AoE damage (Neuvillette, Mona) clears the first wave in a couple of hits",
+  "es": "Un DPS Hydro con daño en área (Neuvillette, Mona) limpia la primera oleada en un par de golpes"
+ },
+ "Щит Пиро мага Бездны быстрее всего ломает Гидро": {
+  "en": "Hydro breaks the Pyro Abyss Mage shield fastest",
+  "es": "Hydro rompe más rápido el escudo del Mago del Abismo Pyro"
+ },
+ "Против руинных машин нужен лучник: попадание в слабую точку обездвиживает их": {
+  "en": "Ruin machines call for a bow user: hitting a weak point stuns them",
+  "es": "Contra las máquinas de las ruinas hace falta un arquero: un golpe en el punto débil las inmoviliza"
+ },
+ "Держите щит или хилера — гром и запретные зоны бьют весь бой": {
+  "en": "Bring a shield or healer — thunder and danger zones hit all fight long",
+  "es": "Lleva escudo o sanador: el trueno y las zonas peligrosas golpean todo el combate"
+ },
+ "Акт 2": {
+  "en": "Act 2",
+  "es": "Acto 2"
+ },
+ "Лечащие персонажи": {
+  "en": "Healers",
+  "es": "Sanadores"
+ },
+ "Атаки Усии и Пневмы": {
+  "en": "Ousia and Pneuma attacks",
+  "es": "Ataques de Ousia y Pneuma"
+ },
+ "Гидро и щиты — в натиске элиты": {
+  "en": "Hydro and shields — in Elite Assault",
+  "es": "Hydro y escudos — en el Asalto de élite"
+ },
+ "Две волны: застрельщики, затем Оперативник ветра. Звезда — за 80 с.": {
+  "en": "Two waves: skirmishers, then the Wind Operative. Star — within 80 s.",
+  "es": "Dos oleadas: escaramuzadores y luego el Operativo del Viento. Estrella — en 80 s."
+ },
+ "Две волны. Звезда — за 65 с.": {
+  "en": "Two waves. Star — within 65 s.",
+  "es": "Dos oleadas. Estrella — en 65 s."
+ },
+ "Две волны. Звезда — за 80 с.": {
+  "en": "Two waves. Star — within 80 s.",
+  "es": "Dos oleadas. Estrella — en 80 s."
+ },
+ "Возьмите хилера: застрельщики и Оперативник ветра наносят много мелкого урона": {
+  "en": "Bring a healer: the skirmishers and the Wind Operative deal lots of small hits",
+  "es": "Lleva un sanador: los escaramuzadores y el Operativo del Viento hacen mucho daño pequeño"
+ },
+ "Протогенов расщелин удобно бить атаками Архе — их наносит Фурина": {
+  "en": "Arkhe attacks are handy against the Breacher Primus — Furina deals them",
+  "es": "Los ataques de Arkhe vienen bien contra los Protógenos — Furina los inflige"
+ },
+ "В натиске элиты Гидро гасит пламя Вайоба, а щит спасает от его взрывов": {
+  "en": "In Elite Assault, Hydro douses the Wayob flames and a shield protects you from its blasts",
+  "es": "En el Asalto de élite, Hydro apaga las llamas del Wayob y un escudo te protege de sus explosiones"
+ },
+ "Акт 3": {
+  "en": "Act 3",
+  "es": "Acto 3"
+ },
+ "Кульминация": {
+  "en": "Climactic Showdown",
+  "es": "Enfrentamiento final"
+ },
+ "Все сложности · враг 80 / 85 / 90 уровня": {
+  "en": "All difficulties · enemy Lv. 80 / 85 / 90",
+  "es": "Todas las dificultades · enemigo de nv. 80 / 85 / 90"
+ },
+ "Урон по одной цели": {
+  "en": "Single-target damage",
+  "es": "Daño a un solo objetivo"
+ },
+ "Любая стихия отряда": {
+  "en": "Any element in your party",
+  "es": "Cualquier elemento del equipo"
+ },
+ "Абсолютная защита: массив распадается и призывает руинных стражей. Убейте усиленных стражей — защита спадёт и босс ослабнет": {
+  "en": "Absolute Defense: the Array splits and summons Ruin Sentinels. Defeat the enhanced Sentinels to remove the defense and weaken the boss",
+  "es": "Defensa absoluta: la Maquinaria se divide e invoca centinelas de las ruinas. Derrota a los centinelas potenciados para quitar la defensa y debilitar al jefe"
+ },
+ "Злодей": {
+  "en": "Villain",
+  "es": "Villano"
+ },
+ "Победить за 120 с. Звезда — за 80 с.": {
+  "en": "Defeat within 120 s. Star — within 80 s.",
+  "es": "Derrótalo en 120 s. Estrella — en 80 s."
+ },
+ "Пока живы усиленные стражи, массив почти неуязвим — бейте сначала их": {
+  "en": "While the enhanced Sentinels are alive, the Array is almost invulnerable — kill them first",
+  "es": "Mientras vivan los centinelas potenciados, la Maquinaria es casi invulnerable: elimínalos primero"
+ },
+ "Здесь важен урон по одной цели, а не по площади": {
+  "en": "Single-target damage matters here, not AoE",
+  "es": "Aquí importa el daño a un objetivo, no en área"
+ },
+ "Удобно собрать отряд из стартовых персонажей и гостей: так он получит бонус +20%": {
+  "en": "Building a team from opening characters and guests is convenient: it gets the +20% bonus",
+  "es": "Conviene armar el equipo con personajes iniciales e invitados: así recibe el bono del +20%"
+ },
+ "Нёвиллет со стартовыми": {
+  "en": "Neuvillette with opening characters",
+  "es": "Neuvillette con personajes iniciales"
+ },
+ "Прюн и Нёвиллет — стартовые, Тома — особый гость": {
+  "en": "Prune and Neuvillette are opening characters, Thoma is a special guest",
+  "es": "Prune y Neuvillette son iniciales; Thoma es invitado especial"
+ },
+ "Странник": {
+  "en": "Wanderer",
+  "es": "Wanderer"
+ },
+ "Испытание Арканы I": {
+  "en": "Arcana Challenge I",
+  "es": "Desafío Arcano I"
+ },
+ "Испытание Арканы": {
+  "en": "Arcana Challenge",
+  "es": "Desafío Arcano"
+ },
+ "Только лунный режим · враги 100 уровня": {
+  "en": "Lunar mode only · enemies Lv. 100",
+  "es": "Solo modo Lunar · enemigos de nv. 100"
+ },
+ "Скрытая порча: весь отряд постоянно теряет HP": {
+  "en": "Concealed Corruption: the whole party constantly loses HP",
+  "es": "Corrupción oculta: todo el equipo pierde PV constantemente"
+ },
+ "Каждый побеждённый враг сокращает таймер": {
+  "en": "Each defeated enemy takes time off the countdown",
+  "es": "Cada enemigo derrotado reduce la cuenta atrás"
+ },
+ "Бой до конца отсчёта": {
+  "en": "Fight until the countdown ends",
+  "es": "Combate hasta el final de la cuenta atrás"
+ },
+ "волнами": {
+  "en": "in waves",
+  "es": "en oleadas"
+ },
+ "Продержаться 360 с., в конце в живых должен остаться хотя бы один персонаж. Звезда — победить 17 врагов.": {
+  "en": "Survive 360 s with at least one character standing at the end. Star — defeat 17 enemies.",
+  "es": "Aguanta 360 s con al menos un personaje en pie al final. Estrella — derrota a 17 enemigos."
+ },
+ "Хилер обязателен: порча и гончие наносят урон без перерыва": {
+  "en": "A healer is a must: corruption and the Rifthounds deal damage nonstop",
+  "es": "Un sanador es obligatorio: la corrupción y los Sabuesos hacen daño sin parar"
+ },
+ "Убивайте как можно быстрее — каждая победа отнимает время от таймера": {
+  "en": "Kill as fast as you can — every kill takes time off the timer",
+  "es": "Mata lo más rápido posible: cada victoria resta tiempo al temporizador"
+ },
+ "Испытание засчитывается, только если к концу отсчёта кто-то выжил": {
+  "en": "The challenge counts only if someone is still alive when the countdown ends",
+  "es": "El desafío solo cuenta si alguien sigue vivo al terminar la cuenta atrás"
+ },
+ "Инеффа — особый гость": {
+  "en": "Ineffa is a special guest",
+  "es": "Ineffa es invitada especial"
+ },
+ "Акт 4": {
+  "en": "Act 4",
+  "es": "Acto 4"
+ },
+ "Оборона": {
+  "en": "Defense",
+  "es": "Defensa"
+ },
+ "С обычного режима · враги 85 / 90 уровня": {
+  "en": "From Normal mode · enemies Lv. 85 / 90",
+  "es": "Desde el modo Normal · enemigos de nv. 85 / 90"
+ },
+ "Сильный враг — в обороне под давлением": {
+  "en": "A powerful foe — in High-Pressure Defense",
+  "es": "Un enemigo poderoso — en la Defensa de alta presión"
+ },
+ "Оборона, вариант 1": {
+  "en": "Defense, variant 1",
+  "es": "Defensa, variante 1"
+ },
+ "Защищать монолит 200 с. Звезда — у монолита осталось не меньше 35% HP.": {
+  "en": "Protect the Monolith for 200 s. Star — the Monolith keeps at least 35% HP.",
+  "es": "Protege el Monolito 200 s. Estrella — el Monolito conserva al menos el 35 % de PV."
+ },
+ "Оборона, вариант 2": {
+  "en": "Defense, variant 2",
+  "es": "Defensa, variante 2"
+ },
+ "Защищать монолит 250 с. Звезда — не меньше 35% HP монолита.": {
+  "en": "Protect the Monolith for 250 s. Star — at least 35% Monolith HP.",
+  "es": "Protege el Monolito 250 s. Estrella — al menos el 35 % de PV del Monolito."
+ },
+ "Оборона под давлением": {
+  "en": "High-Pressure Defense",
+  "es": "Defensa de alta presión"
+ },
+ "Защищать монолит 230 с. Звезда — не меньше 35% HP монолита.": {
+  "en": "Protect the Monolith for 230 s. Star — at least 35% Monolith HP.",
+  "es": "Protege el Monolito 230 s. Estrella — al menos el 35 % de PV del Monolito."
+ },
+ "Стойте у монолита и стягивайте врагов: Анемо-притяжение (Кадзуха, Сахароза, Странник с Фарузан) сильно облегчает акт": {
+  "en": "Stay by the Monolith and group enemies: Anemo crowd control (Kazuha, Sucrose, Wanderer with Faruzan) makes the act much easier",
+  "es": "Quédate junto al Monolito y agrupa enemigos: el control Anemo (Kazuha, Sucrose, Wanderer con Faruzan) facilita mucho el acto"
+ },
+ "Победы над врагами сокращают таймер, поэтому урон по площади здесь важнее урона по одной цели": {
+  "en": "Kills shorten the timer, so AoE damage matters more than single-target here",
+  "es": "Las victorias acortan el temporizador, así que aquí el daño en área importa más que el de un objetivo"
+ },
+ "Сухопутный крейсер — главная угроза монолиту: переключайтесь на него, как только он появится": {
+  "en": "The Storm Landcruiser is the main threat to the Monolith: switch to it as soon as it appears",
+  "es": "El Crucero Terrestre es la mayor amenaza para el Monolito: cambia a él en cuanto aparezca"
+ },
+ "Акт 5": {
+  "en": "Act 5",
+  "es": "Acto 5"
+ },
+ "Бой на счёт": {
+  "en": "Kill count battle",
+  "es": "Combate por número de bajas"
+ },
+ "Последний рубеж (натиск элиты): враги получают +25% атаки и ещё +25% за каждого побеждённого, до 3 раз": {
+  "en": "Last Stand (Elite Assault): enemies gain +25% ATK, plus another +25% for each one defeated, up to 3 times",
+  "es": "Última resistencia (Asalto de élite): los enemigos ganan +25 % de ATQ y otro +25 % por cada derrotado, hasta 3 veces"
+ },
+ "За 120 с. победить минимум 15 врагов. Звезда — 21.": {
+  "en": "Defeat at least 15 enemies within 120 s. Star — 21.",
+  "es": "Derrota al menos a 15 enemigos en 120 s. Estrella — 21."
+ },
+ "За 120 с. победить минимум 6 врагов. Звезда — 9.": {
+  "en": "Defeat at least 6 enemies within 120 s. Star — 9.",
+  "es": "Derrota al menos a 6 enemigos en 120 s. Estrella — 9."
+ },
+ "За 120 с. победить минимум 34 врага. Звезда — 40.": {
+  "en": "Defeat at least 34 enemies within 120 s. Star — 40.",
+  "es": "Derrota al menos a 34 enemigos en 120 s. Estrella — 40."
+ },
+ "Здесь важно число побед, а не полная зачистка: всё решают урон по площади и стягивание": {
+  "en": "What counts is the number of kills, not a full clear: AoE damage and grouping decide everything",
+  "es": "Cuenta el número de bajas, no limpiar la sala: el daño en área y el agrupamiento lo deciden todo"
+ },
+ "В натиске элиты атака врагов растёт с каждой победой — возьмите щит или хилера": {
+  "en": "In Elite Assault enemy ATK grows with every kill — bring a shield or healer",
+  "es": "En el Asalto de élite el ATQ enemigo crece con cada baja: lleva escudo o sanador"
+ },
+ "Акт 6": {
+  "en": "Act 6",
+  "es": "Acto 6"
+ },
+ "С обычного режима · враг 90 / 92 уровня": {
+  "en": "From Normal mode · enemy Lv. 90 / 92",
+  "es": "Desde el modo Normal · enemigo de nv. 90 / 92"
+ },
+ "Звёздный блеск": {
+  "en": "Stellar Glimmer",
+  "es": "Destello Estelar"
+ },
+ "Когда Фуриоса зарывается под землю или выпускает град стрел, на поле вырастают корни. Уничтожьте все — приём прервётся и она ослабнет": {
+  "en": "When Furiosa burrows underground or unleashes an arrow shower, roots grow on the field. Destroy them all to interrupt the move and weaken her",
+  "es": "Cuando Furiosa se entierra o lanza una lluvia de flechas, aparecen raíces en el campo. Destrúyelas todas para interrumpir el ataque y debilitarla"
+ },
+ "Реакция Звёздного блеска открывает ядра корней там, где по ним легче попасть": {
+  "en": "A Stellar Glimmer reaction exposes the root cores in spots that are easier to hit",
+  "es": "La reacción de Destello Estelar expone los núcleos de las raíces en lugares más fáciles de golpear"
+ },
+ "закалённая в боях": {
+  "en": "battle-hardened",
+  "es": "curtida en batalla"
+ },
+ "Победить за 105 с. Звезда — за 70 с.": {
+  "en": "Defeat within 105 s. Star — within 70 s.",
+  "es": "Derrótala en 105 s. Estrella — en 70 s."
+ },
+ "Держите на поле Звёздный блеск — корни станет проще разбивать": {
+  "en": "Keep Stellar Glimmer up — the roots become easier to break",
+  "es": "Mantén el Destello Estelar activo: las raíces serán más fáciles de romper"
+ },
+ "Как только Фуриоса уходит под землю, переключайтесь на корни, а не на неё": {
+  "en": "As soon as Furiosa goes underground, switch to the roots, not to her",
+  "es": "En cuanto Furiosa se entierre, ataca las raíces, no a ella"
+ },
+ "Чаще меняйте позицию: стрелы бьют по площади": {
+  "en": "Reposition often: the arrows hit an area",
+  "es": "Cambia de posición a menudo: las flechas golpean en área"
+ },
+ "Странник — стартовый, Тома — особый гость": {
+  "en": "Wanderer is an opening character, Thoma is a special guest",
+  "es": "Wanderer es inicial; Thoma es invitado especial"
+ },
+ "Испытание Арканы II": {
+  "en": "Arcana Challenge II",
+  "es": "Desafío Arcano II"
+ },
+ "Лучники": {
+  "en": "Bow users",
+  "es": "Arqueros"
+ },
+ "Щиты": {
+  "en": "Shields",
+  "es": "Escudos"
+ },
+ "Крио-разряд: время от времени взрывы наносят Крио урон активному персонажу": {
+  "en": "Cryo Discharge: explosions periodically deal Cryo DMG to the active character",
+  "es": "Descarga Cryo: periódicamente hay explosiones que infligen daño Cryo al personaje activo"
+ },
+ "Продержаться 360 с., в конце в живых должен остаться хотя бы один персонаж. Звезда — победить 10 врагов.": {
+  "en": "Survive 360 s with at least one character standing at the end. Star — defeat 10 enemies.",
+  "es": "Aguanta 360 s con al menos un personaje en pie al final. Estrella — derrota a 10 enemigos."
+ },
+ "Драконы руин и Страж руин падают после попаданий в слабые точки — нужен лучник": {
+  "en": "Ruin Drakes and the Ruin Guard go down after hits to their weak points — bring a bow user",
+  "es": "Los Dracos de las ruinas y el Guardián de las ruinas caen tras golpes en sus puntos débiles: lleva un arquero"
+ },
+ "Щит защищает от Крио-разрядов": {
+  "en": "A shield protects against the Cryo Discharges",
+  "es": "Un escudo protege de las descargas Cryo"
+ },
+ "Акт 7": {
+  "en": "Act 7",
+  "es": "Acto 7"
+ },
+ "Со сложного режима · враги 92 уровня": {
+  "en": "From Hard mode · enemies Lv. 92",
+  "es": "Desde el modo Difícil · enemigos de nv. 92"
+ },
+ "Стихийные эффекты": {
+  "en": "Elemental effects",
+  "es": "Efectos elementales"
+ },
+ "Гидро — против Пламени бездны": {
+  "en": "Hydro — against Fathomless Flames",
+  "es": "Hydro — contra las Llamas abismales"
+ },
+ "Давление выживания: через некоторое время после начала боя отряд постоянно теряет HP": {
+  "en": "Survival Pressure: some time after the battle starts, the party constantly loses HP",
+  "es": "Presión de supervivencia: un tiempo después de empezar el combate, el equipo pierde PV constantemente"
+ },
+ "Дублёр (натиск элиты): HP всех врагов время от времени выравнивается по врагу с наибольшим запасом HP": {
+  "en": "Enemy Stunt Double (Elite Assault): every so often all enemies have their HP% set to that of the enemy with the highest HP%",
+  "es": "Doble de riesgo (Asalto de élite): cada cierto tiempo el % de PV de todos los enemigos se iguala al del enemigo con más % de PV"
+ },
+ "Звезда — за 85 с.": {
+  "en": "Star — within 85 s.",
+  "es": "Estrella — en 85 s."
+ },
+ "Звезда — за 95 с.": {
+  "en": "Star — within 95 s.",
+  "es": "Estrella — en 95 s."
+ },
+ "Три волны по два врага. Звезда — за 80 с.": {
+  "en": "Three waves of two enemies. Star — within 80 s.",
+  "es": "Tres oleadas de dos enemigos. Estrella — en 80 s."
+ },
+ "Чтецы Бездны прячутся за стихийным щитом — ломайте его стихией; против Пламени бездны лучше всего Гидро": {
+  "en": "Abyss Lectors hide behind an elemental shield — break it with elements; Hydro works best against Fathomless Flames",
+  "es": "Los Bardos del Abismo se protegen con un escudo elemental: rómpelo con elementos; contra las Llamas abismales, mejor Hydro"
+ },
+ "В натиске элиты не добивайте врагов по одному: из-за Дублёра их HP выравнивается, поэтому выгоднее урон по площади": {
+  "en": "In Elite Assault don't finish enemies one by one: Stunt Double evens out their HP, so AoE damage pays off",
+  "es": "En el Asalto de élite no remates a los enemigos uno a uno: el Doble de riesgo iguala sus PV, así que conviene el daño en área"
+ },
+ "Акт 8": {
+  "en": "Act 8",
+  "es": "Acto 8"
+ },
+ "Со сложного режима · враг 95 уровня": {
+  "en": "From Hard mode · enemy Lv. 95",
+  "es": "Desde el modo Difícil · enemigo de nv. 95"
+ },
+ "Крио — против Надсмотрщика": {
+  "en": "Cryo — against the Overseer Device",
+  "es": "Cryo — contra la Máquina de control"
+ },
+ "Звёздный блеск — против химеры-льва": {
+  "en": "Stellar Glimmer — against the Winged Lion",
+  "es": "Destello Estelar — contra el León Alado"
+ },
+ "Химера-лев по очереди входит в две формы. В форме грома она ослабевает, если сломать её стихийный щит, а разлёт громовых клинков прерывает Звёздный блеск": {
+  "en": "The Chimeric Winged Lion alternates between two forms. In its thunder form it is weakened when its Elemental Ward breaks, and Stellar Glimmer interrupts its spreading thunder blades",
+  "es": "El León Quimérico Alado alterna entre dos formas. En la forma de trueno se debilita al romper su escudo elemental, y el Destello Estelar interrumpe la dispersión de sus hojas de trueno"
+ },
+ "В форме бури химера-лев втягивает Анемо-сферы с поля для заряженной атаки: разбейте сферы или примените Звёздный блеск, и она ослабнет": {
+  "en": "In its gale form the Winged Lion absorbs Anemo orbs on the field to charge an attack: destroy the orbs or use Stellar Glimmer to weaken it",
+  "es": "En la forma de vendaval el León Alado absorbe los orbes Anemo del campo para cargar un ataque: destruye los orbes o usa Destello Estelar para debilitarlo"
+ },
+ "Механики Надсмотрщика — в акте 10": {
+  "en": "Overseer Device mechanics — see Act 10",
+  "es": "Mecánicas de la Máquina de control: ver el acto 10"
+ },
+ "Сложный режим": {
+  "en": "Hard mode",
+  "es": "Modo Difícil"
+ },
+ "Победить за 110 с. Звезда — за 75 с.": {
+  "en": "Defeat within 110 s. Star — within 75 s.",
+  "es": "Derrótalo en 110 s. Estrella — en 75 s."
+ },
+ "Визионерский и лунный режимы": {
+  "en": "Visionary and Lunar modes",
+  "es": "Modos Visionario y Lunar"
+ },
+ "Против химеры-льва держите на поле Звёздный блеск: он сбивает обе формы": {
+  "en": "Against the Winged Lion keep Stellar Glimmer up: it disrupts both forms",
+  "es": "Contra el León Alado mantén el Destello Estelar: interrumpe ambas formas"
+ },
+ "В форме бури сразу разбивайте Анемо-сферы, иначе химера зарядит мощную атаку": {
+  "en": "In the gale form break the Anemo orbs right away, or the Lion will charge a powerful attack",
+  "es": "En la forma de vendaval rompe los orbes Anemo de inmediato o el León cargará un ataque poderoso"
+ },
+ "Против Надсмотрщика подойдёт любой отряд с частым Крио — см. советы к акту 10": {
+  "en": "Any team with frequent Cryo works against the Overseer Device — see the Act 10 tips",
+  "es": "Contra la Máquina de control sirve cualquier equipo con Cryo frecuente: ver los consejos del acto 10"
+ },
+ "Против химеры-льва": {
+  "en": "Against the Winged Lion",
+  "es": "Contra el León Alado"
+ },
+ "Яэ Мико — особый гость": {
+  "en": "Yae Miko is a special guest",
+  "es": "Yae Miko es invitada especial"
+ },
+ "Против Надсмотрщика": {
+  "en": "Against the Overseer Device",
+  "es": "Contra la Máquina de control"
+ },
+ "Акт 9": {
+  "en": "Act 9",
+  "es": "Acto 9"
+ },
+ "Охота за целями": {
+  "en": "Bounty hunt",
+  "es": "Caza de recompensas"
+ },
+ "С визионерского режима · враги 95 уровня": {
+  "en": "From Visionary mode · enemies Lv. 95",
+  "es": "Desde el modo Visionario · enemigos de nv. 95"
+ },
+ "Гидро — против лавы": {
+  "en": "Hydro — against the Avatar of Lava",
+  "es": "Hydro — contra el Avatar de lava"
+ },
+ "Дуэль (натиск элиты): в зоне дуэли элитного врага урон персонажа +40%, а за её пределами он получает урон каждые 2 с.": {
+  "en": "Thrilling Duel (Elite Assault): inside an elite enemy's Duel Zone your character deals +40% DMG; outside it they take DMG every 2 s",
+  "es": "Duelo emocionante (Asalto de élite): dentro de la zona de duelo de un enemigo de élite tu personaje inflige +40 % de daño; fuera, recibe daño cada 2 s"
+ },
+ "Обычный бой, вариант 1": {
+  "en": "Normal battle, variant 1",
+  "es": "Combate normal, variante 1"
+ },
+ "цель": {
+  "en": "bounty",
+  "es": "objetivo"
+ },
+ "Победить 2 цели за 110 с. Звезда — за 75 с.": {
+  "en": "Defeat 2 bounties within 110 s. Star — within 75 s.",
+  "es": "Derrota 2 objetivos en 110 s. Estrella — en 75 s."
+ },
+ "Обычный бой, вариант 2": {
+  "en": "Normal battle, variant 2",
+  "es": "Combate normal, variante 2"
+ },
+ "Победить 3 цели за 120 с. Звезда — за 80 с.": {
+  "en": "Defeat 3 bounties within 120 s. Star — within 80 s.",
+  "es": "Derrota 3 objetivos en 120 s. Estrella — en 80 s."
+ },
+ "Обычные враги появляются бесконечно — не тратьте на них время, бейте только цели": {
+  "en": "Regular enemies spawn endlessly — don't waste time on them, hit only the bounties",
+  "es": "Los enemigos normales aparecen sin fin: no pierdas tiempo con ellos, ataca solo a los objetivos"
+ },
+ "Против воплощения лавы берите Гидро, против лешего и драконов руин — лучника": {
+  "en": "Bring Hydro against the Avatar of Lava, and a bow user against the Leshy and Ruin Drakes",
+  "es": "Lleva Hydro contra el Avatar de lava y un arquero contra el Leshy y los Dracos de las ruinas"
+ },
+ "В натиске элиты стойте в зоне дуэли цели: там +40% урона, а снаружи отряд теряет HP": {
+  "en": "In Elite Assault stay inside the bounty's Duel Zone: +40% DMG there, while outside the party loses HP",
+  "es": "En el Asalto de élite quédate en la zona de duelo del objetivo: dentro hay +40 % de daño y fuera el equipo pierde PV"
+ },
+ "Акт 10": {
+  "en": "Act 10",
+  "es": "Acto 10"
+ },
+ "С визионерского режима · враг 100 уровня": {
+  "en": "From Visionary mode · enemy Lv. 100",
+  "es": "Desde el modo Visionario · enemigo de nv. 100"
+ },
+ "Режим зачистки: сопротивления босса сильно растут, он вращается и копит Импульс потока — чем больше импульс, тем сильнее удары": {
+  "en": "Sweeper Mode: the boss gains greatly increased RES, spins and builds Flow Momentum — the more momentum, the harder it hits",
+  "es": "Modo barrido: las RES del jefe aumentan mucho, gira y acumula Impulso de flujo; cuanto más impulso, más fuerte golpea"
+ },
+ "Крио урон сбивает импульс. Ниже порога босс останавливается, его сопротивления сильно падают, а Крио — сильнее всего": {
+  "en": "Cryo DMG reduces momentum. Below a threshold the boss stops, its RES drops sharply, and Cryo RES drops the most",
+  "es": "El daño Cryo reduce el impulso. Por debajo de un umbral el jefe se detiene y sus RES caen mucho, sobre todo la Cryo"
+ },
+ "Если активный персонаж долго держит Благословение Ночного духа, босс переходит в режим контратаки и бьёт самонаводящимися лучами": {
+  "en": "If the active character holds Nightsoul's Blessing for a while, the boss enters Counterstrike Mode and fires tracking rays",
+  "es": "Si el personaje activo mantiene la bendición noctámbula un tiempo, el jefe entra en modo contraataque y dispara rayos teledirigidos"
+ },
+ "Нужен частый Крио, а не один мощный удар: импульс сбивает каждое попадание": {
+  "en": "You need frequent Cryo, not one big hit: every hit knocks down momentum",
+  "es": "Hace falta Cryo frecuente, no un solo golpe fuerte: cada impacto reduce el impulso"
+ },
+ "Когда босс остановился, выкладывайте весь урон — это главное окно": {
+  "en": "When the boss stops, unload all your damage — that is the main window",
+  "es": "Cuando el jefe se detenga, descarga todo tu daño: es la ventana principal"
+ },
+ "Персонажей Натлана с Благословением Ночного духа на поле лучше не держать: начнутся лучи контратаки": {
+  "en": "Better not keep Natlan characters in Nightsoul's Blessing on the field: it triggers the counterstrike rays",
+  "es": "Mejor no mantener en campo a personajes de Natlan con bendición noctámbula: provocan los rayos de contraataque"
+ },
+ "Сандроне с гостем": {
+  "en": "Sandrone with a guest",
+  "es": "Sandrone con invitada"
+ },
+ "Гиперкэрри Нёвиллета": {
+  "en": "Neuvillette hypercarry",
+  "es": "Hypercarry de Neuvillette"
+ },
+ "Универсальные команды — наш вывод из правил сезона. Команды на отдельные акты — по Game8 и Cyber.Sports.ru; они спрятаны под кнопкой «Как проходить».": {
+  "en": "General teams are our conclusion from the season rules. Teams for individual acts follow Game8 and Cyber.Sports.ru; they are hidden under the “How to clear” button.",
+  "es": "Los equipos generales son nuestra conclusión a partir de las reglas de la temporada. Los equipos por acto siguen a Game8 y Cyber.Sports.ru; están ocultos tras el botón «Cómo superarlo»."
+ },
+ "Версия 7.1 — «Битва сияния»": {
+  "en": "Version 7.1 — “Luminous Battlefront”",
+  "es": "Versión 7.1 — «Campaña luminosa»"
+ },
+ "Три боя подряд, у каждого свой лимит времени. Испытание засчитано, когда побеждены все три босса": {
+  "en": "Three fights in a row, each with its own time limit. The challenge counts once all three bosses are defeated",
+  "es": "Tres combates seguidos, cada uno con su límite de tiempo. El desafío cuenta cuando derrotas a los tres jefes"
+ },
+ "Вознесённые: до 16 персонажей получают усиления, список меняется. На безнадёжной сложности усиления Вознесённых не действуют": {
+  "en": "Exalted Ones: up to 16 characters receive buffs, and the list changes. On Dire difficulty the Exalted Ones’ buffs do not apply",
+  "es": "Ensalzados: hasta 16 personajes reciben mejoras y la lista cambia. En dificultad Funesta las mejoras de los Ensalzados no se aplican"
+ },
+ "Всплеск флуктуаций (30 сентября — 10 октября): после прохождения на тяжёлой сложности и выше можно тратить смолу на артефакты выбранного подземелья и копить престиж натиска": {
+  "en": "Disturbance Outbreak (September 30 — October 10): after clearing Hard or higher you can spend Resin on artifacts from a chosen domain and earn Dire Prestige",
+  "es": "Brote de perturbación (30 de septiembre — 10 de octubre): tras superar Difícil o más puedes gastar resina en artefactos del dominio elegido y acumular prestigio"
+ },
+ "С зловещей сложности персонажа нельзя использовать в двух боях — Звёздный блеск нужен в первом и третьем бою, Крио — во втором": {
+  "en": "From Menacing difficulty a character cannot be used in two fights — Stellar Glimmer is needed in fights 1 and 3, Cryo in fight 2",
+  "es": "Desde la dificultad Amenazante un personaje no puede usarse en dos combates: el Destello Estelar se necesita en los combates 1 y 3, y Cryo en el 2"
+ },
+ "Награды: 450 примогемов за первые три сложности, облик оружия «Сияющий фантазм» за безнадёжную и «Сублимация» за безнадёжную быстрее 180 с.": {
+  "en": "Rewards: 450 Primogems for the first three difficulties, the “Radiant Phantasm” weapon appearance for Dire and “Sublimation” for Dire under 180 s.",
+  "es": "Recompensas: 450 Protogemas por las tres primeras dificultades, la apariencia de arma «Fantasma radiante» por Funesta y «Sublimación» por Funesta en menos de 180 s."
+ },
+ "Обычная": {
+  "en": "Normal",
+  "es": "Normal"
+ },
+ "Открыта сразу, можно играть с подбором игроков": {
+  "en": "Open from the start, matchmaking available",
+  "es": "Disponible desde el inicio, con emparejamiento"
+ },
+ "Продвинутая": {
+  "en": "Advancing",
+  "es": "Avanzada"
+ },
+ "Тяжёлая": {
+  "en": "Hard",
+  "es": "Difícil"
+ },
+ "Открыта сразу. Во время Всплеска флуктуаций даёт артефакты за смолу": {
+  "en": "Open from the start. During the Disturbance Outbreak it rewards artifacts for Resin",
+  "es": "Disponible desde el inicio. Durante el Brote de perturbación da artefactos a cambio de resina"
+ },
+ "Зловещая": {
+  "en": "Menacing",
+  "es": "Amenazante"
+ },
+ "Открывается после тяжёлой. Персонажей нельзя повторять в разных боях, совместная игра — только в своём мире": {
+  "en": "Unlocks after Hard. Characters cannot repeat across fights, co-op only within your own world",
+  "es": "Se desbloquea tras Difícil. Los personajes no pueden repetirse entre combates; cooperativo solo en tu mundo"
+ },
+ "Бесстрашная": {
+  "en": "Fearless",
+  "es": "Intrépida"
+ },
+ "Враги сильно усилены, у боссов новые формы. Награда — только за одиночное прохождение": {
+  "en": "Enemies are greatly enhanced, bosses get new forms. Rewards only for a solo clear",
+  "es": "Los enemigos están muy potenciados y los jefes tienen nuevas formas. Recompensa solo en solitario"
+ },
+ "Безнадёжная": {
+  "en": "Dire",
+  "es": "Funesta"
+ },
+ "Вознесённые без усилений, только одиночная игра. Быстрее 180 с. — облик оружия «Сублимация»": {
+  "en": "Exalted Ones without buffs, solo only. Under 180 s — the “Sublimation” weapon appearance",
+  "es": "Ensalzados sin mejoras, solo en solitario. En menos de 180 s — la apariencia de arma «Sublimación»"
+ },
+ "Бой 1": {
+  "en": "Fight 1",
+  "es": "Combate 1"
+ },
+ "Чурин, закалённый в боях": {
+  "en": "Churin, battle-hardened",
+  "es": "Churin, curtido en batalla"
+ },
+ "Обычная–тяжёлая: обычная форма · зловещая: «Молот и резец» · бесстрашная и безнадёжная: «Рубящий ветер»": {
+  "en": "Normal–Hard: base form · Menacing: “Hammer-and-Chisel” · Fearless and Dire: “Gale Hewing”",
+  "es": "Normal–Difícil: forma base · Amenazante: «Martillo y cincel» · Intrépida y Funesta: «Tallado de vendaval»"
+ },
+ "Анемо — на бесстрашной и безнадёжной": {
+  "en": "Anemo — on Fearless and Dire",
+  "es": "Anemo — en Intrépida y Funesta"
+ },
+ "Время от времени лепит из первозданного льда статую, которая оживает и обстреливает отряд снежками": {
+  "en": "Every so often it carves a Prime Ice sculpture that comes to life and pelts the party with snowballs",
+  "es": "Cada cierto tiempo talla una escultura de hielo primigenio que cobra vida y lanza bolas de nieve al equipo"
+ },
+ "Звёздный блеск по боссу во время лепки срывает её: вместо снеговика получается безобидная фигурка зверя": {
+  "en": "Stellar Glimmer on the boss while it carves interrupts it: instead of a snowman you get a harmless animal statue",
+  "es": "El Destello Estelar sobre el jefe mientras talla lo interrumpe: en lugar de un muñeco de nieve sale una inofensiva estatua de animal"
+ },
+ "С зловещей сложности первую статую он начинает лепить сразу в начале боя": {
+  "en": "From Menacing difficulty it starts carving the first sculpture right at the start of the fight",
+  "es": "Desde Amenazante empieza a tallar la primera escultura nada más comenzar el combate"
+ },
+ "Бесстрашная и безнадёжная: босс стартует с очень высокими сопротивлениями и лепит чаще. Фигурка зверя взрывается, снижает все его сопротивления, а Анемо — сильнее всего (до 3 раз)": {
+  "en": "Fearless and Dire: the boss starts with very high RES and carves more often. The animal statue explodes, lowering all its RES and Anemo RES the most (up to 3 times)",
+  "es": "Intrépida y Funesta: el jefe empieza con RES muy altas y talla más a menudo. La estatua de animal explota y reduce todas sus RES, sobre todo la Anemo (hasta 3 veces)"
+ },
+ "Босс": {
+  "en": "Boss",
+  "es": "Jefe"
+ },
+ "закалённый в боях": {
+  "en": "battle-hardened",
+  "es": "curtido en batalla"
+ },
+ "Первым делом сорвите лепку Звёздным блеском — это и защита от снежков, и снижение сопротивлений": {
+  "en": "First of all, interrupt the carving with Stellar Glimmer — it both protects you from snowballs and lowers its RES",
+  "es": "Lo primero, interrumpe el tallado con Destello Estelar: te protege de las bolas de nieve y reduce sus RES"
+ },
+ "На бесстрашной и безнадёжной считайте взрывы фигурок: после третьего сопротивления минимальны — выкладывайте взрывы стихии": {
+  "en": "On Fearless and Dire count the statue explosions: after the third its RES is at its lowest — unload your bursts",
+  "es": "En Intrépida y Funesta cuenta las explosiones de estatuas: tras la tercera sus RES están al mínimo; usa tus definitivas"
+ },
+ "Не стойте в вихрях на поле, чаще меняйте позицию": {
+  "en": "Don't stand in the vortexes on the field, reposition often",
+  "es": "No te quedes en los vórtices del campo; cambia de posición a menudo"
+ },
+ "Бой 2": {
+  "en": "Fight 2",
+  "es": "Combate 2"
+ },
+ "Автоматон таинственного источника: Надсмотрщик": {
+  "en": "Secret Source Automaton: Overseer Device",
+  "es": "Autómata Fuentenigma - Máquina de control"
+ },
+ "Обычная–тяжёлая: обычная форма · зловещая: «Быстрый удар» · бесстрашная и безнадёжная: «Арсенал уничтожения»": {
+  "en": "Normal–Hard: base form · Menacing: “Swift Strike” · Fearless and Dire: “Obliterator Panoply”",
+  "es": "Normal–Difícil: forma base · Amenazante: «Golpe veloz» · Intrépida y Funesta: «Arsenal aniquilador»"
+ },
+ "Режим зачистки: сопротивления сильно растут, босс вращается и копит Импульс потока — чем больше импульс, тем быстрее вращение и сильнее урон": {
+  "en": "Sweeper Mode: RES greatly increases, the boss spins and builds Flow Momentum — the more momentum, the faster it spins and the more damage it deals",
+  "es": "Modo barrido: las RES aumentan mucho, el jefe gira y acumula Impulso de flujo; cuanto más impulso, más rápido gira y más daño inflige"
+ },
+ "Если активный персонаж долго держит Благословение Ночного духа, босс переходит в режим контратаки: бьёт самонаводящимися лучами, но его сопротивления снижены. Несколько Крио-попаданий в этом режиме полностью останавливают его": {
+  "en": "If the active character holds Nightsoul's Blessing for a while, the boss enters Counterstrike Mode: it fires tracking rays but its RES is lowered. Several Cryo hits in this mode stop it completely",
+  "es": "Si el personaje activo mantiene la bendición noctámbula un tiempo, el jefe entra en modo contraataque: dispara rayos teledirigidos, pero sus RES bajan. Varios golpes Cryo en este modo lo detienen por completo"
+ },
+ "С зловещей сложности режим зачистки включается сразу в начале боя": {
+  "en": "From Menacing difficulty Sweeper Mode starts right at the beginning of the fight",
+  "es": "Desde Amenazante el modo barrido se activa nada más empezar el combate"
+ },
+ "Бесстрашная и безнадёжная: сопротивления ещё выше, Крио сбивает импульс слабее, лучи контратаки сильнее. При первой остановке в каждом цикле выпадают дополнительные сферы энергии": {
+  "en": "Fearless and Dire: RES is even higher, Cryo knocks down less momentum and the counterstrike rays are stronger. The first stop in each cycle drops extra energy orbs",
+  "es": "Intrépida y Funesta: RES aún más altas, el Cryo reduce menos impulso y los rayos de contraataque son más fuertes. La primera detención de cada ciclo suelta orbes de energía extra"
+ },
+ "Крио нужен частый, а не сильный: даже слабые попадания сбивают импульс": {
+  "en": "Cryo needs to be frequent, not strong: even weak hits knock down momentum",
+  "es": "El Cryo debe ser frecuente, no fuerte: incluso los golpes débiles reducen el impulso"
+ },
+ "Остановка босса — главное окно урона, ведь Крио-сопротивление падает сильнее всего": {
+  "en": "The boss stopping is the main damage window, since its Cryo RES drops the most",
+  "es": "Cuando el jefe se detiene llega la principal ventana de daño, porque su RES Cryo es la que más baja"
+ },
+ "Хорошо работают два ДД на поле по очереди: пока один в откате, второй продолжает сбивать импульс": {
+  "en": "Two on-field DPS taking turns work well: while one is on cooldown, the other keeps knocking down momentum",
+  "es": "Funcionan bien dos DPS en campo por turnos: mientras uno espera su enfriamiento, el otro sigue reduciendo el impulso"
+ },
+ "Ризли": {
+  "en": "Wriothesley",
+  "es": "Wriothesley"
+ },
+ "Бой 3": {
+  "en": "Fight 3",
+  "es": "Combate 3"
+ },
+ "Разящая вьюга": {
+  "en": "Guardian Blade of Drifting Snow",
+  "es": "Espadachina Protectora Surcanieves"
+ },
+ "Обычная–тяжёлая: обычная форма · зловещая: «Реприза» · бесстрашная и безнадёжная: «Бесконечное эхо»": {
+  "en": "Normal–Hard: base form · Menacing: “Reprise” · Fearless and Dire: “Endless Reverberation”",
+  "es": "Normal–Difícil: forma base · Amenazante: «Reprise» · Intrépida y Funesta: «Reverberación infinita»"
+ },
+ "Электро, Анемо, Пиро — до зловещей": {
+  "en": "Electro, Anemo, Pyro — below Fearless",
+  "es": "Electro, Anemo, Pyro — por debajo de Intrépida"
+ },
+ "Пиро — на бесстрашной и безнадёжной": {
+  "en": "Pyro — on Fearless and Dire",
+  "es": "Pyro — en Intrépida y Funesta"
+ },
+ "Потеряв часть HP, заключает себя в Ледяной гроб с Крио-щитом и бьёт ледяными бурями (один раз за бой)": {
+  "en": "After losing some HP it encases itself in an Ice Coffin with a Cryo Ward and attacks with icy storms (once per fight)",
+  "es": "Tras perder parte de sus PV se encierra en un Ataúd de hielo con un escudo Cryo y ataca con tormentas heladas (una vez por combate)"
+ },
+ "Не сломали гроб — босс восстанавливает HP и контратакует ледяными мечами. Сломали — он на время ослаблен и получает урон отдачи": {
+  "en": "Coffin not broken — the boss restores HP and counterattacks with ice swords. Broken — it is weakened for a while and takes backlash DMG",
+  "es": "Si no rompes el ataúd, el jefe recupera PV y contraataca con espadas de hielo. Si lo rompes, queda debilitado un tiempo y recibe daño de rebote"
+ },
+ "Под Звёздным блеском Электро и Анемо ломают щит быстрее": {
+  "en": "Under Stellar Glimmer, Electro and Anemo break the ward faster",
+  "es": "Bajo el Destello Estelar, Electro y Anemo rompen el escudo más rápido"
+ },
+ "Бесстрашная и безнадёжная: щит прочнее, а вскоре после первого разрушения появляется второй. Под Звёздным блеском щит превращается в барьер, поглощающий урон, — его разрушение наносит огромную отдачу": {
+  "en": "Fearless and Dire: the ward is tougher, and a second one appears shortly after the first breaks. Under Stellar Glimmer the ward turns into a DMG-absorbing shield — breaking it deals huge backlash",
+  "es": "Intrépida y Funesta: el escudo es más resistente y poco después de romperlo aparece un segundo. Bajo el Destello Estelar se convierte en un escudo que absorbe daño; romperlo inflige un rebote enorme"
+ },
+ "Сохраните взрывы стихии к появлению гроба: сломать щит важнее, чем снять HP": {
+  "en": "Save your bursts for the coffin: breaking the ward matters more than chipping HP",
+  "es": "Guarda tus definitivas para el ataúd: romper el escudo importa más que quitar PV"
+ },
+ "На бесстрашной и безнадёжной бонус Электро и Анемо пропадает — берите Пиро или Звёздный блеск": {
+  "en": "On Fearless and Dire the Electro and Anemo bonus is gone — bring Pyro or Stellar Glimmer",
+  "es": "En Intrépida y Funesta desaparece la ventaja de Electro y Anemo: lleva Pyro o Destello Estelar"
+ },
+ "Этот отряд нужен последним — на зловещей и выше не тратьте его персонажей в первых боях": {
+  "en": "This team is needed last — on Menacing and above, don't spend its characters in the earlier fights",
+  "es": "Este equipo se usa al final: en Amenazante o más, no gastes a sus personajes en los combates anteriores"
+ },
+ "Звёздный проводник с Одеттой": {
+  "en": "Stellar-Conduct with Odette",
+  "es": "Superconductor Estelar con Odette"
+ },
+ "Пиро против щита": {
+  "en": "Pyro against the ward",
+  "es": "Pyro contra el escudo"
+ },
+ "Звёздный блеск нужен в первом и третьем бою, Крио — во втором. С зловещей сложности персонажей нельзя повторять: заранее соберите три разных отряда.": {
+  "en": "Stellar Glimmer is needed in fights 1 and 3, Cryo in fight 2. From Menacing difficulty characters cannot repeat: build three different teams in advance.",
+  "es": "El Destello Estelar se necesita en los combates 1 y 3, y Cryo en el 2. Desde Amenazante los personajes no pueden repetirse: prepara tres equipos distintos con antelación."
  }
 }

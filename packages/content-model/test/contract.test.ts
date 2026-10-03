@@ -90,10 +90,8 @@ const sanityOnly: Exception[] = [
   { collection: 'rotations', path: 'slug', reason: 'Слаг файла хранится только в Sanity.' },
   { collection: 'rotations', path: 'halves[].need[].elements', reason: 'cms-mapping.ts превращает массив стихий в elementGroup.', subtree: true },
   { collection: 'rotations', path: 'floors[].chambers[].halves[].enemies[].name', reason: 'cms-mapping.ts превращает строкового врага в enemyText.' },
+  { collection: 'rotations', path: 'floors[].chambers[].halves[].label', reason: 'Общее поле rotationEnemyHalf используется этапами; у залов Бездны подписи половин задаются порядком.' },
   { collection: 'rotations', path: 'stages[].halves[].enemies[].name', reason: 'cms-mapping.ts превращает строкового врага в enemyText.' },
-  { collection: 'rotations', path: 'stages[].halves[].enemies[].id', reason: 'Sanity допускает enemy наряду с enemyText; zod этапа хранит строки.' },
-  { collection: 'rotations', path: 'stages[].halves[].enemies[].n', reason: 'Sanity допускает enemy наряду с enemyText; zod этапа хранит строки.' },
-  { collection: 'rotations', path: 'stages[].halves[].enemies[].note', reason: 'Sanity допускает enemy наряду с enemyText; zod этапа хранит строки.' },
 
   { collection: 'banners', path: 'syncHash', reason: syncMarker },
   { collection: 'banners', path: 'slug', reason: 'Слаг файла хранится только в Sanity.' },
