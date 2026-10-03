@@ -47,6 +47,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
 <html lang={lang} data-season={season.theme ?? undefined}>
   <head>
     <ClientRouter />
+    <meta name="gf-build" content={__GF_BUILD__} />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
