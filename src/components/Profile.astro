@@ -4,24 +4,26 @@ import AccountStrip from './AccountStrip.astro';
 import { useData } from '../lib/data';
 import namecards from '../data/generated/namecards.json';
 
+interface Props { mode?: 'own' | 'public' }
+const { mode = 'own' } = Astro.props;
 const { base, t, characters } = useData(Astro.currentLocale);
 const cards = namecards as Record<string, string>;
 const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, rarity }) => ({
   slug, name, icon, element, rarity, namecard: cards[slug] ?? '',
 }))).replace(/</g, '\\u003c');
 ---
-<Layout title={t('Мой профиль')} description={t('Избранное, персонажи и история круток.')}>
-  <div class="profile-root profile-page">
+<Layout title={t(mode === 'public' ? 'Профиль игрока' : 'Мой профиль')} description={t(mode === 'public' ? 'Публичный профиль игрока на GenshinFlex.' : 'Избранное, персонажи и история круток.')} noindex={mode === 'public'}>
+  <div class="profile-root profile-page" data-mode={mode}>
     <div class="profile-bg" id="profile-bg" aria-hidden="true"></div>
     <canvas class="profile-effect" id="profile-effect" aria-hidden="true" hidden></canvas>
-    <AccountStrip />
+    {mode === 'own' && <AccountStrip />}
     <section class="profile-card hero">
       <div class="banner" id="profile-banner">
         <img id="profile-cover" alt="" hidden />
-        <button class="btn edit-profile" id="edit-profile" type="button" disabled>
+        {mode === 'own' && <button class="btn edit-profile" id="edit-profile" type="button" disabled>
           <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m4 13 9-9 3 3-9 9-4 1 1-4ZM11.5 5.5l3 3" /></svg>
           {t('Настроить профиль')}
-        </button>
+        </button>}
       </div>
       <div class="hero-content">
         <div class="hero-info">
@@ -36,10 +38,19 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
               <h1 id="profile-name">{t('Путешественник')}</h1>
               <span class="title-chip" id="profile-title" hidden></span>
             </div>
+            {mode === 'public' && <p class="muted handle" id="profile-handle" hidden></p>}
             <p id="profile-about" hidden></p>
             <p class="muted" id="profile-meta" hidden></p>
           </div>
         </div>
+        {mode === 'own' && <div class="public-actions">
+          <a class="btn" id="public-link" hidden>{t('Публичная страница')}</a>
+          <button class="btn" id="public-copy" type="button" hidden>{t('Скопировать ссылку')}</button>
+          <span class="muted" id="public-hidden-note" hidden>{t('Профиль скрыт')}</span>
+        </div>}
+        {mode === 'public' && <p class="status" id="public-profile-status" aria-live="polite">{t('Загружаю…')}</p>}
+        {mode === 'public' && <a class="btn" id="public-own-link" href={`${base}/profile/`} hidden>{t('Это ваш профиль — настроить')}</a>}
+        {mode === 'own' && <>
         <form id="showcase-form">
           <label for="profile-uid">{t('UID')}</label>
           <div class="uid-row">
@@ -52,12 +63,14 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
           <h2>{t('Витрина')}</h2>
           <div class="strip" id="showcase-list"></div>
         </div>
+        </>}
       </div>
     </section>
     <section class="profile-card favorite-card" id="profile-favorites" hidden>
       <h2>{t('Любимые персонажи')}</h2>
       <div class="favorite-grid" id="profile-favorites-list"></div>
     </section>
+    {mode === 'own' && <>
     <div class="profile-grid">
       <section class="profile-card">
         <h2>{t('Избранное')}</h2>
@@ -114,6 +127,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <label for="editor-about">{t('О себе')}</label>
             <textarea class="input" id="editor-about" maxlength="300" rows="4"></textarea>
             <small id="about-count"></small>
+          </div>
+          <!-- Публичный адрес и видимость хранятся в аккаунте и меняются сразу, без «Готово» -->
+          <div class="editor-field" id="public-field" hidden>
+            <label for="public-nick">{t('Адрес профиля')}</label>
+            <div class="public-nick-row">
+              <span class="public-prefix">genshinflex.com/u/</span>
+              <input class="input" id="public-nick" maxlength="24" autocomplete="off" spellcheck="false" pattern="[A-Za-z0-9_\-]{3,24}" />
+              <button class="btn" id="public-nick-save" type="button">{t('Сохранить')}</button>
+            </div>
+            <small class="status" id="public-nick-status" aria-live="polite">{t('3–24 символа: латиница, цифры, _ и -')}</small>
+            <label class="public-visible"><input id="public-visible" type="checkbox" />{t('Показывать профиль всем по ссылке')}</label>
           </div>
           <!-- Титул хранится в аккаунте и меняется сразу, без «Готово» -->
           <div class="editor-field" id="title-field" data-none={t('Без титула')} hidden>
@@ -238,6 +262,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         <button class="btn primary" id="save-editor" type="button">{t('Готово')}</button>
       </div>
     </dialog>
+    </>}
   </div>
   <script type="application/json" id="profile-chars" set:html={charsJson}></script>
 </Layout>
@@ -253,6 +278,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const colorOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
 
   onPage((signal) => {
+    if (document.querySelector('.profile-root[data-mode="public"]')) return;
     const chip = document.getElementById('profile-title');
     const field = document.getElementById('title-field');
     const select = document.getElementById('profile-title-select') as HTMLSelectElement | null;
@@ -340,6 +366,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 </script>
 
 <script>
+  import { onPage } from '../scripts/router';
+  import { initPublicSettings } from '../scripts/profile-public-settings';
+
+  onPage((signal) => {
+    if (document.querySelector('.profile-root[data-mode="own"]')) initPublicSettings(signal);
+  });
+</script>
+
+<script>
   import { favorites, recent, store, type Entry } from '../scripts/common';
   import { BASE, t } from '../scripts/search';
   import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
@@ -348,16 +383,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { userData, userDataKey } from '../scripts/user-data';
   import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
   import { onSessionChange } from '../scripts/user-data/session';
+  import {
+    type Avatar, type BackgroundType, type CoverType, type Custom, type PickerChar,
+    accentHex, colors, colorNames, createEffect, effects, el, emptyCustom, extraColors,
+    frameMarks, frames, hexOk, iconUrl, img, mediaKeys, readPickerChars,
+    renderAppearance, renderAvatar, renderCover, usesMedia, validCustom,
+  } from '../scripts/profile-view';
 
   type Char = { id: number | null; s: string; n: string; i: string };
-  type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
   type Profile = { uid: string; time: number; player: { nickname: string; level: number; worldLevel: number; signature: string; profilePictureId?: number }; showcase: number[] };
-  type Avatar = { type: 'none' } | { type: 'character'; slug: string } | { type: 'upload' };
-  type CoverType = 'none' | 'namecard' | 'upload';
-  type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
-  type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss';
-  type Effect = 'none' | 'snow' | 'sparks' | 'petals' | 'stars' | 'fireflies' | 'blizzard';
-  type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
   // Избранное по языкам: старые файлы экспорта содержат только ru — остальные языки тогда не трогаем
   type ImportData = { custom: Custom; favs: Partial<Record<'ru' | 'en' | 'es', Entry[]>>; roster: RosterEntry[]; uid: string | null; media: Partial<Record<MediaKey, Blob>> };
   // Запись «Моих персонажей» целиком: прокачку проверяет и нормализует team-check, профиль её только переносит
@@ -368,32 +402,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
   const uidOk = (value: unknown): value is string => typeof value === 'string' && /^\d{9,10}$/.test(value);
   const num = (value: unknown) => value !== null && value !== undefined && Number.isFinite(Number(value)) ? Number(value) : null;
-  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', label = '') => { const node = document.createElement(tag); node.className = className; node.textContent = label; return node; };
-  const iconUrl = (value: unknown) => { if (typeof value !== 'string') return null; try { const url = new URL(value, location.origin); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } };
   const safeHref = (value: string) => { if (!value.startsWith('/') || value.startsWith('//')) return null; try { const url = new URL(value, location.origin); return url.origin === location.origin ? url.pathname + url.search + url.hash : null; } catch { return null; } };
-  const img = (src: string, size: number) => { const node = document.createElement('img'); node.src = src; node.alt = ''; node.width = size; node.height = size; node.loading = 'lazy'; node.decoding = 'async'; return node; };
-  const colors = ['accent', 'pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'] as const;
-  const colorNames = ['Золото сайта', 'Пиро', 'Гидро', 'Анемо', 'Электро', 'Дендро', 'Крио', 'Гео'];
-  const extraColors = [
-    ['pink', 'Розовый', '#ff6fa8'], ['turquoise', 'Бирюзовый', '#3fd0c9'], ['emerald', 'Изумрудный', '#3ecf7a'],
-    ['lavender', 'Лавандовый', '#a78bfa'], ['scarlet', 'Алый', '#ff4d5e'], ['silver', 'Серебро', '#c9d3e3'],
-  ] as const;
-  const frames: [Frame, string][] = [['none', 'Без рамки'], ['gold', 'Золото'], ['accent', 'Цвет профиля'], ['ice', 'Лёд'], ['constellation', 'Созвездие'], ['flame', 'Пламя'], ['petals', 'Лепестки'], ['abyss', 'Бездна']];
-  const effects: [Effect, string][] = [['none', 'Нет'], ['snow', 'Снегопад'], ['sparks', 'Искры'], ['petals', 'Лепестки'], ['stars', 'Звёздное небо'], ['fireflies', 'Светлячки'], ['blizzard', 'Метель']];
-  const elements = ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'];
-  const mediaKeys: MediaKey[] = ['avatar', 'cover', 'background'];
-  const hexOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
-  const colorOk = (value: unknown): value is string => typeof value === 'string' && (hexOk(value) || colors.some((color) => color === value) || extraColors.some(([key]) => key === value));
-  const bounded = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max;
-  const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
 
   onPage((signal) => {
   const root = document.querySelector<HTMLElement>('.profile-root');
-  if (!root) return;
-  const rawChars: unknown = (() => { try { return JSON.parse($('profile-chars').textContent ?? '[]'); } catch { return []; } })();
-  const pickerChars: PickerChar[] = Array.isArray(rawChars) ? rawChars.filter((item): item is PickerChar =>
-    isRecord(item) && typeof item.slug === 'string' && /^[a-z0-9-]+$/.test(item.slug) && typeof item.name === 'string' &&
-    typeof item.icon === 'string' && typeof item.element === 'string' && typeof item.rarity === 'number' && typeof item.namecard === 'string') : [];
+  if (!root || root.dataset.mode === 'public') return;
+  const pickerChars = readPickerChars($('profile-chars'));
   const pickerBySlug = new Map(pickerChars.map((char) => [char.slug, char]));
   const charsById = new Map<number, Char>();
   const charsBySlug = new Map<string, Char>();
@@ -402,8 +416,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const placeholder = avatar.firstElementChild!.cloneNode(true);
   const dialog = $<HTMLDialogElement>('profile-dialog');
   const editButton = $<HTMLButtonElement>('edit-profile');
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let saved = emptyCustom(), draft = emptyCustom(), avatarTab: Avatar['type'] = 'character';
+  const effect = createEffect($<HTMLCanvasElement>('profile-effect'), () => draft, signal);
+  const { reduced } = effect;
+  reduced.addEventListener('change', () => { $('effect-reduced').hidden = !reduced.matches; }, { signal });
   let pendingImport: ImportData | null = null, confirmedImport: ImportData | null = null, keepChanges = false;
   let editorSession = 0, importSelection = 0, saving = false, exporting = false;
   let sessionGeneration = 0, editorGeneration = 0;
@@ -419,56 +435,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   let showcaseController: AbortController | null = null;
   const cancelShowcase = () => { ++showcaseRequest; showcaseController?.abort(); showcaseController = null; $<HTMLButtonElement>('load-showcase').disabled = false; };
 
-  function validCustom(value: unknown) {
-    const result = emptyCustom();
-    if (value === null) return { value: result, valid: true };
-    if (!isRecord(value) || value.v !== 1) return { value: result, valid: false };
-    let valid = true;
-    if (typeof value.nick === 'string' && value.nick.length <= 24) result.nick = value.nick; else valid = false;
-    if (typeof value.about === 'string' && value.about.length <= 300) result.about = value.about; else valid = false;
-    if (value.media !== undefined) {
-      if (!isRecord(value.media)) valid = false;
-      else for (const key of mediaKeys) {
-        const id = value.media[key];
-        if (id === undefined) continue;
-        if (typeof id === 'string' && /^[a-z0-9-]{1,64}$/i.test(id)) result.media[key] = id;
-        else valid = false;
-      }
-    }
-    if (isRecord(value.avatar)) {
-      if (value.avatar.type === 'none') result.avatar = { type: 'none' };
-      else if (value.avatar.type === 'character' && typeof value.avatar.slug === 'string' && pickerBySlug.has(value.avatar.slug)) result.avatar = { type: 'character', slug: value.avatar.slug };
-      else if (value.avatar.type === 'upload' && value.avatar.data === undefined) result.avatar = { type: 'upload' };
-      else valid = false;
-    } else valid = false;
-    if (typeof value.cover === 'string' && (!value.cover || !!pickerBySlug.get(value.cover)?.namecard)) result.cover = value.cover; else valid = false;
-    if (value.coverType === undefined) result.coverType = result.cover ? 'namecard' : 'none';
-    else if (value.coverType === 'none' || value.coverType === 'upload' || value.coverType === 'namecard') result.coverType = value.coverType;
-    else valid = false;
-    if (result.coverType === 'namecard' && !result.cover) valid = false;
-    if (value.coverPosition === undefined || bounded(value.coverPosition, 0, 100)) result.coverPosition = value.coverPosition as number ?? 50; else valid = false;
-    if (colorOk(value.color)) result.color = value.color; else valid = false;
-    if (value.frame === undefined || frames.some(([key]) => key === value.frame)) result.frame = value.frame as Frame ?? 'none'; else valid = false;
-    if (value.effect === undefined || effects.some(([key]) => key === value.effect)) result.effect = value.effect as Effect ?? 'none'; else valid = false;
-    if (value.intensity === undefined || bounded(value.intensity, 25, 100)) result.intensity = value.intensity as number ?? 50; else valid = false;
-    if (value.background !== undefined) {
-      const bg = value.background;
-      if (isRecord(bg) && ['default', 'namecard', 'upload', 'color'].includes(String(bg.type)) &&
-        typeof bg.slug === 'string' && (!bg.slug || !!pickerBySlug.get(bg.slug)?.namecard) &&
-        bounded(bg.darken, 0, 80) && bounded(bg.blur, 0, 12) && typeof bg.gradient === 'boolean' &&
-        (bg.type !== 'namecard' || !!bg.slug)) result.background = bg as Custom['background'];
-      else valid = false;
-    }
-    if (Array.isArray(value.favorites)) {
-      const unique = new Set<string>();
-      for (const slug of value.favorites) {
-        if (typeof slug === 'string' && pickerBySlug.has(slug) && !unique.has(slug) && unique.size < 6) unique.add(slug);
-        else valid = false;
-      }
-      result.favorites = [...unique];
-    } else valid = false;
-    return { value: result, valid };
-  }
+
   function validEntries(value: unknown) {
     if (!Array.isArray(value)) return null;
     const list: Entry[] = [];
@@ -508,83 +475,13 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     link.append(el('span', '', char.n));
     parent.append(link);
   }
-  const usesMedia = (custom: Custom, key: MediaKey) => key === 'avatar' ? custom.avatar.type === 'upload' : key === 'cover' ? custom.coverType === 'upload' : custom.background.type === 'upload';
-  function accentHex() {
-    if (hexOk(draft.color)) return draft.color.toLowerCase();
-    const extra = extraColors.find(([key]) => key === draft.color);
-    if (extra) return extra[2];
-    return getComputedStyle(document.documentElement).getPropertyValue(`--${draft.color}`).trim() || '#e3b04b';
-  }
-  function accentInk(hex: string) {
-    const channels = [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16) / 255).map((value) => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4);
-    return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722 > .5 ? '#20212a' : '#ffffff';
-  }
   const mediaSource = (key: MediaKey) => stagedMedia.get(key)?.url ?? committedUrls.get(key) ?? null;
-  function frameMarks(shell: HTMLElement) {
-    const decoration = shell.querySelector<HTMLElement>('.frame-decoration');
-    if (!decoration || decoration.querySelector('.frame-mark')) return;
-    for (let index = 0; index < 8; index++) {
-      const mark = el('span', 'frame-mark');
-      mark.style.setProperty('--mark-index', String(index));
-      decoration.append(mark);
-    }
-  }
-  function renderAvatar(box: HTMLElement, shell: HTMLElement) {
-    box.replaceChildren(placeholder.cloneNode(true));
-    const src = draft.avatar.type === 'character' ? iconUrl(pickerBySlug.get(draft.avatar.slug)?.icon) : draft.avatar.type === 'upload' ? mediaSource('avatar') : null;
-    if (src) box.replaceChildren(img(src, 96));
-    shell.dataset.frame = draft.frame;
-  }
-  function renderBackground() {
-    const layer = $('profile-bg');
-    const bg = draft.background;
-    const src = bg.type === 'upload' ? mediaSource('background') : bg.type === 'namecard' ? iconUrl(pickerBySlug.get(bg.slug)?.namecard) : null;
-    layer.style.backgroundImage = src ? `url("${src}")` : bg.type === 'color' ? bg.gradient ? `linear-gradient(135deg, ${accentHex()}, var(--bg-deep))` : 'none' : 'none';
-    layer.style.backgroundColor = bg.type === 'color' ? accentHex() : 'transparent';
-    layer.style.setProperty('--profile-darken', String(bg.darken / 100));
-    layer.style.setProperty('--profile-blur', `${bg.blur}px`);
-    layer.hidden = bg.type === 'default' || ((bg.type === 'upload' || bg.type === 'namecard') && !src);
-    document.documentElement.classList.toggle('profile-custom-bg', !layer.hidden);
-  }
   function renderPersonal() {
-    const accent = accentHex();
-    root.style.setProperty('--profile-accent', accent);
-    root.style.setProperty('--profile-accent-ink', accentInk(accent));
-    $('profile-name').textContent = draft.nick || currentProfile?.player.nickname || t('Путешественник');
+    renderAppearance(root, draft, pickerBySlug, mediaSource, draft.nick || currentProfile?.player.nickname || t('Путешественник'), placeholder, effect);
     $('preview-name').textContent = $('profile-name').textContent;
-    const about = $('profile-about');
-    about.textContent = draft.about;
-    about.hidden = !draft.about;
-    const coverSrc = draft.coverType === 'upload' ? mediaSource('cover') : draft.coverType === 'namecard' ? iconUrl(pickerBySlug.get(draft.cover)?.namecard) : null;
-    for (const id of ['profile-cover', 'preview-cover']) {
-      const cover = $<HTMLImageElement>(id);
-      cover.hidden = !coverSrc;
-      cover.style.objectPosition = `center ${draft.coverPosition}%`;
-      if (coverSrc) cover.src = coverSrc; else cover.removeAttribute('src');
-    }
-    renderAvatar(avatar, $('profile-avatar-shell'));
-    renderAvatar(previewAvatar, $('preview-avatar-shell'));
-    const box = $('profile-favorites-list');
-    box.replaceChildren();
-    for (const slug of draft.favorites) {
-      const char = pickerBySlug.get(slug);
-      if (!char) continue;
-      const link = document.createElement('a');
-      link.href = `${BASE}/characters/${char.slug}/`;
-      link.className = `favorite-tile r${char.rarity === 5 ? 5 : 4}`;
-      link.setAttribute('data-el', elements.includes(char.element) ? char.element : '');
-      const portrait = el('span', 'favorite-portrait');
-      const image = iconUrl(char.icon);
-      if (image) portrait.append(img(image, 88));
-      const name = el('span', 'favorite-name', char.name);
-      const element = el('span', 'favorite-element');
-      element.setAttribute('aria-label', t(colorNames[colors.indexOf(char.element as typeof colors[number])] ?? 'Персонаж'));
-      link.append(portrait, name, element);
-      box.append(link);
-    }
-    $('profile-favorites').hidden = !box.childElementCount;
-    renderBackground();
-    renderEffect();
+    renderCover($<HTMLImageElement>('preview-cover'), draft, pickerBySlug, mediaSource);
+    renderAvatar(previewAvatar, $('preview-avatar-shell'), draft, pickerBySlug, mediaSource, placeholder);
+    $('effect-reduced').hidden = !reduced.matches;
   }
   function renderProfile() {
     const player = currentProfile?.player;
@@ -797,8 +694,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     $<HTMLInputElement>('background-blur').value = String(draft.background.blur);
     $<HTMLInputElement>('background-gradient').checked = draft.background.gradient;
     $<HTMLInputElement>('effect-intensity').value = String(draft.intensity);
-    $<HTMLInputElement>('color-picker').value = accentHex();
-    $<HTMLInputElement>('color-hex').value = accentHex();
+    $<HTMLInputElement>('color-picker').value = accentHex(draft.color);
+    $<HTMLInputElement>('color-hex').value = accentHex(draft.color);
     $('effect-reduced').hidden = !reduced.matches;
   }
   function setAvatarTab(tab: Avatar['type']) {
@@ -845,69 +742,6 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     $<HTMLInputElement>('editor-name').focus();
   }
 
-  type Particle = { x: number; y: number; vx: number; vy: number; size: number; phase: number; spin: number };
-  const canvas = $<HTMLCanvasElement>('profile-effect');
-  let particles: Particle[] = [], effectFrame = 0, effectKey = '', effectLast = 0, resizeTimer = 0;
-  function stopEffect() { cancelAnimationFrame(effectFrame); effectFrame = 0; effectKey = ''; particles = []; canvas.hidden = true; }
-  function sizeEffect() {
-    const ratio = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.round(innerWidth * ratio));
-    canvas.height = Math.max(1, Math.round((innerHeight - canvas.getBoundingClientRect().top) * ratio));
-    canvas.style.width = `${innerWidth}px`;
-    canvas.style.height = `${Math.max(1, innerHeight - canvas.getBoundingClientRect().top)}px`;
-    canvas.getContext('2d')?.setTransform(ratio, 0, 0, ratio, 0, 0);
-    particles = Array.from({ length: Math.min(120, Math.round(draft.intensity * 1.2)) }, () => ({
-      x: Math.random() * innerWidth, y: Math.random() * canvas.clientHeight,
-      vx: (Math.random() - .5) * 1.2, vy: .3 + Math.random() * 1.3,
-      size: 1 + Math.random() * 3, phase: Math.random() * Math.PI * 2, spin: (Math.random() - .5) * .04,
-    }));
-  }
-  function tickEffect(time: number) {
-    effectFrame = 0;
-    if (document.hidden || reduced.matches || draft.effect === 'none' || canvas.hidden) return;
-    const context = canvas.getContext('2d');
-    if (!context) { stopEffect(); return; }
-    const step = Math.min((time - (effectLast || time)) / 16.7, 2);
-    effectLast = time;
-    context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-    const height = canvas.clientHeight, width = canvas.clientWidth, color = accentHex();
-    for (const particle of particles) {
-      const effect = draft.effect;
-      const wind = effect === 'blizzard' ? 5 : effect === 'petals' ? .7 : 0;
-      particle.x += (particle.vx + wind) * step;
-      particle.y += (effect === 'stars' ? 0 : effect === 'fireflies' ? Math.sin(time / 700 + particle.phase) * .25 : particle.vy * (effect === 'blizzard' ? 3 : 1)) * step;
-      particle.phase += particle.spin * step;
-      if (particle.x > width + 20) particle.x = -20;
-      if (particle.x < -20) particle.x = width + 20;
-      if (particle.y > height + 20) particle.y = -20;
-      context.save();
-      context.translate(particle.x, particle.y);
-      context.globalAlpha = .35 + (Math.sin(time / 600 + particle.phase * 8) + 1) * .3;
-      context.fillStyle = effect === 'snow' || effect === 'blizzard' || effect === 'stars' ? '#ffffff' : effect === 'sparks' ? (particle.size > 2.5 ? '#ffd878' : color) : color;
-      if (effect === 'petals') {
-        context.rotate(particle.phase);
-        context.beginPath(); context.ellipse(0, 0, particle.size * 1.7, particle.size * .8, 0, 0, Math.PI * 2); context.fill();
-      } else if (effect === 'blizzard') {
-        context.rotate(-.6);
-        context.fillRect(0, 0, particle.size * 4, Math.max(1, particle.size / 2));
-      } else {
-        if (effect === 'fireflies' || effect === 'sparks') { context.shadowBlur = 12; context.shadowColor = context.fillStyle; }
-        context.beginPath(); context.arc(0, 0, effect === 'stars' ? particle.size * .6 : particle.size, 0, Math.PI * 2); context.fill();
-      }
-      context.restore();
-    }
-    effectFrame = requestAnimationFrame(tickEffect);
-  }
-  function renderEffect() {
-    $('effect-reduced').hidden = !reduced.matches;
-    if (draft.effect === 'none' || reduced.matches || !canvas.getContext('2d')) { stopEffect(); return; }
-    const key = `${draft.effect}:${draft.intensity}`;
-    if (key !== effectKey) { effectKey = key; canvas.hidden = false; sizeEffect(); effectLast = 0; }
-    if (!document.hidden && !effectFrame) effectFrame = requestAnimationFrame(tickEffect);
-  }
-  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(() => { if (!canvas.hidden) sizeEffect(); }, 120); }, { signal });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(effectFrame); effectFrame = 0; } else renderEffect(); }, { signal });
-  reduced.addEventListener('change', renderEffect, { signal });
 
   renderEntries('favorites-list', entries(favorites.list), 'Добавляйте персонажей и оружие в избранное кнопкой ☆ на их страницах.');
   renderEntries('recent-list', entries(recent.list), '', true);
@@ -948,7 +782,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         if (signal.aborted) return;
       } catch { if (signal.aborted) return; status(t('Не удалось сохранить картинку в этом браузере'), true); }
     }
-    saved = validCustom(raw).value;
+    saved = validCustom(raw, pickerBySlug).value;
     draft = structuredClone(saved);
     for (const key of mediaKeys) {
       if (!usesMedia(saved, key)) continue;
@@ -1079,6 +913,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const mediaSnapshot = new Map<MediaKey, Blob>([...stagedMedia].map(([key, entry]) => [key, entry.blob]));
     const importSnapshot = confirmedImport ? structuredClone(confirmedImport) : null;
     const controls = [...dialog.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement>('button, input, textarea')]
+      .filter((control) => !control.closest('#public-field'))
       .map((control) => [control, control.disabled] as const);
     const release = () => { if (releaseControls !== release) return; for (const [control, disabled] of controls) control.disabled = disabled; releaseControls = null; };
     releaseControls = release;
@@ -1270,7 +1105,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const mediaRaw = raw['gf:profile-media'];
       const legacy = isRecord(customRaw) && isRecord(customRaw.avatar) && customRaw.avatar.type === 'upload' && typeof customRaw.avatar.data === 'string' ? customRaw.avatar.data : null;
       if (legacy && isRecord(customRaw)) customRaw = { ...customRaw, avatar: { type: 'upload' } };
-      const custom = validCustom(customRaw), favs = validEntries(raw['gf:favs']), roster = validRoster(raw['gf:roster'], false), uid = raw['gf:profile-uid'];
+      const custom = validCustom(customRaw, pickerBySlug), favs = validEntries(raw['gf:favs']), roster = validRoster(raw['gf:roster'], false), uid = raw['gf:profile-uid'];
       if (!custom.valid || !favs || !roster || (uid !== null && !uidOk(uid)) || (mediaRaw !== undefined && !isRecord(mediaRaw))) throw new Error();
       // en/es появились в экспорте позже: если ключа нет — язык не трогаем, если есть, но повреждён — файл неверный
       const favsByLang: ImportData['favs'] = { ru: favs.value };
@@ -1339,8 +1174,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     for (const key of mediaKeys) mediaOperations[key]++;
     checkerController.abort();
     cancelShowcase();
-    stopEffect();
-    clearTimeout(resizeTimer);
+    effect.stop();
     revokeStaged(clearStaged());
     for (const url of committedUrls.values()) URL.revokeObjectURL(url);
     committedUrls.clear();
@@ -1349,6 +1183,16 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     exportUrls.clear();
     document.documentElement.classList.remove('profile-custom-bg');
   });
+  });
+</script>
+
+<script>
+  import { onPage } from '../scripts/router';
+  import { initPublicProfile } from '../scripts/public-profile';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('.profile-root[data-mode="public"]');
+    if (root) void initPublicProfile(root, signal);
   });
 </script>
 
@@ -1374,6 +1218,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .edit-profile svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
   .hero-content { display: grid; gap: 1rem; padding: 0 1.2rem 1.2rem; }
   .hero-info { display: flex; align-items: flex-start; gap: 1rem; min-width: 0; }
+  .public-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+  .public-actions .muted { font-size: .82rem; }
   .profile-root :global(.avatar-shell) { width: 96px; height: 96px; margin-top: -48px; flex: none; position: relative; z-index: 1; border-radius: 50%; }
   .profile-root :global(.avatar) { width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; position: relative; border: 3px solid var(--profile-accent); border-radius: 50%; background: var(--surface-2); color: var(--profile-accent); }
   .profile-root :global(.avatar svg) { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
@@ -1401,6 +1247,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .identity { min-width: 0; overflow-wrap: anywhere; padding-bottom: .2rem; }
   .identity h1 { margin: 0; }
   .identity p { margin: .3rem 0 0; }
+  .handle { color: var(--muted); }
   #profile-about { white-space: pre-line; }
   #showcase-form { display: grid; gap: .35rem; }
   #showcase-form label { color: var(--muted); font-size: .82rem; }
@@ -1463,6 +1310,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .editor-field { display: grid; gap: .35rem; }
   .editor-field label { font-weight: 600; }
   .editor-field small { color: var(--muted); text-align: right; }
+  .public-nick-row { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+  .public-prefix { flex: none; color: var(--muted); font-size: .82rem; white-space: nowrap; }
+  .public-nick-row .input { flex: 1 1 auto; width: 0; min-width: 0; }
+  .public-nick-row .btn { flex: none; }
+  .editor-field #public-nick-status { text-align: left; }
+  .editor-field .public-visible { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
   .editor-section { min-width: 0; display: grid; gap: .7rem; }
   .editor-section h3 { margin: 0; }
   .editor-tabs, .editor-actions, .effect-choices { display: flex; flex-wrap: wrap; gap: .5rem; }

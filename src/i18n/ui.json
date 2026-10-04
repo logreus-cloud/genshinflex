@@ -4578,5 +4578,77 @@
  "В билдах: {n}": {
   "en": "In builds: {n}",
   "es": "En builds: {n}"
+ },
+ "Профиль игрока": {
+  "en": "Player profile",
+  "es": "Perfil del jugador"
+ },
+ "Публичный профиль игрока на GenshinFlex.": {
+  "en": "Public player profile on GenshinFlex.",
+  "es": "Perfil público del jugador en GenshinFlex."
+ },
+ "Это ваш профиль — настроить": {
+  "en": "This is your profile — customize",
+  "es": "Este es tu perfil: personalizar"
+ },
+ "Профиль не найден или скрыт": {
+  "en": "Profile not found or hidden",
+  "es": "Perfil no encontrado u oculto"
+ },
+ "Не удалось загрузить профиль": {
+  "en": "Couldn't load the profile",
+  "es": "No se pudo cargar el perfil"
+ },
+ "На сайте с {date}": {
+  "en": "Member since {date}",
+  "es": "En el sitio desde {date}"
+ },
+ "Публичная страница": {
+  "en": "Public page",
+  "es": "Página pública"
+ },
+ "Профиль скрыт": {
+  "en": "Profile hidden",
+  "es": "Perfil oculto"
+ },
+ "Адрес профиля": {
+  "en": "Profile address",
+  "es": "Dirección del perfil"
+ },
+ "Сохранить": {
+  "en": "Save",
+  "es": "Guardar"
+ },
+ "3–24 символа: латиница, цифры, _ и -": {
+  "en": "3–24 characters: Latin letters, digits, _ and -",
+  "es": "3–24 caracteres: letras latinas, dígitos, _ y -"
+ },
+ "Показывать профиль всем по ссылке": {
+  "en": "Show my profile to anyone with the link",
+  "es": "Mostrar el perfil a cualquiera con el enlace"
+ },
+ "Недопустимый адрес": {
+  "en": "Invalid address",
+  "es": "Dirección no válida"
+ },
+ "Этот адрес уже занят": {
+  "en": "This address is already taken",
+  "es": "Esta dirección ya está ocupada"
+ },
+ "Не удалось сохранить": {
+  "en": "Couldn't save",
+  "es": "No se pudo guardar"
+ },
+ "Адрес сохранён": {
+  "en": "Address saved",
+  "es": "Dirección guardada"
+ },
+ "Скопировано": {
+  "en": "Copied",
+  "es": "Copiado"
+ },
+ "Не удалось скопировать": {
+  "en": "Couldn't copy",
+  "es": "No se pudo copiar"
  }
 }
