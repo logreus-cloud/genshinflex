@@ -160,13 +160,17 @@ export async function prepareImage(file: File, kind: MediaKey): Promise<Blob> {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     if (!context) throw new ImageError('decode');
-    const limit = kind === 'avatar' ? 1024 : kind === 'cover' ? 2400 : 2560;
-    const ratio = Math.min(1, limit / (kind === 'cover' ? width : Math.max(width, height)), kind === 'cover' ? limit / height : 1);
+    const limit = kind === 'avatar' ? 1024 : 4096;
+    const ratio = Math.min(1, limit / Math.max(width, height));
     canvas.width = Math.max(1, Math.round(width * ratio));
     canvas.height = Math.max(1, Math.round(height * ratio));
+    if (ratio < 1) {
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+    }
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     if (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap) image.close();
-    const encode = (type: string) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, .86));
+    const encode = (type: string) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, .92));
     let blob = await encode('image/webp');
     if (!blob || blob.type !== 'image/webp') blob = await encode('image/jpeg');
     if (!blob) throw new ImageError('decode');

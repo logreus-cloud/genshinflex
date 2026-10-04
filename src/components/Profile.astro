@@ -216,6 +216,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
               <div class="framing-editor" id="cover-frame-editor" hidden>
                 <strong>{t('Кадр')}</strong>
                 <div class="framing-preview cover-framing" id="cover-frame-preview" tabindex="0" role="application" aria-label={t('Перетащите картинку, чтобы выбрать видимую часть')}><img id="cover-frame-image" alt="" /></div>
+                <p class="small status frame-warning" id="cover-frame-warning" aria-live="polite" hidden><span aria-hidden="true">⚠</span> {t('Картинка маловата для такого масштаба — будет нечётко')}</p>
                 <small>{t('Перетащите картинку, чтобы выбрать видимую часть')}</small>
                 <label for="cover-frame-zoom">{t('Масштаб')} <output id="cover-frame-value">100%</output></label>
                 <input id="cover-frame-zoom" type="range" min="100" max="400" />
@@ -247,6 +248,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
               <div class="framing-editor" id="background-frame-editor" hidden>
                 <strong>{t('Кадр')}</strong>
                 <div class="framing-preview background-framing" id="background-frame-preview" tabindex="0" role="application" aria-label={t('Перетащите картинку, чтобы выбрать видимую часть')}><img id="background-frame-image" alt="" /></div>
+                <p class="small status frame-warning" id="background-frame-warning" aria-live="polite" hidden><span aria-hidden="true">⚠</span> {t('Картинка маловата для такого масштаба — будет нечётко')}</p>
                 <small>{t('Перетащите картинку, чтобы выбрать видимую часть')}</small>
                 <label for="background-frame-zoom">{t('Масштаб')} <output id="background-frame-value">100%</output></label>
                 <input id="background-frame-zoom" type="range" min="100" max="400" />
@@ -575,8 +577,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     $('cover-frame-preview').style.setProperty('--banner-ratio', String(coverRatio));
     $('preview-banner').style.setProperty('--banner-ratio', String(coverRatio));
     const top = parseFloat(getComputedStyle(background).top) || 0;
-    const ratio = (background.clientWidth || innerWidth) / (background.clientHeight || Math.max(1, innerHeight - top));
-    $('background-frame-preview').style.setProperty('--frame-ratio', String(ratio));
+    const backgroundWidth = background.clientWidth || innerWidth;
+    const backgroundHeight = background.clientHeight || Math.max(1, innerHeight - top);
+    $('background-frame-preview').style.setProperty('--frame-ratio', String(backgroundWidth / backgroundHeight));
     for (const key of mediaKeys) {
       const src = mediaSource(key);
       const editor = $(`${key}-frame-editor`);
@@ -589,6 +592,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       const zoom = framingOf(draft, key).zoom;
       $<HTMLInputElement>(`${key}-frame-zoom`).value = String(zoom);
       $(`${key}-frame-value`).textContent = `${zoom}%`;
+      if (key !== 'avatar') {
+        const width = key === 'cover' ? bannerWidth : backgroundWidth;
+        const height = key === 'cover' ? bannerHeight : backgroundHeight;
+        $(`${key}-frame-warning`).hidden = editor.hidden || !image.complete || !image.naturalWidth || !image.naturalHeight ||
+          (devicePixelRatio || 1) * Math.max(width / image.naturalWidth, height / image.naturalHeight) * zoom / 100 <= 1.5;
+      }
     }
   }
   function choice(char: PickerChar, selected: boolean, cover = false, focusKey = '') {
@@ -1054,6 +1063,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const frame = $(`${key}-frame-preview`);
     const image = $<HTMLImageElement>(`${key}-frame-image`);
     const zoom = $<HTMLInputElement>(`${key}-frame-zoom`);
+    if (key !== 'avatar') image.addEventListener('load', renderFramers, { signal });
     let pointer = -1, startX = 0, startY = 0, lastX = 0, lastY = 0, initial = framingOf(draft, key);
     const update = (next: Framing, dragging = false) => {
       if (saving || !dialog.open || !mediaSource(key) || !uploadTabOpen(key)) return;
@@ -1463,6 +1473,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .framing-editor { display: grid; gap: .55rem; min-width: 0; margin-top: .7rem; padding: .8rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
   .framing-editor small { color: var(--muted); }
   .framing-editor label { display: flex; justify-content: space-between; gap: .5rem; }
+  .frame-warning { color: var(--muted); }
+  .frame-warning span { color: var(--bad); }
   .framing-editor .btn { justify-self: start; }
   .framing-preview { position: relative; overflow: hidden; max-width: 100%; border: 1px solid var(--profile-accent); border-radius: var(--radius); cursor: grab; touch-action: none; }
   .framing-preview[aria-disabled="true"] { pointer-events: none; }

@@ -1687,6 +1687,10 @@
   "en": "Map of Teyvat",
   "es": "Mapa de Teyvat"
  },
+ "Картинка маловата для такого масштаба — будет нечётко": {
+  "en": "The image is too small at this scale — it will look blurry.",
+  "es": "La imagen es demasiado pequeña a esta escala: se verá borrosa."
+ },
  "Картинка слишком большая": {
   "en": "The image is too large",
   "es": "La imagen es demasiado grande"
