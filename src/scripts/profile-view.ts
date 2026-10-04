@@ -1,7 +1,12 @@
 import { BASE, t } from './search';
 import type { MediaKey } from './profile-media';
+import type { Entry } from './common';
 
 export type PickerChar = { slug: string; name: string; icon: string; element: string; rarity: number; namecard: string };
+export type Char = { id: number | null; s: string; n: string; i: string };
+export type RosterEntry = Record<string, unknown> & { s: string };
+export type Profile = { uid: string; time: number; player: { nickname: string; level: number; worldLevel: number; signature: string; profilePictureId?: number }; showcase: number[] };
+export type WishSummary = { label: string; total: number; fives: number; pity: { character: number; weapon: number; standard: number }; recent?: { name: string; gacha_type: string; time: string }[] };
 export type Avatar = { type: 'none' } | { type: 'character'; slug: string } | { type: 'upload' };
 export type CoverType = 'none' | 'namecard' | 'upload';
 export type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
@@ -30,12 +35,78 @@ export const bounded = (value: unknown, min: number, max: number) => typeof valu
 export const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
 export const usesMedia = (custom: Custom, key: MediaKey) => key === 'avatar' ? custom.avatar.type === 'upload' : key === 'cover' ? custom.coverType === 'upload' : custom.background.type === 'upload';
 const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
+const num = (value: unknown) => value !== null && value !== undefined && Number.isFinite(Number(value)) ? Number(value) : null;
+export const safeHref = (value: string) => { if (!value.startsWith('/') || value.startsWith('//')) return null; try { const url = new URL(value, location.origin); const path = url.pathname; return url.origin === location.origin && !/^\/[\\/]/.test(path) ? path + url.search + url.hash : null; } catch { return null; } };
+
+// Для показа можно проверить каталог; при импорте сохраняем незнакомые slug
+export function validRoster(value: unknown, known?: ReadonlyMap<string, unknown>) {
+  if (!Array.isArray(value)) return null;
+  const list: RosterEntry[] = [];
+  let valid = true;
+  for (const item of value) {
+    if (!isRecord(item) || typeof item.s !== 'string' || (known && !known.has(item.s))) { valid = false; continue; }
+    list.push({ ...item, s: item.s });
+  }
+  return { value: list, valid };
+}
+
+export async function loadChars(signal: AbortSignal) {
+  const response = await fetch(`${BASE}/data/checker.json`, { signal });
+  if (!response.ok) throw new Error();
+  const data: unknown = await response.json();
+  if (signal.aborted || !isRecord(data) || !Array.isArray(data.characters)) throw new Error();
+  const byId = new Map<number, Char>(), bySlug = new Map<string, Char>();
+  for (const value of data.characters) if (isRecord(value) && typeof value.id === 'number' && typeof value.s === 'string' &&
+    /^[a-z0-9-]+$/.test(value.s) && typeof value.n === 'string' && typeof value.i === 'string') {
+    const char = value as Char; byId.set(char.id!, char); bySlug.set(char.s, char);
+  }
+  return { byId, bySlug };
+}
+
+function addChar(parent: HTMLElement, char: Char) {
+  const link = document.createElement('a');
+  link.href = `${BASE}/characters/${char.s}/`;
+  link.title = char.n;
+  const src = iconUrl(char.i);
+  if (src) link.append(img(src, 56));
+  link.append(el('span', '', char.n));
+  parent.append(link);
+}
 
 export function readPickerChars(node: HTMLElement | null): PickerChar[] {
   const raw: unknown = (() => { try { return JSON.parse(node?.textContent ?? '[]'); } catch { return []; } })();
   return Array.isArray(raw) ? raw.filter((item): item is PickerChar =>
     isRecord(item) && typeof item.slug === 'string' && /^[a-z0-9-]+$/.test(item.slug) && typeof item.name === 'string' &&
     typeof item.icon === 'string' && typeof item.element === 'string' && typeof item.rarity === 'number' && typeof item.namecard === 'string') : [];
+}
+
+export function renderEntryList(box: HTMLElement, list: Entry[], empty: string, hideEmpty = false) {
+  box.replaceChildren();
+  box.closest('section')!.hidden = hideEmpty && !list.length;
+  if (!list.length) { if (!hideEmpty) box.append(el('span', 'empty', t(empty))); return; }
+  for (const item of list.slice(0, 100)) {
+    if (!item || typeof item.href !== 'string' || typeof item.name !== 'string') continue;
+    const href = safeHref(item.href);
+    if (!href) continue;
+    const link = document.createElement('a');
+    link.href = href;
+    const src = iconUrl(item.icon);
+    if (src) link.append(img(src, 40));
+    link.append(el('span', '', item.name));
+    box.append(link);
+  }
+  if (!box.childElementCount && !hideEmpty) box.append(el('span', 'empty', t(empty)));
+  if (hideEmpty && !box.childElementCount) box.closest('section')!.hidden = true;
+}
+
+export function renderRosterList(box: HTMLElement, countEl: HTMLElement, list: RosterEntry[], bySlug: ReadonlyMap<string, Char>) {
+  box.replaceChildren();
+  const seen = new Set<string>();
+  const known = list.filter((item) => bySlug.has(item.s) && !seen.has(item.s) && !!seen.add(item.s));
+  countEl.textContent = known.length ? t('Персонажей: {n}', { n: known.length }) : '';
+  if (!known.length) { box.textContent = t('Добавьте персонажей в проверке команды или загрузите по UID.'); return; }
+  for (const item of known.slice(0, 16)) addChar(box, bySlug.get(item.s)!);
+  if (known.length > 16) box.append(el('span', 'more', `+${known.length - 16}`));
 }
 
 export function validCustom(value: unknown, pickerBySlug: ReadonlyMap<string, PickerChar>) {
@@ -89,6 +160,34 @@ export function validCustom(value: unknown, pickerBySlug: ReadonlyMap<string, Pi
   return { value: result, valid };
 }
 
+export function renderWishSummary(box: HTMLElement, accounts: WishSummary[]) {
+  box.replaceChildren();
+  for (const summary of accounts) {
+    const account = el('div', 'account');
+    account.append(el('h3', '', summary.label), el('p', 'summary', t('Молитв: {total} · 5★: {fives}', { total: summary.total, fives: summary.fives })));
+    for (const [title, pity] of [
+      [t('Молитва события персонажа'), summary.pity.character], [t('Молитва события оружия'), summary.pity.weapon],
+      [t('Стандартная молитва'), summary.pity.standard],
+    ] as [string, number][]) {
+      const line = el('div', 'pity-row');
+      line.append(el('span', '', title), el('span', '', t('Текущий гарант: {n}', { n: pity })));
+      account.append(line);
+    }
+    if (summary.recent?.length) {
+      const recent = el('p', 'recent', t('Последние 5★: '));
+      for (const [index, wish] of summary.recent.slice(0, 10).entries()) {
+        if (index) recent.append(document.createTextNode(', '));
+        const name = el('span', '', wish.name);
+        name.title = wish.time;
+        recent.append(name);
+      }
+      account.append(recent);
+    }
+    box.append(account);
+  }
+  if (!box.childElementCount) box.append(el('p', 'empty', t('История круток не загружена')));
+}
+
 export function accentHex(color: string) {
   if (hexOk(color)) return color.toLowerCase();
   const extra = extraColors.find(([key]) => key === color);
@@ -96,9 +195,32 @@ export function accentHex(color: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(`--${color}`).trim() || '#e3b04b';
 }
 
+export async function fetchShowcase(uid: string, signal: AbortSignal): Promise<Profile> {
+  const response = await fetch(`/api/enka/${uid}`, { signal });
+  let body: unknown;
+  try { body = await response.json(); } catch { throw new Error('Не удалось загрузить профиль.'); }
+  if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+  if (!response.ok) throw new Error(isRecord(body) && typeof body.error === 'string' ? body.error : 'Не удалось загрузить профиль.');
+  if (!isRecord(body) || !isRecord(body.playerInfo)) throw new Error('Не удалось загрузить профиль.');
+  const player = body.playerInfo;
+  const picture = isRecord(player.profilePicture) ? num(player.profilePicture.avatarId ?? player.profilePicture.id) : null;
+  const shown = Array.isArray(player.showAvatarInfoList) && player.showAvatarInfoList.length ? player.showAvatarInfoList : body.avatarInfoList;
+  const showcase = Array.isArray(shown) ? shown.map((item) => isRecord(item) ? num(item.avatarId) : null).filter((id): id is number => id !== null) : [];
+  return { uid, time: Date.now(), player: { nickname: typeof player.nickname === 'string' ? player.nickname : '', level: num(player.level) ?? 0,
+    worldLevel: num(player.worldLevel) ?? 0, signature: typeof player.signature === 'string' ? player.signature : '', profilePictureId: picture ?? undefined }, showcase };
+}
+
 export function accentInk(hex: string) {
   const channels = [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16) / 255).map((value) => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4);
   return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722 > .5 ? '#20212a' : '#ffffff';
+}
+
+export function renderShowcase(box: HTMLElement, meta: HTMLElement, profile: Profile, byId: ReadonlyMap<number, Char>) {
+  meta.textContent = t('Ранг приключений {level} · Уровень мира {world}', { level: profile.player.level, world: profile.player.worldLevel });
+  meta.hidden = false;
+  box.replaceChildren();
+  for (const id of profile.showcase) { const char = byId.get(id); if (char) addChar(box, char); }
+  if (!box.childElementCount) box.textContent = profile.showcase.length ? t('На витрине нет знакомых персонажей.') : t('Витрина пуста или скрыта.');
 }
 
 export function frameMarks(shell: HTMLElement) {

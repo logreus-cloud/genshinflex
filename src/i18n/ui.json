@@ -4650,5 +4650,45 @@
  "Не удалось скопировать": {
   "en": "Couldn't copy",
   "es": "No se pudo copiar"
+ },
+ "Приватность": {
+  "en": "Privacy",
+  "es": "Privacidad"
+ },
+ "Скопировать UID": {
+  "en": "Copy UID",
+  "es": "Copiar UID"
+ },
+ "Войдите в аккаунт, чтобы настроить приватность.": {
+  "en": "Sign in to set up privacy.",
+  "es": "Inicia sesión para configurar la privacidad."
+ },
+ "Что видно на публичной странице": {
+  "en": "What the public page shows",
+  "es": "Qué se ve en la página pública"
+ },
+ "UID и витрина": {
+  "en": "UID and showcase",
+  "es": "UID y escaparate"
+ },
+ "Крутки (сводка и последние 5★)": {
+  "en": "Wishes (summary and latest 5★)",
+  "es": "Gachapones (resumen y últimos 5★)"
+ },
+ "Оформление, «О себе», титул и любимые персонажи видны всегда, если профиль открыт. Без входа в аккаунт настройки недоступны.": {
+  "en": "Profile design, \"About me\", title and favorite characters are always visible while the profile is public. The settings are unavailable without signing in.",
+  "es": "El diseño, «Sobre mí», el título y los personajes favoritos siempre se ven si el perfil es público. Sin iniciar sesión, los ajustes no están disponibles."
+ },
+ "Последние 5★: ": {
+  "en": "Latest 5★: ",
+  "es": "Últimos 5★: "
+ },
+ "Витрина недоступна": {
+  "en": "Showcase unavailable",
+  "es": "Escaparate no disponible"
+ },
+ "Аккаунт {n}": {
+  "en": "Account {n}",
+  "es": "Cuenta {n}"
  }
 }
