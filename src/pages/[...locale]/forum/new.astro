@@ -1,0 +1,78 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Новая тема')} description={t('Создать тему на форуме GenshinFlex.')} noindex>
+  <div class="forum" data-forum-new>
+    <a href={`${base}/forum/`}>{t('Форум')}</a>
+    <h1>{t('Новая тема')}</h1>
+    <p class="status" data-status></p>
+    <form class="panel">
+      <label>
+        {t('Раздел')}
+        <select class="input" name="category" required></select>
+      </label>
+      <label>
+        {t('Название темы')}
+        <input class="input" name="title" minlength="3" maxlength="120" required />
+      </label>
+      <label>
+        {t('Язык')}
+        <select class="input" name="lang">
+          <option value="ru">{t('Русский')}</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </label>
+      <div class="forum-actions">
+        <button class="btn" type="button" data-tab-text>{t('Текст')}</button>
+        <button class="btn" type="button" data-tab-preview>{t('Предпросмотр')}</button>
+      </div>
+      <textarea class="input" rows="9" maxlength="10000" required></textarea>
+      <div class="forum-body" data-preview hidden></div>
+      <span class="small muted" data-count>0/10000</span>
+      <button class="btn primary" type="submit">{t('Создать тему')}</button>
+    </form>
+    <section class="panel">
+      <h2>{t('Правила форума')}</h2>
+      <ul>
+        <li>{t('Уважайте собеседников')}</li>
+        <li>{t('Без спама и рекламы')}</li>
+        <li>{t('Сюжетные спойлеры — под ||…||')}</li>
+        <li>{t('Новым аккаунтам ссылки доступны через 3 дня')}</li>
+      </ul>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { initNewThread } from '../../../scripts/forum/new-thread';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-forum-new]');
+    if (root) void initNewThread(root, signal);
+  });
+</script>
+
+<style>
+  /* Классы вроде .btn и .forum-actions задают display и перебивают атрибут hidden */
+  .forum :global([hidden]) { display: none !important; }
+  .forum, .forum form { display: grid; gap: 1rem; }
+  .forum { max-width: 760px; }
+  .forum label { display: grid; gap: .4rem; }
+  .forum .input { width: 100%; }
+  .forum textarea { resize: vertical; }
+  .forum-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .forum-body { min-width: 0; overflow-wrap: anywhere; line-height: 1.6; }
+  .forum-body :global(pre) { overflow: auto; padding: 1rem; background: var(--bg-deep); }
+  .forum-body :global(blockquote) {
+    margin-left: 0;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent-text);
+  }
+  .forum-body :global(.spoiler) { background: var(--text); color: transparent; border-radius: .2rem; }
+</style>

@@ -15,6 +15,19 @@ function cleanMetadata(value: unknown): unknown {
   ).map(([key, item]) => [key, cleanMetadata(item)]));
 }
 
+async function exportRows(client: AdminClient, table: string, key: string, id: string, columns: string[]) {
+  const rows: unknown[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const query = client.from(table).select('*').eq(key, id);
+    for (const column of columns) query.order(column);
+    const { data, error } = await query.range(offset, offset + 999);
+    if (error || !data) throw new Error('Account export failed');
+    rows.push(...data);
+    if (data.length < 1000) break;
+  }
+  return rows;
+}
+
 export async function exportAccount(client: AdminClient, id: string) {
   const wishes: unknown[] = [];
   for (let offset = 0; ; offset += 1000) {
@@ -24,14 +37,22 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes.push(...data);
     if (data.length < 1000) break;
   }
-  const [auth, profile, userData, roles, telegram] = await Promise.all([
+  const [threads, posts, reactions, reports] = await Promise.all([
+    exportRows(client, 'forum_threads', 'author_id', id, ['id']),
+    exportRows(client, 'forum_posts', 'author_id', id, ['id']),
+    exportRows(client, 'forum_reactions', 'user_id', id, ['post_id', 'kind']),
+    exportRows(client, 'forum_reports', 'reporter_id', id, ['id']),
+  ]);
+  const [auth, profile, userData, roles, telegram, ban] = await Promise.all([
     client.auth.admin.getUserById(id),
     client.from('profiles').select('*').eq('id', id).maybeSingle(),
     client.from('user_data').select('*').eq('user_id', id).maybeSingle(),
     client.from('roles').select('*').eq('user_id', id),
     client.from('telegram_accounts').select('telegram_id,user_id,username,created_at,updated_at').eq('user_id', id).maybeSingle(),
+    client.from('forum_bans').select('*').eq('user_id', id).maybeSingle(),
   ]);
-  if (auth.error || !auth.data.user || profile.error || userData.error || roles.error || telegram.error) {
+  if (auth.error || !auth.data.user || profile.error || userData.error || roles.error || telegram.error
+    || ban.error) {
     throw new Error('Account export failed');
   }
   const user = auth.data.user;
@@ -53,6 +74,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes,
     roles: roles.data,
     telegram: telegram.data,
+    forum: { threads, posts, reactions, reports, ban: ban.data },
     exported_at: new Date().toISOString(),
   };
 }

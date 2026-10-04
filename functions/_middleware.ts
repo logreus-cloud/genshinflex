@@ -53,5 +53,39 @@ export async function onRequest({ request, next, env }: Ctx) {
         .transform(page(200));
     } catch { return page(200); }
   }
+  const forum = url.pathname.match(/^\/(?:(en|es)\/)?forum\/t\/(\d+)\/?$/);
+  if (forum) {
+    const prefix = forum[1] ? `/${forum[1]}` : '';
+    const shell = await env.ASSETS.fetch(new URL(`${prefix}/forum/t/`, request.url));
+    const headers = new Headers(shell.headers);
+    headers.set('Cache-Control', 'public, max-age=60');
+    const page = (status: number) => new Response(shell.body, { status, headers });
+    const rpc = async (name: string, body: Record<string, unknown>) => {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(2000),
+      });
+      if (!response.ok) throw new Error();
+      return response.json() as Promise<Record<string, unknown>[]>;
+    };
+    try {
+      const thread = (await rpc('forum_thread', { p_id: Number(forum[2]) }))[0];
+      if (!thread) return page(404);
+      const post = (await rpc('forum_posts', { p_thread: Number(forum[2]), p_limit: 1 }))[0];
+      const snippet = String(post?.body ?? '').replace(/\|\|[\s\S]*?\|\|/g, '[спойлер]').replace(/```[\s\S]*?```/g, ' ').replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, '$1').replace(/(?:^|\n)[>*-] ?/g, ' ').replace(/[*_~`]/g, '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
+      const forumLabel = forum[1] === 'en' ? 'Forum' : forum[1] === 'es' ? 'Foro' : 'Форум';
+      const title = `${String(thread.title)} — ${forumLabel} GenshinFlex`;
+      const canonical = new URL(url.pathname, url.origin).toString();
+      return new HTMLRewriter()
+        .on('title', { element(element) { element.setInnerContent(title, { html: false }); } })
+        .on('meta[property="og:title"], meta[name="twitter:title"]', { element(element) { element.setAttribute('content', title); } })
+        .on('meta[name="description"], meta[property="og:description"]', { element(element) { element.setAttribute('content', snippet); } })
+        .on('link[rel="canonical"]', { element(element) { element.setAttribute('href', canonical); } })
+        .on('meta[property="og:url"]', { element(element) { element.setAttribute('content', canonical); } })
+        .transform(page(200));
+    } catch { return page(200); }
+  }
   return next();
 }

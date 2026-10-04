@@ -1,0 +1,47 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Форум')} description={t('Обсуждения Genshin Impact на GenshinFlex.')}>
+  <div class="forum" data-forum-index>
+    <h1>{t('Форум')}</h1>
+    <a class="btn primary" href={`${base}/forum/new/`}>{t('Новая тема')}</a>
+    <div class="forum-grid" data-categories></div>
+    <h2>{t('Последние обсуждения')}</h2>
+    <div class="forum-list" data-recent>{t('Загружаю…')}</div>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { initForumIndex } from '../../../scripts/forum/index';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-forum-index]');
+    if (root) void initForumIndex(root, signal);
+  });
+</script>
+
+<style>
+  /* Классы вроде .btn и .forum-actions задают display и перебивают атрибут hidden */
+  .forum :global([hidden]) { display: none !important; }
+  .forum { display: grid; gap: 1.2rem; }
+  .forum > .btn { justify-self: start; }
+  .forum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .forum-list { display: grid; gap: .7rem; }
+  .forum-grid :global(.forum-category) {
+    display: grid;
+    align-content: start;
+    gap: .45rem;
+    min-width: 0;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .forum-grid :global(.forum-category:hover) { border-color: var(--accent); }
+  .forum-grid :global(.forum-category strong) { color: var(--accent-text); }
+  .forum-list :global(.forum-thread) { display: block; text-decoration: none; color: var(--text); }
+  .forum-list :global(.forum-thread:hover) { border-color: var(--accent); }
+</style>

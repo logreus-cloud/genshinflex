@@ -1,0 +1,76 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Модерация форума')} description={t('Очередь жалоб форума.')} noindex>
+  <div class="forum" data-forum-moderation>
+    <a href={`${base}/forum/`}>{t('Форум')}</a>
+    <h1>{t('Модерация форума')}</h1>
+    <p class="status" data-status></p>
+    <select class="input" data-filter>
+      <option value="open">{t('Открытые')}</option>
+      <option value="resolved">{t('Решённые')}</option>
+      <option value="dismissed">{t('Отклонённые')}</option>
+    </select>
+    <div class="forum-list" data-list></div>
+    <label>
+      {t('Причина удаления')}
+      <input class="input" data-delete-reason maxlength="200" />
+    </label>
+    <dialog>
+      <form>
+        <label>
+          {t('Срок блокировки')}
+          <select class="input">
+            <option value="1">{t('1 день')}</option>
+            <option value="7">{t('7 дней')}</option>
+            <option value="30">{t('30 дней')}</option>
+            <option value="0">{t('Навсегда')}</option>
+          </select>
+        </label>
+        <label>
+          {t('Причина блокировки')}
+          <input class="input" maxlength="200" />
+        </label>
+        <button class="btn" type="button" data-cancel>{t('Отмена')}</button>
+        <button class="btn primary" type="submit">{t('Заблокировать')}</button>
+      </form>
+    </dialog>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { initForumModeration } from '../../../scripts/forum/moderation';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-forum-moderation]');
+    if (root) void initForumModeration(root, signal);
+  });
+</script>
+
+<style>
+  /* Классы вроде .btn и .forum-actions задают display и перебивают атрибут hidden */
+  .forum :global([hidden]) { display: none !important; }
+  .forum, .forum-list { display: grid; gap: 1rem; }
+  .forum-list { max-width: 900px; }
+  .forum :global(.forum-report) { display: grid; gap: .5rem; overflow-wrap: anywhere; }
+  .forum :global(.forum-author) { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; }
+  .forum :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  .forum :global(.forum-actions) { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .forum > .input { max-width: 220px; }
+  label, dialog form { display: grid; gap: .7rem; }
+  dialog { background: var(--bg); color: var(--text); border: 1px solid var(--accent); border-radius: var(--radius); }
+</style>

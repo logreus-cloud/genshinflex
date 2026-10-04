@@ -1,4 +1,348 @@
 {
+ "Форум": {
+  "en": "Forum",
+  "es": "Foro"
+ },
+ "Обсуждения Genshin Impact на GenshinFlex.": {
+  "en": "Genshin Impact discussions on GenshinFlex.",
+  "es": "Debates de Genshin Impact en GenshinFlex."
+ },
+ "Новая тема": {
+  "en": "New thread",
+  "es": "Nuevo tema"
+ },
+ "Последние обсуждения": {
+  "en": "Recent discussions",
+  "es": "Debates recientes"
+ },
+ "Объявления": {
+  "en": "Announcements",
+  "es": "Anuncios"
+ },
+ "Новости и правила форума от команды сайта": {
+  "en": "News and forum rules from the site team",
+  "es": "Noticias y normas del foro del equipo del sitio"
+ },
+ "Билды и команды": {
+  "en": "Builds and teams",
+  "es": "Builds y equipos"
+ },
+ "Сборки персонажей, артефакты, составы отрядов": {
+  "en": "Character builds, artifacts and team compositions",
+  "es": "Builds de personajes, artefactos y composiciones de equipo"
+ },
+ "Бездна, Театр воображариума, Натиск": {
+  "en": "Abyss, Imaginarium Theater, Stygian Onslaught",
+  "es": "Abismo, Teatro Imaginario y Embestida Estigia"
+ },
+ "Баннеры и крутки": {
+  "en": "Banners and wishes",
+  "es": "Gachapones y deseos"
+ },
+ "Кого крутить, гаранты, удача и неудачи": {
+  "en": "Who to pull, pity, good and bad luck",
+  "es": "Por quién tirar, garantías, buena y mala suerte"
+ },
+ "Сюжет и лор": {
+  "en": "Story and lore",
+  "es": "Historia y lore"
+ },
+ "Обсуждение истории и персонажей. Спойлеры — под ||спойлер||": {
+  "en": "Discuss the story and characters. Hide spoilers with ||spoiler||",
+  "es": "Debate la historia y los personajes. Oculta spoilers con ||spoiler||"
+ },
+ "Идеи для сайта": {
+  "en": "Ideas for the site",
+  "es": "Ideas para el sitio"
+ },
+ "Предложения и пожелания к GenshinFlex": {
+  "en": "Suggestions and requests for GenshinFlex",
+  "es": "Sugerencias y deseos para GenshinFlex"
+ },
+ "Общение": {
+  "en": "Chat",
+  "es": "Charla"
+ },
+ "Всё остальное": {
+  "en": "Everything else",
+  "es": "Todo lo demás"
+ },
+ "Тем: {threads} · сообщений: {posts}": {
+  "en": "Threads: {threads} · posts: {posts}",
+  "es": "Temas: {threads} · mensajes: {posts}"
+ },
+ "Последняя тема": {
+  "en": "Latest thread",
+  "es": "Último tema"
+ },
+ "Русский": {
+  "en": "Russian",
+  "es": "Ruso"
+ },
+ "Все": {
+  "en": "All",
+  "es": "Todos"
+ },
+ "Показать ещё": {
+  "en": "Show more",
+  "es": "Mostrar más"
+ },
+ "Ответов: {n}": {
+  "en": "Replies: {n}",
+  "es": "Respuestas: {n}"
+ },
+ "Последний ответ {time}": {
+  "en": "Last reply {time}",
+  "es": "Última respuesta {time}"
+ },
+ "Удалённый пользователь": {
+  "en": "Deleted user",
+  "es": "Usuario eliminado"
+ },
+ "Модератор": {
+  "en": "Moderator",
+  "es": "Moderador"
+ },
+ "Войдите, чтобы писать на форуме": {
+  "en": "Sign in to post on the forum",
+  "es": "Inicia sesión para escribir en el foro"
+ },
+ "Вы заблокированы на форуме до {date}": {
+  "en": "You are banned from the forum until {date}",
+  "es": "Tienes bloqueado el acceso al foro hasta {date}"
+ },
+ "Вы заблокированы на форуме": {
+  "en": "You are banned from the forum",
+  "es": "Tienes bloqueado el acceso al foro"
+ },
+ "Слишком часто — подождите немного": {
+  "en": "Too often — please wait a moment",
+  "es": "Demasiado frecuente: espera un momento"
+ },
+ "Новым аккаунтам ссылки можно публиковать через 3 дня после регистрации": {
+  "en": "New accounts can post links three days after registration",
+  "es": "Las cuentas nuevas pueden publicar enlaces tres días después de registrarse"
+ },
+ "Тема закрыта": {
+  "en": "Thread locked",
+  "es": "Tema cerrado"
+ },
+ "Не найдено": {
+  "en": "Not found",
+  "es": "No encontrado"
+ },
+ "Недостаточно прав": {
+  "en": "Insufficient permissions",
+  "es": "Permisos insuficientes"
+ },
+ "Проверьте заполнение": {
+  "en": "Check the fields",
+  "es": "Revisa los campos"
+ },
+ "Не получилось. Попробуйте ещё раз": {
+  "en": "It didn't work. Please try again",
+  "es": "No ha funcionado. Inténtalo de nuevo"
+ },
+ "Войдите, чтобы ответить": {
+  "en": "Sign in to reply",
+  "es": "Inicia sesión para responder"
+ },
+ "Войдите, чтобы реагировать": {
+  "en": "Sign in to react",
+  "es": "Inicia sesión para reaccionar"
+ },
+ "Предпросмотр": {
+  "en": "Preview",
+  "es": "Vista previa"
+ },
+ "Подсказка по разметке: **жирный**, *курсив*, ||спойлер||, > цитата": {
+  "en": "Formatting: **bold**, *italic*, ||spoiler||, > quote",
+  "es": "Formato: **negrita**, *cursiva*, ||spoiler||, > cita"
+ },
+ "Модерация": {
+  "en": "Moderation",
+  "es": "Moderación"
+ },
+ "Причина удаления": {
+  "en": "Reason for deletion",
+  "es": "Motivo de eliminación"
+ },
+ "Причина жалобы": {
+  "en": "Report reason",
+  "es": "Motivo de la denuncia"
+ },
+ "Спам": {
+  "en": "Spam",
+  "es": "Spam"
+ },
+ "Оскорбления": {
+  "en": "Abuse",
+  "es": "Insultos"
+ },
+ "Спойлер без пометки": {
+  "en": "Unmarked spoiler",
+  "es": "Spoiler sin marcar"
+ },
+ "Не по теме": {
+  "en": "Off topic",
+  "es": "Fuera de tema"
+ },
+ "Пожаловаться": {
+  "en": "Report",
+  "es": "Denunciar"
+ },
+ "Жалоба отправлена": {
+  "en": "Report sent",
+  "es": "Denuncia enviada"
+ },
+ "Сообщение удалено": {
+  "en": "Post deleted",
+  "es": "Mensaje eliminado"
+ },
+ "изменено": {
+  "en": "edited",
+  "es": "editado"
+ },
+ "В ответ на #{id}": {
+  "en": "In reply to #{id}",
+  "es": "En respuesta a #{id}"
+ },
+ "Ответить": {
+  "en": "Reply",
+  "es": "Responder"
+ },
+ "Изменить": {
+  "en": "Edit",
+  "es": "Editar"
+ },
+ "Открепить": {
+  "en": "Unpin",
+  "es": "Desfijar"
+ },
+ "Закрепить": {
+  "en": "Pin",
+  "es": "Fijar"
+ },
+ "Открыть тему": {
+  "en": "Unlock thread",
+  "es": "Abrir tema"
+ },
+ "Закрыть тему": {
+  "en": "Lock thread",
+  "es": "Cerrar tema"
+ },
+ "Вернуть тему": {
+  "en": "Restore thread",
+  "es": "Restaurar tema"
+ },
+ "Скрыть тему": {
+  "en": "Hide thread",
+  "es": "Ocultar tema"
+ },
+ "Название темы": {
+  "en": "Thread title",
+  "es": "Título del tema"
+ },
+ "Создать тему": {
+  "en": "Create thread",
+  "es": "Crear tema"
+ },
+ "Создать тему на форуме GenshinFlex.": {
+  "en": "Create a thread on the GenshinFlex forum.",
+  "es": "Crea un tema en el foro de GenshinFlex."
+ },
+ "Правила форума": {
+  "en": "Forum rules",
+  "es": "Normas del foro"
+ },
+ "Уважайте собеседников": {
+  "en": "Respect other participants",
+  "es": "Respeta a los demás"
+ },
+ "Без спама и рекламы": {
+  "en": "No spam or advertising",
+  "es": "Sin spam ni publicidad"
+ },
+ "Сюжетные спойлеры — под ||…||": {
+  "en": "Hide story spoilers with ||…||",
+  "es": "Oculta los spoilers de la historia con ||…||"
+ },
+ "Новым аккаунтам ссылки доступны через 3 дня": {
+  "en": "New accounts can post links after three days",
+  "es": "Las cuentas nuevas pueden publicar enlaces tras tres días"
+ },
+ "Модерация форума": {
+  "en": "Forum moderation",
+  "es": "Moderación del foro"
+ },
+ "Очередь жалоб форума.": {
+  "en": "Forum report queue.",
+  "es": "Cola de denuncias del foro."
+ },
+ "Открытые": {
+  "en": "Open",
+  "es": "Abiertas"
+ },
+ "Решённые": {
+  "en": "Resolved",
+  "es": "Resueltas"
+ },
+ "Отклонённые": {
+  "en": "Dismissed",
+  "es": "Rechazadas"
+ },
+ "Жалоб: {n}": {
+  "en": "Reports: {n}",
+  "es": "Denuncias: {n}"
+ },
+ "Удалить пост": {
+  "en": "Delete post",
+  "es": "Eliminar mensaje"
+ },
+ "Отклонить жалобу": {
+  "en": "Dismiss report",
+  "es": "Rechazar denuncia"
+ },
+ "Решено": {
+  "en": "Resolved",
+  "es": "Resuelto"
+ },
+ "Заблокировать автора": {
+  "en": "Ban author",
+  "es": "Bloquear al autor"
+ },
+ "Разблокировать": {
+  "en": "Unban",
+  "es": "Desbloquear"
+ },
+ "Срок блокировки": {
+  "en": "Ban duration",
+  "es": "Duración del bloqueo"
+ },
+ "1 день": {
+  "en": "1 day",
+  "es": "1 día"
+ },
+ "7 дней": {
+  "en": "7 days",
+  "es": "7 días"
+ },
+ "30 дней": {
+  "en": "30 days",
+  "es": "30 días"
+ },
+ "Навсегда": {
+  "en": "Forever",
+  "es": "Para siempre"
+ },
+ "Причина блокировки": {
+  "en": "Ban reason",
+  "es": "Motivo del bloqueo"
+ },
+ "Заблокировать": {
+  "en": "Ban",
+  "es": "Bloquear"
+ },
  "{mode} в Genshin Impact — текущий цикл: враги по актам и сложностям, слабости, команды, советы и видео.": {
   "en": "{mode} in Genshin Impact — current cycle: enemies by act and difficulty, weaknesses, teams, tips and videos.",
   "es": "{mode} en Genshin Impact — ciclo actual: enemigos por acto y dificultad, debilidades, equipos, consejos y vídeos."
@@ -4718,5 +5062,9 @@
  "Аккаунт {n}": {
   "en": "Account {n}",
   "es": "Cuenta {n}"
+ },
+ "Восстановить": {
+  "en": "Restore",
+  "es": "Restaurar"
  }
 }

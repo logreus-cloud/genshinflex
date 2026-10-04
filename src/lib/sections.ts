@@ -36,7 +36,8 @@ export const SECTIONS: Section[] = [
   { id: 'banners', href: '/banners', label: 'Баннеры', icon: 'moon', navGroup: 'Таймлайн', footerColumn: 'Эндгейм', footerOrder: 5 },
   { id: 'guides', href: '/guides', label: 'Руководства', icon: 'book', navGroup: 'Гайды', footerColumn: 'База', footerOrder: 4 },
   { id: 'profile', href: '/profile', label: 'Мой профиль', icon: 'user', navGroup: 'Сайт' },
-  { id: 'news', href: '/news', label: 'Новости сайта', icon: 'book', navGroup: 'Сайт', footerColumn: 'Сайт', footerOrder: 1 },
+  { id: 'forum', href: '/forum', label: 'Форум', icon: 'chat', navGroup: 'Сайт', footerColumn: 'Сайт', footerOrder: 1 },
+  { id: 'news', href: '/news', label: 'Новости сайта', icon: 'book', navGroup: 'Сайт', footerColumn: 'Сайт', footerOrder: 2 },
   { id: 'simulator', href: '/tools/simulator', label: 'Симулятор команды', icon: 'chart', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 1 },
   { id: 'team-check', href: '/tools/team-check', label: 'Проверка команды', icon: 'check', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 2 },
   { id: 'wishes', href: '/tools/wishes', label: 'Трекер круток', icon: 'star', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 3 },
@@ -45,12 +46,12 @@ export const SECTIONS: Section[] = [
   { id: 'rating', href: '/rating', label: 'Рейтинг', icon: 'chart', navGroup: 'В разработке', footerColumn: 'Эндгейм', footerOrder: 7, soon: true },
   { id: 'banner-history', href: '/banners/#history', label: 'История баннеров', icon: 'moon', footerColumn: 'Эндгейм', footerOrder: 6, footerOnly: true },
   { id: 'map', href: (lang: Lang) => `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`, label: 'Карта Тейвата', icon: 'home', footerColumn: 'Инструменты', footerOrder: 6, footerOnly: true, external: true },
-  { id: 'telegram', href: (_lang: Lang, social: Social) => social.telegram, label: 'Telegram-канал', icon: 'book', footerColumn: 'Сайт', footerOrder: 2, footerOnly: true, external: true },
-  { id: 'discord', href: (_lang: Lang, social: Social) => social.discord, label: 'Discord-сервер', icon: 'book', footerColumn: 'Сайт', footerOrder: 3, footerOnly: true, external: true },
-  { id: 'about', href: '/about/', label: 'О сайте', icon: 'book', footerColumn: 'Сайт', footerOrder: 4, footerOnly: true },
-  { id: 'feedback', href: '/feedback/', label: 'Обратная связь', icon: 'book', footerColumn: 'Сайт', footerOrder: 5, footerOnly: true },
-  { id: 'privacy', href: '/privacy/', label: 'Политика конфиденциальности', icon: 'book', footerColumn: 'Сайт', footerOrder: 6, footerOnly: true },
-  { id: 'sitemap', href: '/sitemap.xml', label: 'Sitemap', icon: 'book', footerColumn: 'Сайт', footerOrder: 7, footerOnly: true },
+  { id: 'telegram', href: (_lang: Lang, social: Social) => social.telegram, label: 'Telegram-канал', icon: 'book', footerColumn: 'Сайт', footerOrder: 3, footerOnly: true, external: true },
+  { id: 'discord', href: (_lang: Lang, social: Social) => social.discord, label: 'Discord-сервер', icon: 'book', footerColumn: 'Сайт', footerOrder: 4, footerOnly: true, external: true },
+  { id: 'about', href: '/about/', label: 'О сайте', icon: 'book', footerColumn: 'Сайт', footerOrder: 5, footerOnly: true },
+  { id: 'feedback', href: '/feedback/', label: 'Обратная связь', icon: 'book', footerColumn: 'Сайт', footerOrder: 6, footerOnly: true },
+  { id: 'privacy', href: '/privacy/', label: 'Политика конфиденциальности', icon: 'book', footerColumn: 'Сайт', footerOrder: 7, footerOnly: true },
+  { id: 'sitemap', href: '/sitemap.xml', label: 'Sitemap', icon: 'book', footerColumn: 'Сайт', footerOrder: 8, footerOnly: true },
 ];
 
 export const sectionHref = (section: Section, lang: Lang, social: Social) =>

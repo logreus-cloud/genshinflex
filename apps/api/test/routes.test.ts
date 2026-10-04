@@ -92,6 +92,7 @@ test('выгружает данные через подставленный кл
     wishes: [],
     roles: [],
     telegram: null,
+    forum: { threads: [], posts: [], reactions: [], reports: [], ban: null },
   });
 });
 

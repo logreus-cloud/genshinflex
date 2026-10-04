@@ -59,6 +59,10 @@ test('requires the exact confirmation', async () => {
 
 test('includes every export section without provider tokens', async () => {
     const wishes = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, game_uid: '700000000', id: String(index + 1) }));
+    const posts = Array.from({ length: 1001 }, (_, index) => ({ author_id: id, id: index + 1, deleted_at: index === 0 ? '2026-09-27' : null }));
+    const threads = Array.from({ length: 1001 }, (_, index) => ({ author_id: id, id: index + 1 }));
+    const reactions = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, post_id: index + 1, kind: 'heart' }));
+    const reports = Array.from({ length: 1001 }, (_, index) => ({ reporter_id: id, id: index + 1 }));
     const row = (data: unknown) => ({
       select: () => ({
         eq: () => ({
@@ -72,13 +76,32 @@ test('includes every export section without provider tokens', async () => {
       user_data: { user_id: id, favorites: [] },
       roles: [{ user_id: id, role: 'author' }],
       telegram_accounts: { user_id: id, telegram_id: 123 },
+      forum_bans: { user_id: id, reason: 'Pause' },
     };
-    const ranges: [number, number][] = [];
+    const ranges: { table: string; start: number; end: number }[] = [];
+    const orders: { table: string; column: string }[] = [];
+    const collections: Record<string, unknown[]> = {
+      wishes,
+      forum_threads: threads,
+      forum_posts: posts,
+      forum_reactions: reactions,
+      forum_reports: reports,
+    };
     const client = {
-      from: (table: string) => table === 'wishes' ? {
-        select: () => ({ eq: () => ({ order: () => ({ order: () => ({
-          range: async (start: number, end: number) => { ranges.push([start, end]); return { data: wishes.slice(start, end + 1), error: null }; },
-        }) }) }) }),
+      from: (table: string) => table in collections ? {
+        select: () => ({ eq: () => {
+          const query = {
+            order: (column: string) => {
+              orders.push({ table, column });
+              return query;
+            },
+            range: async (start: number, end: number) => {
+              ranges.push({ table, start, end });
+              return { data: collections[table]!.slice(start, end + 1), error: null };
+            },
+          };
+          return query;
+        } }),
       } : row(rows[table]),
       auth: {
         admin: {
@@ -109,9 +132,28 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(data.profile, rows.profiles);
     assert.deepEqual(data.user_data, rows.user_data);
     assert.deepEqual(data.wishes, wishes);
-    assert.deepEqual(ranges, [[0, 999], [1000, 1999]]);
+    for (const table of Object.keys(collections)) {
+      assert.deepEqual(ranges.filter((entry) => entry.table === table), [
+        { table, start: 0, end: 999 },
+        { table, start: 1000, end: 1999 },
+      ]);
+    }
+    const columns: Record<string, string[]> = {
+      wishes: ['game_uid', 'id'],
+      forum_threads: ['id'],
+      forum_posts: ['id'],
+      forum_reactions: ['post_id', 'kind'],
+      forum_reports: ['id'],
+    };
+    for (const [table, list] of Object.entries(columns)) {
+      assert.deepEqual(orders.filter((entry) => entry.table === table).map((entry) => entry.column), [...list, ...list]);
+    }
     assert.deepEqual(data.roles, rows.roles);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
+    assert.deepEqual(data.forum, {
+      threads, posts, reactions,
+      reports, ban: rows.forum_bans,
+    });
     assert.ok(data.exported_at);
     assert.equal(JSON.stringify(data).includes('secret'), false);
     assert.equal(JSON.stringify(data).includes('provider_token'), false);

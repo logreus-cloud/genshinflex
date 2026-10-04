@@ -1,0 +1,176 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Форум')} description={t('Обсуждения Genshin Impact на GenshinFlex.')}>
+  <div class="forum" data-forum-thread>
+    <a href={`${base}/forum/`}>{t('Форум')}</a>
+    <div data-heading></div>
+    <p class="status" data-status></p>
+    <div class="forum-list" data-posts></div>
+    <nav class="forum-actions" data-pages></nav>
+
+    <section class="panel" data-reply>
+      <h2>{t('Ответить')}</h2>
+      <form data-reply-form>
+        <div class="forum-actions">
+          <button type="button" class="btn" data-tab-text>{t('Текст')}</button>
+          <button type="button" class="btn" data-tab-preview>{t('Предпросмотр')}</button>
+        </div>
+        <textarea class="input" rows="8" maxlength="10000" required></textarea>
+        <div class="forum-body" data-preview hidden></div>
+        <p class="small muted">{t('Подсказка по разметке: **жирный**, *курсив*, ||спойлер||, > цитата')}</p>
+        <span class="small muted" data-count>0/10000</span>
+        <button class="btn primary" type="submit">{t('Отправить')}</button>
+      </form>
+    </section>
+
+    <section class="panel forum-actions" data-moderator hidden>
+      <h2>{t('Модерация')}</h2>
+    </section>
+
+    <dialog data-delete-dialog>
+      <form>
+        <label>
+          {t('Причина удаления')}
+          <input class="input" maxlength="200" />
+        </label>
+        <button class="btn" type="button" data-cancel>{t('Отмена')}</button>
+        <button class="btn primary" type="submit">{t('Удалить')}</button>
+      </form>
+    </dialog>
+
+    <dialog data-report-dialog>
+      <form>
+        <label>
+          {t('Причина жалобы')}
+          <select class="input">
+            <option value="spam">{t('Спам')}</option>
+            <option value="abuse">{t('Оскорбления')}</option>
+            <option value="spoiler">{t('Спойлер без пометки')}</option>
+            <option value="offtopic">{t('Не по теме')}</option>
+            <option value="other">{t('Другое')}</option>
+          </select>
+        </label>
+        <label>
+          {t('Комментарий для модератора')}
+          <textarea class="input" maxlength="500"></textarea>
+        </label>
+        <button class="btn" type="button" data-cancel>{t('Отмена')}</button>
+        <button class="btn primary" type="submit">{t('Пожаловаться')}</button>
+      </form>
+    </dialog>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { initForumThread } from '../../../scripts/forum/thread';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-forum-thread]');
+    if (root) void initForumThread(root, signal);
+  });
+</script>
+
+<style>
+  /* Классы вроде .btn и .forum-actions задают display и перебивают атрибут hidden */
+  .forum :global([hidden]) { display: none !important; }
+  .forum, .forum-list { display: grid; gap: 1rem; }
+  [data-heading] { display: grid; gap: .5rem; }
+  [data-heading] :global(h1) { margin: 0; overflow-wrap: anywhere; }
+  .forum :global(.forum-post) {
+    display: grid;
+    grid-template-columns: minmax(170px, 210px) minmax(0, 1fr);
+    gap: .8rem 1.2rem;
+    scroll-margin-top: 5rem;
+  }
+  .forum :global(.forum-post header) {
+    grid-row: 1 / span 4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .4rem;
+    min-width: 0;
+    padding-right: 1rem;
+    border-right: 1px solid var(--border);
+  }
+  .forum :global(.forum-post .forum-author) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem;
+    overflow-wrap: anywhere;
+  }
+  .forum :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    overflow: hidden;
+  }
+  .forum :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .forum-actions, .forum :global(.forum-actions) {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+  .forum :global(.forum-post .forum-actions) { grid-column: 2; }
+  .forum :global(.forum-post form) { grid-column: 2; display: grid; gap: .6rem; }
+  .forum :global(.forum-post form .btn) { justify-self: start; }
+  .forum :global(.forum-post form .input) { width: 100%; }
+  .forum-body, .forum :global(.forum-body) { min-width: 0; overflow-wrap: anywhere; line-height: 1.6; }
+  .forum-body :global(pre), .forum :global(.forum-body pre) {
+    overflow: auto;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg-deep);
+  }
+  .forum-body :global(blockquote), .forum :global(.forum-body blockquote) {
+    border-left: 3px solid var(--accent-text);
+    margin-left: 0;
+    padding-left: 1rem;
+  }
+  .forum-body :global(.spoiler), .forum :global(.forum-body .spoiler) {
+    background: var(--text);
+    color: transparent;
+    cursor: pointer;
+    border-radius: .2rem;
+  }
+  .forum-body :global(.spoiler.revealed), .forum :global(.forum-body .spoiler.revealed) {
+    background: transparent;
+    color: inherit;
+  }
+  .forum :global(.forum-body .spoiler:focus-visible) { outline: 2px solid var(--accent-text); }
+  [data-reply-form] { display: grid; gap: .7rem; }
+  textarea { width: 100%; resize: vertical; }
+  dialog {
+    max-width: 460px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+  }
+  dialog form, dialog label { display: grid; gap: .7rem; }
+  @media (max-width: 700px) {
+    .forum :global(.forum-post) { grid-template-columns: minmax(0, 1fr); }
+    .forum :global(.forum-post header) {
+      grid-row: auto;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 0 0 .7rem;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .forum :global(.forum-post .forum-actions), .forum :global(.forum-post form) { grid-column: 1; }
+  }
+</style>

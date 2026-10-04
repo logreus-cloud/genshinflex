@@ -1,0 +1,65 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import { FORUM_CATEGORIES } from '../../../lib/forum';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.flatMap((l) =>
+  FORUM_CATEGORIES.map((category) => ({
+    params: { locale: l === 'ru' ? undefined : l, category: category.slug },
+  })));
+const { base, t } = useData(Astro.currentLocale);
+const category = FORUM_CATEGORIES.find((item) => item.slug === Astro.params.category)!;
+---
+<Layout title={t(category.label)} description={t(category.description)}>
+  <div class="forum" data-forum-category data-category={category.slug}>
+    <a href={`${base}/forum/`}>{t('Форум')}</a>
+    <h1>{category.icon} {t(category.label)}</h1>
+    <p class="lead">{t(category.description)}</p>
+    <a class="btn primary" data-create href={`${base}/forum/new/?c=${category.slug}`}>{t('Новая тема')}</a>
+    <label>
+      {t('Язык')}
+      <select class="input" data-lang>
+        <option value="">{t('Все')}</option>
+        <option value="ru">{t('Русский')}</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+      </select>
+    </label>
+    <div class="forum-list" data-list></div>
+    <button class="btn" data-more hidden>{t('Показать ещё')}</button>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { initForumCategory } from '../../../scripts/forum/category';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-forum-category]');
+    if (root) void initForumCategory(root, signal);
+  });
+</script>
+
+<style>
+  /* Классы вроде .btn и .forum-actions задают display и перебивают атрибут hidden */
+  .forum :global([hidden]) { display: none !important; }
+  .forum { display: grid; gap: 1rem; }
+  .forum > .btn { justify-self: start; }
+  .forum-list { display: grid; gap: .7rem; }
+  .forum-list :global(.forum-thread) { display: grid; gap: .4rem; min-width: 0; }
+  .forum-list :global(.forum-thread > a) { font-weight: 700; overflow-wrap: anywhere; }
+  .forum-list :global(.forum-thread.muted) { opacity: .65; }
+  .forum-list :global(.forum-author) { display: inline-flex; align-items: center; flex-wrap: wrap; gap: .3rem; }
+  .forum-list :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  label { display: flex; align-items: center; gap: .5rem; }
+  select { max-width: 180px; }
+</style>
