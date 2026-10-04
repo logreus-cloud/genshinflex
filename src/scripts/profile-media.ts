@@ -1,6 +1,7 @@
 export type MediaKey = 'avatar' | 'cover' | 'background';
 
 const limits: Record<MediaKey, number> = { avatar: 50, cover: 50, background: 50 };
+export const maxMb = (kind: MediaKey) => limits[kind];
 const urls = new Map<string, string>();
 const loadingUrls = new Map<string, { promise: Promise<string | null>; cancel: () => void }>();
 const storageKey = (key: MediaKey, version?: string) => version ? `${key}@${version}` : key;

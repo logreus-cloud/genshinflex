@@ -1695,6 +1695,10 @@
   "en": "The image is too small at this scale — it will look blurry.",
   "es": "La imagen es demasiado pequeña a esta escala: se verá borrosa."
  },
+ "Картинка меньше рекомендуемой ({w}×{h} px) — на больших экранах будет нечётко": {
+  "en": "The image is below the recommended size ({w}×{h} px) — it may look blurry on large screens",
+  "es": "La imagen es más pequeña que el tamaño recomendado ({w}×{h} px): se verá borrosa en pantallas grandes"
+ },
  "Картинка слишком большая": {
   "en": "The image is too large",
   "es": "La imagen es demasiado grande"
@@ -3218,6 +3222,10 @@
  "Рекомендуем": {
   "en": "Recommended",
   "es": "Recomendamos"
+ },
+ "Рекомендуемый размер: от {w}×{h} px · PNG, JPEG, WebP, GIF · до {n} МБ": {
+  "en": "Recommended size: at least {w}×{h} px · PNG, JPEG, WebP, GIF · up to {n} MB",
+  "es": "Tamaño recomendado: al menos {w}×{h} px · PNG, JPEG, WebP, GIF · hasta {n} MB"
  },
  "Розовый": {
   "en": "Pink",
