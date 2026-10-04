@@ -5,6 +5,10 @@ import { claimsFromToken } from './lib/auth.ts';
 import type { TokenClaims } from './lib/auth.ts';
 import { deleteAccount, exportAccount } from './lib/account.ts';
 import type { AdminClient } from './lib/account.ts';
+import {
+  AccountError, adminDeleteAccount, banAccount, getAccount, listAccounts, unbanAccount,
+} from './lib/accounts.ts';
+import type { AccountClient } from './lib/accounts.ts';
 import type { Env } from './lib/env.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
@@ -17,9 +21,9 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.5.1';
+const version = '0.6.0';
 
-export type ServiceClient = AdminClient & TitleClient & Parameters<typeof telegramLogin>[0];
+export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
   Bindings: Env;
   Variables: {
@@ -77,7 +81,7 @@ async function titleBody(c: ApiContext): Promise<unknown> {
   }
 }
 
-function logTitleAction(admin: string, action: string, target: string): void {
+function logAdminAction(admin: string, action: string, target: string): void {
   console.log(JSON.stringify({ at: new Date().toISOString(), admin, action, target }));
 }
 
@@ -159,7 +163,7 @@ app.post('/admin/titles', async (c) => {
   if (admin instanceof Response) return admin;
   try {
     const title = await createTitle(client, await titleBody(c), admin.sub);
-    logTitleAction(admin.sub, 'create_title', title.id);
+    logAdminAction(admin.sub, 'create_title', title.id);
     return c.json(title, 201);
   } catch (error) {
     return titleFailure(c, error);
@@ -173,7 +177,7 @@ app.delete('/admin/titles/:id', async (c) => {
   if (admin instanceof Response) return admin;
   try {
     const result = await deleteTitle(client, c.req.param('id'));
-    logTitleAction(admin.sub, 'delete_title', c.req.param('id'));
+    logAdminAction(admin.sub, 'delete_title', c.req.param('id'));
     return c.json(result);
   } catch (error) {
     return titleFailure(c, error);
@@ -201,7 +205,7 @@ app.post('/admin/users/:userId/titles', async (c) => {
     const body = await titleBody(c);
     const result = await grantTitle(client, c.req.param('userId'), body, admin.sub);
     const title = (body as { title: string }).title;
-    logTitleAction(admin.sub, 'grant_title', `${c.req.param('userId')}:${title}`);
+    logAdminAction(admin.sub, 'grant_title', `${c.req.param('userId')}:${title}`);
     return c.json(result, 201);
   } catch (error) {
     return titleFailure(c, error);
@@ -215,10 +219,97 @@ app.delete('/admin/users/:userId/titles/:titleId', async (c) => {
   if (admin instanceof Response) return admin;
   try {
     const result = await revokeTitle(client, c.req.param('userId'), c.req.param('titleId'));
-    logTitleAction(admin.sub, 'revoke_title', `${c.req.param('userId')}:${c.req.param('titleId')}`);
+    logAdminAction(admin.sub, 'revoke_title', `${c.req.param('userId')}:${c.req.param('titleId')}`);
     return c.json(result);
   } catch (error) {
     return titleFailure(c, error);
+  }
+});
+
+function accountFailure(c: ApiContext, error: unknown): Response {
+  if (error instanceof AccountError) return c.json({ error: error.message }, error.status);
+  return c.json({ error: 'Внутренняя ошибка' }, 500);
+}
+
+app.get('/admin/accounts', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  try {
+    return c.json(await listAccounts(client, {
+      q: c.req.query('q'), filter: c.req.query('filter'), page: c.req.query('page'),
+    }));
+  } catch (error) {
+    return accountFailure(c, error);
+  }
+});
+
+app.get('/admin/accounts/:id', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  try {
+    return c.json(await getAccount(client, c.req.param('id')));
+  } catch (error) {
+    return accountFailure(c, error);
+  }
+});
+
+app.post('/admin/accounts/:id/ban', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Неверный JSON' }, 400);
+  }
+  try {
+    await banAccount(client, admin.sub, c.req.param('id'), body);
+    logAdminAction(admin.sub, `ban_${(body as { scope: string }).scope}`, c.req.param('id'));
+    return c.json(await getAccount(client, c.req.param('id')));
+  } catch (error) {
+    return accountFailure(c, error);
+  }
+});
+
+app.delete('/admin/accounts/:id/ban/:scope', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  try {
+    await unbanAccount(client, c.req.param('id'), c.req.param('scope'));
+    logAdminAction(admin.sub, `unban_${c.req.param('scope')}`, c.req.param('id'));
+    return c.json(await getAccount(client, c.req.param('id')));
+  } catch (error) {
+    return accountFailure(c, error);
+  }
+});
+
+app.delete('/admin/accounts/:id', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Требуется подтверждение' }, 400);
+  }
+  const confirm = body && typeof body === 'object' && !Array.isArray(body)
+    ? (body as { confirm?: unknown }).confirm : undefined;
+  try {
+    await adminDeleteAccount(client, admin.sub, c.req.param('id'), confirm);
+    logAdminAction(admin.sub, 'delete_account', c.req.param('id'));
+    return c.json({ ok: true });
+  } catch (error) {
+    return accountFailure(c, error);
   }
 });
 

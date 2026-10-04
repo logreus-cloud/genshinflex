@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-// Админка: заявки гайдов, обратная связь и титулы. Страница и /api/admin закрыты Cloudflare Access (вход по почте),
+// Админка: заявки гайдов, обратная связь, титулы и аккаунты. Страница и /api/admin закрыты Cloudflare Access (вход по почте),
 // данные приходят из /api/admin/inbox. Публикация гайда — локально: npm run guide:md -- <номер>
 ---
 <Layout title="Админка" noindex wide>
@@ -14,6 +14,7 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" role="tab" aria-selected="true" data-tab="guides">Гайды <b id="c-guides">…</b></button>
         <button type="button" role="tab" aria-selected="false" data-tab="feedback">Обратная связь <b id="c-feedback">…</b></button>
         <button type="button" role="tab" aria-selected="false" data-tab="titles">Титулы</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="accounts">Аккаунты</button>
       </div>
       <label class="small"><input type="checkbox" id="all" /> показать обработанные</label>
       <button type="button" class="btn small" id="reload">Обновить</button>
@@ -53,6 +54,30 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </div>
     </section>
+    <section id="accounts" class="list accounts" hidden>
+      <p class="notice" id="accounts-auth" hidden></p>
+      <div class="accounts-content" id="accounts-content">
+        <p class="notice" id="accounts-error" hidden></p>
+        <div id="accounts-list-view" class="accounts-content">
+          <div class="row acc-toolbar">
+            <input id="accounts-query" type="search" placeholder="Почта, ник, имя или ID" autocomplete="off" aria-label="Поиск аккаунтов" />
+            <select id="accounts-filter" aria-label="Фильтр аккаунтов">
+              <option value="all">Все</option>
+              <option value="banned">Забаненные</option>
+              <option value="staff">Команда</option>
+            </select>
+            <span class="muted small" id="accounts-count"></span>
+          </div>
+          <div class="list" id="accounts-list"></div>
+          <div class="row acc-pager">
+            <button type="button" class="btn small" id="accounts-prev">← Назад</button>
+            <span class="muted small" id="accounts-page"></span>
+            <button type="button" class="btn small" id="accounts-next">Вперёд →</button>
+          </div>
+        </div>
+        <div id="accounts-detail" class="accounts-content" hidden></div>
+      </div>
+    </section>
   </div>
 </Layout>
 
@@ -61,6 +86,7 @@ import { makeLookup, renderGuide, esc } from '../lib/guide-markup';
 import { API_URL } from '../lib/platform';
 import { authUrl, getSupabase, pageBase } from '../scripts/auth';
 import { onPage, cleanup } from '../scripts/router';
+import { initAccounts } from '../scripts/admin-accounts';
 
 onPage(async (signal) => {
   const root = document.querySelector<HTMLElement>('.adm');
@@ -327,6 +353,7 @@ onPage(async (signal) => {
       if (!signal.aborted) button.disabled = false;
     }
   }, { signal });
+  const accounts = initAccounts($('#accounts'), signal);
   root.querySelector('.tabs')!.addEventListener('click', (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-tab]');
     if (!button) return;
@@ -334,11 +361,14 @@ onPage(async (signal) => {
     $('#guides').hidden = button.dataset.tab !== 'guides';
     $('#feedback').hidden = button.dataset.tab !== 'feedback';
     $('#titles').hidden = button.dataset.tab !== 'titles';
-    $<HTMLInputElement>('#all').parentElement!.hidden = button.dataset.tab === 'titles';
+    $('#accounts').hidden = button.dataset.tab !== 'accounts';
+    $<HTMLInputElement>('#all').parentElement!.hidden = button.dataset.tab === 'titles' || button.dataset.tab === 'accounts';
     if (button.dataset.tab === 'titles') void loadTitles();
+    if (button.dataset.tab === 'accounts') void accounts.load();
   }, { signal });
   $('#reload').addEventListener('click', () => {
     if (!$('#titles').hidden) void loadTitles().then(() => searchUsers());
+    if (!$('#accounts').hidden) void accounts.load();
   }, { signal });
 
   const editor = await fetch('/data/editor.json', { signal: controller.signal }).then((r) => r.json()).catch(() => null);
@@ -451,7 +481,7 @@ onPage(async (signal) => {
       if (signal.aborted) return;
       void load();
     }
-    if (b.id === 'reload' && $('#titles').hidden) void load();
+    if (b.id === 'reload' && $('#titles').hidden && $('#accounts').hidden) void load();
   }, { signal });
   $('#all').addEventListener('change', () => { void load(); }, { signal });
   void load();
@@ -492,6 +522,32 @@ onPage(async (signal) => {
   .titles :global(.title-user-chips), .titles :global(.title-user-actions) { align-items: center; flex-wrap: wrap; }
   .titles :global(.title-user-actions input) { flex: 1 1 220px; }
   .titles :global(.title-revoke) { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 0 .1rem; }
+  .accounts-content { display: grid; gap: 10px; }
+  .accounts-content[hidden] { display: none; }
+  .accounts :global(input), .accounts :global(select) { min-width: 0; padding: .45rem .6rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: inherit; font: inherit; }
+  .acc-toolbar, .acc-pager { align-items: center; flex-wrap: wrap; }
+  .acc-toolbar input { flex: 1 1 260px; }
+  .accounts :global(.acc-row) { display: grid; gap: .3rem; width: 100%; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+  .accounts :global(.acc-row:hover) { border-color: var(--accent); }
+  .accounts :global(.acc-head) { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+  .accounts :global(.acc-head h2) { margin: 0; }
+  .accounts :global(.acc-email) { overflow-wrap: anywhere; }
+  .accounts :global(.acc-badges) { flex-wrap: wrap; gap: .35rem; }
+  .accounts :global(.acc-ban) { color: #f87171; border-color: color-mix(in srgb, #f87171 50%, transparent); }
+  .accounts :global(.acc-card) { display: grid; gap: .8rem; }
+  .accounts :global(.acc-fields) { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .6rem 1rem; }
+  .accounts :global(.acc-field) { display: grid; gap: .1rem; min-width: 0; overflow-wrap: anywhere; }
+  .accounts :global(.acc-id) { align-items: center; flex-wrap: wrap; gap: .4rem; }
+  .accounts :global(.acc-actions) { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+  .accounts :global(.acc-action) { display: grid; gap: .5rem; align-content: start; }
+  .accounts :global(.acc-action h3), .accounts :global(.acc-action p) { margin: 0; }
+  .accounts :global(.acc-action > button) { justify-self: start; }
+  .accounts :global(.acc-ban-form) { flex-wrap: wrap; align-items: center; }
+  .accounts :global(.acc-ban-form input) { flex: 1 1 160px; }
+  .accounts :global(.acc-ban-form[hidden]) { display: none; }
+  .accounts :global(.acc-danger) { color: #fff; background: #c2410c; border-color: #c2410c; }
+  .accounts :global(.acc-danger:disabled) { opacity: .5; cursor: not-allowed; }
+  .accounts > :global(button), .accounts-content > :global(button) { justify-self: start; }
   :global(:root[data-theme="light"]) .titles :global(.title-chip) { color: color-mix(in srgb, var(--title-color) 70%, #000); }
   @media (prefers-color-scheme: light) {
     :global(:root:not([data-theme])) .titles :global(.title-chip) { color: color-mix(in srgb, var(--title-color) 70%, #000); }

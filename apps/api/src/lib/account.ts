@@ -110,6 +110,11 @@ async function mediaPaths(client: AdminClient, bucketName: string, folder: strin
 export async function deleteAccount(client: AdminClient, id: string, confirm: unknown, claims: TokenClaims, now = Date.now()) {
   const check = deletionCheck(confirm, claims, now);
   if (check) return check;
+  await purgeAccount(client, id);
+  return null;
+}
+
+export async function purgeAccount(client: AdminClient, id: string) {
   for (const name of ['avatars', 'profile-media']) {
     const bucket = client.storage.from(name);
     const paths = await mediaPaths(client, name, id);
@@ -120,5 +125,4 @@ export async function deleteAccount(client: AdminClient, id: string, confirm: un
   }
   const { error } = await client.auth.admin.deleteUser(id, false);
   if (error) throw new Error('Account removal failed');
-  return null;
 }

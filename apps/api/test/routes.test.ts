@@ -28,6 +28,11 @@ const routes: Route[] = [
   { method: 'GET', path: '/admin/users', admin: true },
   { method: 'POST', path: `/admin/users/${userId}/titles`, body: {}, admin: true },
   { method: 'DELETE', path: `/admin/users/${userId}/titles/test`, admin: true },
+  { method: 'GET', path: '/admin/accounts', admin: true },
+  { method: 'GET', path: `/admin/accounts/${userId}`, admin: true },
+  { method: 'POST', path: `/admin/accounts/${userId}/ban`, body: { scope: 'forum', days: 1 }, admin: true },
+  { method: 'DELETE', path: `/admin/accounts/${userId}/ban/forum`, admin: true },
+  { method: 'DELETE', path: `/admin/accounts/${userId}`, body: { confirm: 'traveler' }, admin: true },
   { method: 'GET', path: '/me/export' },
   { method: 'DELETE', path: '/me', body: { confirm: 'DELETE' } },
 ];
