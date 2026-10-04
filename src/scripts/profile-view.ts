@@ -12,7 +12,8 @@ export type CoverType = 'none' | 'namecard' | 'upload';
 export type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
 export type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss';
 export type Effect = 'none' | 'snow' | 'sparks' | 'petals' | 'stars' | 'fireflies' | 'blizzard';
-export type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
+export type Framing = { x: number; y: number; zoom: number };
+export type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; framing: Partial<Record<MediaKey, Framing>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
 type MediaSource = (key: MediaKey) => string | null;
 type EffectView = ReturnType<typeof createEffect>;
 
@@ -32,7 +33,8 @@ export const mediaKeys: MediaKey[] = ['avatar', 'cover', 'background'];
 export const hexOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
 export const colorOk = (value: unknown): value is string => typeof value === 'string' && (hexOk(value) || colors.some((color) => color === value) || extraColors.some(([key]) => key === value));
 export const bounded = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max;
-export const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
+export const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, framing: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
+export const framingOf = (custom: Custom, key: MediaKey): Framing => custom.framing[key] ?? { x: 50, y: key === 'cover' && custom.coverType === 'upload' ? custom.coverPosition : 50, zoom: 100 };
 export const usesMedia = (custom: Custom, key: MediaKey) => key === 'avatar' ? custom.avatar.type === 'upload' : key === 'cover' ? custom.coverType === 'upload' : custom.background.type === 'upload';
 const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 const num = (value: unknown) => value !== null && value !== undefined && Number.isFinite(Number(value)) ? Number(value) : null;
@@ -137,6 +139,17 @@ export function validCustom(value: unknown, pickerBySlug: ReadonlyMap<string, Pi
   else valid = false;
   if (result.coverType === 'namecard' && !result.cover) valid = false;
   if (value.coverPosition === undefined || bounded(value.coverPosition, 0, 100)) result.coverPosition = value.coverPosition as number ?? 50; else valid = false;
+  if (value.framing !== undefined) {
+    if (!isRecord(value.framing)) valid = false;
+    else for (const [key, frame] of Object.entries(value.framing)) {
+      if (!mediaKeys.includes(key as MediaKey) || !isRecord(frame) ||
+        !bounded(frame.x, 0, 100) || !bounded(frame.y, 0, 100) || !bounded(frame.zoom, 100, 400)) {
+        valid = false;
+        continue;
+      }
+      result.framing[key as MediaKey] = { x: frame.x as number, y: frame.y as number, zoom: frame.zoom as number };
+    }
+  }
   if (colorOk(value.color)) result.color = value.color; else valid = false;
   if (value.frame === undefined || frames.some(([key]) => key === value.frame)) result.frame = value.frame as Frame ?? 'none'; else valid = false;
   if (value.effect === undefined || effects.some(([key]) => key === value.effect)) result.effect = value.effect as Effect ?? 'none'; else valid = false;
@@ -233,10 +246,21 @@ export function frameMarks(shell: HTMLElement) {
   }
 }
 
+export function applyFraming(image: HTMLImageElement, frame: Framing | null) {
+  image.style.objectFit = 'cover';
+  image.style.objectPosition = frame ? `${frame.x}% ${frame.y}%` : '';
+  image.style.transform = frame ? `scale(${frame.zoom / 100})` : '';
+  image.style.transformOrigin = frame ? `${frame.x}% ${frame.y}%` : '';
+}
+
 export function renderAvatar(box: HTMLElement, shell: HTMLElement, custom: Custom, pickerBySlug: ReadonlyMap<string, PickerChar>, mediaSource: MediaSource, placeholder: Node) {
   box.replaceChildren(placeholder.cloneNode(true));
   const src = custom.avatar.type === 'character' ? iconUrl(pickerBySlug.get(custom.avatar.slug)?.icon) : custom.avatar.type === 'upload' ? mediaSource('avatar') : null;
-  if (src) box.replaceChildren(img(src, 96));
+  if (src) {
+    const image = img(src, 96);
+    applyFraming(image, custom.avatar.type === 'upload' ? framingOf(custom, 'avatar') : null);
+    box.replaceChildren(image);
+  }
   shell.dataset.frame = custom.frame;
   frameMarks(shell);
 }
@@ -244,15 +268,21 @@ export function renderAvatar(box: HTMLElement, shell: HTMLElement, custom: Custo
 export function renderCover(cover: HTMLImageElement, custom: Custom, pickerBySlug: ReadonlyMap<string, PickerChar>, mediaSource: MediaSource) {
   const src = custom.coverType === 'upload' ? mediaSource('cover') : custom.coverType === 'namecard' ? iconUrl(pickerBySlug.get(custom.cover)?.namecard) : null;
   cover.hidden = !src;
-  cover.style.objectPosition = `center ${custom.coverPosition}%`;
+  applyFraming(cover, custom.coverType === 'upload' ? framingOf(custom, 'cover') : null);
+  if (custom.coverType === 'namecard') cover.style.objectPosition = `center ${custom.coverPosition}%`;
   if (src) cover.src = src; else cover.removeAttribute('src');
 }
 
 export function renderBackground(layer: HTMLElement, custom: Custom, pickerBySlug: ReadonlyMap<string, PickerChar>, mediaSource: MediaSource) {
   const bg = custom.background;
   const src = bg.type === 'upload' ? mediaSource('background') : bg.type === 'namecard' ? iconUrl(pickerBySlug.get(bg.slug)?.namecard) : null;
-  layer.style.backgroundImage = src ? `url("${src}")` : bg.type === 'color' ? bg.gradient ? `linear-gradient(135deg, ${accentHex(custom.color)}, var(--bg-deep))` : 'none' : 'none';
-  layer.style.backgroundColor = bg.type === 'color' ? accentHex(custom.color) : 'transparent';
+  const image = layer.querySelector<HTMLElement>('.profile-bg-image')!;
+  const frame = bg.type === 'upload' ? framingOf(custom, 'background') : null;
+  image.style.backgroundImage = src ? `url("${src}")` : bg.type === 'color' ? bg.gradient ? `linear-gradient(135deg, ${accentHex(custom.color)}, var(--bg-deep))` : 'none' : 'none';
+  image.style.backgroundColor = bg.type === 'color' ? accentHex(custom.color) : 'transparent';
+  image.style.backgroundPosition = frame ? `${frame.x}% ${frame.y}%` : '';
+  image.style.transform = frame ? `scale(${frame.zoom / 100})` : '';
+  image.style.transformOrigin = frame ? `${frame.x}% ${frame.y}%` : '';
   layer.style.setProperty('--profile-darken', String(bg.darken / 100));
   layer.style.setProperty('--profile-blur', `${bg.blur}px`);
   layer.hidden = bg.type === 'default' || ((bg.type === 'upload' || bg.type === 'namecard') && !src);

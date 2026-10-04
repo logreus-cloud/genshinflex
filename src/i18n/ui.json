@@ -1679,6 +1679,10 @@
   "en": "Level-up calculator",
   "es": "Calculadora de ascensión"
  },
+ "Кадр": {
+  "en": "Framing",
+  "es": "Encuadre"
+ },
  "Карта Тейвата": {
   "en": "Map of Teyvat",
   "es": "Mapa de Teyvat"
@@ -2462,6 +2466,10 @@
  "Нужно": {
   "en": "Needs",
   "es": "Necesita"
+ },
+ "Перетащите картинку, чтобы выбрать видимую часть": {
+  "en": "Drag the image to choose the visible area",
+  "es": "Arrastra la imagen para elegir la parte visible"
  },
  "Нумерованный список": {
   "en": "Numbered list",
@@ -3254,6 +3262,10 @@
  "Сбросить": {
   "en": "Reset",
   "es": "Restablecer"
+ },
+ "Сбросить кадр": {
+  "en": "Reset framing",
+  "es": "Restablecer encuadre"
  },
  "Сбросить оформление": {
   "en": "Reset appearance",

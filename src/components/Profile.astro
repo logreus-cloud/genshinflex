@@ -14,7 +14,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 ---
 <Layout title={t(mode === 'public' ? 'Профиль игрока' : 'Мой профиль')} description={t(mode === 'public' ? 'Публичный профиль игрока на GenshinFlex.' : 'Избранное, персонажи и история круток.')} noindex={mode === 'public'}>
   <div class="profile-root profile-page" data-mode={mode}>
-    <div class="profile-bg" id="profile-bg" aria-hidden="true"></div>
+    <div class="profile-bg" id="profile-bg" aria-hidden="true"><div class="profile-bg-image"></div></div>
     <canvas class="profile-effect" id="profile-effect" aria-hidden="true" hidden></canvas>
     {mode === 'own' && <AccountStrip />}
     <section class="profile-card hero">
@@ -183,6 +183,14 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <div id="avatar-upload-panel" hidden>
               <input id="avatar-file" type="file" accept="image/gif,image/png,image/jpeg,image/webp" aria-label={t('Своя картинка')} />
               <p class="small status" id="avatar-status" aria-live="polite"></p>
+              <div class="framing-editor" id="avatar-frame-editor" hidden>
+                <strong>{t('Кадр')}</strong>
+                <div class="framing-preview avatar-framing" id="avatar-frame-preview" tabindex="0" role="application" aria-label={t('Перетащите картинку, чтобы выбрать видимую часть')}><img id="avatar-frame-image" alt="" /></div>
+                <small>{t('Перетащите картинку, чтобы выбрать видимую часть')}</small>
+                <label for="avatar-frame-zoom">{t('Масштаб')} <output id="avatar-frame-value">100%</output></label>
+                <input id="avatar-frame-zoom" type="range" min="100" max="400" />
+                <button class="btn" id="avatar-frame-reset" type="button">{t('Сбросить кадр')}</button>
+              </div>
             </div>
           </section>
           <section class="editor-section">
@@ -205,9 +213,19 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <div id="cover-upload-panel" hidden>
               <input id="cover-file" type="file" accept="image/gif,image/png,image/jpeg,image/webp" aria-label={t('Своя картинка')} />
               <p class="small status" id="cover-status" aria-live="polite"></p>
+              <div class="framing-editor" id="cover-frame-editor" hidden>
+                <strong>{t('Кадр')}</strong>
+                <div class="framing-preview cover-framing" id="cover-frame-preview" tabindex="0" role="application" aria-label={t('Перетащите картинку, чтобы выбрать видимую часть')}><img id="cover-frame-image" alt="" /></div>
+                <small>{t('Перетащите картинку, чтобы выбрать видимую часть')}</small>
+                <label for="cover-frame-zoom">{t('Масштаб')} <output id="cover-frame-value">100%</output></label>
+                <input id="cover-frame-zoom" type="range" min="100" max="400" />
+                <button class="btn" id="cover-frame-reset" type="button">{t('Сбросить кадр')}</button>
+              </div>
             </div>
-            <label for="cover-position">{t('Положение обложки')}</label>
-            <input id="cover-position" type="range" min="0" max="100" />
+            <div id="cover-position-row">
+              <label for="cover-position">{t('Положение обложки')}</label>
+              <input id="cover-position" type="range" min="0" max="100" />
+            </div>
           </section>
         </div>
         <div class="editor-panel" data-panel="background" hidden>
@@ -226,6 +244,14 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <div id="background-upload-panel" hidden>
               <input id="background-file" type="file" accept="image/gif,image/png,image/jpeg,image/webp" aria-label={t('Своя картинка')} />
               <p class="small status" id="background-status" aria-live="polite"></p>
+              <div class="framing-editor" id="background-frame-editor" hidden>
+                <strong>{t('Кадр')}</strong>
+                <div class="framing-preview background-framing" id="background-frame-preview" tabindex="0" role="application" aria-label={t('Перетащите картинку, чтобы выбрать видимую часть')}><img id="background-frame-image" alt="" /></div>
+                <small>{t('Перетащите картинку, чтобы выбрать видимую часть')}</small>
+                <label for="background-frame-zoom">{t('Масштаб')} <output id="background-frame-value">100%</output></label>
+                <input id="background-frame-zoom" type="range" min="100" max="400" />
+                <button class="btn" id="background-frame-reset" type="button">{t('Сбросить кадр')}</button>
+              </div>
             </div>
             <label class="check-row" id="background-gradient-row"><input id="background-gradient" type="checkbox" />{t('Градиент')}</label>
             <label for="background-darken">{t('Затемнение')}</label>
@@ -419,9 +445,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import { openWishStore, type Wish, type WishStore } from '../scripts/wish-store';
   import { onSessionChange } from '../scripts/user-data/session';
   import {
-    type Avatar, type BackgroundType, type CoverType, type Custom, type PickerChar,
-    accentHex, colors, colorNames, createEffect, effects, el, emptyCustom, extraColors,
-    frameMarks, frames, hexOk, iconUrl, img, mediaKeys, readPickerChars,
+    type Avatar, type BackgroundType, type CoverType, type Custom, type Framing, type PickerChar,
+    accentHex, applyFraming, colors, colorNames, createEffect, effects, el, emptyCustom, extraColors,
+    frameMarks, frames, framingOf, hexOk, iconUrl, img, mediaKeys, readPickerChars,
     fetchShowcase, loadChars, renderAppearance, renderAvatar, renderCover, renderEntryList,
     renderRosterList, renderShowcase, renderWishSummary, safeHref, usesMedia, validCustom, validRoster,
     type Char, type Profile, type RosterEntry, type WishSummary,
@@ -461,6 +487,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const mediaOperations: Record<MediaKey, number> = { avatar: 0, cover: 0, background: 0 };
   const stagedMedia = new Map<MediaKey, StagedMedia>();
   const committedUrls = new Map<MediaKey, string>();
+  const stopDragging: (() => void)[] = [];
   const status = (message: string, bad = false) => { $('profile-status').textContent = message; $('profile-status').classList.toggle('bad', bad); };
   let showcaseRequest = 0;
   let showcaseController: AbortController | null = null;
@@ -492,6 +519,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     renderCover($<HTMLImageElement>('preview-cover'), draft, pickerBySlug, mediaSource);
     renderAvatar(previewAvatar, $('preview-avatar-shell'), draft, pickerBySlug, mediaSource, placeholder);
     $('effect-reduced').hidden = !reduced.matches;
+    renderFramers();
   }
   function renderProfile() {
     const player = currentProfile?.player;
@@ -535,6 +563,33 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         fives: list.filter((wish) => wish.rank_type === '5').length, pity });
     }
     renderWishSummary($('wishes-list'), accounts);
+  }
+  function uploadTabOpen(key: MediaKey) {
+    return key === 'avatar' ? avatarTab === 'upload' : key === 'cover' ? draft.coverType === 'upload' : draft.background.type === 'upload';
+  }
+  function renderFramers() {
+    const banner = $('profile-banner'), background = $('profile-bg');
+    const bannerWidth = banner.clientWidth || banner.parentElement?.clientWidth || root.clientWidth || innerWidth;
+    const bannerHeight = banner.clientHeight || (innerWidth <= 700 ? 120 : 180);
+    const coverRatio = bannerWidth / bannerHeight;
+    $('cover-frame-preview').style.setProperty('--banner-ratio', String(coverRatio));
+    $('preview-banner').style.setProperty('--banner-ratio', String(coverRatio));
+    const top = parseFloat(getComputedStyle(background).top) || 0;
+    const ratio = (background.clientWidth || innerWidth) / (background.clientHeight || Math.max(1, innerHeight - top));
+    $('background-frame-preview').style.setProperty('--frame-ratio', String(ratio));
+    for (const key of mediaKeys) {
+      const src = mediaSource(key);
+      const editor = $(`${key}-frame-editor`);
+      const image = $<HTMLImageElement>(`${key}-frame-image`);
+      editor.hidden = !src || !uploadTabOpen(key);
+      if (src) {
+        if (image.getAttribute('src') !== src) image.src = src;
+        applyFraming(image, framingOf(draft, key));
+      } else image.removeAttribute('src');
+      const zoom = framingOf(draft, key).zoom;
+      $<HTMLInputElement>(`${key}-frame-zoom`).value = String(zoom);
+      $(`${key}-frame-value`).textContent = `${zoom}%`;
+    }
   }
   function choice(char: PickerChar, selected: boolean, cover = false, focusKey = '') {
     const button = el('button', 'choice');
@@ -664,6 +719,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     $('cover-upload-panel').hidden = draft.coverType !== 'upload';
     $('background-namecard-panel').hidden = draft.background.type !== 'namecard';
     $('background-upload-panel').hidden = draft.background.type !== 'upload';
+    $('cover-position-row').hidden = draft.coverType !== 'namecard';
     $('background-gradient-row').hidden = draft.background.type !== 'color';
     $<HTMLInputElement>('cover-position').value = String(draft.coverPosition);
     $<HTMLInputElement>('background-darken').value = String(draft.background.darken);
@@ -679,6 +735,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     for (const [kind, id] of [['character', 'avatar-character'], ['upload', 'avatar-upload'], ['none', 'avatar-none']] as const) $(id).setAttribute('aria-pressed', String(kind === tab));
     $('avatar-character-panel').hidden = tab !== 'character';
     $('avatar-upload-panel').hidden = tab !== 'upload';
+    renderFramers();
   }
   function setEditorTab(tab: string) {
     for (const button of document.querySelectorAll<HTMLButtonElement>('[data-editor-tab]')) button.setAttribute('aria-pressed', String(button.dataset.editorTab === tab));
@@ -714,6 +771,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     setAvatarTab(draft.avatar.type);
     setEditorTab('basic');
     renderPickers();
+    renderPersonal();
     dialog.showModal();
     $<HTMLInputElement>('editor-name').focus();
   }
@@ -873,6 +931,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   $('save-editor').addEventListener('click', async () => {
     if (saving || exporting || !dialog.open || editorGeneration !== sessionGeneration) return;
     saving = true;
+    for (const stop of stopDragging) stop();
     const session = editorSession;
     const generation = editorGeneration;
     const snapshot = structuredClone(draft);
@@ -881,9 +940,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const controls = [...dialog.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement>('button, input, textarea')]
       .filter((control) => !control.closest('#public-field, #privacy-field'))
       .map((control) => [control, control.disabled] as const);
-    const release = () => { if (releaseControls !== release) return; for (const [control, disabled] of controls) control.disabled = disabled; releaseControls = null; };
+    const release = () => { if (releaseControls !== release) return; for (const [control, disabled] of controls) control.disabled = disabled; for (const key of mediaKeys) $(`${key}-frame-preview`).removeAttribute('aria-disabled'); releaseControls = null; };
     releaseControls = release;
     for (const [control] of controls) control.disabled = true;
+    for (const key of mediaKeys) $(`${key}-frame-preview`).setAttribute('aria-disabled', 'true');
     for (const key of mediaKeys) mediaOperations[key]++;
     importSelection++;
     let version = '', written: MediaKey[] = [], switched = false;
@@ -956,7 +1016,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   });
   for (const id of ['avatar-search', 'cover-search', 'favorite-search', 'background-search']) $(id).addEventListener('input', renderPickers);
   $('avatar-character').addEventListener('click', () => { mediaOperations.avatar++; setAvatarTab('character'); });
-  $('avatar-upload').addEventListener('click', () => { mediaOperations.avatar++; setAvatarTab('upload'); });
+  $('avatar-upload').addEventListener('click', () => { mediaOperations.avatar++; if (mediaSource('avatar')) draft.avatar = { type: 'upload' }; setAvatarTab('upload'); renderPersonal(); renderPickers(); });
   $('avatar-none').addEventListener('click', () => { mediaOperations.avatar++; draft.avatar = { type: 'none' }; setAvatarTab('none'); renderPersonal(); renderPickers(); });
   for (const button of document.querySelectorAll<HTMLButtonElement>('[data-cover-type]')) button.addEventListener('click', () => {
     mediaOperations.cover++;
@@ -970,6 +1030,81 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (draft.background.type === 'namecard' && !draft.background.slug) draft.background.slug = pickerChars.find((char) => char.namecard)?.slug ?? '';
     renderPersonal(); renderPickers();
   });
+  for (const key of mediaKeys) {
+    const frame = $(`${key}-frame-preview`);
+    const image = $<HTMLImageElement>(`${key}-frame-image`);
+    const zoom = $<HTMLInputElement>(`${key}-frame-zoom`);
+    let pointer = -1, startX = 0, startY = 0, lastX = 0, lastY = 0, initial = framingOf(draft, key);
+    const update = (next: Framing, dragging = false) => {
+      if (saving || !mediaSource(key) || !uploadTabOpen(key)) return;
+      const changedType = !usesMedia(draft, key);
+      if (key === 'avatar') draft.avatar = { type: 'upload' };
+      else if (key === 'cover') draft.coverType = 'upload';
+      else draft.background.type = 'upload';
+      draft.framing[key] = {
+        x: Math.max(0, Math.min(100, Math.round(next.x))),
+        y: Math.max(0, Math.min(100, Math.round(next.y))),
+        zoom: Math.max(100, Math.min(400, Math.round(next.zoom))),
+      };
+      renderPersonal();
+      if (changedType) renderPickers();
+      if (pointer !== -1 && !dragging) {
+        initial = { ...draft.framing[key]! };
+        startX = lastX; startY = lastY;
+      }
+    };
+    frame.addEventListener('pointerdown', (event) => {
+      if (saving || pointer !== -1 || !image.naturalWidth || !image.naturalHeight) return;
+      pointer = event.pointerId;
+      startX = lastX = event.clientX; startY = lastY = event.clientY;
+      initial = { ...framingOf(draft, key) };
+      frame.setPointerCapture(pointer);
+      frame.focus();
+      frame.classList.add('dragging');
+    }, { signal });
+    frame.addEventListener('pointermove', (event) => {
+      if (saving || event.pointerId !== pointer) return;
+      const width = frame.clientWidth, height = frame.clientHeight;
+      const fit = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+      const scale = initial.zoom / 100;
+      const travelX = image.naturalWidth * fit * scale - width;
+      const travelY = image.naturalHeight * fit * scale - height;
+      lastX = event.clientX; lastY = event.clientY;
+      update({ x: travelX > 0 ? initial.x - (event.clientX - startX) * 100 / travelX : initial.x,
+        y: travelY > 0 ? initial.y - (event.clientY - startY) * 100 / travelY : initial.y, zoom: initial.zoom }, true);
+    }, { signal });
+    const stop = (event?: PointerEvent) => {
+      if (pointer === -1 || (event && event.pointerId !== pointer)) return;
+      if (frame.hasPointerCapture(pointer)) frame.releasePointerCapture(pointer);
+      pointer = -1;
+      frame.classList.remove('dragging');
+    };
+    stopDragging.push(() => stop());
+    frame.addEventListener('pointerup', stop, { signal });
+    frame.addEventListener('pointercancel', stop, { signal });
+    frame.addEventListener('wheel', (event) => {
+      if (saving) return;
+      event.preventDefault();
+      update({ ...framingOf(draft, key), zoom: framingOf(draft, key).zoom + (event.deltaY < 0 ? 10 : -10) });
+    }, { passive: false, signal });
+    frame.addEventListener('keydown', (event) => {
+      if (saving) return;
+      const current = framingOf(draft, key);
+      const next = { ...current };
+      if (event.key === 'ArrowLeft') next.x += 2;
+      else if (event.key === 'ArrowRight') next.x -= 2;
+      else if (event.key === 'ArrowUp') next.y += 2;
+      else if (event.key === 'ArrowDown') next.y -= 2;
+      else if (event.key === '+' || event.key === '=') next.zoom += 10;
+      else if (event.key === '-') next.zoom -= 10;
+      else return;
+      event.preventDefault();
+      update(next);
+    }, { signal });
+    zoom.addEventListener('input', () => update({ ...framingOf(draft, key), zoom: Number(zoom.value) }), { signal });
+    $(`${key}-frame-reset`).addEventListener('click', () => update({ x: 50, y: 50, zoom: 100 }), { signal });
+  }
+  window.addEventListener('resize', renderFramers, { signal });
   for (const key of mediaKeys) $<HTMLInputElement>(`${key}-file`).addEventListener('change', async (event) => {
     const input = event.target as HTMLInputElement, file = input.files?.[0];
     input.value = '';
@@ -980,7 +1115,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     try {
       const blob = await prepareImage(file, key);
       if (!active()) return;
+      const probe = new Image();
+      const url = URL.createObjectURL(blob);
+      let portrait = false;
+      try {
+        probe.src = url;
+        await probe.decode();
+        portrait = probe.naturalHeight > probe.naturalWidth;
+      } finally { URL.revokeObjectURL(url); }
+      if (!active()) return;
       stage(key, blob);
+      draft.framing[key] = { x: 50, y: portrait && key !== 'background' ? 30 : 50, zoom: 100 };
       if (key === 'avatar') { draft.avatar = { type: 'upload' }; setAvatarTab('upload'); }
       if (key === 'cover') draft.coverType = 'upload';
       if (key === 'background') draft.background.type = 'upload';
@@ -1165,7 +1310,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .profile-root { --profile-accent: var(--accent); --profile-accent-ink: var(--accent-ink); }
   .profile-page { display: grid; gap: 14px; min-width: 0; }
   .profile-page > :not(.profile-bg, .profile-effect, .profile-dialog) { position: relative; z-index: 1; }
-  .profile-bg { position: fixed; inset: var(--top-h) 0 0; z-index: 0; background-position: center; background-size: cover; pointer-events: none; }
+  .profile-bg { position: fixed; inset: var(--top-h) 0 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .profile-bg-image { position: absolute; inset: 0; background-position: center; background-size: cover; }
   .profile-bg::after { content: ""; position: absolute; inset: 0; background: rgb(0 0 0 / var(--profile-darken, 0)); backdrop-filter: blur(var(--profile-blur, 0px)); }
   .profile-effect { position: fixed; top: var(--top-h); left: 0; z-index: 5; pointer-events: none; }
   :global(html.profile-custom-bg .season-scene), :global(html.profile-custom-bg .season-snow) { display: none; }
@@ -1176,7 +1322,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   .profile-grid > * { min-width: 0; }
   .hero { padding: 0; overflow: hidden; }
-  .banner, .preview-banner { position: relative; height: 180px; background: linear-gradient(135deg, var(--profile-accent), var(--surface-2)); }
+  .banner, .preview-banner { position: relative; height: 180px; overflow: hidden; background: linear-gradient(135deg, var(--profile-accent), var(--surface-2)); }
   .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgb(0 0 0 / .5)); pointer-events: none; }
   .banner img, .preview-banner img { width: 100%; height: 100%; object-fit: cover; }
   .edit-profile { position: absolute; z-index: 1; top: 1rem; right: 1rem; background: var(--surface); border-color: var(--profile-accent); }
@@ -1271,7 +1417,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .dialog-body { min-height: 0; overflow-y: auto; padding: 1.2rem; display: grid; align-content: start; gap: 1.2rem; }
   .dialog-foot { justify-content: flex-end; border-top: 1px solid var(--border); }
   .editor-preview { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
-  .preview-banner { height: 80px; }
+  .preview-banner { height: auto; aspect-ratio: var(--banner-ratio, 4); }
+  .preview-banner img { position: absolute; inset: 0; }
   .preview-info { display: flex; align-items: center; gap: .8rem; min-height: 54px; padding: 0 .8rem .5rem; overflow-wrap: anywhere; }
   .profile-root :global(.preview-shell) { width: 64px; height: 64px; margin-top: -20px; }
   .profile-root :global(.preview-shell .frame-mark) { scale: .67; transform-origin: center; }
@@ -1290,6 +1437,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .editor-section { min-width: 0; display: grid; gap: .7rem; }
   .editor-section h3 { margin: 0; }
   .editor-tabs, .editor-actions, .effect-choices { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .framing-editor { display: grid; gap: .55rem; min-width: 0; margin-top: .7rem; padding: .8rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
+  .framing-editor small { color: var(--muted); }
+  .framing-editor label { display: flex; justify-content: space-between; gap: .5rem; }
+  .framing-editor .btn { justify-self: start; }
+  .framing-preview { position: relative; overflow: hidden; max-width: 100%; border: 1px solid var(--profile-accent); border-radius: var(--radius); cursor: grab; touch-action: none; }
+  .framing-preview[aria-disabled="true"] { pointer-events: none; }
+  .framing-preview.dragging { cursor: grabbing; }
+  .framing-preview img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .avatar-framing { width: min(180px, 100%); aspect-ratio: 1; border-radius: 50%; }
+  .cover-framing { width: min(600px, 100%); aspect-ratio: var(--banner-ratio, 4); }
+  .background-framing { width: min(100%, 520px, calc(50vh * var(--frame-ratio, 1.7778))); max-height: 50vh; aspect-ratio: var(--frame-ratio, 1.7778); }
   .picker-search { max-width: 100%; }
   .choice-grid { display: grid; gap: .5rem; max-height: 250px; overflow-y: auto; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
   .choice-grid :global(.choice) { min-width: 0; display: grid; justify-items: center; align-content: center; gap: .25rem; padding: .35rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); cursor: pointer; font-size: .72rem; overflow-wrap: anywhere; }

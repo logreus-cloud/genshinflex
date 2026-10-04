@@ -160,19 +160,11 @@ export async function prepareImage(file: File, kind: MediaKey): Promise<Blob> {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     if (!context) throw new ImageError('decode');
-    if (kind === 'background') {
-      const ratio = Math.min(1, 2560 / Math.max(width, height));
-      canvas.width = Math.max(1, Math.round(width * ratio));
-      canvas.height = Math.max(1, Math.round(height * ratio));
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    } else {
-      const aspect = kind === 'avatar' ? 1 : 4;
-      const sourceWidth = Math.min(width, height * aspect), sourceHeight = sourceWidth / aspect;
-      const targetWidth = kind === 'avatar' ? 256 : Math.min(1600, Math.round(sourceWidth));
-      canvas.width = targetWidth;
-      canvas.height = kind === 'avatar' ? 256 : Math.max(1, Math.round(targetWidth / 4));
-      context.drawImage(image, (width - sourceWidth) / 2, (height - sourceHeight) / 2, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
-    }
+    const limit = kind === 'avatar' ? 1024 : kind === 'cover' ? 2400 : 2560;
+    const ratio = Math.min(1, limit / (kind === 'cover' ? width : Math.max(width, height)), kind === 'cover' ? limit / height : 1);
+    canvas.width = Math.max(1, Math.round(width * ratio));
+    canvas.height = Math.max(1, Math.round(height * ratio));
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
     if (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap) image.close();
     const encode = (type: string) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, .86));
     let blob = await encode('image/webp');
