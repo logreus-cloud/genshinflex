@@ -146,8 +146,7 @@ async function decoded(blob: Blob) {
   const url = URL.createObjectURL(blob);
   try {
     const image = new Image();
-    image.src = url;
-    await image.decode();
+    await new Promise<void>((resolve, reject) => { image.onload = () => resolve(); image.onerror = reject; image.src = url; });
     if (!image.naturalWidth || !image.naturalHeight) throw new Error();
     return image;
   } finally { URL.revokeObjectURL(url); }
@@ -155,6 +154,26 @@ async function decoded(blob: Blob) {
 
 function dimensions(image: ImageBitmap | HTMLImageElement) {
   return typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ? [image.width, image.height] : [image.naturalWidth, image.naturalHeight];
+}
+
+// Размеры без Image.decode(): в Chrome он может не завершиться на больших картинках
+export async function imageSize(blob: Blob): Promise<[number, number] | null> {
+  try {
+    const bitmap = await createImageBitmap(blob);
+    const size: [number, number] = [bitmap.width, bitmap.height];
+    bitmap.close();
+    if (size[0] && size[1]) return size;
+  } catch { /* ниже — запасной путь через Image */ }
+  const url = URL.createObjectURL(blob);
+  try {
+    return await new Promise((resolve) => {
+      const image = new Image();
+      const timer = setTimeout(() => resolve(null), 5000);
+      image.onload = () => { clearTimeout(timer); resolve(image.naturalWidth && image.naturalHeight ? [image.naturalWidth, image.naturalHeight] : null); };
+      image.onerror = () => { clearTimeout(timer); resolve(null); };
+      image.src = url;
+    });
+  } finally { URL.revokeObjectURL(url); }
 }
 
 export async function prepareImage(file: File, kind: MediaKey): Promise<Blob> {

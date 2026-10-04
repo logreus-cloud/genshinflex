@@ -440,7 +440,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 <script>
   import { favorites, recent, store, type Entry } from '../scripts/common';
   import { t } from '../scripts/search';
-  import { getMedia, commitMedia, deleteMedia, prepareImage, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
+  import { getMedia, commitMedia, deleteMedia, prepareImage, imageSize, dataUrlToBlob, blobToDataUrl, ImageError, type MediaKey } from '../scripts/profile-media';
   import { onPage, cleanup } from '../scripts/router';
   import { syncNow, type SyncResult } from '../scripts/profile-sync';
   import { userData, userDataKey } from '../scripts/user-data';
@@ -1171,14 +1171,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       try {
         const blob = await prepareImage(file, key);
         if (!active()) return;
-        const probe = new Image();
-        const url = URL.createObjectURL(blob);
-        let portrait = false;
-        try {
-          probe.src = url;
-          await probe.decode();
-          portrait = probe.naturalHeight > probe.naturalWidth;
-        } finally { URL.revokeObjectURL(url); }
+        const size = await imageSize(blob);
+        const portrait = !!size && size[1] > size[0];
         if (!active()) return;
         stopDragging.get(key)?.();
         stage(key, blob);
