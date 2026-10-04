@@ -2,6 +2,7 @@ export type MediaKey = 'avatar' | 'cover' | 'background';
 
 const limits: Record<MediaKey, number> = { avatar: 50, cover: 50, background: 50 };
 const urls = new Map<string, string>();
+const loadingUrls = new Map<string, { promise: Promise<string | null>; cancel: () => void }>();
 const storageKey = (key: MediaKey, version?: string) => version ? `${key}@${version}` : key;
 let opening: Promise<IDBDatabase | null> | null = null;
 
@@ -47,6 +48,8 @@ function transaction<T>(key: MediaKey, mode: IDBTransactionMode, action: (store:
 }
 
 function revoke(key: string) {
+  loadingUrls.get(key)?.cancel();
+  loadingUrls.delete(key);
   const url = urls.get(key);
   if (url) URL.revokeObjectURL(url);
   urls.delete(key);
@@ -99,16 +102,24 @@ export async function commitMedia(changes: Partial<Record<MediaKey, Blob>>, vers
 }
 
 export async function mediaUrl(key: MediaKey, version?: string): Promise<string | null> {
-  try {
-    const id = storageKey(key, version);
+  const id = storageKey(key, version);
+  const cached = urls.get(id);
+  if (cached) return cached;
+  const pending = loadingUrls.get(id);
+  if (pending) return pending.promise;
+  let cancelled = false;
+  const promise = (async () => {
+    const blob = await getMedia(key, version);
+    if (!blob || cancelled) return null;
     const cached = urls.get(id);
     if (cached) return cached;
-    const blob = await getMedia(key, version);
-    if (!blob) return null;
     const url = URL.createObjectURL(blob);
     urls.set(id, url);
     return url;
-  } catch { return null; }
+  })().catch(() => null);
+  loadingUrls.set(id, { promise, cancel: () => { cancelled = true; } });
+  try { return await promise; }
+  finally { if (loadingUrls.get(id)?.promise === promise) loadingUrls.delete(id); }
 }
 
 function animatedWebp(bytes: Uint8Array) {

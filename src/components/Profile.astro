@@ -487,6 +487,19 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const exportUrls = new Set<string>();
   let exportTimer: number | undefined;
   const mediaOperations: Record<MediaKey, number> = { avatar: 0, cover: 0, background: 0 };
+  // Картинки в обработке (ключ → номер операции): пока они есть, «Готово» недоступна, иначе сохранится старая картинка
+  const processingMedia = new Map<MediaKey, number>();
+  function processing() {
+    for (const [key, operation] of processingMedia) if (operation !== mediaOperations[key]) processingMedia.delete(key);
+    return processingMedia.size > 0;
+  }
+  function syncSaveButton() {
+    if (signal.aborted) return;
+    const button = $<HTMLButtonElement>('save-editor'), busy = processing();
+    button.textContent = t(busy ? 'Обрабатываю картинку…' : 'Готово');
+    button.disabled = busy || saving || exporting;
+    button.setAttribute('aria-busy', String(busy));
+  }
   const stagedMedia = new Map<MediaKey, StagedMedia>();
   const committedUrls = new Map<MediaKey, string>();
   const stopDragging = new Map<MediaKey, () => void>();
@@ -522,6 +535,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     renderAvatar(previewAvatar, $('preview-avatar-shell'), draft, pickerBySlug, mediaSource, placeholder);
     $('effect-reduced').hidden = !reduced.matches;
     renderFramers();
+    syncSaveButton();
   }
   function renderProfile() {
     const player = currentProfile?.player;
@@ -745,6 +759,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     $('avatar-character-panel').hidden = tab !== 'character';
     $('avatar-upload-panel').hidden = tab !== 'upload';
     renderFramers();
+    syncSaveButton();
   }
   function setEditorTab(tab: string) {
     for (const button of document.querySelectorAll<HTMLButtonElement>('[data-editor-tab]')) button.setAttribute('aria-pressed', String(button.dataset.editorTab === tab));
@@ -945,6 +960,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   dialog.addEventListener('cancel', (event) => { if (saving) event.preventDefault(); });
   dialog.addEventListener('close', () => {
     for (const stop of stopDragging.values()) stop();
+    processingMedia.clear(); syncSaveButton();
     for (const key of mediaKeys) mediaOperations[key]++;
     importSelection++; editorSession++;
     pendingImport = null; confirmedImport = null;
@@ -958,8 +974,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   $('cancel-editor').addEventListener('click', closeEditor);
   for (const button of document.querySelectorAll<HTMLButtonElement>('[data-editor-tab]')) button.addEventListener('click', () => setEditorTab(button.dataset.editorTab!));
   $('save-editor').addEventListener('click', async () => {
-    if (saving || exporting || !dialog.open || editorGeneration !== sessionGeneration) return;
-    saving = true;
+    if (saving || exporting || processing() || !dialog.open || editorGeneration !== sessionGeneration) return;
+    saving = true; syncSaveButton();
     for (const stop of stopDragging.values()) stop();
     const session = editorSession;
     const generation = editorGeneration;
@@ -1028,13 +1044,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       keepChanges = true;
       release();
       saving = false;
+      syncSaveButton();
       closeEditor();
     } catch {
       if (!switched) for (const key of written) await deleteMedia(key, version);
       if (!signal.aborted && generation === sessionGeneration && session === editorSession) { $('import-status').textContent = t('Не удалось сохранить профиль в этом браузере'); setEditorTab('transfer'); }
     } finally {
       if (!signal.aborted && generation === sessionGeneration && session === editorSession) release();
-      if (generation === sessionGeneration && session === editorSession) saving = false;
+      if (generation === sessionGeneration && session === editorSession) {
+        saving = false;
+        syncSaveButton();
+      }
     }
   });
   $<HTMLInputElement>('editor-name').addEventListener('input', (event) => { draft.nick = (event.target as HTMLInputElement).value; renderPersonal(); });
@@ -1137,37 +1157,48 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     $(`${key}-frame-reset`).addEventListener('click', () => update({ x: 50, y: 50, zoom: 100 }), { signal });
   }
   window.addEventListener('resize', renderFramers, { signal });
-  for (const key of mediaKeys) $<HTMLInputElement>(`${key}-file`).addEventListener('change', async (event) => {
+  for (const key of mediaKeys) $<HTMLInputElement>(`${key}-file`).addEventListener('change', (event) => {
     const input = event.target as HTMLInputElement, file = input.files?.[0];
     input.value = '';
     if (!file) return;
     const operation = ++mediaOperations[key], session = editorSession;
     const active = () => !signal.aborted && dialog.open && operation === mediaOperations[key] && session === editorSession;
     const message = $(`${key}-status`);
-    try {
-      const blob = await prepareImage(file, key);
-      if (!active()) return;
-      const probe = new Image();
-      const url = URL.createObjectURL(blob);
-      let portrait = false;
+    processingMedia.set(key, operation);
+    message.textContent = t('Обрабатываю картинку…');
+    syncSaveButton();
+    void (async () => {
       try {
-        probe.src = url;
-        await probe.decode();
-        portrait = probe.naturalHeight > probe.naturalWidth;
-      } finally { URL.revokeObjectURL(url); }
-      if (!active()) return;
-      stopDragging.get(key)?.();
-      stage(key, blob);
-      draft.framing[key] = { x: 50, y: portrait && key !== 'background' ? 30 : 50, zoom: 100 };
-      if (key === 'avatar') { draft.avatar = { type: 'upload' }; setAvatarTab('upload'); }
-      if (key === 'cover') draft.coverType = 'upload';
-      if (key === 'background') draft.background.type = 'upload';
-      message.textContent = '';
-      renderPersonal(); renderPickers();
-    } catch (error) {
-      if (active()) message.textContent = error instanceof ImageError && error.reason === 'size' ?
-        t('Файл слишком большой (максимум {n} МБ)', { n: error.maxMb }) : t('Не удалось обработать картинку.');
-    }
+        const blob = await prepareImage(file, key);
+        if (!active()) return;
+        const probe = new Image();
+        const url = URL.createObjectURL(blob);
+        let portrait = false;
+        try {
+          probe.src = url;
+          await probe.decode();
+          portrait = probe.naturalHeight > probe.naturalWidth;
+        } finally { URL.revokeObjectURL(url); }
+        if (!active()) return;
+        stopDragging.get(key)?.();
+        stage(key, blob);
+        draft.framing[key] = { x: 50, y: portrait && key !== 'background' ? 30 : 50, zoom: 100 };
+        if (key === 'avatar') { draft.avatar = { type: 'upload' }; setAvatarTab('upload'); }
+        if (key === 'cover') draft.coverType = 'upload';
+        if (key === 'background') draft.background.type = 'upload';
+        message.textContent = '';
+        renderPersonal(); renderPickers();
+      } catch (error) {
+        if (active()) message.textContent = error instanceof ImageError && error.reason === 'size' ?
+          t('Файл слишком большой (максимум {n} МБ)', { n: error.maxMb }) : t('Не удалось обработать картинку.');
+      } finally {
+        if (processingMedia.get(key) === operation) processingMedia.delete(key);
+        if (session === editorSession && !signal.aborted) {
+          if (!processingMedia.has(key) && message.textContent === t('Обрабатываю картинку…')) message.textContent = '';
+          syncSaveButton();
+        }
+      }
+    })();
   });
   for (const [id, update] of [
     ['cover-position', (value: number) => { draft.coverPosition = value; }],
@@ -1223,11 +1254,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   $('export-profile').addEventListener('click', async () => {
     if (saving || exporting) return;
     exporting = true;
-    const saveButton = $<HTMLButtonElement>('save-editor');
-    saveButton.disabled = true;
+    syncSaveButton();
     try { await exportProfile(); }
     catch { if (!signal.aborted) $('import-status').textContent = t('Не удалось прочитать картинку в этом браузере'); }
-    finally { if (!signal.aborted) saveButton.disabled = false; exporting = false; }
+    finally { exporting = false; if (!signal.aborted) syncSaveButton(); }
   });
   $<HTMLInputElement>('import-file').addEventListener('change', async (event) => {
     const selection = ++importSelection, session = editorSession;
@@ -1314,6 +1344,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   });
   cleanup(signal, () => {
     editorSession++;
+    processingMedia.clear();
     importSelection++;
     for (const key of mediaKeys) mediaOperations[key]++;
     cancelShowcase();
