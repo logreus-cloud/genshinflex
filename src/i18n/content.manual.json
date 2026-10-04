@@ -2026,5 +2026,37 @@
  "Щит обновляется сам: активный персонаж копит Бенедикцию каждыми 4 обычными атаками, а Заморозка сразу даёт 2 уровня. Скорость атаки растёт от макс. HP Далии — до +20% при 40 тыс. HP.": {
   "en": "The shield refreshes on its own: every 4 Normal Attack hits by the active character grant Benison, and Freeze grants 2 stacks at once. ATK SPD scales with Dahlia's Max HP — up to +20% at 40k HP.",
   "es": "El escudo se renueva solo: cada 4 golpes de ataque normal del personaje activo dan beatitud, y la Congelación da 2 cargas de golpe. La Velocidad de ATQ escala con la Vida Máx. de Dahlia: hasta +20 % con 40 000 de Vida."
+ },
+ "4 предмета, если Изумрудную тень не носит другой Анемо-персонаж": {
+  "en": "4-piece, if no other Anemo character holds Viridescent Venerer",
+  "es": "4 piezas, si ningún otro personaje Anemo lleva Sombra Verde Esmeralda"
+ },
+ "4 предмета, если в отряде больше никто не носит Церемонию": {
+  "en": "4-piece, if nobody else in the team uses Noblesse Oblige",
+  "es": "4 piezas, si nadie más del equipo lleva Ritual Antiguo de la Nobleza"
+ },
+ "Бесплатный вариант с ВЭ": {
+  "en": "Free option with ER",
+  "es": "Opción gratuita con RE"
+ },
+ "Взрыв стихии первым — бафф и снижение сопротивления держатся всё время, пока многогранник на поле. Навык с заряженным выстрелом выпускает стрелу урагана: её воронка тоже снижает сопротивление и даёт частицы. До C6 навык повторяют по откату ради энергии; на C6 после Q можно сразу уходить.": {
+  "en": "Burst first — the buff and the resistance shred last as long as the Polyhedron is on the field. Skill plus a charged shot fires a Hurricane Arrow: its vortex also shreds resistance and generates particles. Before C6, use the Skill again on cooldown for energy; at C6 you can swap out right after Q.",
+  "es": "Primero la Habilidad Definitiva: el bufo y la reducción de resistencia duran mientras el poliedro esté en el campo. La Habilidad Elemental con un disparo cargado lanza una flecha huracanada: su vórtice también reduce la resistencia y genera partículas. Antes de C6, repite la Habilidad Elemental en cuanto se recargue para conseguir energía; en C6 puedes cambiar de personaje justo después de la Q."
+ },
+ "Второй навык за откат — больше воронок и частиц": {
+  "en": "A second Skill per cooldown — more vortices and particles",
+  "es": "Una segunda Habilidad Elemental por enfriamiento: más vórtices y partículas"
+ },
+ "Лучший бесплатный вариант: частицы энергии, нужен шанс крита": {
+  "en": "Best free option: energy particles, needs Crit Rate",
+  "es": "Mejor opción gratuita: partículas de energía, necesita Prob. CRIT"
+ },
+ "Лучший вариант: ВЭ и бафф отряду": {
+  "en": "Best option: ER and a team buff",
+  "es": "Mejor opción: RE y bufo al equipo"
+ },
+ "заряженный выстрел": {
+  "en": "charged shot",
+  "es": "disparo cargado"
  }
 }
