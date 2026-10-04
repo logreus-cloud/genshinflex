@@ -479,7 +479,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   reduced.addEventListener('change', () => { $('effect-reduced').hidden = !reduced.matches; }, { signal });
   let pendingImport: ImportData | null = null, confirmedImport: ImportData | null = null, keepChanges = false;
   let editorSession = 0, importSelection = 0, saving = false, exporting = false;
-  let sessionGeneration = 0, editorGeneration = 0;
+  let sessionGeneration = 0, editorGeneration = 0, customLoad = 0;
   // Снять блокировку элементов редактора текущей операции сохранения (и при успехе, и при смене аккаунта)
   let releaseControls: (() => void) | null = null;
   const exportUrls = new Set<string>();
@@ -487,7 +487,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   const mediaOperations: Record<MediaKey, number> = { avatar: 0, cover: 0, background: 0 };
   const stagedMedia = new Map<MediaKey, StagedMedia>();
   const committedUrls = new Map<MediaKey, string>();
-  const stopDragging: (() => void)[] = [];
+  const stopDragging = new Map<MediaKey, () => void>();
   const status = (message: string, bad = false) => { $('profile-status').textContent = message; $('profile-status').classList.toggle('bad', bad); };
   let showcaseRequest = 0;
   let showcaseController: AbortController | null = null;
@@ -754,7 +754,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     if (old) URL.revokeObjectURL(old.url);
     stagedMedia.set(key, { blob, url: URL.createObjectURL(blob) });
   }
-  function closeEditor() { if (saving) return; for (const key of mediaKeys) mediaOperations[key]++; importSelection++; editorSession++; dialog.close(); }
+  function closeEditor() { if (saving) return; for (const stop of stopDragging.values()) stop(); for (const key of mediaKeys) mediaOperations[key]++; importSelection++; editorSession++; dialog.close(); }
   function openEditor() {
     editorGeneration = sessionGeneration;
     editorSession++; for (const key of mediaKeys) mediaOperations[key]++; importSelection++;
@@ -795,36 +795,54 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     sessionGeneration++;
     cancelShowcase();
     if (dialog.open) { saving = false; releaseControls?.(); closeEditor(); }
+    // Оформление прежнего аккаунта нельзя редактировать: перечитываем его, текущая загрузка устаревает
+    editButton.disabled = true;
+    customLoad++;
+    pendingSync.custom = true;
+    pendingSync.data = true;
+    void refreshSync();
     void loadWishes();
   }, { signal });
   for (const shell of [$('profile-avatar-shell'), $('preview-avatar-shell')]) frameMarks(shell);
   async function initCustom() {
     // Сырое значение: старый формат аватара мигрирует ниже, глубокую проверку делает validCustom
-    let raw = read(userDataKey('profileCustom'));
+    const storageKey = userDataKey('profileCustom'), generation = sessionGeneration, turn = ++customLoad;
+    const active = () => !signal.aborted && turn === customLoad && generation === sessionGeneration;
+    // Пока оформление загружается, редактор закрыт: иначе загрузка запишет поверх сохранённых правок
+    editButton.disabled = true;
+    let raw = read(storageKey);
     if (isRecord(raw) && isRecord(raw.avatar) && raw.avatar.type === 'upload' && typeof raw.avatar.data === 'string') {
+      let version = '';
+      const stale = new Error();
       try {
         const blob = await dataUrlToBlob(raw.avatar.data, 'avatar');
-        if (signal.aborted) return;
-        const version = crypto.randomUUID();
-        if (!blob || !await commitMedia({ avatar: blob }, version)) throw new Error();
-        if (signal.aborted) { await deleteMedia('avatar', version); return; }
+        if (!active()) throw stale;
+        if (!blob) throw new Error();
+        version = crypto.randomUUID();
+        const committed = await commitMedia({ avatar: blob }, version);
+        if (!active()) throw stale;
+        if (!committed) throw new Error();
         const migrated = { ...raw, avatar: { type: 'upload' }, media: { ...(isRecord(raw.media) ? raw.media : {}), avatar: version } };
         // Миграция формата, а не правка пользователя — без отметки изменений
-        try { localStorage.setItem(userDataKey('profileCustom'), JSON.stringify(migrated)); raw = migrated; }
-        catch { await deleteMedia('avatar', version); throw new Error(); }
+        localStorage.setItem(storageKey, JSON.stringify(migrated));
+        raw = migrated;
+        version = '';
         await deleteMedia('avatar');
-        if (signal.aborted) return;
-      } catch { if (signal.aborted) return; status(t('Не удалось сохранить картинку в этом браузере'), true); }
+      } catch (error) { if (error !== stale && active()) status(t('Не удалось сохранить картинку в этом браузере'), true); }
+      finally {
+        if (version) try { await deleteMedia('avatar', version); } catch {}
+      }
+      if (!active()) return;
     }
     saved = validCustom(raw, pickerBySlug).value;
     draft = structuredClone(saved);
     for (const key of mediaKeys) {
       if (!usesMedia(saved, key)) continue;
       const blob = await getMedia(key, saved.media[key]);
-      if (signal.aborted) return;
+      if (!active()) return;
       if (blob) committedUrls.set(key, URL.createObjectURL(blob));
     }
-    if (signal.aborted) return;
+    if (!active()) return;
     renderProfile();
     editButton.disabled = false;
   }
@@ -870,7 +888,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   };
   document.addEventListener('gf:profile-synced', (event) => {
     const detail = (event as CustomEvent<SyncResult>).detail;
-    pendingSync.custom ||= detail.custom === 'pulled';
+    // Пришли свежие настройки — идущая загрузка (и миграция) не должна записать поверх них старые
+    if (detail.custom === 'pulled') { customLoad++; pendingSync.custom = true; }
     pendingSync.data ||= detail.data === 'pulled';
     void refreshSync();
   }, { signal });
@@ -916,6 +935,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   editButton.addEventListener('click', openEditor);
   dialog.addEventListener('cancel', (event) => { if (saving) event.preventDefault(); });
   dialog.addEventListener('close', () => {
+    for (const stop of stopDragging.values()) stop();
     for (const key of mediaKeys) mediaOperations[key]++;
     importSelection++; editorSession++;
     pendingImport = null; confirmedImport = null;
@@ -931,7 +951,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   $('save-editor').addEventListener('click', async () => {
     if (saving || exporting || !dialog.open || editorGeneration !== sessionGeneration) return;
     saving = true;
-    for (const stop of stopDragging) stop();
+    for (const stop of stopDragging.values()) stop();
     const session = editorSession;
     const generation = editorGeneration;
     const snapshot = structuredClone(draft);
@@ -1036,7 +1056,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const zoom = $<HTMLInputElement>(`${key}-frame-zoom`);
     let pointer = -1, startX = 0, startY = 0, lastX = 0, lastY = 0, initial = framingOf(draft, key);
     const update = (next: Framing, dragging = false) => {
-      if (saving || !mediaSource(key) || !uploadTabOpen(key)) return;
+      if (saving || !dialog.open || !mediaSource(key) || !uploadTabOpen(key)) return;
       const changedType = !usesMedia(draft, key);
       if (key === 'avatar') draft.avatar = { type: 'upload' };
       else if (key === 'cover') draft.coverType = 'upload';
@@ -1075,13 +1095,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }, { signal });
     const stop = (event?: PointerEvent) => {
       if (pointer === -1 || (event && event.pointerId !== pointer)) return;
-      if (frame.hasPointerCapture(pointer)) frame.releasePointerCapture(pointer);
+      const captured = pointer;
       pointer = -1;
+      if (frame.hasPointerCapture(captured)) frame.releasePointerCapture(captured);
       frame.classList.remove('dragging');
     };
-    stopDragging.push(() => stop());
+    stopDragging.set(key, () => stop());
     frame.addEventListener('pointerup', stop, { signal });
     frame.addEventListener('pointercancel', stop, { signal });
+    frame.addEventListener('lostpointercapture', stop, { signal });
     frame.addEventListener('wheel', (event) => {
       if (saving) return;
       event.preventDefault();
@@ -1124,6 +1146,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         portrait = probe.naturalHeight > probe.naturalWidth;
       } finally { URL.revokeObjectURL(url); }
       if (!active()) return;
+      stopDragging.get(key)?.();
       stage(key, blob);
       draft.framing[key] = { x: 50, y: portrait && key !== 'background' ? 30 : 50, zoom: 100 };
       if (key === 'avatar') { draft.avatar = { type: 'upload' }; setAvatarTab('upload'); }
