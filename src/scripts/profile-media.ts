@@ -1,6 +1,6 @@
 export type MediaKey = 'avatar' | 'cover' | 'background';
 
-const limits: Record<MediaKey, number> = { avatar: 2, cover: 6, background: 8 };
+const limits: Record<MediaKey, number> = { avatar: 5, cover: 15, background: 20 };
 const urls = new Map<string, string>();
 const storageKey = (key: MediaKey, version?: string) => version ? `${key}@${version}` : key;
 let opening: Promise<IDBDatabase | null> | null = null;
