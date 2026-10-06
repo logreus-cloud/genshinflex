@@ -5066,5 +5066,13 @@
  "Восстановить": {
   "en": "Restore",
   "es": "Restaurar"
+ },
+ "На форуме": {
+  "en": "On the forum",
+  "es": "En el foro"
+ },
+ "Не удалось загрузить": {
+  "en": "Failed to load",
+  "es": "No se pudo cargar"
  }
 }

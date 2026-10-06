@@ -92,6 +92,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         <h2>{t('Крутки')}</h2><div class="wish-list" id="public-wishes-list"></div>
       </section>
     </div>
+    <section class="profile-card" id="public-forum" hidden>
+      <h2>{t('На форуме')}</h2>
+      <div class="public-forum-list" id="public-forum-list"></div>
+      <button class="btn" id="public-forum-more" type="button" hidden>{t('Показать ещё')}</button>
+      <p class="small muted" id="public-forum-status" aria-live="polite"></p>
+    </section>
     </>}
     {mode === 'own' && <>
     <div class="profile-grid">
@@ -1401,6 +1407,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .profile-card h2::before { content: ""; display: inline-block; width: 4px; height: 1em; margin-right: .55rem; border-radius: 3px; background: var(--profile-accent); vertical-align: -.12em; }
   .profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   .profile-grid > * { min-width: 0; }
+  .public-forum-list { display: grid; gap: .7rem; min-width: 0; margin-bottom: .8rem; }
+  .public-forum-list :global(.public-forum-post) { min-width: 0; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
+  .public-forum-list :global(a) { display: block; color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
+  .public-forum-list :global(p) { display: -webkit-box; margin: .35rem 0; color: var(--muted); overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .public-forum-list :global(time) { color: var(--muted); font-size: .75rem; }
+  #public-forum-status { margin: .5rem 0 0; }
   .hero { padding: 0; overflow: hidden; }
   .banner, .preview-banner { position: relative; height: 180px; overflow: hidden; background: linear-gradient(135deg, var(--profile-accent), var(--surface-2)); }
   .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgb(0 0 0 / .5)); pointer-events: none; }

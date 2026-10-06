@@ -266,6 +266,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
     card.append(actions);
     postsBox.append(card);
   }
+  if (/^#p\d+$/.test(location.hash)) postsBox.querySelector<HTMLElement>(`#${location.hash.slice(1)}`)?.scrollIntoView({ block: 'start' });
 
   postsBox.addEventListener('click', (event) => {
     const target = event.target as HTMLElement;

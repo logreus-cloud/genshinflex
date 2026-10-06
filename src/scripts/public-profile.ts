@@ -1,6 +1,9 @@
 import { pageLang } from '../i18n/client';
+import { threadHref } from '../lib/forum';
 import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
+import { forumUserPosts } from './forum/api';
+import { plainSnippet } from './forum/markup';
 import { hasSession } from './user-data/session';
 import { colorOk, createEffect, fetchShowcase, loadChars, readPickerChars, renderAppearance, renderEntryList,
   renderRosterList, renderShowcase, renderWishSummary, usesMedia, validCustom, validRoster, type Custom, type WishSummary } from './profile-view';
@@ -124,6 +127,46 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
           renderWishSummary($('public-wishes-list'), accounts);
         }
       } catch { /* Дополнительные данные не влияют на основной профиль */ }
+    })();
+
+    void (async () => {
+      const card = $('public-forum');
+      const list = $('public-forum-list');
+      const more = $<HTMLButtonElement>('public-forum-more');
+      const forumStatus = $('public-forum-status');
+      let shown = 0;
+      const load = async () => {
+        more.disabled = true;
+        try {
+          const posts = await forumUserPosts(row.nickname, 6, shown);
+          if (signal.aborted) return;
+          for (const post of posts.slice(0, 5)) {
+            const item = document.createElement('div');
+            item.className = 'public-forum-post';
+            const link = document.createElement('a');
+            link.href = `${threadHref(BASE, post.thread_id)}#p${post.id}`;
+            link.textContent = post.thread_title;
+            const snippet = document.createElement('p');
+            snippet.textContent = plainSnippet(post.body, 160);
+            const date = document.createElement('time');
+            date.dateTime = post.created_at;
+            date.textContent = new Date(post.created_at).toLocaleDateString(pageLang(), { day: 'numeric', month: 'short', year: 'numeric' });
+            item.append(link, snippet, date);
+            list.append(item);
+          }
+          shown += Math.min(posts.length, 5);
+          card.hidden = shown === 0;
+          more.hidden = posts.length <= 5;
+          forumStatus.textContent = '';
+        } catch {
+          if (!signal.aborted && shown) forumStatus.textContent = t('Не удалось загрузить');
+        } finally {
+          if (!signal.aborted) more.disabled = false;
+        }
+      };
+      more.addEventListener('click', () => { void load(); }, { signal });
+      await load();
+      if (signal.aborted) return;
     })();
 
     if (row.active_title) {
