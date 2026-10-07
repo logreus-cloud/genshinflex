@@ -1,11 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_KEY, SUPABASE_URL, TURNSTILE_SITE_KEY } from '../lib/platform';
 import { SESSION_KEY } from './user-data/session';
 
-let client: ReturnType<typeof createClient> | undefined;
+// Схема базы не сгенерирована — клиент без типов таблиц (иначе supabase-js выводит never)
+let client: SupabaseClient<any> | undefined;
 
 export function getSupabase() {
-  return client ??= createClient(SUPABASE_URL, SUPABASE_KEY, {
+  return client ??= createClient<any>(SUPABASE_URL, SUPABASE_KEY, {
     auth: {
       flowType: 'implicit',
       persistSession: true,

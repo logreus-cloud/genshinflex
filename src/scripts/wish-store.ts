@@ -47,7 +47,8 @@ function memory() {
     lists,
     uids: () => [...lists.keys()],
     list: (uid: string) => lists.get(uid) ?? [],
-    add(uid: string, incoming: Wish[]) {
+    // Строки проверяет validWish: из базы приходят с game_uid вместо uid
+    add(uid: string, incoming: readonly unknown[]) {
       const map = new Map((lists.get(uid) ?? []).map((wish) => [wish.id, wish]));
       let added = 0;
       for (const value of incoming) {
@@ -115,7 +116,7 @@ export async function openWishStore(signal?: AbortSignal): Promise<WishStore> {
         .eq('user_id', user.id).order('game_uid').order('id').range(offset, offset + 999);
       if (error || !data) throw new Error(error?.message || 'Не удалось загрузить историю аккаунта.');
       if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-      const page = new Map<string, Wish[]>();
+      const page = new Map<string, unknown[]>();
       for (const row of data) {
         if (typeof row.game_uid !== 'string' || !uidOk(row.game_uid)) continue;
         const list = page.get(row.game_uid) ?? [];
