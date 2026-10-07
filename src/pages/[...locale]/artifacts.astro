@@ -74,7 +74,7 @@ const users = new Map(artifacts.map((a) => [a.slug, builds.flatMap((b) => {
               {who.length > 0 ? (
                 <div class="sd-users">
                   {who.map(({ c, main }) => (
-                    <a class="sd-user" href={`${base}/characters/${c.slug}`} style={`--el: var(--${c.element})`}>
+                    <a class="sd-user" href={`${base}/characters/${c.slug}/`} style={`--el: var(--${c.element})`}>
                       <img class="avatar" src={c.icon} alt="" width="48" height="48" loading="lazy" />
                       <span class="sd-user-name"><b>{c.name}</b><small class:list={{ main }}>{t(main ? 'Основной сет' : 'Запасной вариант')}</small></span>
                     </a>

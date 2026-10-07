@@ -5,7 +5,7 @@ const SUPABASE_URL = 'https://qhfufvdculphsqxuqxsw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_3IqstX40IpHaa2g9_o4wVg_n54We4l_';
 // Типы Workers в проекте не подключены — минимальное объявление HTMLRewriter
 declare class HTMLRewriter {
-  on(selector: string, handlers: { element(element: { setAttribute(name: string, value: string): void; setInnerContent(content: string, options?: { html: boolean }): void }): void }): HTMLRewriter;
+  on(selector: string, handlers: { element(element: { setAttribute(name: string, value: string): void; setInnerContent(content: string, options?: { html: boolean }): void; remove(): void }): void }): HTMLRewriter;
   transform(response: Response): Response;
 }
 
@@ -41,7 +41,7 @@ export async function onRequest({ request, next, env }: Ctx) {
       const fallback = match[1] === 'en' ? `Player ${name}'s profile on GenshinFlex.` :
         match[1] === 'es' ? `Perfil del jugador ${name} en GenshinFlex.` : `Профиль игрока ${name} на GenshinFlex.`;
       const description = (typeof custom.about === 'string' && custom.about ? custom.about : fallback).slice(0, 160);
-      const canonical = new URL(url.pathname, url.origin).toString();
+      const canonical = new URL(url.pathname.replace(/\/?$/, '/'), url.origin).toString();
       return new HTMLRewriter()
         .on('title', { element(element) { element.setInnerContent(title, { html: false }); } })
         .on('meta[property="og:title"]', { element(element) { element.setAttribute('content', title); } })
@@ -77,15 +77,17 @@ export async function onRequest({ request, next, env }: Ctx) {
       const snippet = String(post?.body ?? '').replace(/\|\|[\s\S]*?\|\|/g, '[спойлер]').replace(/```[\s\S]*?```/g, ' ').replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, '$1').replace(/(?:^|\n)[>*-] ?/g, ' ').replace(/[*_~`]/g, '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
       const forumLabel = forum[1] === 'en' ? 'Forum' : forum[1] === 'es' ? 'Foro' : 'Форум';
       const title = `${String(thread.title)} — ${forumLabel} GenshinFlex`;
-      const canonical = new URL(url.pathname, url.origin).toString();
+      const canonical = new URL(`/forum/t/${Number(forum[2])}/`, url.origin).toString();
       return new HTMLRewriter()
+        .on('meta[name="robots"]', { element(element) { element.remove(); } })
+        .on('link[rel="alternate"][hreflang]', { element(element) { element.remove(); } })
         .on('title', { element(element) { element.setInnerContent(title, { html: false }); } })
         .on('meta[property="og:title"], meta[name="twitter:title"]', { element(element) { element.setAttribute('content', title); } })
         .on('meta[name="description"], meta[property="og:description"]', { element(element) { element.setAttribute('content', snippet); } })
         .on('link[rel="canonical"]', { element(element) { element.setAttribute('href', canonical); } })
         .on('meta[property="og:url"]', { element(element) { element.setAttribute('content', canonical); } })
         .transform(page(200));
-    } catch { return page(200); }
+    } catch { headers.set('Cache-Control', 'no-store'); headers.set('Retry-After', '120'); return page(503); }
   }
   return next();
 }

@@ -117,7 +117,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <div class:list={['group', { soon: items.some((item) => item.soon) }]}>
             {group && <p class="gtitle">{t(group)}</p>}
             {items.map(({ label, href, icon, soon }) => (
-              <a href={`${base}${href}`} aria-current={active(href) ? 'page' : undefined}>
+              <a href={href === '/' ? `${base}/` : `${base}${href}/`} aria-current={active(href) ? 'page' : undefined}>
                 <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" set:html={icons[icon]} />
                 {t(label)}
                 {soon && <small class="soon-tag">{t('скоро')}</small>}
@@ -216,7 +216,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
             <p>{t('Данные')} — <a href="https://github.com/theBowja/genshin-db" rel="noopener">genshin-db</a>, {t('изображения')} — enka.network, {t('история баннеров')} — paimon.moe.
               {t('Genshin Impact, персонажи и арты © HoYoverse. GenshinFlex — фанатский проект и не связан с HoYoverse.')}</p>
             <p>© {new Date().getFullYear()} GenshinFlex · {t('обновлено')} {new Date().toLocaleDateString(OG_LOCALE[lang].replace('_', '-'))}</p>
-            <a class="btn dark f-cta" href={`${base}/feedback/?from=${encodeURIComponent(path === '/' ? '/' : path + '/')}`}>{t('Сообщить об ошибке')}</a>
+            <a class="btn dark f-cta" href={`${base}/feedback/?from=${encodeURIComponent(path === '/' ? '/' : path + '/')}`} rel="nofollow">{t('Сообщить об ошибке')}</a>
           </div>
         </div>
       </footer>

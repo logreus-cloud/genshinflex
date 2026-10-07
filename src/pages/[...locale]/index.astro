@@ -42,13 +42,13 @@ const weaponImage = weaponSlug && (weaponArt as string[]).includes(weaponSlug)
 const latestArtifact = [...artifacts].sort((a, b) => parseFloat(b.version) - parseFloat(a.version))[0];
 const modeItems = rotations.map(({ data: r }) => ({
   label: MODE_SECTIONS[r.mode].label,
-  href: MODE_SECTIONS[r.mode].href,
+  href: `${MODE_SECTIONS[r.mode].href}/`,
   icon: MODE_SECTIONS[r.mode].icon,
   until: resetAt(r.start > now ? r.start : r.end),
 }));
 const modes = [
   ...modeItems,
-  { label: ROTATION_SECTION.label, href: ROTATION_SECTION.href, icon: ROTATION_SECTION.icon, until: modeItems.map((item) => item.until).sort()[0] },
+  { label: ROTATION_SECTION.label, href: `${ROTATION_SECTION.href}/`, icon: ROTATION_SECTION.icon, until: modeItems.map((item) => item.until).sort()[0] },
 ];
 
 const leaks = characters.filter((c) => c.beta);
@@ -105,7 +105,7 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
         <div class="gate-list" id="new-characters" role="region" aria-label={t('Новые персонажи')} tabindex="0">
           <div class="tile-track">
             {[...leaks, ...newest].map((c) => (
-              <a class:list={['tile', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element} aria-label={c.name} title={c.name}>
+              <a class:list={['tile', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}/`} data-el={c.element} aria-label={c.name} title={c.name}>
                 <img src={c.icon} alt="" width="96" height="96" loading="lazy" />
                 {c.beta && <span class="beta">BETA</span>}
               </a>
@@ -124,7 +124,7 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parse
           <div class="gate-list" id="new-weapons" role="region" aria-label={t('Новое оружие')} tabindex="0">
             <div class="tile-track">
               {newWeapons.map((w) => (
-                <a class:list={['tile', 'weapon', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`} aria-label={w.name} title={w.name}>
+                <a class:list={['tile', 'weapon', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}/`} aria-label={w.name} title={w.name}>
                   <img src={w.icon} alt="" width="96" height="96" loading="lazy" />
                 </a>
               ))}

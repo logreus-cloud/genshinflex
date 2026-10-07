@@ -74,7 +74,7 @@ const seoTitle = c.beta ? t('{name} (BETA): утечки — Genshin Impact', { 
 const seoDescription = b
   ? t('{name} ({el}, {r}★) — гайд и билд: лучшее оружие — {weapon}, артефакты — {sets}, статы, команды и таланты. Актуально для патча {patch}.', { name: c.name, el: c.elementText, r: c.rarity, weapon: getWeapon(b.weapons[0].slug).name, sets: b.artifacts[0].sets.map((s) => getArtifact(s).name).join(' + '), patch: b.patch })
   : t('{name} в Genshin Impact: {el}, {weapon}, таланты с множителями, созвездия и статы на любом уровне.', { name: c.name, el: c.elementText, weapon: c.weaponText.toLowerCase() });
-const pageUrl = new URL(`/characters/${c.slug}/`, Astro.site).toString();
+const pageUrl = new URL(`${base}/characters/${c.slug}/`, Astro.site).toString();
 const jsonLd = b && {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -91,7 +91,7 @@ const jsonLd = b && {
 ---
 <Layout title={seoTitle} description={seoDescription} image={c.splash ?? c.icon} type={b ? 'article' : 'website'} jsonLd={jsonLd} noindex={c.beta} wide>
   <article data-character-page data-pagefind-body data-visit={JSON.stringify({ href: `${base}/characters/${c.slug}`, name: c.name, icon: c.icon, kind: t('Персонаж') })}>
-    <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/characters`}>{t('Персонажи')}</a> / {c.name}</nav>
+    <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/characters/`}>{t('Персонажи')}</a> / {c.name}</nav>
 
     <header class="head" data-el={c.element}>
       {c.splash && <img class="splash" src={c.splash} alt="" aria-hidden="true" />}
@@ -112,7 +112,7 @@ const jsonLd = b && {
             <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="m10 3.5 1.9 4 4.3.5-3.2 3 .9 4.3L10 13.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5Z" /></svg>
             <span>{t('В избранное')}</span>
           </button>
-          <a class="btn edit" href={`${base}/guides/editor/?c=${c.slug}`} data-pagefind-ignore>
+          <a class="btn edit" href={`${base}/guides/editor/?c=${c.slug}`} rel="nofollow" data-pagefind-ignore>
             <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4 16h3l8.5-8.5-3-3L4 13Zm7-10 3 3" /></svg>
             <span>{b ? t('Дополнить гайд') : t('Написать гайд')}</span>
           </a>
@@ -160,7 +160,7 @@ const jsonLd = b && {
                     <li>
                       <span class="n">{i + 1}</span>
                       <img class:list={[`r${it.rarity}`]} src={it.icon} alt="" width="40" height="40" loading="lazy" />
-                      <span><a href={`${base}/weapons/${it.slug}`}><b>{it.name}</b></a> <span class="muted small">{stars(it.rarity)}</span>
+                      <span><a href={`${base}/weapons/${it.slug}/`}><b>{it.name}</b></a> <span class="muted small">{stars(it.rarity)}</span>
                         {w.note && <small class="muted note">{t(w.note)}</small>}</span>
                     </li>
                   );
@@ -211,7 +211,7 @@ const jsonLd = b && {
             </div>
           )}
           {b.sources.length > 0 && (
-            <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`}>{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Дополнить гайд')}</a></p>
+            <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`} rel="nofollow">{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`} rel="nofollow">{t('Дополнить гайд')}</a></p>
           )}
         </section>
 
@@ -258,7 +258,7 @@ const jsonLd = b && {
     ) : !c.beta && (
       <p class="notice" data-pagefind-ignore>
         {t('Билда для этого персонажа пока нет — он появится в одном из ближайших обновлений.')}
-        {' '}<a href={`${base}/guides/editor/?c=${c.slug}`}>{t('Напишите свой')}</a> {t('— после проверки он появится здесь.')}
+        {' '}<a href={`${base}/guides/editor/?c=${c.slug}`} rel="nofollow">{t('Напишите свой')}</a> {t('— после проверки он появится здесь.')}
       </p>
     )}
 
@@ -351,9 +351,9 @@ const jsonLd = b && {
     <section class="browse" data-pagefind-ignore>
       <h2 class="h-sec">{t('Другие персонажи')}</h2>
       <div class="panel browse-grid">
-        <div><span class="muted small">{t('По редкости')}</span><div class="row">{[5, 4].map((r) => <a class="chip" href={`${base}/characters?rarity=${r}`}>{r}★</a>)}</div></div>
-        <div><span class="muted small">{t('По стихии')}</span><div class="row">{Object.entries(ELEMENTS).map(([k, v]) => <a class="chip" href={`${base}/characters?element=${k}`}><span class="el-dot" data-el={k}></span>{v}</a>)}</div></div>
-        <div><span class="muted small">{t('По оружию')}</span><div class="row">{Object.entries(WEAPON_TYPES).map(([k, v]) => <a class="chip" href={`${base}/characters?weapon=${k}`}>{v}</a>)}</div></div>
+        <div><span class="muted small">{t('По редкости')}</span><div class="row">{[5, 4].map((r) => <a class="chip" href={`${base}/characters/?rarity=${r}`}>{r}★</a>)}</div></div>
+        <div><span class="muted small">{t('По стихии')}</span><div class="row">{Object.entries(ELEMENTS).map(([k, v]) => <a class="chip" href={`${base}/characters/?element=${k}`}><span class="el-dot" data-el={k}></span>{v}</a>)}</div></div>
+        <div><span class="muted small">{t('По оружию')}</span><div class="row">{Object.entries(WEAPON_TYPES).map(([k, v]) => <a class="chip" href={`${base}/characters/?weapon=${k}`}>{v}</a>)}</div></div>
       </div>
     </section>
   </article>

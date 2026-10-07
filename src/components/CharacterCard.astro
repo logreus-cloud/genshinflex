@@ -6,7 +6,7 @@ interface Props { slug: string; badge?: string; }
 const { slug, badge } = Astro.props;
 const c = getCharacter(slug);
 ---
-<a class:list={['cc', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}`} data-el={c.element}>
+<a class:list={['cc', `r${c.rarity}`, { emblem: c.emblem }]} href={`${base}/characters/${c.slug}/`} data-el={c.element}>
   <img src={c.icon} alt="" loading="lazy" width="140" height="160" />
   {c.emblem && <img class="skill" src={c.emblem} alt="" loading="lazy" width="40" height="40" />}
   <span class="el-dot" title={c.elementText}></span>

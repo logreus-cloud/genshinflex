@@ -53,7 +53,7 @@ const latest = versions[0];
             const top = w.stats.at(-1)!;
             return (
               <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={w.name} data-version={w.version} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
-                <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}`}>
+                <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}/`}>
                   <span class="wc-glow" aria-hidden="true"></span>
                   {w.version === latest && <span class="wc-badge">{t('новое')}</span>}
                   <img class="wc-img" src={pic(w)} alt="" width="96" height="96" loading="lazy" />

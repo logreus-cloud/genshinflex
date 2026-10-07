@@ -27,8 +27,8 @@ const { slides } = Astro.props;
           </div>
           {hero.region && <p class="region">{hero.region}</p>}
           <div class="actions">
-            <a class="btn dark" href={`${base}/characters/${hero.slug}`}>{t('Гайд')}</a>
-            <a class="btn dark" href={`${base}/banners`}>{t('Все баннеры')}</a>
+            <a class="btn dark" href={`${base}/characters/${hero.slug}/`}>{t('Гайд')}</a>
+            <a class="btn dark" href={`${base}/banners/`}>{t('Все баннеры')}</a>
           </div>
           <p class="time"><span>{upcoming ? t('До начала') : t('Оставшееся время')}</span>
             <b data-until={upcoming ? banner.start : banner.end} data-full data-done={upcoming ? t('Идёт сейчас') : t('уже закончился')}>…</b>

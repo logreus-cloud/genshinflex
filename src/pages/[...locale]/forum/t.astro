@@ -5,7 +5,7 @@ import Layout from '../../../layouts/Layout.astro';
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { base, t } = useData(Astro.currentLocale);
 ---
-<Layout title={t('Форум')} description={t('Обсуждения Genshin Impact на GenshinFlex.')}>
+<Layout title={t('Форум')} description={t('Обсуждения Genshin Impact на GenshinFlex.')} noindex>
   <div class="forum" data-forum-thread>
     <a href={`${base}/forum/`}>{t('Форум')}</a>
     <div data-heading></div>

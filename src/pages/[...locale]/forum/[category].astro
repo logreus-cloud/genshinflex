@@ -15,7 +15,7 @@ const category = FORUM_CATEGORIES.find((item) => item.slug === Astro.params.cate
     <a href={`${base}/forum/`}>{t('Форум')}</a>
     <h1>{category.icon} {t(category.label)}</h1>
     <p class="lead">{t(category.description)}</p>
-    <a class="btn primary" data-create href={`${base}/forum/new/?c=${category.slug}`}>{t('Новая тема')}</a>
+    <a class="btn primary" data-create href={`${base}/forum/new/?c=${category.slug}`} rel="nofollow">{t('Новая тема')}</a>
     <label>
       {t('Язык')}
       <select class="input" data-lang>

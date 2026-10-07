@@ -72,7 +72,7 @@ const sections = [
             {b.featured.map((f) => {
               const c = getCharacter(f.slug);
               return (
-                <a class="feat" href={`${base}/characters/${c.slug}`} data-el={c.element}>
+                <a class="feat" href={`${base}/characters/${c.slug}/`} data-el={c.element}>
                   {c.splash && <img class="art" src={c.splash} alt="" loading="lazy" />}
                   <div class="feat-info">
                     <span class="chip gold">{f.rerun ? t('повтор') : t('новый')}</span>
@@ -97,7 +97,7 @@ const sections = [
                 <div class="row">
                   {b.weapons.map((s) => {
                     const w = getWeapon(s);
-                    return <a class="wpn" href={`${base}/weapons/${w.slug}`}><img src={w.icon} alt="" width="44" height="44" loading="lazy" /><span>{w.name}</span></a>;
+                    return <a class="wpn" href={`${base}/weapons/${w.slug}/`}><img src={w.icon} alt="" width="44" height="44" loading="lazy" /><span>{w.name}</span></a>;
                   })}
                 </div>
               </div>

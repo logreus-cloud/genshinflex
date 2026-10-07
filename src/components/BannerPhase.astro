@@ -21,7 +21,7 @@ const rerun = (n: number) => (n === 0 ? t('впервые') : n === 1 ? t('по�
           {b.five.map((s, i) => {
             const c = getCharacter(s);
             return (
-              <a class="five" href={`${base}/characters/${s}`} data-el={c.element}>
+              <a class="five" href={`${base}/characters/${s}/`} data-el={c.element}>
                 <img src={c.icon} alt="" width="56" height="56" loading="lazy" />
                 <span><b>{c.name}</b><small class:list={['chip', { gold: b.reruns[i] === 0 }]}>{rerun(b.reruns[i])}</small></span>
               </a>

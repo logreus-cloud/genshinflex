@@ -7,18 +7,18 @@ interface Props { heroIcon?: string; weaponImage?: string; artifactIcon?: string
 const { heroIcon, weaponImage, artifactIcon, modes } = Astro.props;
 const groups: { key: string; label: string; items: Item[] }[] = [
   { key: 'base', label: 'База', items: [
-    { label: 'Персонажи', href: '/characters', icon: 'user', image: heroIcon, imageClass: 'character' },
-    { label: 'Оружие', href: '/weapons', icon: 'sword', image: weaponImage, imageClass: 'weapon' },
-    { label: 'Артефакты', href: '/artifacts', icon: 'flower', image: artifactIcon, imageClass: 'artifact' },
+    { label: 'Персонажи', href: '/characters/', icon: 'user', image: heroIcon, imageClass: 'character' },
+    { label: 'Оружие', href: '/weapons/', icon: 'sword', image: weaponImage, imageClass: 'weapon' },
+    { label: 'Артефакты', href: '/artifacts/', icon: 'flower', image: artifactIcon, imageClass: 'artifact' },
   ] },
   { key: 'endgame', label: 'Эндгейм', items: modes },
   { key: 'tools', label: 'Инструменты', items: [
-    { label: 'Симулятор команды', href: '/tools/simulator', icon: 'chart', description: 'Соберите отряд и сравните варианты.' },
-    { label: 'Проверка команды', href: '/tools/team-check', icon: 'check', description: 'Проверьте отряд для текущей Бездны.' },
-    { label: 'Трекер круток', href: '/tools/wishes', icon: 'star', description: 'Следите за гарантом и историей круток.' },
-    { label: 'Калькулятор прокачки', href: '/tools/calculator', icon: 'calc', description: 'Посчитайте материалы для прокачки.' },
-    { label: 'Конструктор ротаций', href: '/tools/rotation-builder', icon: 'tool', description: 'Составьте порядок действий отряда.' },
-    { label: 'Рейтинг', href: '/rating', icon: 'chart', description: 'Рейтинг персонажей от сообщества и по забегам.', soon: true },
+    { label: 'Симулятор команды', href: '/tools/simulator/', icon: 'chart', description: 'Соберите отряд и сравните варианты.' },
+    { label: 'Проверка команды', href: '/tools/team-check/', icon: 'check', description: 'Проверьте отряд для текущей Бездны.' },
+    { label: 'Трекер круток', href: '/tools/wishes/', icon: 'star', description: 'Следите за гарантом и историей круток.' },
+    { label: 'Калькулятор прокачки', href: '/tools/calculator/', icon: 'calc', description: 'Посчитайте материалы для прокачки.' },
+    { label: 'Конструктор ротаций', href: '/tools/rotation-builder/', icon: 'tool', description: 'Составьте порядок действий отряда.' },
+    { label: 'Рейтинг', href: '/rating/', icon: 'chart', description: 'Рейтинг персонажей от сообщества и по забегам.', soon: true },
   ] },
 ];
 const buttons: Record<string, string> = {

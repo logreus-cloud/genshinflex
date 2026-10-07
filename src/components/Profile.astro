@@ -12,7 +12,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   slug, name, icon, element, rarity, namecard: cards[slug] ?? '',
 }))).replace(/</g, '\\u003c');
 ---
-<Layout title={t(mode === 'public' ? 'Профиль игрока' : 'Мой профиль')} description={t(mode === 'public' ? 'Публичный профиль игрока на GenshinFlex.' : 'Избранное, персонажи и история круток.')} noindex={mode === 'public'}>
+<Layout title={t(mode === 'public' ? 'Профиль игрока' : 'Мой профиль')} description={t(mode === 'public' ? 'Публичный профиль игрока на GenshinFlex.' : 'Избранное, персонажи и история круток.')} noindex>
   <div class="profile-root profile-page" data-mode={mode}>
     <div class="profile-bg" id="profile-bg" aria-hidden="true"><div class="profile-bg-image"></div></div>
     <canvas class="profile-effect" id="profile-effect" aria-hidden="true" hidden></canvas>

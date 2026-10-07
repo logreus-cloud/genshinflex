@@ -6,7 +6,7 @@ interface Props { slug: string; size?: number; label?: boolean; }
 const { slug, size = 48, label = true } = Astro.props;
 const w = getWeapon(slug);
 ---
-<a class="wi" href={`${base}/weapons/${w.slug}`} style={`--s:${size}px`} title={w.name}>
+<a class="wi" href={`${base}/weapons/${w.slug}/`} style={`--s:${size}px`} title={w.name}>
   <span class:list={['frame', `r${w.rarity}`]}><img src={w.icon} alt="" width={size} height={size} loading="lazy" /></span>
   {label && <span class="name">{w.name}</span>}
 </a>

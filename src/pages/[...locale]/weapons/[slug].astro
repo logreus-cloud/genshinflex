@@ -24,7 +24,7 @@ const users = (await getCollection('builds'))
 ---
 <Layout title={t('{name}: статы, эффект и кому подходит — Genshin Impact', { name: w.name })} description={t('{name} ({stars}, {type}): статы на каждом уровне, эффект на всех пробуждениях R1–R5 и персонажи, которым оружие подходит лучше всего.', { name: w.name, stars: stars(w.rarity), type: w.weaponText.toLowerCase() })} image={w.icon}>
   <article data-weapon-page data-pagefind-body data-visit={JSON.stringify({ href: `${base}/weapons/${w.slug}`, name: w.name, icon: w.icon, kind: t('Оружие') })}>
-    <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/weapons`}>{t('Оружие')}</a> / {w.name}</nav>
+    <nav class="crumbs small muted" aria-label={t('Путь')}><a href={`${base}/weapons/`}>{t('Оружие')}</a> / {w.name}</nav>
     <header class:list={['head', `r${w.rarity}`]}>
       <div class="pic">
         <img src={w.icon} alt="" width="160" height="160" data-base={w.icon} data-awaken={w.iconAwaken} />
