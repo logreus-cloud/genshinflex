@@ -12,6 +12,7 @@ import namecards from '../../data/generated/namecards.json';
 import { siteNews, newsDate } from '../../lib/news';
 import { calendarItems, serverTime } from '../../lib/calendar';
 import { MODE_SECTIONS, ROTATION_SECTION } from '../../lib/sections';
+import { compareVersions } from '../../lib/version';
 import { useData, LANGS } from '../../lib/data';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
@@ -39,7 +40,7 @@ const weapon = weapons.find((w) => w.slug === weaponSlug);
 // weapon-art.json — массив слагов оружия, у которых есть полный арт
 const weaponImage = weaponSlug && (weaponArt as string[]).includes(weaponSlug)
   ? `/img/weapons/${weaponSlug}.webp` : weapon?.icon;
-const latestArtifact = [...artifacts].sort((a, b) => parseFloat(b.version) - parseFloat(a.version))[0];
+const latestArtifact = [...artifacts].sort((a, b) => compareVersions(b.version, a.version))[0];
 const modeItems = rotations.map(({ data: r }) => ({
   label: MODE_SECTIONS[r.mode].label,
   href: `${MODE_SECTIONS[r.mode].href}/`,
@@ -52,8 +53,8 @@ const modes = [
 ];
 
 const leaks = characters.filter((c) => c.beta);
-const newest = characters.filter((c) => !c.beta).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
-const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => parseFloat(b.version) - parseFloat(a.version) || b.rarity - a.rarity).slice(0, 24);
+const newest = characters.filter((c) => !c.beta).sort((a, b) => compareVersions(b.version, a.version) || b.rarity - a.rarity).slice(0, 24);
+const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => compareVersions(b.version, a.version) || b.rarity - a.rarity).slice(0, 24);
 ---
 <Layout>
   {season.theme === 'snezhnaya' && <EntryGate />}

@@ -17,7 +17,11 @@ export const store = {
 // Недавние и избранное — отдельно для каждого языка: в записи хранятся подписи и ссылки на языке страницы
 const langKey = (k: string) => (pageLang() === 'ru' ? k : `${k}:${pageLang()}`);
 export const recent = {
-  list: () => store.get<Entry[]>(langKey('gf:recent'), []),
+  // В localStorage может лежать что угодно (старый формат, ручная правка) — берём только целые записи
+  list: (): Entry[] => {
+    const raw = store.get<unknown>(langKey('gf:recent'), []);
+    return Array.isArray(raw) ? raw.filter((x): x is Entry => !!x && typeof x === 'object' && typeof (x as Entry).href === 'string' && typeof (x as Entry).name === 'string') : [];
+  },
   push(e: Entry) {
     store.set(langKey('gf:recent'), [e, ...recent.list().filter((x) => x.href !== e.href)].slice(0, 12));
   },
