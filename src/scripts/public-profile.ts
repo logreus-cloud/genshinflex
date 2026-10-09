@@ -4,7 +4,7 @@ import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
 import { forumUserPosts } from './forum/api';
 import { plainSnippet } from './forum/markup';
-import { friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unfollow, type SocialListKind, type SocialRelation } from './social/api';
+import { block, friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unblock, unfollow, type SocialListKind, type SocialRelation } from './social/api';
 import { initConnections } from './social/lists';
 import { hasSession, onSessionChange } from './user-data/session';
 import { colorOk, createEffect, fetchShowcase, loadChars, readPickerChars, renderAppearance, renderEntryList,
@@ -131,6 +131,7 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             actions.replaceChildren();
             if (relation.blocked) {
               addText(t('Вы заблокировали этого пользователя'));
+              addButton(t('Разблокировать'), () => unblock(profileId));
               return;
             }
             if (relation.following) addButton(t('Отписаться'), () => unfollow(profileId), false, 'followers');
@@ -150,6 +151,28 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               addText(t('В друзьях'));
               addButton(t('Убрать из друзей'), () => friendRemove(profileId), false, 'friends');
             } else if (relation.friend === 'declined') addText(t('Заявка отклонена'));
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn';
+            button.textContent = t('Заблокировать');
+            button.addEventListener('click', () => {
+              if (busy) return;
+              const message = document.createElement('span');
+              message.className = 'small muted';
+              message.textContent = t('Заблокировать? Подписки и дружба будут удалены.');
+              const confirm = document.createElement('button');
+              confirm.type = 'button';
+              confirm.className = 'btn';
+              confirm.textContent = t('Да, заблокировать');
+              confirm.addEventListener('click', () => { void run(() => block(profileId)); }, { signal });
+              const cancel = document.createElement('button');
+              cancel.type = 'button';
+              cancel.className = 'btn';
+              cancel.textContent = t('Отмена');
+              cancel.addEventListener('click', () => render(relation), { signal });
+              button.replaceWith(message, confirm, cancel);
+            }, { signal });
+            actions.append(button);
           }
           async function run(action: () => Promise<unknown>, kind?: SocialListKind) {
             if (!current() || busy) return;

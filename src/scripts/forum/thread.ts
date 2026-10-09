@@ -1,6 +1,7 @@
 import { FORUM_CATEGORIES, PAGE_SIZE, REACTIONS, categoryHref, threadHref } from '../../lib/forum';
 import { pageLang } from '../../i18n/client';
 import { BASE, t } from '../search';
+import { socialBlockedIds } from '../social/api';
 import { createPost, deletePost, editPost, editThread, forumErrorText, forumMe, forumPosts, forumThread, moderateThread, report, restorePost, setReaction, type ForumPost, type ForumThread } from './api';
 import { renderAuthor } from './author';
 import { renderMarkup } from './markup';
@@ -30,13 +31,16 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
   let thread: ForumThread;
   let posts: ForumPost[];
   let me: Awaited<ReturnType<typeof forumMe>>;
+  let blockedIds: Set<string>;
   let replyTo: number | null = null;
   try {
-    [thread, posts, me] = await Promise.all([
+    const meRequest = forumMe();
+    [thread, posts, me, blockedIds] = await Promise.all([
       forumThread(id),
       forumPosts(id, PAGE_SIZE, (page - 1) * PAGE_SIZE),
-      forumMe(),
-    ]) as [ForumThread, ForumPost[], typeof me];
+      meRequest,
+      meRequest.then((user) => user ? socialBlockedIds() : new Set<string>()),
+    ]) as [ForumThread, ForumPost[], typeof me, Set<string>];
     if (signal.aborted) return;
     if (!thread) {
       status.textContent = t('Не найдено');
@@ -264,6 +268,19 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       });
     }
     card.append(actions);
+    if (!post.deleted && post.author?.id && blockedIds.has(post.author.id)) {
+      const shown = [...card.children].filter((child) => !(child as HTMLElement).hidden) as HTMLElement[];
+      for (const child of shown) child.hidden = true;
+      const placeholder = el('p', t('Сообщение скрыто: вы заблокировали автора'), 'muted small');
+      const show = el('button', t('Показать'), 'btn small') as HTMLButtonElement;
+      show.type = 'button';
+      show.addEventListener('click', () => {
+        placeholder.remove();
+        for (const child of shown) child.hidden = false;
+      }, { signal });
+      placeholder.append(' ', show);
+      card.prepend(placeholder);
+    }
     postsBox.append(card);
   }
   if (/^#p\d+$/.test(location.hash)) postsBox.querySelector<HTMLElement>(`#${location.hash.slice(1)}`)?.scrollIntoView({ block: 'start' });

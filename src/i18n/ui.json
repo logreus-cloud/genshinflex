@@ -5250,5 +5250,29 @@
  "Пользователь скрыл эти списки": {
   "en": "This user has hidden these lists",
   "es": "Este usuario ha ocultado estas listas"
+ },
+ "Заблокировать? Подписки и дружба будут удалены.": {
+  "en": "Block this user? Follows and friendship will be removed.",
+  "es": "¿Bloquear a este usuario? Se eliminarán los seguimientos y la amistad."
+ },
+ "Да, заблокировать": {
+  "en": "Yes, block",
+  "es": "Sí, bloquear"
+ },
+ "Заблокированные": {
+  "en": "Blocked",
+  "es": "Bloqueados"
+ },
+ "Вы никого не блокировали": {
+  "en": "You have not blocked anyone",
+  "es": "No has bloqueado a nadie"
+ },
+ "Сообщение скрыто: вы заблокировали автора": {
+  "en": "Message hidden: you blocked the author",
+  "es": "Mensaje oculto: has bloqueado al autor"
+ },
+ "Показать": {
+  "en": "Show",
+  "es": "Mostrar"
  }
 }

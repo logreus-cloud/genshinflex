@@ -2,34 +2,34 @@ import { pageLang } from '../../i18n/client';
 import { renderAuthor } from '../forum/author';
 import { BASE, t } from '../search';
 import { hasSession, onSessionChange } from '../user-data/session';
-import { friendRemove, friendRespond, socialErrorText, socialRequests, type SocialRequest } from './api';
+import { friendRemove, friendRespond, socialBlocked, socialErrorText, socialRequests, unblock, type SocialRequest } from './api';
 
-type Direction = 'incoming' | 'outgoing';
+type Direction = 'incoming' | 'outgoing' | 'blocked';
 
 export async function initFriendRequests(root: HTMLElement, signal: AbortSignal) {
   const status = root.querySelector<HTMLElement>('[data-status]')!;
   const tabs = root.querySelector<HTMLElement>('[data-tabs]')!;
   const list = root.querySelector<HTMLElement>('[data-list]')!;
   const more = root.querySelector<HTMLButtonElement>('[data-more]')!;
-  const buttons = { incoming: root.querySelector<HTMLButtonElement>('[data-tab="incoming"]')!, outgoing: root.querySelector<HTMLButtonElement>('[data-tab="outgoing"]')! };
-  const counts = { incoming: root.querySelector<HTMLElement>('[data-count="incoming"]')!, outgoing: root.querySelector<HTMLElement>('[data-count="outgoing"]')! };
-  let tab: Direction = location.hash === '#outgoing' ? 'outgoing' : 'incoming';
+  const buttons = { incoming: root.querySelector<HTMLButtonElement>('[data-tab="incoming"]')!, outgoing: root.querySelector<HTMLButtonElement>('[data-tab="outgoing"]')!, blocked: root.querySelector<HTMLButtonElement>('[data-tab="blocked"]')! };
+  const counts = { incoming: root.querySelector<HTMLElement>('[data-count="incoming"]')!, outgoing: root.querySelector<HTMLElement>('[data-count="outgoing"]')!, blocked: root.querySelector<HTMLElement>('[data-count="blocked"]')! };
+  let tab: Direction = location.hash === '#blocked' ? 'blocked' : location.hash === '#outgoing' ? 'outgoing' : 'incoming';
   let generation = 0;
   let busy = false;
   let offset = 0;
   let hasMore = false;
   const current = (turn: number) => !signal.aborted && turn === generation;
-  const empty = (direction: Direction) => direction === 'incoming' ? t('Входящих заявок нет') : t('Исходящих заявок нет');
+  const empty = (direction: Direction) => direction === 'incoming' ? t('Входящих заявок нет') : direction === 'outgoing' ? t('Исходящих заявок нет') : t('Вы никого не блокировали');
   const setCount = (direction: Direction, value: number) => {
     counts[direction].textContent = value ? `(${value > 30 ? '30+' : value})` : '';
   };
   const selectTab = () => {
-    for (const direction of ['incoming', 'outgoing'] as const) {
+    for (const direction of ['incoming', 'outgoing', 'blocked'] as const) {
       buttons[direction].setAttribute('aria-selected', String(tab === direction));
     }
   };
   const syncControls = () => {
-    for (const direction of ['incoming', 'outgoing'] as const) buttons[direction].disabled = busy;
+    for (const direction of ['incoming', 'outgoing', 'blocked'] as const) buttons[direction].disabled = busy;
     for (const button of list.querySelectorAll<HTMLButtonElement>('.friend-request-actions button')) button.disabled = busy;
     more.hidden = !hasMore;
     more.disabled = busy || !hasMore;
@@ -44,7 +44,7 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
     let hasNext = false;
     while (rows.length < target) {
       const limit = Math.min(30, target - rows.length);
-      const page = await socialRequests(direction, limit + 1, rows.length);
+      const page = await (direction === 'blocked' ? socialBlocked(limit + 1, rows.length) : socialRequests(direction, limit + 1, rows.length));
       if (!current(turn)) return null;
       if (!rows.length) firstCount = page.length;
       rows.push(...page.slice(0, limit));
@@ -55,11 +55,14 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
   };
   const loadOtherCount = async (direction: Direction, active: Direction, turn: number) => {
     try {
-      const rows = await socialRequests(direction, 31);
+      const rows = await (direction === 'blocked' ? socialBlocked(31) : socialRequests(direction, 31));
       if (current(turn) && tab === active) setCount(direction, rows.length);
     } catch {
       if (current(turn) && tab === active) setCount(direction, 0);
     }
+  };
+  const loadOtherCounts = (active: Direction, turn: number) => {
+    for (const direction of ['incoming', 'outgoing', 'blocked'] as const) if (direction !== active) void loadOtherCount(direction, active, turn);
   };
   const render = (row: SocialRequest, direction: Direction, turn: number) => {
     const item = document.createElement('div');
@@ -92,13 +95,13 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
           offset = 0;
           hasMore = false;
           syncControls();
+          setCount(direction, 0);
           const result = await fetchRows(direction, target, turn);
           if (!result || !current(turn)) return;
-          const other: Direction = direction === 'incoming' ? 'outgoing' : 'incoming';
           setCount(direction, result.firstCount);
           showRows(result.rows, direction, turn, result.hasNext);
           if (accepted) status.textContent = t('Теперь вы друзья');
-          void loadOtherCount(other, direction, turn);
+          loadOtherCounts(direction, turn);
         } catch (error) {
           if (current(turn)) status.textContent = completed ? t('Не удалось загрузить') : socialErrorText(error);
         } finally {
@@ -110,7 +113,8 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
     if (direction === 'incoming') {
       addAction(t('Принять'), () => friendRespond(row.user_id, true), true, true);
       addAction(t('Отклонить'), () => friendRespond(row.user_id, false));
-    } else addAction(t('Отменить заявку'), () => friendRemove(row.user_id));
+    } else if (direction === 'outgoing') addAction(t('Отменить заявку'), () => friendRemove(row.user_id));
+    else addAction(t('Разблокировать'), () => unblock(row.user_id));
     item.append(person, actions);
     return item;
   };
@@ -136,9 +140,11 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
       offset = 0;
       hasMore = false;
       syncControls();
+      setCount(direction, 0);
+      loadOtherCounts(direction, turn);
     }
     try {
-      const rows = await socialRequests(direction, 31, offset);
+      const rows = await (direction === 'blocked' ? socialBlocked(31, offset) : socialRequests(direction, 31, offset));
       if (!current(turn)) return;
       if (reset) {
         setCount(direction, rows.length);
@@ -158,7 +164,7 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
   };
   const initialize = async () => {
     const turn = ++generation;
-    tab = location.hash === '#outgoing' ? 'outgoing' : 'incoming';
+    tab = location.hash === '#blocked' ? 'blocked' : location.hash === '#outgoing' ? 'outgoing' : 'incoming';
     busy = false;
     offset = 0;
     hasMore = false;
@@ -168,6 +174,7 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
     status.replaceChildren();
     setCount('incoming', 0);
     setCount('outgoing', 0);
+    setCount('blocked', 0);
     selectTab();
     syncControls();
     setBusy(true);
@@ -186,13 +193,12 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
         return;
       }
       authenticated = true;
+      loadOtherCounts(tab, turn);
       const result = await fetchRows(tab, 30, turn);
       if (!result || !current(turn)) return;
-      const other: Direction = tab === 'incoming' ? 'outgoing' : 'incoming';
       setCount(tab, result.firstCount);
       showRows(result.rows, tab, turn, result.hasNext);
       tabs.hidden = false;
-      void loadOtherCount(other, tab, turn);
     } catch {
       if (current(turn)) {
         if (authenticated) tabs.hidden = false;
@@ -217,6 +223,15 @@ export async function initFriendRequests(root: HTMLElement, signal: AbortSignal)
     selectTab();
     const url = new URL(location.href);
     url.hash = 'outgoing';
+    history.replaceState(history.state, '', url);
+    void loadList(true);
+  }, { signal });
+  buttons.blocked.addEventListener('click', () => {
+    if (busy) return;
+    tab = 'blocked';
+    selectTab();
+    const url = new URL(location.href);
+    url.hash = 'blocked';
     history.replaceState(history.state, '', url);
     void loadList(true);
   }, { signal });

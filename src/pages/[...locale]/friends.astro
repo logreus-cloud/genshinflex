@@ -12,6 +12,7 @@ const { t } = useData(Astro.currentLocale);
     <div class="friends-tabs" role="tablist" data-tabs hidden>
       <button class="btn" type="button" role="tab" data-tab="incoming">{t('Входящие')} <span data-count="incoming"></span></button>
       <button class="btn" type="button" role="tab" data-tab="outgoing">{t('Исходящие')} <span data-count="outgoing"></span></button>
+      <button class="btn" type="button" role="tab" data-tab="blocked">{t('Заблокированные')} <span data-count="blocked"></span></button>
     </div>
     <div class="friends-list" data-list></div>
     <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
