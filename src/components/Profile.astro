@@ -50,6 +50,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         </div>}
         {mode === 'public' && <p class="status" id="public-profile-status" aria-live="polite">{t('Загружаю…')}</p>}
         {mode === 'public' && <a class="btn" id="public-own-link" href={`${base}/profile/`} hidden>{t('Это ваш профиль — настроить')}</a>}
+        {mode === 'public' && <div class="public-social" id="public-social" hidden>
+          <p class="small muted" id="public-social-counts"></p>
+          <div class="public-social-actions" id="public-social-actions"></div>
+          <p class="small status" id="public-social-status" aria-live="polite"></p>
+        </div>}
     {mode === 'own' && <>
         <form id="showcase-form">
           <label for="profile-uid">{t('UID')}</label>
@@ -1423,6 +1428,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .hero-info { display: flex; align-items: flex-start; gap: 1rem; min-width: 0; }
   .public-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
   .public-actions .muted { font-size: .82rem; }
+  .public-social { display: grid; gap: 8px; }
+  .public-social[hidden] { display: none; }
+  .public-social-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .profile-root :global(.avatar-shell) { width: 96px; height: 96px; margin-top: -48px; flex: none; position: relative; z-index: 1; border-radius: 50%; }
   .profile-root :global(.avatar) { width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; position: relative; border: 3px solid var(--profile-accent); border-radius: 50%; background: var(--surface-2); color: var(--profile-accent); }
   .profile-root :global(.avatar svg) { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }

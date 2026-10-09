@@ -5094,5 +5094,85 @@
  "Не удалось загрузить": {
   "en": "Failed to load",
   "es": "No se pudo cargar"
+ },
+ "Повторить заявку можно через 3 дня после отказа": {
+  "en": "You can send a new request 3 days after it was declined",
+  "es": "Puedes volver a enviar la solicitud 3 días después del rechazo"
+ },
+ "Действие недоступно": {
+  "en": "This action is unavailable",
+  "es": "Esta acción no está disponible"
+ },
+ "Войдите в аккаунт": {
+  "en": "Sign in to your account",
+  "es": "Inicia sesión en tu cuenta"
+ },
+ "Подписчики: {n}": {
+  "en": "Followers: {n}",
+  "es": "Seguidores: {n}"
+ },
+ "Подписки: {n}": {
+  "en": "Following: {n}",
+  "es": "Siguiendo: {n}"
+ },
+ "Друзья: {n}": {
+  "en": "Friends: {n}",
+  "es": "Amigos: {n}"
+ },
+ "Войдите, чтобы подписаться или добавить в друзья": {
+  "en": "Sign in to follow or add as a friend",
+  "es": "Inicia sesión para seguir o añadir como amigo"
+ },
+ "Вы заблокировали этого пользователя": {
+  "en": "You blocked this user",
+  "es": "Has bloqueado a este usuario"
+ },
+ "Отписаться": {
+  "en": "Unfollow",
+  "es": "Dejar de seguir"
+ },
+ "Подписаться": {
+  "en": "Follow",
+  "es": "Seguir"
+ },
+ "Подписан на вас": {
+  "en": "Follows you",
+  "es": "Te sigue"
+ },
+ "В друзья": {
+  "en": "Add friend",
+  "es": "Añadir amigo"
+ },
+ "Заявка отправлена": {
+  "en": "Request sent",
+  "es": "Solicitud enviada"
+ },
+ "Отменить заявку": {
+  "en": "Cancel request",
+  "es": "Cancelar solicitud"
+ },
+ "Хочет добавить вас в друзья": {
+  "en": "Wants to be your friend",
+  "es": "Quiere ser tu amigo"
+ },
+ "Принять": {
+  "en": "Accept",
+  "es": "Aceptar"
+ },
+ "Отклонить": {
+  "en": "Decline",
+  "es": "Rechazar"
+ },
+ "В друзьях": {
+  "en": "Friends",
+  "es": "Amigos"
+ },
+ "Убрать из друзей": {
+  "en": "Remove friend",
+  "es": "Eliminar de amigos"
+ },
+ "Заявка отклонена": {
+  "en": "Request declined",
+  "es": "Solicitud rechazada"
  }
 }

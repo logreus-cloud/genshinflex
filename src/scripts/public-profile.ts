@@ -4,7 +4,8 @@ import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
 import { forumUserPosts } from './forum/api';
 import { plainSnippet } from './forum/markup';
-import { hasSession } from './user-data/session';
+import { friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unfollow, type SocialRelation } from './social/api';
+import { hasSession, onSessionChange } from './user-data/session';
 import { colorOk, createEffect, fetchShowcase, loadChars, readPickerChars, renderAppearance, renderEntryList,
   renderRosterList, renderShowcase, renderWishSummary, usesMedia, validCustom, validRoster, type Custom, type WishSummary } from './profile-view';
 import type { MediaKey } from './profile-media';
@@ -31,7 +32,7 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
   const effect = createEffect($<HTMLCanvasElement>('profile-effect'), () => custom, signal);
   signal.addEventListener('abort', () => document.documentElement.classList.remove('profile-custom-bg'), { once: true });
   try {
-    const { getSupabase } = await import('./auth');
+    const { authUrl, getSupabase } = await import('./auth');
     if (signal.aborted) return;
     const client = getSupabase();
     const { data, error } = await client.from('public_profiles').select('id,nickname,display_name,created_at,active_title,custom').eq('nickname', nick).maybeSingle();
@@ -64,6 +65,127 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
     }
     document.title = `${name} — GenshinFlex`;
     status.textContent = '';
+    const profileId = row.id;
+    void (async () => {
+      const card = $('public-social');
+      const countsLabel = $('public-social-counts');
+      const actions = $('public-social-actions');
+      const socialStatus = $('public-social-status');
+      const ownLink = $('public-own-link');
+      let generation = 0;
+      const initialize = async () => {
+        const turn = ++generation;
+        const current = () => !signal.aborted && turn === generation;
+        let countsRequest = 0;
+        const refreshCounts = async () => {
+          const request = ++countsRequest;
+          const counts = await socialCounts(profileId);
+          if (!current() || request !== countsRequest) return;
+          countsLabel.textContent = counts ? [
+            t('Подписчики: {n}', { n: counts.followers }),
+            t('Подписки: {n}', { n: counts.following }),
+            t('Друзья: {n}', { n: counts.friends }),
+          ].join(' · ') : '';
+          card.hidden = false;
+        };
+        countsLabel.textContent = '';
+        actions.replaceChildren();
+        socialStatus.textContent = '';
+        ownLink.hidden = true;
+        void refreshCounts().catch(() => {});
+        try {
+          const userId = hasSession() ? (await client.auth.getSession()).data.session?.user.id : null;
+          if (!current()) return;
+          ownLink.hidden = userId !== profileId;
+          if (userId === profileId) return;
+          if (!userId) {
+            const link = document.createElement('a');
+            link.className = 'btn';
+            link.href = authUrl(BASE, 'login', location.pathname);
+            link.textContent = t('Войдите, чтобы подписаться или добавить в друзья');
+            actions.replaceChildren(link);
+            card.hidden = false;
+            return;
+          }
+          let busy = false;
+          const addButton = (label: string, action: () => Promise<unknown>, primary = false) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = primary ? 'btn primary' : 'btn';
+            button.textContent = label;
+            button.addEventListener('click', () => { void run(action); }, { signal });
+            actions.append(button);
+          };
+          const addText = (label: string) => {
+            const text = document.createElement('span');
+            text.className = 'small muted';
+            text.textContent = label;
+            actions.append(text);
+          };
+          function render(relation: SocialRelation) {
+            actions.replaceChildren();
+            if (relation.blocked) {
+              addText(t('Вы заблокировали этого пользователя'));
+              return;
+            }
+            if (relation.following) addButton(t('Отписаться'), () => unfollow(profileId));
+            else addButton(t('Подписаться'), () => follow(profileId), true);
+            if (relation.followed_by) addText(t('Подписан на вас'));
+            if (relation.friend === 'none') addButton(t('В друзья'), () => friendRequest(profileId));
+            else if (relation.friend === 'outgoing') {
+              addText(t('Заявка отправлена'));
+              addButton(t('Отменить заявку'), () => friendRemove(profileId));
+            } else if (relation.friend === 'incoming') {
+              addText(t('Хочет добавить вас в друзья'));
+              addButton(t('Принять'), () => friendRespond(profileId, true), true);
+              addButton(t('Отклонить'), () => friendRespond(profileId, false));
+            } else if (relation.friend === 'friends') {
+              addText(t('В друзьях'));
+              addButton(t('Убрать из друзей'), () => friendRemove(profileId));
+            } else if (relation.friend === 'declined') addText(t('Заявка отклонена'));
+          }
+          async function run(action: () => Promise<unknown>) {
+            if (!current() || busy) return;
+            busy = true;
+            socialStatus.textContent = '';
+            for (const button of actions.querySelectorAll('button')) button.disabled = true;
+            try {
+              await action();
+              if (!current()) return;
+              void refreshCounts().catch(() => {});
+              try {
+                const relation = await socialRelation(profileId);
+                if (!current()) return;
+                render(relation);
+              } catch {
+                if (!current()) return;
+                actions.replaceChildren();
+                socialStatus.textContent = t('Не удалось загрузить');
+              }
+            } catch (error) {
+              if (current()) socialStatus.textContent = socialErrorText(error);
+            } finally {
+              if (current()) {
+                busy = false;
+                for (const button of actions.querySelectorAll('button')) button.disabled = false;
+              }
+            }
+          }
+          const relation = await socialRelation(profileId);
+          if (!current()) return;
+          render(relation);
+          card.hidden = false;
+        } catch {
+          if (!current()) return;
+          actions.replaceChildren();
+          socialStatus.textContent = t('Не удалось загрузить');
+          card.hidden = false;
+        }
+      };
+      onSessionChange(() => { void initialize(); }, { signal });
+      void initialize();
+    })();
+
     const charsRequest = loadChars(signal).catch(() => null);
     void (async () => {
       try {
@@ -182,11 +304,6 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
         chip.title = title.description || '';
         chip.hidden = false;
       }
-    }
-    if (hasSession()) {
-      const { data: session } = await client.auth.getSession();
-      if (signal.aborted) return;
-      if (session.session?.user.id === row.id) $('public-own-link').hidden = false;
     }
   } catch {
     if (!signal.aborted) status.textContent = t('Не удалось загрузить профиль');
