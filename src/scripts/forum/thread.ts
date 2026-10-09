@@ -68,7 +68,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
   const preview = root.querySelector<HTMLElement>('[data-preview]')!;
   body.addEventListener('input', () => {
     count.textContent = `${body.value.length}/10000`;
-    if (!preview.hidden) preview.innerHTML = renderMarkup(body.value);
+    if (!preview.hidden) preview.innerHTML = renderMarkup(body.value, BASE);
   }, { signal });
   root.querySelector<HTMLElement>('[data-tab-text]')!.addEventListener('click', () => {
     body.hidden = false;
@@ -77,7 +77,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
   root.querySelector<HTMLElement>('[data-tab-preview]')!.addEventListener('click', () => {
     body.hidden = true;
     preview.hidden = false;
-    preview.innerHTML = renderMarkup(body.value);
+    preview.innerHTML = renderMarkup(body.value, BASE);
   }, { signal });
 
   if (!me) {
@@ -169,7 +169,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
     }
     const content = el('div', '', 'forum-body');
     if (post.deleted) content.textContent = t('Сообщение удалено');
-    else content.innerHTML = renderMarkup(post.body || '');
+    else content.innerHTML = renderMarkup(post.body || '', BASE);
     card.append(content);
     if (post.deleted && post.delete_reason) card.append(el('p', post.delete_reason, 'small muted'));
     if (!post.deleted) {

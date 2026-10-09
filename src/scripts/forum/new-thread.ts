@@ -46,7 +46,7 @@ export async function initNewThread(root: HTMLElement, signal: AbortSignal) {
 
   body.addEventListener('input', () => {
     count.textContent = `${body.value.length}/10000`;
-    if (!preview.hidden) preview.innerHTML = renderMarkup(body.value);
+    if (!preview.hidden) preview.innerHTML = renderMarkup(body.value, BASE);
   }, { signal });
   root.querySelector<HTMLElement>('[data-tab-text]')!.addEventListener('click', () => {
     body.hidden = false;
@@ -55,7 +55,7 @@ export async function initNewThread(root: HTMLElement, signal: AbortSignal) {
   root.querySelector<HTMLElement>('[data-tab-preview]')!.addEventListener('click', () => {
     body.hidden = true;
     preview.hidden = false;
-    preview.innerHTML = renderMarkup(body.value);
+    preview.innerHTML = renderMarkup(body.value, BASE);
   }, { signal });
 
   form.addEventListener('submit', async (event) => {
