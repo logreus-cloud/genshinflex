@@ -176,6 +176,16 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
+          <div class="notif" id="notif" hidden>
+            <button class="icon-btn notif-button" id="notif-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="notif-panel" aria-label={t('Уведомления')} title={t('Уведомления')}>
+              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 3a4.5 4.5 0 0 0-4.5 4.5c0 4-1.5 5.5-1.5 5.5h12s-1.5-1.5-1.5-5.5A4.5 4.5 0 0 0 10 3Z" /><path d="M8.3 16a1.8 1.8 0 0 0 3.4 0" /></svg>
+              <span class="notif-badge" id="notif-badge" hidden></span>
+            </button>
+            <div class="notif-panel" id="notif-panel" role="dialog" aria-label={t('Уведомления')} hidden>
+              <div class="notif-head"><strong>{t('Уведомления')}</strong><button class="notif-read-all" id="notif-read-all" type="button">{t('Прочитать все')}</button></div>
+              <div class="notif-list" id="notif-list"></div>
+            </div>
+          </div>
           <a class="icon-btn profile account-link" id="profile-link" href={`${base}/profile/`} data-profile={t('Мой профиль')} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" /><path d="M4 17c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2" /></svg>
             <span class="account-letter" hidden></span>
@@ -304,6 +314,18 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .account-link { position: relative; color: var(--muted); text-decoration: none; }
   .account-link:hover { color: var(--accent); }
   .account-letter:not([hidden]) { position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .65rem; font-weight: 700; }
+  .notif { position: relative; }
+  .notif[hidden], .notif-panel[hidden], .notif-badge[hidden] { display: none; }
+  .notif-badge:not([hidden]) { position: absolute; top: -2px; right: -2px; display: grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #e5484d; color: #fff; font-size: .65rem; font-weight: 700; pointer-events: none; }
+  .notif-panel { position: absolute; top: calc(100% + 12px); right: 0; width: min(360px, calc(100vw - 16px)); max-height: 70vh; overflow: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 32px rgb(0 0 0 / .3); z-index: 50; }
+  .notif-head { display: flex; justify-content: space-between; align-items: center; padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+  .notif-read-all { background: none; border: 0; color: var(--accent-text); cursor: pointer; font: inherit; font-size: .85rem; }
+  .notif-list :global(.notif-item) { display: grid; gap: .2rem; padding: .6rem .8rem; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .notif-list :global(button.notif-item) { text-align: left; width: 100%; border: 0; font: inherit; background: none; cursor: pointer; }
+  .notif-list :global(.notif-item.unread) { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .notif-list :global(.notif-item:hover) { background: var(--surface-2); }
+  .notif-list :global(.notif-item time), .notif-list :global(.notif-item .notif-snippet) { font-size: .8rem; color: var(--muted); }
+  .notif-list :global(.notif-empty) { margin: 0; padding: .8rem; color: var(--muted); }
   .language { position: relative; }
   .langs { position: absolute; top: calc(100% + 12px); right: 0; display: grid; min-width: 90px; padding: .3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 32px rgb(0 0 0 / .3); }
   .langs[hidden], .search-panel[hidden] { display: none; }
@@ -408,6 +430,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   /* Шесть иконок в шапке: на узких экранах от логотипа остаётся значок, иначе надпись наезжает на кнопки */
   @media (max-width: 540px) {
     .top-logo span { display: none; }
+    .notif-panel { position: fixed; top: calc(var(--top-h) + 8px); right: 8px; }
   }
   @media (max-width: 359px) {
     .dc { display: none; }

@@ -5298,5 +5298,49 @@
  "В ленте пока ничего нет. Подпишитесь на авторов, чтобы видеть их темы и посты.": {
   "en": "Nothing here yet. Follow authors to see their threads and posts.",
   "es": "Aún no hay nada. Sigue a autores para ver sus temas y publicaciones."
+ },
+ "Уведомления": {
+  "en": "Notifications",
+  "es": "Notificaciones"
+ },
+ "Прочитать все": {
+  "en": "Mark all as read",
+  "es": "Marcar todo como leído"
+ },
+ "Ответ от {name} в теме «{title}»": {
+  "en": "Reply from {name} in “{title}”",
+  "es": "Respuesta de {name} en «{title}»"
+ },
+ "Ответ от {name}": {
+  "en": "Reply from {name}",
+  "es": "Respuesta de {name}"
+ },
+ "Упоминание от {name} в теме «{title}»": {
+  "en": "{name} mentioned you in “{title}”",
+  "es": "{name} te mencionó en «{title}»"
+ },
+ "Упоминание от {name}": {
+  "en": "{name} mentioned you",
+  "es": "{name} te mencionó"
+ },
+ "Новый подписчик: {name}": {
+  "en": "New follower: {name}",
+  "es": "Nuevo seguidor: {name}"
+ },
+ "Заявка в друзья от {name}": {
+  "en": "Friend request from {name}",
+  "es": "Solicitud de amistad de {name}"
+ },
+ "{name} теперь у вас в друзьях": {
+  "en": "{name} is now your friend",
+  "es": "{name} ahora es tu amigo"
+ },
+ "Сообщение от {name}": {
+  "en": "Message from {name}",
+  "es": "Mensaje de {name}"
+ },
+ "Уведомлений пока нет": {
+  "en": "No notifications yet",
+  "es": "Aún no hay notificaciones"
  }
 }

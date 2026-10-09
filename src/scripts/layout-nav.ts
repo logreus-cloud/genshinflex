@@ -1,5 +1,6 @@
 import '../scripts/common';
 import '../scripts/build-guard';
+import '../scripts/notifications/bell';
 import { onPage, cleanup } from '../scripts/router';
 onPage((signal) => {
   const side = document.getElementById('side');
