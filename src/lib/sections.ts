@@ -50,8 +50,9 @@ export const SECTIONS: Section[] = [
   { id: 'discord', href: (_lang: Lang, social: Social) => social.discord, label: 'Discord-сервер', icon: 'book', footerColumn: 'Сайт', footerOrder: 4, footerOnly: true, external: true },
   { id: 'about', href: '/about/', label: 'О сайте', icon: 'book', footerColumn: 'Сайт', footerOrder: 5, footerOnly: true },
   { id: 'feedback', href: '/feedback/', label: 'Обратная связь', icon: 'book', footerColumn: 'Сайт', footerOrder: 6, footerOnly: true },
-  { id: 'privacy', href: '/privacy/', label: 'Политика конфиденциальности', icon: 'book', footerColumn: 'Сайт', footerOrder: 7, footerOnly: true },
-  { id: 'sitemap', href: '/sitemap.xml', label: 'Sitemap', icon: 'book', footerColumn: 'Сайт', footerOrder: 8, footerOnly: true },
+  { id: 'rules', href: '/rules/', label: 'Правила сообщества', icon: 'book', footerColumn: 'Сайт', footerOrder: 7, footerOnly: true },
+  { id: 'privacy', href: '/privacy/', label: 'Политика конфиденциальности', icon: 'book', footerColumn: 'Сайт', footerOrder: 8, footerOnly: true },
+  { id: 'sitemap', href: '/sitemap.xml', label: 'Sitemap', icon: 'book', footerColumn: 'Сайт', footerOrder: 9, footerOnly: true },
 ];
 
 export const sectionHref = (section: Section, lang: Lang, social: Social) =>

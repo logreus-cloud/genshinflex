@@ -1,0 +1,28 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+import { Content as RuContent } from '../../data/rules/ru.md';
+import { Content as EnContent } from '../../data/rules/en.md';
+import { Content as EsContent } from '../../data/rules/es.md';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, lang, t } = useData(Astro.currentLocale);
+const Content = { ru: RuContent, en: EnContent, es: EsContent }[lang];
+---
+<Layout title={t('Правила сообщества')} description={t('Правила форума и публичных профилей GenshinFlex.')}>
+  <div class="rules-prose">
+    <h1>{t('Правила сообщества')}</h1>
+    <p class="muted">{t('Редакция от 9 октября 2026')}</p>
+    <Content />
+    <p>
+      <a href={`${base}/forum/`}>{t('Форум')}</a>
+      · <a href={`${base}/privacy/`}>{t('Политика конфиденциальности')}</a>
+      · <a href={`${base}/feedback/`}>{t('Форма обратной связи')}</a>
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .rules-prose { max-width: 75ch; overflow-wrap: anywhere; }
+  .rules-prose h1 { margin-bottom: .3rem; }
+  :global(.rules-prose h2) { margin-top: 1.8rem; }
+</style>

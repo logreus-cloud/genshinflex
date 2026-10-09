@@ -24,6 +24,7 @@ const { base, t } = useData(Astro.currentLocale);
         <div class="forum-body" data-preview hidden></div>
         <p class="small muted">{t('Подсказка по разметке: **жирный**, *курсив*, ||спойлер||, > цитата')}</p>
         <span class="small muted" data-count>0/10000</span>
+        <p class="small muted">{t('Публикуя, вы соглашаетесь с')} <a href={`${base}/rules/`}>{t('правилами сообщества')}</a>.</p>
         <button class="btn primary" type="submit">{t('Отправить')}</button>
       </form>
     </section>

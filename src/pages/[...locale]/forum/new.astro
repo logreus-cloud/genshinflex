@@ -34,6 +34,7 @@ const { base, t } = useData(Astro.currentLocale);
       <textarea class="input" rows="9" maxlength="10000" required></textarea>
       <div class="forum-body" data-preview hidden></div>
       <span class="small muted" data-count>0/10000</span>
+      <p class="small muted">{t('Публикуя, вы соглашаетесь с')} <a href={`${base}/rules/`}>{t('правилами сообщества')}</a>.</p>
       <button class="btn primary" type="submit">{t('Создать тему')}</button>
     </form>
     <section class="panel">
@@ -44,6 +45,7 @@ const { base, t } = useData(Astro.currentLocale);
         <li>{t('Сюжетные спойлеры — под ||…||')}</li>
         <li>{t('Новым аккаунтам ссылки доступны через 3 дня')}</li>
       </ul>
+      <a href={`${base}/rules/`}>{t('Все правила сообщества')}</a>
     </section>
   </div>
 </Layout>
