@@ -9,6 +9,8 @@ export type SocialRelation = {
 };
 
 export type SocialCounts = { followers: number; following: number; friends: number };
+export type SocialListKind = 'followers' | 'following' | 'friends';
+export type SocialListRow = { user_id: string; author: Author; since: string };
 export type SocialRequest = { user_id: string; author: Author; created_at: string };
 
 async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise<T> {
@@ -33,6 +35,8 @@ export const unfollow = (user: string) => rpc<void>('social_unfollow', { p_user:
 export const friendRequest = (user: string) => rpc<'outgoing' | 'friends'>('social_friend_request', { p_user: user });
 export const friendRespond = (user: string, accept: boolean) => rpc<void>('social_friend_respond', { p_user: user, p_accept: accept });
 export const friendRemove = (user: string) => rpc<void>('social_friend_remove', { p_user: user });
+export const socialList = (user: string, kind: SocialListKind, limit = 30, offset = 0) =>
+  rpc<SocialListRow[]>('social_list', { p_user: user, p_kind: kind, p_limit: limit, p_offset: offset });
 export const socialRequests = (direction: 'incoming' | 'outgoing', limit = 30, offset = 0) =>
   rpc<SocialRequest[]>('social_requests', { p_direction: direction, p_limit: limit, p_offset: offset });
 

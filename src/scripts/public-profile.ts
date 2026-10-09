@@ -4,7 +4,8 @@ import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
 import { forumUserPosts } from './forum/api';
 import { plainSnippet } from './forum/markup';
-import { friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unfollow, type SocialRelation } from './social/api';
+import { friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unfollow, type SocialListKind, type SocialRelation } from './social/api';
+import { initConnections } from './social/lists';
 import { hasSession, onSessionChange } from './user-data/session';
 import { colorOk, createEffect, fetchShowcase, loadChars, readPickerChars, renderAppearance, renderEntryList,
   renderRosterList, renderShowcase, renderWishSummary, usesMedia, validCustom, validRoster, type Custom, type WishSummary } from './profile-view';
@@ -66,9 +67,9 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
     document.title = `${name} — GenshinFlex`;
     status.textContent = '';
     const profileId = row.id;
+    const connections = initConnections(root, profileId, signal);
     void (async () => {
       const card = $('public-social');
-      const countsLabel = $('public-social-counts');
       const actions = $('public-social-actions');
       const socialStatus = $('public-social-status');
       const ownLink = $('public-own-link');
@@ -81,14 +82,10 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
           const request = ++countsRequest;
           const counts = await socialCounts(profileId);
           if (!current() || request !== countsRequest) return;
-          countsLabel.textContent = counts ? [
-            t('Подписчики: {n}', { n: counts.followers }),
-            t('Подписки: {n}', { n: counts.following }),
-            t('Друзья: {n}', { n: counts.friends }),
-          ].join(' · ') : '';
+          connections.setCounts(counts);
           card.hidden = false;
         };
-        countsLabel.textContent = '';
+        connections.setCounts(null);
         actions.replaceChildren();
         socialStatus.textContent = '';
         ownLink.hidden = true;
@@ -116,12 +113,12 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             return;
           }
           let busy = false;
-          const addButton = (label: string, action: () => Promise<unknown>, primary = false) => {
+          const addButton = (label: string, action: () => Promise<unknown>, primary = false, kind?: SocialListKind) => {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = primary ? 'btn primary' : 'btn';
             button.textContent = label;
-            button.addEventListener('click', () => { void run(action); }, { signal });
+            button.addEventListener('click', () => { void run(action, kind); }, { signal });
             actions.append(button);
           };
           const addText = (label: string) => {
@@ -136,23 +133,23 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               addText(t('Вы заблокировали этого пользователя'));
               return;
             }
-            if (relation.following) addButton(t('Отписаться'), () => unfollow(profileId));
-            else addButton(t('Подписаться'), () => follow(profileId), true);
+            if (relation.following) addButton(t('Отписаться'), () => unfollow(profileId), false, 'followers');
+            else addButton(t('Подписаться'), () => follow(profileId), true, 'followers');
             if (relation.followed_by) addText(t('Подписан на вас'));
-            if (relation.friend === 'none') addButton(t('В друзья'), () => friendRequest(profileId));
+            if (relation.friend === 'none') addButton(t('В друзья'), () => friendRequest(profileId), false, 'friends');
             else if (relation.friend === 'outgoing') {
               addText(t('Заявка отправлена'));
-              addButton(t('Отменить заявку'), () => friendRemove(profileId));
+              addButton(t('Отменить заявку'), () => friendRemove(profileId), false, 'friends');
             } else if (relation.friend === 'incoming') {
               addText(t('Хочет добавить вас в друзья'));
-              addButton(t('Принять'), () => friendRespond(profileId, true), true);
-              addButton(t('Отклонить'), () => friendRespond(profileId, false));
+              addButton(t('Принять'), () => friendRespond(profileId, true), true, 'friends');
+              addButton(t('Отклонить'), () => friendRespond(profileId, false), false, 'friends');
             } else if (relation.friend === 'friends') {
               addText(t('В друзьях'));
-              addButton(t('Убрать из друзей'), () => friendRemove(profileId));
+              addButton(t('Убрать из друзей'), () => friendRemove(profileId), false, 'friends');
             } else if (relation.friend === 'declined') addText(t('Заявка отклонена'));
           }
-          async function run(action: () => Promise<unknown>) {
+          async function run(action: () => Promise<unknown>, kind?: SocialListKind) {
             if (!current() || busy) return;
             busy = true;
             socialStatus.textContent = '';
@@ -161,6 +158,7 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               await action();
               if (!current()) return;
               void refreshCounts().catch(() => {});
+              connections.reload(kind);
               try {
                 const relation = await socialRelation(profileId);
                 if (!current()) return;

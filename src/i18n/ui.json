@@ -5206,5 +5206,21 @@
  "Теперь вы друзья": {
   "en": "You are now friends",
   "es": "Ahora sois amigos"
+ },
+ "Подписчики": {
+  "en": "Followers",
+  "es": "Seguidores"
+ },
+ "Подписки": {
+  "en": "Following",
+  "es": "Siguiendo"
+ },
+ "Друзья": {
+  "en": "Friends",
+  "es": "Amigos"
+ },
+ "Здесь пока никого нет": {
+  "en": "Nobody here yet",
+  "es": "Aún no hay nadie"
  }
 }

@@ -51,7 +51,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         {mode === 'public' && <p class="status" id="public-profile-status" aria-live="polite">{t('Загружаю…')}</p>}
         {mode === 'public' && <a class="btn" id="public-own-link" href={`${base}/profile/`} hidden>{t('Это ваш профиль — настроить')}</a>}
         {mode === 'public' && <div class="public-social" id="public-social" hidden>
-          <p class="small muted" id="public-social-counts"></p>
+          <div class="public-social-tabs" id="public-social-counts" role="tablist" hidden>
+            <button type="button" class="social-tab" role="tab" aria-selected="false" data-kind="followers">{t('Подписчики')} <span data-count></span></button>
+            <button type="button" class="social-tab" role="tab" aria-selected="false" data-kind="following">{t('Подписки')} <span data-count></span></button>
+            <button type="button" class="social-tab" role="tab" aria-selected="false" data-kind="friends">{t('Друзья')} <span data-count></span></button>
+          </div>
           <div class="public-social-actions" id="public-social-actions"></div>
           <p class="small status" id="public-social-status" aria-live="polite"></p>
         </div>}
@@ -71,6 +75,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
         </>}
       </div>
     </section>
+    {mode === 'public' && <section class="profile-card" id="public-connections" hidden>
+      <h2 id="public-connections-title"></h2>
+      <div class="connections-list" id="public-connections-list"></div>
+      <p class="small muted" id="public-connections-status" aria-live="polite"></p>
+      <button class="btn" type="button" id="public-connections-more" hidden>{t('Показать ещё')}</button>
+    </section>}
     <section class="profile-card favorite-card" id="profile-favorites" hidden>
       <h2>{t('Любимые персонажи')}</h2>
       <div class="favorite-grid" id="profile-favorites-list"></div>
@@ -1430,7 +1440,18 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .public-actions .muted { font-size: .82rem; }
   .public-social { display: grid; gap: 8px; }
   .public-social[hidden] { display: none; }
+  .public-social-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .public-social-tabs[hidden] { display: none; }
+  .social-tab { background: none; border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 999px; padding: 4px 12px; color: var(--muted); font: inherit; font-size: .85rem; cursor: pointer; }
+  .social-tab:hover, .social-tab[aria-selected="true"] { border-color: var(--profile-accent); color: var(--text); }
+  .social-tab span[data-count] { font-weight: 600; color: var(--text); }
   .public-social-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #public-connections .connections-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+  #public-connections :global(.connection) { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 10px; background: color-mix(in srgb, var(--text) 4%, transparent); min-width: 0; overflow-wrap: anywhere; }
+  #public-connections :global(.forum-author) { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; min-width: 0; overflow-wrap: anywhere; }
+  #public-connections :global(.forum-avatar) { display: inline-grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); overflow: hidden; }
+  #public-connections :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #public-connections [hidden] { display: none !important; }
   .profile-root :global(.avatar-shell) { width: 96px; height: 96px; margin-top: -48px; flex: none; position: relative; z-index: 1; border-radius: 50%; }
   .profile-root :global(.avatar) { width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; position: relative; border: 3px solid var(--profile-accent); border-radius: 50%; background: var(--surface-2); color: var(--profile-accent); }
   .profile-root :global(.avatar svg) { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
