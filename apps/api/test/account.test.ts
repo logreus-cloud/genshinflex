@@ -63,6 +63,12 @@ test('includes every export section without provider tokens', async () => {
     const threads = Array.from({ length: 1001 }, (_, index) => ({ author_id: id, id: index + 1 }));
     const reactions = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, post_id: index + 1, kind: 'heart' }));
     const reports = Array.from({ length: 1001 }, (_, index) => ({ reporter_id: id, id: index + 1 }));
+    const following = { follower_id: id, followee_id: '22222222-2222-4222-8222-222222222222' };
+    const follower = { follower_id: '33333333-3333-4333-8333-333333333333', followee_id: id };
+    const requestedFriendship = { requester_id: id, addressee_id: following.followee_id, status: 'pending' };
+    const receivedFriendship = { requester_id: follower.follower_id, addressee_id: id, status: 'accepted' };
+    const block = { blocker_id: id, blocked_id: '44444444-4444-4444-8444-444444444444' };
+    const inboundBlock = { blocker_id: following.followee_id, blocked_id: id };
     const row = (data: unknown) => ({
       select: () => ({
         eq: () => ({
@@ -86,10 +92,13 @@ test('includes every export section without provider tokens', async () => {
       forum_posts: posts,
       forum_reactions: reactions,
       forum_reports: reports,
+      social_follows: [following, follower],
+      social_friendships: [requestedFriendship, receivedFriendship],
+      social_blocks: [block, inboundBlock],
     };
     const client = {
       from: (table: string) => table in collections ? {
-        select: () => ({ eq: () => {
+        select: () => ({ eq: (key: string, value: unknown) => {
           const query = {
             order: (column: string) => {
               orders.push({ table, column });
@@ -97,7 +106,10 @@ test('includes every export section without provider tokens', async () => {
             },
             range: async (start: number, end: number) => {
               ranges.push({ table, start, end });
-              return { data: collections[table]!.slice(start, end + 1), error: null };
+              return {
+                data: collections[table]!.filter((item) => (item as Record<string, unknown>)[key] === value).slice(start, end + 1),
+                error: null,
+              };
             },
           };
           return query;
@@ -132,7 +144,7 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(data.profile, rows.profiles);
     assert.deepEqual(data.user_data, rows.user_data);
     assert.deepEqual(data.wishes, wishes);
-    for (const table of Object.keys(collections)) {
+    for (const table of ['wishes', 'forum_threads', 'forum_posts', 'forum_reactions', 'forum_reports']) {
       assert.deepEqual(ranges.filter((entry) => entry.table === table), [
         { table, start: 0, end: 999 },
         { table, start: 1000, end: 1999 },
@@ -148,11 +160,26 @@ test('includes every export section without provider tokens', async () => {
     for (const [table, list] of Object.entries(columns)) {
       assert.deepEqual(orders.filter((entry) => entry.table === table).map((entry) => entry.column), [...list, ...list]);
     }
+    assert.deepEqual(orders.filter((entry) => entry.table === 'social_follows').map((entry) => entry.column), [
+      'followee_id', 'follower_id',
+    ]);
+    assert.deepEqual(orders.filter((entry) => entry.table === 'social_friendships').map((entry) => entry.column), [
+      'requester_id', 'addressee_id', 'requester_id', 'addressee_id',
+    ]);
+    assert.deepEqual(orders.filter((entry) => entry.table === 'social_blocks').map((entry) => entry.column), [
+      'blocked_id',
+    ]);
     assert.deepEqual(data.roles, rows.roles);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
     assert.deepEqual(data.forum, {
       threads, posts, reactions,
       reports, ban: rows.forum_bans,
+    });
+    assert.deepEqual(data.social, {
+      following: [following],
+      followers: [follower],
+      friendships: [requestedFriendship, receivedFriendship],
+      blocks: [block],
     });
     assert.ok(data.exported_at);
     assert.equal(JSON.stringify(data).includes('secret'), false);
