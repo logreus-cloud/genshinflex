@@ -5174,5 +5174,37 @@
  "Заявка отклонена": {
   "en": "Request declined",
   "es": "Solicitud rechazada"
+ },
+ "Заявки в друзья": {
+  "en": "Friend requests",
+  "es": "Solicitudes de amistad"
+ },
+ "Входящие и исходящие заявки в друзья на GenshinFlex.": {
+  "en": "Incoming and outgoing friend requests on GenshinFlex.",
+  "es": "Solicitudes de amistad recibidas y enviadas en GenshinFlex."
+ },
+ "Входящие": {
+  "en": "Incoming",
+  "es": "Recibidas"
+ },
+ "Исходящие": {
+  "en": "Outgoing",
+  "es": "Enviadas"
+ },
+ "Войдите, чтобы видеть заявки в друзья": {
+  "en": "Sign in to see friend requests",
+  "es": "Inicia sesión para ver las solicitudes de amistad"
+ },
+ "Входящих заявок нет": {
+  "en": "No incoming requests",
+  "es": "No hay solicitudes recibidas"
+ },
+ "Исходящих заявок нет": {
+  "en": "No outgoing requests",
+  "es": "No hay solicitudes enviadas"
+ },
+ "Теперь вы друзья": {
+  "en": "You are now friends",
+  "es": "Ahora sois amigos"
  }
 }

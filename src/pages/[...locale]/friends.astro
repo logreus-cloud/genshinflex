@@ -1,0 +1,66 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Заявки в друзья')} description={t('Входящие и исходящие заявки в друзья на GenshinFlex.')} noindex>
+  <div class="friends" data-friend-requests>
+    <h1>{t('Заявки в друзья')}</h1>
+    <p class="status" data-status aria-live="polite"></p>
+    <div class="friends-tabs" role="tablist" data-tabs hidden>
+      <button class="btn" type="button" role="tab" data-tab="incoming">{t('Входящие')} <span data-count="incoming"></span></button>
+      <button class="btn" type="button" role="tab" data-tab="outgoing">{t('Исходящие')} <span data-count="outgoing"></span></button>
+    </div>
+    <div class="friends-list" data-list></div>
+    <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../scripts/router';
+  import { initFriendRequests } from '../../scripts/social/requests';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-friend-requests]');
+    if (root) void initFriendRequests(root, signal);
+  });
+</script>
+
+<style>
+  .friends :global([hidden]) { display: none !important; }
+  .friends { display: grid; gap: 1rem; max-width: 760px; }
+  .friends-tabs { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .friends-tabs [aria-selected="true"] { border-color: var(--accent); }
+  .friends-list { display: grid; gap: .7rem; }
+  .friends :global(.friend-request) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+  .friends :global(.friend-request-person) { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; min-width: 0; }
+  .friends :global(.friend-request-actions) { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .friends :global(.forum-author) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem;
+    overflow-wrap: anywhere;
+  }
+  .friends :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    overflow: hidden;
+  }
+  .friends :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .friends > [data-more] { justify-self: start; }
+</style>

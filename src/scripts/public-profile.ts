@@ -97,7 +97,15 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
           const userId = hasSession() ? (await client.auth.getSession()).data.session?.user.id : null;
           if (!current()) return;
           ownLink.hidden = userId !== profileId;
-          if (userId === profileId) return;
+          if (userId === profileId) {
+            const link = document.createElement('a');
+            link.className = 'btn';
+            link.href = `${BASE}/friends/`;
+            link.textContent = t('Заявки в друзья');
+            actions.replaceChildren(link);
+            card.hidden = false;
+            return;
+          }
           if (!userId) {
             const link = document.createElement('a');
             link.className = 'btn';

@@ -1,4 +1,5 @@
 import { t } from '../search';
+import type { Author } from '../forum/api';
 
 export type SocialRelation = {
   following: boolean;
@@ -8,6 +9,7 @@ export type SocialRelation = {
 };
 
 export type SocialCounts = { followers: number; following: number; friends: number };
+export type SocialRequest = { user_id: string; author: Author; created_at: string };
 
 async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise<T> {
   const { getSupabase } = await import('../auth');
@@ -31,6 +33,8 @@ export const unfollow = (user: string) => rpc<void>('social_unfollow', { p_user:
 export const friendRequest = (user: string) => rpc<'outgoing' | 'friends'>('social_friend_request', { p_user: user });
 export const friendRespond = (user: string, accept: boolean) => rpc<void>('social_friend_respond', { p_user: user, p_accept: accept });
 export const friendRemove = (user: string) => rpc<void>('social_friend_remove', { p_user: user });
+export const socialRequests = (direction: 'incoming' | 'outgoing', limit = 30, offset = 0) =>
+  rpc<SocialRequest[]>('social_requests', { p_direction: direction, p_limit: limit, p_offset: offset });
 
 export function socialErrorText(error: unknown) {
   const code = /social:([a-z_]+)/.exec((error as { message?: string })?.message ?? '')?.[1];
