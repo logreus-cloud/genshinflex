@@ -89,7 +89,7 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
         actions.replaceChildren();
         socialStatus.textContent = '';
         ownLink.hidden = true;
-        void refreshCounts().catch(() => {});
+        void refreshCounts().catch(() => { if (current()) connections.countsUnavailable(); });
         try {
           const userId = hasSession() ? (await client.auth.getSession()).data.session?.user.id : null;
           if (!current()) return;
@@ -136,8 +136,10 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             if (relation.following) addButton(t('Отписаться'), () => unfollow(profileId), false, 'followers');
             else addButton(t('Подписаться'), () => follow(profileId), true, 'followers');
             if (relation.followed_by) addText(t('Подписан на вас'));
-            if (relation.friend === 'none') addButton(t('В друзья'), () => friendRequest(profileId), false, 'friends');
-            else if (relation.friend === 'outgoing') {
+            if (relation.friend === 'none') {
+              if (relation.can_request === false) addText(t('Не принимает заявки в друзья'));
+              else addButton(t('В друзья'), () => friendRequest(profileId), false, 'friends');
+            } else if (relation.friend === 'outgoing') {
               addText(t('Заявка отправлена'));
               addButton(t('Отменить заявку'), () => friendRemove(profileId), false, 'friends');
             } else if (relation.friend === 'incoming') {

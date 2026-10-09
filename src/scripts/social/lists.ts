@@ -4,7 +4,7 @@ import { socialList, type SocialCounts, type SocialListKind } from './api';
 
 const labels: Record<SocialListKind, string> = { followers: 'Подписчики', following: 'Подписки', friends: 'Друзья' };
 
-export function initConnections(root: HTMLElement, profileId: string, signal: AbortSignal): { setCounts(counts: SocialCounts | null): void; reload(kind?: SocialListKind): void } {
+export function initConnections(root: HTMLElement, profileId: string, signal: AbortSignal): { setCounts(counts: SocialCounts | null): void; countsUnavailable(): void; reload(kind?: SocialListKind): void } {
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('#public-social-counts [data-kind]')];
   const countsBox = root.querySelector<HTMLElement>('#public-social-counts')!;
   const card = root.querySelector<HTMLElement>('#public-connections')!;
@@ -17,6 +17,8 @@ export function initConnections(root: HTMLElement, profileId: string, signal: Ab
   let loading = false;
   let failed = false;
   let request = 0;
+  let listsHidden = false;
+  let countsReady = false;
 
   const current = (turn: number, kind: SocialListKind) => !signal.aborted && turn === request && active === kind;
   const select = () => {
@@ -36,10 +38,11 @@ export function initConnections(root: HTMLElement, profileId: string, signal: Ab
     list.replaceChildren();
     status.textContent = '';
     more.hidden = true;
-    void load();
+    if (listsHidden) status.textContent = t('Пользователь скрыл эти списки');
+    else void load();
   };
   async function load() {
-    if (!active || loading || signal.aborted) return;
+    if (!active || loading || !countsReady || listsHidden || signal.aborted) return;
     const kind = active, turn = ++request;
     loading = true;
     more.disabled = true;
@@ -104,6 +107,17 @@ export function initConnections(root: HTMLElement, profileId: string, signal: Ab
     setCounts(counts: SocialCounts | null) {
       countsBox.hidden = !counts;
       for (const tab of tabs) tab.querySelector<HTMLElement>('[data-count]')!.textContent = counts ? String(counts[tab.dataset.kind as SocialListKind]) : '';
+      const changed = countsReady !== !!counts || (!!counts && listsHidden !== counts.lists_hidden);
+      countsReady = !!counts;
+      listsHidden = counts?.lists_hidden === true;
+      if (changed && active) reset();
+    },
+    // Счётчики не загрузились: открываем списки без них — скрытые база всё равно не отдаст.
+    countsUnavailable() {
+      if (countsReady) return;
+      countsReady = true;
+      listsHidden = false;
+      if (active) reset();
     },
     reload(kind?: SocialListKind) {
       if (active && (!kind || active === kind)) reset();

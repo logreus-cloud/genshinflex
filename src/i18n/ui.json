@@ -5222,5 +5222,33 @@
  "Здесь пока никого нет": {
   "en": "Nobody here yet",
   "es": "Aún no hay nadie"
+ },
+ "Подписчики, подписки и друзья": {
+  "en": "Followers, following and friends",
+  "es": "Seguidores, seguidos y amigos"
+ },
+ "Кто может отправлять заявки": {
+  "en": "Who can send requests",
+  "es": "Quién puede enviar solicitudes"
+ },
+ "Только те, на кого я подписан": {
+  "en": "Only people I follow",
+  "es": "Solo las personas que sigo"
+ },
+ "Никто": {
+  "en": "Nobody",
+  "es": "Nadie"
+ },
+ "Пользователь не принимает заявки в друзья": {
+  "en": "This user does not accept friend requests",
+  "es": "Este usuario no acepta solicitudes de amistad"
+ },
+ "Не принимает заявки в друзья": {
+  "en": "Not accepting friend requests",
+  "es": "No acepta solicitudes de amistad"
+ },
+ "Пользователь скрыл эти списки": {
+  "en": "This user has hidden these lists",
+  "es": "Este usuario ha ocultado estas listas"
  }
 }

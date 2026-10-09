@@ -6,9 +6,10 @@ export type SocialRelation = {
   followed_by: boolean;
   friend: 'none' | 'outgoing' | 'incoming' | 'friends' | 'declined';
   blocked: boolean;
+  can_request: boolean;
 };
 
-export type SocialCounts = { followers: number; following: number; friends: number };
+export type SocialCounts = { followers: number; following: number; friends: number; lists_hidden: boolean };
 export type SocialListKind = 'followers' | 'following' | 'friends';
 export type SocialListRow = { user_id: string; author: Author; since: string };
 export type SocialRequest = { user_id: string; author: Author; created_at: string };
@@ -27,8 +28,8 @@ const safeCount = (value: unknown) => {
 
 export const socialRelation = (user: string) => rpc<SocialRelation>('social_relation', { p_user: user });
 export const socialCounts = async (user: string): Promise<SocialCounts | null> => {
-  const row = (await rpc<{ followers: unknown; following: unknown; friends: unknown }[]>('social_counts', { p_user: user }))[0];
-  return row ? { followers: safeCount(row.followers), following: safeCount(row.following), friends: safeCount(row.friends) } : null;
+  const row = (await rpc<{ followers: unknown; following: unknown; friends: unknown; lists_hidden: unknown }[]>('social_counts', { p_user: user }))[0];
+  return row ? { followers: safeCount(row.followers), following: safeCount(row.following), friends: safeCount(row.friends), lists_hidden: row.lists_hidden === true } : null;
 };
 export const follow = (user: string) => rpc<void>('social_follow', { p_user: user });
 export const unfollow = (user: string) => rpc<void>('social_unfollow', { p_user: user });
@@ -44,6 +45,7 @@ export function socialErrorText(error: unknown) {
   const code = /social:([a-z_]+)/.exec((error as { message?: string })?.message ?? '')?.[1];
   if (code === 'rate_limited') return t('Слишком часто — подождите немного');
   if (code === 'cooldown') return t('Повторить заявку можно через 3 дня после отказа');
+  if (code === 'requests_closed') return t('Пользователь не принимает заявки в друзья');
   if (code === 'unavailable') return t('Действие недоступно');
   if (code === 'not_found') return t('Профиль не найден или скрыт');
   if (code === 'auth_required') return t('Войдите в аккаунт');
