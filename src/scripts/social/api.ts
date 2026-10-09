@@ -14,6 +14,7 @@ export type SocialListKind = 'followers' | 'following' | 'friends';
 export type SocialListRow = { user_id: string; author: Author; since: string };
 export type SocialRequest = { user_id: string; author: Author; created_at: string };
 export type SocialBlockedRow = { user_id: string; author: Author; created_at: string };
+export type FeedItem = { id: number; thread_id: number; thread_title: string; is_thread: boolean; body: string; created_at: string; author: Author };
 
 async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise<T> {
   const { getSupabase } = await import('../auth');
@@ -45,6 +46,8 @@ export const socialRequests = (direction: 'incoming' | 'outgoing', limit = 30, o
   rpc<SocialRequest[]>('social_requests', { p_direction: direction, p_limit: limit, p_offset: offset });
 export const socialBlocked = (limit = 30, offset = 0) =>
   rpc<SocialBlockedRow[]>('social_blocked', { p_limit: limit, p_offset: offset });
+export const socialFeed = (before: { at: string; id: number } | null, limit = 20) =>
+  rpc<FeedItem[]>('social_feed', { p_before_at: before?.at ?? null, p_before_id: before?.id ?? null, p_limit: limit });
 
 export async function socialBlockedIds(): Promise<Set<string>> {
   try {

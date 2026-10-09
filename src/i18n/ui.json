@@ -5274,5 +5274,29 @@
  "Показать": {
   "en": "Show",
   "es": "Mostrar"
+ },
+ "Лента подписок": {
+  "en": "Following feed",
+  "es": "Feed de seguidos"
+ },
+ "Новые темы и посты тех, на кого вы подписаны.": {
+  "en": "New threads and posts from people you follow.",
+  "es": "Nuevos temas y publicaciones de las personas que sigues."
+ },
+ "Войдите, чтобы видеть ленту подписок": {
+  "en": "Sign in to see your following feed",
+  "es": "Inicia sesión para ver tu feed de seguidos"
+ },
+ "Новая тема: {title}": {
+  "en": "New thread: {title}",
+  "es": "Nuevo tema: {title}"
+ },
+ "Ответ в теме «{title}»": {
+  "en": "Reply in “{title}”",
+  "es": "Respuesta en «{title}»"
+ },
+ "В ленте пока ничего нет. Подпишитесь на авторов, чтобы видеть их темы и посты.": {
+  "en": "Nothing here yet. Follow authors to see their threads and posts.",
+  "es": "Aún no hay nada. Sigue a autores para ver sus temas y publicaciones."
  }
 }

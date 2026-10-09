@@ -1,0 +1,53 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Лента подписок')} description={t('Новые темы и посты тех, на кого вы подписаны.')} noindex>
+  <div class="feed" data-feed>
+    <h1>{t('Лента подписок')}</h1>
+    <p class="status" data-status aria-live="polite"></p>
+    <div class="feed-list" data-list></div>
+    <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../scripts/router';
+  import { initFeed } from '../../scripts/social/feed';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-feed]');
+    if (root) void initFeed(root, signal);
+  });
+</script>
+
+<style>
+  .feed :global([hidden]) { display: none !important; }
+  .feed { display: grid; gap: 1rem; max-width: 760px; }
+  .feed-list { display: grid; gap: .7rem; }
+  .feed :global(.feed-item) { display: grid; gap: .4rem; min-width: 0; overflow-wrap: anywhere; }
+  .feed :global(.feed-item-person) { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; min-width: 0; }
+  .feed :global(.forum-author) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem;
+    overflow-wrap: anywhere;
+  }
+  .feed :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    overflow: hidden;
+  }
+  .feed :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .feed > [data-more] { justify-self: start; }
+</style>

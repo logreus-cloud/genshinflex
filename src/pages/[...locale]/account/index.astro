@@ -26,6 +26,7 @@ const { base, t } = useData(Astro.currentLocale);
           <a class="btn" data-page="reset" href={`${base}/account/reset/`} hidden>{t('Сменить пароль')}</a>
           <a class="btn" href={`${base}/profile/`}>{t('Мой профиль')}</a>
           <a class="btn" href={`${base}/friends/`}>{t('Заявки в друзья')}</a>
+          <a class="btn" href={`${base}/feed/`}>{t('Лента подписок')}</a>
           <button class="btn" type="button" id="signout">{t('Выйти')}</button>
         </div>
       </div>
