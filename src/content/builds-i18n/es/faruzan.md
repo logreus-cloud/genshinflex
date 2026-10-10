@@ -5,7 +5,7 @@
 
 **Cómo se juega:** su Habilidad Definitiva, Camino del ascenso, coloca el poliedro fulgurante durante 12 segundos. Se mueve en triángulo y en cada vértice lanza una onda borrascosa: reduce la RES Anemo de los enemigos y da a los aliados la bendición vientosacro, una Bonificación de Daño Anemo (alrededor del 32 % con el talento a nivel 10). Mientras dura la bendición vientosacro, el primer golpe Anemo de un aliado hace daño adicional igual al 32 % del ATQ base de Faruzán (su pasiva Sabiduría del pasado), una vez cada 0,8 s. Su Habilidad Elemental, Cielo ventoso del Nasamjñin, convierte su siguiente Disparo Preciso en una flecha huracanada, y el vórtice de derribo tormentoso también reduce la resistencia y atrae a los enemigos.
 
-**Energía:** es su principal problema. La Habilidad Definitiva cuesta 80 de energía y la Habilidad Elemental genera pocas partículas, así que antes de C6 necesita mucha Recarga de Energía y un arma con RE o generación de partículas.
+**Energía:** es su principal problema. La Habilidad Definitiva cuesta 80 de energía y la Habilidad Elemental genera pocas partículas, así que antes de C6 necesita mucha Recarga de Energía y un arma con RE o generación de partículas. Por eso su mejor set antes de C6 es Emblema del Destino: el 20 % de RE de 2 piezas permite depender menos de la Recarga en las subestadísticas.
 
 **Estadísticas:** Recarga de Energía: 250-300 % antes de C6 y alrededor de 200 % en C6. Todo lo demás es secundario: con el Arco de Favonius necesita al menos un 50 % de Prob. CRIT para que el arma se active; para su propio daño, cáliz Anemo y tiara de crítico. Talentos: primero la Habilidad Definitiva (sube la Bonificación de Daño Anemo), luego la Habilidad Elemental; el Ataque Normal no hace falta.
 

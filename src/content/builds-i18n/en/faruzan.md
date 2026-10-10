@@ -5,7 +5,7 @@
 
 **How she plays:** her Burst, The Wind's Secret Ways, places the Dazzling Polyhedron for 12 seconds. It moves along a triangle and releases a Whirlwind Pulse at each corner: the pulse lowers enemies' Anemo RES and gives allies Prayerful Wind's Benefit — an Anemo DMG Bonus (about 32% at talent level 10). While the Benefit is active, an ally's first Anemo hit deals extra damage equal to 32% of Faruzan's Base ATK (her passive Lost Wisdom of the Seven Caverns), once every 0.8 s. Her Skill, Wind Realm of Nasamjnin, charges her next Aimed Shot into a Hurricane Arrow, and its Pressurized Collapse vortex also shreds resistance and pulls enemies in.
 
-**Energy:** Faruzan's main problem. Her Burst costs 80 Energy and her Skill makes few particles, so before C6 she needs a lot of Energy Recharge and a weapon with ER or particle generation.
+**Energy:** Faruzan's main problem. Her Burst costs 80 Energy and her Skill makes few particles, so before C6 she needs a lot of Energy Recharge and a weapon with ER or particle generation. That's also why Emblem of Severed Fate is her best set before C6: the 20% ER from the 2-piece means chasing less Recharge in substats.
 
 **Stats:** Energy Recharge — 250–300% before C6 and about 200% at C6. Everything else is secondary: with Favonius Warbow she needs at least 50% Crit Rate so the weapon procs; for personal damage, Anemo goblet and a crit circlet. Talents: Burst first (it raises the Anemo DMG Bonus), then Skill; Normal Attack isn't needed.
 
