@@ -99,6 +99,7 @@ test('выгружает данные через подставленный кл
     telegram: null,
     forum: { threads: [], posts: [], reactions: [], reports: [], ban: null },
     social: { following: [], followers: [], friendships: [], blocks: [] },
+    notifications: [],
   });
 });
 

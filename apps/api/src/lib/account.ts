@@ -37,7 +37,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes.push(...data);
     if (data.length < 1000) break;
   }
-  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks] = await Promise.all([
+  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications] = await Promise.all([
     exportRows(client, 'forum_threads', 'author_id', id, ['id']),
     exportRows(client, 'forum_posts', 'author_id', id, ['id']),
     exportRows(client, 'forum_reactions', 'user_id', id, ['post_id', 'kind']),
@@ -48,6 +48,8 @@ export async function exportAccount(client: AdminClient, id: string) {
     exportRows(client, 'social_friendships', 'addressee_id', id, ['requester_id', 'addressee_id']),
     // Чужие блокировки не выгружаем, чтобы не раскрывать чужое решение.
     exportRows(client, 'social_blocks', 'blocker_id', id, ['blocked_id']),
+    // Уведомления, адресованные другим, не выгружаем.
+    exportRows(client, 'notifications', 'recipient_id', id, ['id']),
   ]);
   // social_rate_events — суточный технический антиспам, его не выгружаем.
   const [auth, profile, userData, roles, telegram, ban] = await Promise.all([
@@ -83,6 +85,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     telegram: telegram.data,
     forum: { threads, posts, reactions, reports, ban: ban.data },
     social: { following, followers, friendships: [...requestedFriendships, ...receivedFriendships], blocks },
+    notifications,
     exported_at: new Date().toISOString(),
   };
 }

@@ -69,6 +69,9 @@ test('includes every export section without provider tokens', async () => {
     const receivedFriendship = { requester_id: follower.follower_id, addressee_id: id, status: 'accepted' };
     const block = { blocker_id: id, blocked_id: '44444444-4444-4444-8444-444444444444' };
     const inboundBlock = { blocker_id: following.followee_id, blocked_id: id };
+    const notification = { id: 1, recipient_id: id, actor_id: following.followee_id, kind: 'follow' };
+    const anotherNotification = { id: 2, recipient_id: id, actor_id: follower.follower_id, kind: 'follow' };
+    const outboundNotification = { id: 3, recipient_id: following.followee_id, actor_id: id, kind: 'follow' };
     const row = (data: unknown) => ({
       select: () => ({
         eq: () => ({
@@ -86,6 +89,7 @@ test('includes every export section without provider tokens', async () => {
     };
     const ranges: { table: string; start: number; end: number }[] = [];
     const orders: { table: string; column: string }[] = [];
+    const filters: { table: string; key: string; value: unknown }[] = [];
     const collections: Record<string, unknown[]> = {
       wishes,
       forum_threads: threads,
@@ -95,10 +99,12 @@ test('includes every export section without provider tokens', async () => {
       social_follows: [following, follower],
       social_friendships: [requestedFriendship, receivedFriendship],
       social_blocks: [block, inboundBlock],
+      notifications: [notification, anotherNotification, outboundNotification],
     };
     const client = {
       from: (table: string) => table in collections ? {
         select: () => ({ eq: (key: string, value: unknown) => {
+          filters.push({ table, key, value });
           const query = {
             order: (column: string) => {
               orders.push({ table, column });
@@ -169,6 +175,10 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(orders.filter((entry) => entry.table === 'social_blocks').map((entry) => entry.column), [
       'blocked_id',
     ]);
+    assert.deepEqual(filters.filter((entry) => entry.table === 'notifications'), [
+      { table: 'notifications', key: 'recipient_id', value: id },
+    ]);
+    assert.deepEqual(orders.filter((entry) => entry.table === 'notifications').map((entry) => entry.column), ['id']);
     assert.deepEqual(data.roles, rows.roles);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
     assert.deepEqual(data.forum, {
@@ -181,6 +191,7 @@ test('includes every export section without provider tokens', async () => {
       friendships: [requestedFriendship, receivedFriendship],
       blocks: [block],
     });
+    assert.deepEqual(data.notifications, [notification, anotherNotification]);
     assert.ok(data.exported_at);
     assert.equal(JSON.stringify(data).includes('secret'), false);
     assert.equal(JSON.stringify(data).includes('provider_token'), false);
