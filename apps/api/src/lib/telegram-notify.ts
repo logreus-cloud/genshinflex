@@ -80,7 +80,11 @@ export async function deliverTelegramNotifications(
         }),
       });
       if (response.ok) sent++;
-    } catch {}
+      else console.warn('telegram send failed', item.id, response.status, await response.text().catch(() => ''));
+    } catch (error) {
+      console.warn('telegram send failed', item.id, String(error));
+    }
   }
+  if (items.length) console.log('telegram notifications', { claimed: items.length, sent });
   return { claimed: items.length, sent };
 }
