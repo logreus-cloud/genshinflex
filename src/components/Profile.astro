@@ -333,6 +333,15 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
                 <option value="nobody">{t('Никто')}</option>
               </select>
             </label>
+            <h3>{t('Личные сообщения')}</h3>
+            <label class="privacy-requests">{t('Кто может мне писать')}
+              <select class="input" id="privacy-messages">
+                <option value="everyone">{t('Все')}</option>
+                <option value="followers">{t('Только мои подписчики')}</option>
+                <option value="friends">{t('Только друзья')}</option>
+              </select>
+            </label>
+            <small class="muted">{t('Тем, кто уже написал вам, ответить можно всегда. Заблокированные писать не могут.')}</small>
             <small class="muted">{t('Оформление, «О себе», титул и любимые персонажи видны всегда, если профиль открыт. Без входа в аккаунт настройки недоступны.')}</small>
             <small class="status" id="privacy-status" aria-live="polite"></small>
           </div>

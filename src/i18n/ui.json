@@ -5474,5 +5474,25 @@
  "Войдите, чтобы подписаться, добавить в друзья или написать": {
   "en": "Sign in to follow, add as a friend or send a message",
   "es": "Inicia sesión para seguir, añadir como amigo o escribir"
+ },
+ "Личные сообщения": {
+  "en": "Private messages",
+  "es": "Mensajes privados"
+ },
+ "Кто может мне писать": {
+  "en": "Who can message me",
+  "es": "Quién puede escribirme"
+ },
+ "Только мои подписчики": {
+  "en": "Only my followers",
+  "es": "Solo mis seguidores"
+ },
+ "Только друзья": {
+  "en": "Only friends",
+  "es": "Solo amigos"
+ },
+ "Тем, кто уже написал вам, ответить можно всегда. Заблокированные писать не могут.": {
+  "en": "You can always reply to people who have already written to you. Blocked users can’t message you.",
+  "es": "Siempre puedes responder a quien ya te escribió. Los usuarios bloqueados no pueden escribirte."
  }
 }

@@ -4,6 +4,7 @@ import { hasSession, onSessionChange } from './user-data/session';
 const validNick = /^[A-Za-z0-9_-]{3,24}$/;
 type PrivacyKey = 'uid' | 'roster' | 'favorites' | 'wishes' | 'connections';
 const requestValue = (value: unknown) => value === 'followed' || value === 'nobody' ? value : 'everyone';
+const messagesValue = (value: unknown) => value === 'followers' || value === 'friends' ? value : 'everyone';
 
 export function initPublicSettings(signal: AbortSignal) {
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -13,6 +14,7 @@ export function initPublicSettings(signal: AbortSignal) {
   const privacyStatus = $('privacy-status');
   const privacyControls = [...privacyField.querySelectorAll<HTMLInputElement>('input[data-privacy]')];
   const requests = $<HTMLSelectElement>('privacy-requests');
+  const messages = $<HTMLSelectElement>('privacy-messages');
   const input = $<HTMLInputElement>('public-nick');
   const save = $<HTMLButtonElement>('public-nick-save');
   const visible = $<HTMLInputElement>('public-visible');
@@ -32,14 +34,14 @@ export function initPublicSettings(signal: AbortSignal) {
     busy = value;
     input.disabled = save.disabled = visible.disabled = value;
     for (const control of privacyControls) control.disabled = value || !isPublic;
-    requests.disabled = value || !isPublic;
+    requests.disabled = messages.disabled = value || !isPublic;
   };
   const render = () => {
     link.href = `${BASE}/u/${encodeURIComponent(nickname)}/`;
     link.hidden = copy.hidden = false;
     note.hidden = isPublic;
     for (const control of privacyControls) control.disabled = busy || !isPublic;
-    requests.disabled = busy || !isPublic;
+    requests.disabled = messages.disabled = busy || !isPublic;
   };
   const reset = () => {
     userId = nickname = ''; isPublic = false; privacy = {};
@@ -49,6 +51,7 @@ export function initPublicSettings(signal: AbortSignal) {
     setBusy(false);
     for (const control of privacyControls) control.checked = false;
     requests.value = 'everyone';
+    messages.value = 'everyone';
     visible.checked = false;
     privacyStatus.textContent = '';
     copy.textContent = t('Скопировать ссылку');
@@ -76,6 +79,7 @@ export function initPublicSettings(signal: AbortSignal) {
       input.value = nickname; visible.checked = isPublic;
       for (const control of privacyControls) control.checked = privacy[control.dataset.privacy!] === true;
       requests.value = requestValue(privacy.requests);
+      messages.value = messagesValue(privacy.messages);
       field.hidden = privacyField.hidden = false;
       loginNote.hidden = true;
       render();
@@ -154,6 +158,7 @@ export function initPublicSettings(signal: AbortSignal) {
       privacy = data as Record<string, unknown>;
       for (const item of privacyControls) item.checked = privacy[item.dataset.privacy!] === true;
       requests.value = requestValue(privacy.requests);
+      messages.value = messagesValue(privacy.messages);
     } catch {
       if (!current()) return;
       control.checked = privacy[key] === true;
@@ -177,10 +182,36 @@ export function initPublicSettings(signal: AbortSignal) {
       if (error || !data || typeof data !== 'object' || Array.isArray(data) || data.requests !== next) throw new Error();
       privacy = data as Record<string, unknown>;
       requests.value = requestValue(privacy.requests);
+      messages.value = messagesValue(privacy.messages);
       for (const item of privacyControls) item.checked = privacy[item.dataset.privacy!] === true;
     } catch {
       if (!current()) return;
       requests.value = previous;
+      privacyStatus.textContent = t('Не удалось сохранить');
+      privacyStatus.classList.add('bad');
+    } finally { if (current()) setBusy(false); }
+  }, { signal });
+
+  messages.addEventListener('change', async () => {
+    const id = userId, request = loadRequest, next = messages.value, previous = messagesValue(privacy.messages);
+    const current = () => !signal.aborted && request === loadRequest && userId === id;
+    if (!id || busy || !isPublic) { messages.value = previous; return; }
+    setBusy(true);
+    privacyStatus.textContent = '';
+    privacyStatus.classList.remove('bad');
+    try {
+      const { getSupabase } = await import('./auth');
+      if (!current()) return;
+      const { data, error } = await getSupabase().rpc('set_message_privacy', { p_value: next });
+      if (!current()) return;
+      if (error || !data || typeof data !== 'object' || Array.isArray(data) || data.messages !== next) throw new Error();
+      privacy = data as Record<string, unknown>;
+      requests.value = requestValue(privacy.requests);
+      messages.value = messagesValue(privacy.messages);
+      for (const item of privacyControls) item.checked = privacy[item.dataset.privacy!] === true;
+    } catch {
+      if (!current()) return;
+      messages.value = previous;
       privacyStatus.textContent = t('Не удалось сохранить');
       privacyStatus.classList.add('bad');
     } finally { if (current()) setBusy(false); }
