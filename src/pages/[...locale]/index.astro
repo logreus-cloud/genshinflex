@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import AbyssGate from '../../components/AbyssGate.astro';
 import HeroCarousel from '../../components/HeroCarousel.astro';
-import EntryGate from '../../components/EntryCompass.astro';
 import FeatureTabs from '../../components/FeatureTabs.astro';
 import SnowDivider from '../../components/SnowDivider.astro';
 import season from '../../data/season.json';
@@ -57,7 +56,6 @@ const newest = characters.filter((c) => !c.beta).sort((a, b) => compareVersions(
 const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => compareVersions(b.version, a.version) || b.rarity - a.rarity).slice(0, 24);
 ---
 <Layout>
-  {season.theme === 'snezhnaya' && <EntryGate />}
   <HeroCarousel slides={slides} />
 
   <div class="feature-band">
