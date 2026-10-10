@@ -56,3 +56,27 @@ export const PAGE_SIZE = 30;
 
 export const threadHref = (base: string, id: number) => `${base}/forum/t/${id}/`;
 export const categoryHref = (base: string, slug: string) => `${base}/forum/${slug}/`;
+
+export const SUBJECT_KINDS = ['character', 'rotation', 'build'] as const;
+export type Subject = { kind: (typeof SUBJECT_KINDS)[number]; id: string };
+const ROTATION_PAGES = ['abyss', 'theater', 'onslaught'];
+
+export function parseSubject(value: string | null): Subject | null {
+  const match = /^(character|rotation|build):([a-z0-9][a-z0-9._-]{0,79})$/i.exec(value ?? '');
+  return match ? { kind: match[1] as Subject['kind'], id: match[2] } : null;
+}
+
+export const subjectParam = (subject: Subject) => `${subject.kind}:${subject.id}`;
+
+export function subjectHref(base: string, subject: Subject): string | null {
+  if (subject.kind === 'character' || subject.kind === 'build') return `${base}/characters/${subject.id}/`;
+  const mode = subject.id.split('-')[0];
+  return ROTATION_PAGES.includes(mode) ? `${base}/${mode}/` : null;
+}
+
+export const newSubjectThreadHref = (base: string, subject: Subject, label: string) =>
+  `${base}/forum/new/?${new URLSearchParams({
+    c: subject.kind === 'rotation' ? 'endgame' : 'builds',
+    subject: subjectParam(subject),
+    label,
+  })}`;

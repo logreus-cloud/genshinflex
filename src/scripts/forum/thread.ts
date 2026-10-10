@@ -1,4 +1,4 @@
-import { FORUM_CATEGORIES, PAGE_SIZE, REACTIONS, categoryHref, threadHref } from '../../lib/forum';
+import { FORUM_CATEGORIES, PAGE_SIZE, REACTIONS, categoryHref, threadHref, parseSubject, subjectHref } from '../../lib/forum';
 import { pageLang } from '../../i18n/client';
 import { BASE, t } from '../search';
 import { socialBlockedIds } from '../social/api';
@@ -61,6 +61,13 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
     el('h1', `${thread.pinned ? '📌 ' : ''}${thread.locked ? '🔒 ' : ''}${thread.title}`),
     el('span', thread.lang.toUpperCase(), 'muted'),
   );
+  const subject = thread.subject_kind && thread.subject_id ? parseSubject(`${thread.subject_kind}:${thread.subject_id}`) : null;
+  const subjectLink = subject ? subjectHref(BASE, subject) : null;
+  if (subjectLink) {
+    const link = el('a', t('Страница, к которой относится тема')) as HTMLAnchorElement;
+    link.href = subjectLink;
+    heading.append(link);
+  }
 
   const form = root.querySelector<HTMLFormElement>('[data-reply-form]')!;
   const body = form.querySelector<HTMLTextAreaElement>('textarea')!;

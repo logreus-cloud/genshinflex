@@ -1,4 +1,4 @@
-import { FORUM_CATEGORIES, threadHref } from '../../lib/forum';
+import { FORUM_CATEGORIES, parseSubject, subjectHref, threadHref } from '../../lib/forum';
 import { pageLang } from '../../i18n/client';
 import { BASE, t } from '../search';
 import { createThread, forumErrorText, forumMe } from './api';
@@ -11,6 +11,9 @@ export async function initNewThread(root: HTMLElement, signal: AbortSignal) {
   const body = form.querySelector<HTMLTextAreaElement>('textarea')!;
   const preview = root.querySelector<HTMLElement>('[data-preview]')!;
   const count = root.querySelector<HTMLElement>('[data-count]')!;
+  const subjectNote = root.querySelector<HTMLElement>('[data-subject]')!;
+  const params = new URLSearchParams(location.search);
+  const subject = parseSubject(params.get('subject'));
   try {
     const me = await forumMe();
     if (signal.aborted) return;
@@ -36,9 +39,18 @@ export async function initNewThread(root: HTMLElement, signal: AbortSignal) {
       option.textContent = t(item.label);
       category.append(option);
     }
-    const chosen = new URLSearchParams(location.search).get('c');
+    const chosen = params.get('c');
     if ([...category.options].some((option) => option.value === chosen)) category.value = chosen!;
     form.querySelector<HTMLSelectElement>('[name="lang"]')!.value = pageLang();
+    if (subject) {
+      const label = (params.get('label') ?? '').trim().slice(0, 80) || subject.id;
+      const href = subjectHref(BASE, subject);
+      const target = document.createElement(href ? 'a' : 'strong');
+      if (href) target.setAttribute('href', href);
+      target.textContent = label;
+      subjectNote.replaceChildren(`${t('Тема о')} `, target);
+      subjectNote.hidden = false;
+    }
   } catch (error) {
     status.textContent = forumErrorText(error);
     return;
@@ -69,7 +81,7 @@ export async function initNewThread(root: HTMLElement, signal: AbortSignal) {
     button.disabled = true;
     try {
       const lang = form.querySelector<HTMLSelectElement>('[name="lang"]')!.value;
-      const id = await createThread(category.value, title.value, body.value, lang);
+      const id = await createThread(category.value, title.value, body.value, lang, subject);
       if (!signal.aborted) location.assign(threadHref(BASE, id));
     } catch (error) {
       if (!signal.aborted) status.textContent = forumErrorText(error);

@@ -17,11 +17,15 @@ export type ForumThread = {
   pinned: boolean;
   locked: boolean;
   deleted: boolean;
+  subject_kind: SubjectKind | null;
+  subject_id: string | null;
   post_count: number;
   last_post_at: string;
   author: Author;
   first_post_id?: number;
 };
+
+export type SubjectKind = 'character' | 'rotation' | 'build';
 
 export type ForumPost = {
   id: number;
@@ -97,8 +101,16 @@ export async function forumMe(): Promise<ForumMe | null> {
 
 export const forumReportsQueue = (status = 'open', limit = 30, offset = 0) =>
   rpc<ForumReport[]>('forum_reports_queue', { p_status: status, p_limit: limit, p_offset: offset });
-export const createThread = (category: string, title: string, body: string, lang: string) =>
-  rpc<number>('forum_create_thread', { p_category: category, p_title: title, p_body: body, p_lang: lang });
+export const forumSubjectThreads = (kind: SubjectKind, id: string, limit = 5) =>
+  rpc<ForumThread[]>('forum_subject_threads', { p_kind: kind, p_id: id, p_limit: limit });
+export const createThread = (
+  category: string, title: string, body: string, lang: string,
+  subject: { kind: SubjectKind; id: string } | null = null,
+) =>
+  rpc<number>('forum_create_thread', {
+    p_category: category, p_title: title, p_body: body, p_lang: lang,
+    p_subject_kind: subject?.kind ?? null, p_subject_id: subject?.id ?? null,
+  });
 export const createPost = (thread: number, body: string, replyTo: number | null) =>
   rpc<number>('forum_create_post', { p_thread: thread, p_body: body, p_reply_to: replyTo });
 export const editPost = (post: number, body: string) =>

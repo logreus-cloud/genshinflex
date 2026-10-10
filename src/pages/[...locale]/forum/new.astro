@@ -9,6 +9,7 @@ const { base, t } = useData(Astro.currentLocale);
   <div class="forum" data-forum-new>
     <a href={`${base}/forum/`}>{t('Форум')}</a>
     <h1>{t('Новая тема')}</h1>
+    <p class="small" data-subject hidden></p>
     <p class="status" data-status></p>
     <form class="panel">
       <label>
