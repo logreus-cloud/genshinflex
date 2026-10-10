@@ -83,14 +83,6 @@
   "en": "4-piece — best option",
   "es": "4 piezas: la mejor opción"
  },
- "4 предмета — лучший вариант до C6: +20% ВЭ снимает главную проблему с энергией": {
-  "en": "4-piece — best option before C6: +20% ER solves her main energy problem",
-  "es": "4 piezas: la mejor opción antes de C6; +20 % de RE resuelve su principal problema de energía"
- },
- "4 предмета — лучший вариант на C6": {
-  "en": "4-piece — best option at C6",
-  "es": "4 piezas: la mejor opción en C6"
- },
  "4 предмета — лучший вариант с большим отрывом": {
   "en": "4-piece — best option by a wide margin",
   "es": "4 piezas: la mejor opción con diferencia"
@@ -2062,5 +2054,33 @@
  "заряженный выстрел": {
   "en": "charged shot",
   "es": "disparo cargado"
+ },
+ "2 + 2, пока не собраны 4 предмета нужного сета": {
+  "en": "2 + 2, until you've collected 4 pieces of the right set",
+  "es": "2 + 2, hasta reunir 4 piezas del conjunto adecuado"
+ },
+ "4 предмета — для отрядов без реакций, если в отряде больше никто не носит Церемонию": {
+  "en": "4-piece — for teams without reactions, if nobody else in the team uses Noblesse Oblige",
+  "es": "4 piezas: para equipos sin reacciones, si nadie más del equipo lleva Ritual Antiguo de la Nobleza"
+ },
+ "4 предмета — лучший вариант до C6 в командах с Рассеиванием, если Изумрудную тень больше никто не носит": {
+  "en": "4-piece — best option before C6 in Swirl teams, if nobody else holds Viridescent Venerer",
+  "es": "4 piezas: la mejor opción antes de C6 en equipos con Torbellino, si nadie más lleva Sombra Verde Esmeralda"
+ },
+ "4 предмета — лучший вариант на C6: навык стабильно попадает и держит +20% силы атаки отряду": {
+  "en": "4-piece — best option at C6: her Skill hits reliably and keeps +20% ATK on the team",
+  "es": "4 piezas: la mejor opción en C6; su habilidad acierta de forma fiable y mantiene +20 % de ATQ al equipo"
+ },
+ "4 предмета, если не хватает энергии: +20% ВЭ от двух предметов": {
+  "en": "4-piece, if you're short on Energy: +20% ER from the 2-piece",
+  "es": "4 piezas, si te falta energía: +20 % de Recarga de Energía con 2 piezas"
+ },
+ "Для отрядов с Рассеиванием: мастерство стихий": {
+  "en": "For Swirl teams: Elemental Mastery",
+  "es": "Para equipos con Torbellino: Maestría Elemental"
+ },
+ "Странник и Заряжение": {
+  "en": "Wanderer Electro-Charged",
+  "es": "Trotamundos y Electrocargado"
  }
 }
