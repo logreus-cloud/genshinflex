@@ -5458,5 +5458,21 @@
  "← Все сообщения": {
   "en": "← All messages",
   "es": "← Todos los mensajes"
+ },
+ "Написать": {
+  "en": "Message",
+  "es": "Escribir"
+ },
+ "Не принимает сообщения": {
+  "en": "Doesn’t accept messages",
+  "es": "No acepta mensajes"
+ },
+ "Мои сообщения": {
+  "en": "My messages",
+  "es": "Mis mensajes"
+ },
+ "Войдите, чтобы подписаться, добавить в друзья или написать": {
+  "en": "Sign in to follow, add as a friend or send a message",
+  "es": "Inicia sesión para seguir, añadir como amigo o escribir"
  }
 }

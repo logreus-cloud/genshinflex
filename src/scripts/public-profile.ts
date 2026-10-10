@@ -1,3 +1,4 @@
+import { navigate } from 'astro:transitions/client';
 import { pageLang } from '../i18n/client';
 import { threadHref } from '../lib/forum';
 import { SUPABASE_URL } from '../lib/platform';
@@ -5,6 +6,7 @@ import { BASE, t } from './search';
 import { forumUserPosts } from './forum/api';
 import { plainSnippet } from './forum/markup';
 import { block, friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unblock, unfollow, type SocialListKind, type SocialRelation } from './social/api';
+import { dmCanMessage, dmOpen, messageError } from './messages/api';
 import { initConnections } from './social/lists';
 import { hasSession, onSessionChange } from './user-data/session';
 import { colorOk, createEffect, fetchShowcase, loadChars, readPickerChars, renderAppearance, renderEntryList,
@@ -99,7 +101,11 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             link.className = 'btn';
             link.href = `${BASE}/friends/`;
             link.textContent = t('Заявки в друзья');
-            actions.replaceChildren(link);
+            const messagesLink = document.createElement('a');
+            messagesLink.className = 'btn';
+            messagesLink.href = `${BASE}/messages/`;
+            messagesLink.textContent = t('Мои сообщения');
+            actions.replaceChildren(link, messagesLink);
             card.hidden = false;
             return;
           }
@@ -107,12 +113,13 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             const link = document.createElement('a');
             link.className = 'btn';
             link.href = authUrl(BASE, 'login', location.pathname);
-            link.textContent = t('Войдите, чтобы подписаться или добавить в друзья');
+            link.textContent = t('Войдите, чтобы подписаться, добавить в друзья или написать');
             actions.replaceChildren(link);
             card.hidden = false;
             return;
           }
           let busy = false;
+          let lastCanMessage = false;
           const addButton = (label: string, action: () => Promise<unknown>, primary = false, kind?: SocialListKind) => {
             const button = document.createElement('button');
             button.type = 'button';
@@ -127,7 +134,8 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             text.textContent = label;
             actions.append(text);
           };
-          function render(relation: SocialRelation) {
+          function render(relation: SocialRelation, canMessage: boolean) {
+            lastCanMessage = canMessage;
             actions.replaceChildren();
             if (relation.blocked) {
               addText(t('Вы заблокировали этого пользователя'));
@@ -151,6 +159,33 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               addText(t('В друзьях'));
               addButton(t('Убрать из друзей'), () => friendRemove(profileId), false, 'friends');
             } else if (relation.friend === 'declined') addText(t('Заявка отклонена'));
+            if (canMessage) {
+              const messageButton = document.createElement('button');
+              messageButton.type = 'button';
+              messageButton.className = 'btn';
+              messageButton.textContent = t('Написать');
+              messageButton.addEventListener('click', () => {
+                if (!current() || busy) return;
+                busy = true;
+                socialStatus.textContent = '';
+                for (const button of actions.querySelectorAll('button')) button.disabled = true;
+                void (async () => {
+                  try {
+                    const id = await dmOpen(profileId);
+                    if (!current()) return;
+                    await navigate(`${BASE}/messages/?c=${id}`);
+                  } catch (error) {
+                    if (current()) socialStatus.textContent = messageError(error);
+                  } finally {
+                    if (current()) {
+                      busy = false;
+                      for (const button of actions.querySelectorAll('button')) button.disabled = false;
+                    }
+                  }
+                })();
+              }, { signal });
+              actions.append(messageButton);
+            } else addText(t('Не принимает сообщения'));
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'btn';
@@ -169,7 +204,7 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               cancel.type = 'button';
               cancel.className = 'btn';
               cancel.textContent = t('Отмена');
-              cancel.addEventListener('click', () => render(relation), { signal });
+              cancel.addEventListener('click', () => render(relation, lastCanMessage), { signal });
               button.replaceWith(message, confirm, cancel);
             }, { signal });
             actions.append(button);
@@ -185,9 +220,9 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               void refreshCounts().catch(() => {});
               connections.reload(kind);
               try {
-                const relation = await socialRelation(profileId);
+                const [relation, canMessage] = await Promise.all([socialRelation(profileId), dmCanMessage(profileId).catch(() => false)]);
                 if (!current()) return;
-                render(relation);
+                render(relation, canMessage);
               } catch {
                 if (!current()) return;
                 actions.replaceChildren();
@@ -202,9 +237,9 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
               }
             }
           }
-          const relation = await socialRelation(profileId);
+          const [relation, canMessage] = await Promise.all([socialRelation(profileId), dmCanMessage(profileId).catch(() => false)]);
           if (!current()) return;
-          render(relation);
+          render(relation, canMessage);
           card.hidden = false;
         } catch {
           if (!current()) return;
