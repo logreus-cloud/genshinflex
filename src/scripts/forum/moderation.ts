@@ -1,6 +1,6 @@
 import { threadHref } from '../../lib/forum';
 import { BASE, t } from '../search';
-import { ban, deletePost, forumErrorText, forumMe, forumReportsQueue, resolveReport, unban, type ForumReport } from './api';
+import { ban, deletePost, forumErrorText, forumMe, forumReportsQueue, resolveReport, unban } from './api';
 import { renderAuthor } from './author';
 import { plainSnippet } from './markup';
 
@@ -17,7 +17,15 @@ export async function initForumModeration(root: HTMLElement, signal: AbortSignal
   const list = root.querySelector<HTMLElement>('[data-list]')!;
   const select = root.querySelector<HTMLSelectElement>('[data-filter]')!;
   const dialog = root.querySelector<HTMLDialogElement>('dialog')!;
-  let selected: ForumReport | null = null;
+  let selected: string | null = null;
+  const openBan = (id: string) => {
+    selected = id;
+    dialog.showModal();
+  };
+  root.addEventListener('gf:ban-author', (event) => {
+    const id = (event as CustomEvent<{ id: string }>).detail?.id;
+    if (id) openBan(id);
+  }, { signal });
 
   try {
     const me = await forumMe();
@@ -75,8 +83,7 @@ export async function initForumModeration(root: HTMLElement, signal: AbortSignal
         if (row.author?.id) {
           const control = button(t('Заблокировать автора'));
           control.addEventListener('click', () => {
-            selected = row;
-            dialog.showModal();
+            openBan(row.author!.id);
           }, { signal });
           actions.append(control);
           run(t('Разблокировать'), () => unban(row.author!.id));
@@ -93,13 +100,14 @@ export async function initForumModeration(root: HTMLElement, signal: AbortSignal
   dialog.querySelector<HTMLButtonElement>('[data-cancel]')!.addEventListener('click', () => dialog.close(), { signal });
   dialog.querySelector<HTMLFormElement>('form')!.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!selected?.author?.id) return;
+    if (!selected) return;
     const days = Number(dialog.querySelector<HTMLSelectElement>('select')!.value);
     const until = days ? new Date(Date.now() + days * 86400000).toISOString() : null;
     try {
-      await ban(selected.author.id, until, dialog.querySelector<HTMLInputElement>('input')!.value);
+      await ban(selected, until, dialog.querySelector<HTMLInputElement>('input')!.value);
       dialog.close();
       await load();
+      root.dispatchEvent(new Event('gf:moderation-changed'));
     } catch (error) {
       status.textContent = forumErrorText(error);
     }

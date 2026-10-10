@@ -3,9 +3,9 @@ import { pageLang } from '../../i18n/client';
 import { renderAuthor } from '../forum/author';
 import { BASE, t } from '../search';
 import { hasSession, onSessionChange } from '../user-data/session';
-import { dmConversation, dmDeleteMessage, dmMarkRead, dmMessages, dmSend, messageError, type Message } from './api';
+import { dmConversation, dmDeleteMessage, dmMarkRead, dmMessages, dmReport, dmSend, messageError, type DmReportReason, type Message } from './api';
 
-type Rendered = { body: HTMLElement; button?: HTMLButtonElement; deleted: boolean };
+type Rendered = { body: HTMLElement; button?: HTMLButtonElement; report?: HTMLElement; deleted: boolean };
 
 export async function initThread(root: HTMLElement, conversationId: number, signal: AbortSignal) {
   if (signal.aborted) return;
@@ -32,6 +32,7 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
   let loaded = false;
   let composing = false;
   const shown = new Map<number, Rendered>();
+  let activeReport: number | null = null;
   const confirmations = new Map<number, ReturnType<typeof setTimeout>>();
   const realtimeDeleted = new Set<number>();
   const current = (turn: number) => !signal.aborted && turn === generation;
@@ -54,6 +55,7 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     confirmations.forEach((timer) => clearTimeout(timer));
     confirmations.clear();
     shown.clear();
+    activeReport = null;
     realtimeDeleted.clear();
     owner = null;
     oldestId = null;
@@ -81,6 +83,9 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     clearConfirmation(id);
     rendered.body.textContent = t('Сообщение удалено');
     rendered.body.classList.add('muted', 'deleted');
+    if (activeReport === id) activeReport = null;
+    rendered.report?.remove();
+    rendered.report = undefined;
     rendered.button?.remove();
     rendered.button = undefined;
   };
@@ -132,6 +137,82 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
             button.textContent = t('Удалить');
           }
         }
+      }, { signal });
+      rendered.button = button;
+      item.append(button);
+    } else if (!deleted) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'small muted dm-delete';
+      button.textContent = t('Пожаловаться');
+      button.addEventListener('click', () => {
+        if (!current(turn) || rendered.deleted) return;
+        if (activeReport !== null) {
+          const previous = shown.get(activeReport);
+          previous?.report?.remove();
+          if (previous) previous.report = undefined;
+        }
+        activeReport = message.id;
+        const box = document.createElement('div');
+        box.className = 'dm-report';
+        const reportForm = document.createElement('form');
+        reportForm.className = 'dm-report-form';
+        reportForm.style.display = 'flex';
+        reportForm.style.flexWrap = 'wrap';
+        reportForm.style.gap = '.35rem';
+        const reason = document.createElement('select');
+        reason.className = 'input';
+        reason.setAttribute('aria-label', t('Причина жалобы'));
+        for (const [value, label] of [['spam', t('Спам')], ['abuse', t('Оскорбления')], ['other', t('Другое')]]) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = label;
+          reason.append(option);
+        }
+        const comment = document.createElement('input');
+        comment.className = 'input';
+        comment.maxLength = 500;
+        comment.placeholder = t('Комментарий (необязательно)');
+        const send = document.createElement('button');
+        send.type = 'submit';
+        send.className = 'btn small';
+        send.textContent = t('Отправить жалобу');
+        const cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.className = 'btn small';
+        cancel.textContent = t('Отмена');
+        const reportStatus = document.createElement('p');
+        reportStatus.className = 'small muted';
+        cancel.addEventListener('click', () => {
+          box.remove();
+          rendered.report = undefined;
+          activeReport = null;
+        }, { signal });
+        reportForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          if (!current(turn) || rendered.deleted || activeReport !== message.id || send.disabled) return;
+          send.disabled = true;
+          reportStatus.textContent = '';
+          try {
+            await dmReport(message.id, reason.value as DmReportReason, comment.value.trim() || null);
+            if (!current(turn) || rendered.deleted || activeReport !== message.id || rendered.report !== box) return;
+            const success = document.createElement('p');
+            success.className = 'small muted';
+            success.textContent = t('Жалоба отправлена модераторам');
+            box.replaceChildren(success);
+            button.remove();
+            rendered.button = undefined;
+            activeReport = null;
+          } catch (error) {
+            if (current(turn) && !rendered.deleted && activeReport === message.id && rendered.report === box) reportStatus.textContent = messageError(error);
+          } finally {
+            if (current(turn) && activeReport === message.id && rendered.report === box) send.disabled = false;
+          }
+        }, { signal });
+        reportForm.append(reason, comment, send, cancel);
+        box.append(reportForm, reportStatus);
+        rendered.report = box;
+        item.append(box);
       }, { signal });
       rendered.button = button;
       item.append(button);

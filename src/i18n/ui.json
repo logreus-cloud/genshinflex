@@ -5494,5 +5494,53 @@
  "Тем, кто уже написал вам, ответить можно всегда. Заблокированные писать не могут.": {
   "en": "You can always reply to people who have already written to you. Blocked users can’t message you.",
   "es": "Siempre puedes responder a quien ya te escribió. Los usuarios bloqueados no pueden escribirte."
+ },
+ "Автор": {
+  "en": "Author",
+  "es": "Autor"
+ },
+ "Вам запрещено писать сообщения: действует блокировка": {
+  "en": "You can’t send messages: you are banned",
+  "es": "No puedes enviar mensajes: tienes un bloqueo activo"
+ },
+ "Жалоба на личное сообщение": {
+  "en": "Report on a private message",
+  "es": "Denuncia de un mensaje privado"
+ },
+ "Жалоба отправлена модераторам": {
+  "en": "Report sent to moderators",
+  "es": "Denuncia enviada a los moderadores"
+ },
+ "Жалобы на личные сообщения": {
+  "en": "Private message reports",
+  "es": "Denuncias de mensajes privados"
+ },
+ "Комментарий (необязательно)": {
+  "en": "Comment (optional)",
+  "es": "Comentario (opcional)"
+ },
+ "Контекст переписки": {
+  "en": "Conversation context",
+  "es": "Contexto de la conversación"
+ },
+ "Отправить жалобу": {
+  "en": "Send report",
+  "es": "Enviar denuncia"
+ },
+ "Переписку модератор видит только по жалобе: снимок сообщения и до пяти сообщений до и после.": {
+  "en": "Moderators see conversations only through a report: a copy of the message and up to five messages before and after it.",
+  "es": "Los moderadores solo ven conversaciones a través de una denuncia: una copia del mensaje y hasta cinco mensajes antes y después."
+ },
+ "Пожаловался": {
+  "en": "Reported by",
+  "es": "Denunciado por"
+ },
+ "Слишком много жалоб, попробуйте позже": {
+  "en": "Too many reports, try again later",
+  "es": "Demasiadas denuncias, inténtalo más tarde"
+ },
+ "Удалить сообщение": {
+  "en": "Delete message",
+  "es": "Eliminar mensaje"
  }
 }

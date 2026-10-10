@@ -16,6 +16,17 @@ const { base, t } = useData(Astro.currentLocale);
       <option value="dismissed">{t('Отклонённые')}</option>
     </select>
     <div class="forum-list" data-list></div>
+    <section class="dm-moderation" data-dm-moderation>
+      <h2>{t('Жалобы на личные сообщения')}</h2>
+      <p class="small muted">{t('Переписку модератор видит только по жалобе: снимок сообщения и до пяти сообщений до и после.')}</p>
+      <select class="input" data-dm-filter>
+        <option value="open">{t('Открытые')}</option>
+        <option value="resolved">{t('Решённые')}</option>
+        <option value="dismissed">{t('Отклонённые')}</option>
+      </select>
+      <p class="status" data-dm-status></p>
+      <div class="forum-list" data-dm-list></div>
+    </section>
     <label>
       {t('Причина удаления')}
       <input class="input" data-delete-reason maxlength="200" />
@@ -45,10 +56,13 @@ const { base, t } = useData(Astro.currentLocale);
 <script>
   import { onPage } from '../../../scripts/router';
   import { initForumModeration } from '../../../scripts/forum/moderation';
+  import { initDmModeration } from '../../../scripts/messages/moderation';
 
   onPage((signal) => {
     const root = document.querySelector<HTMLElement>('[data-forum-moderation]');
     if (root) void initForumModeration(root, signal);
+    const section = root?.querySelector<HTMLElement>('[data-dm-moderation]');
+    if (section) void initDmModeration(section, signal);
   });
 </script>
 
@@ -57,6 +71,13 @@ const { base, t } = useData(Astro.currentLocale);
   .forum :global([hidden]) { display: none !important; }
   .forum, .forum-list { display: grid; gap: 1rem; }
   .forum-list { max-width: 900px; }
+  .dm-moderation { display: grid; gap: 1rem; }
+  .dm-moderation > .input { max-width: 220px; }
+  .forum :global(.dm-context-list), .forum :global(.dm-context-message) { display: grid; gap: .35rem; }
+  .forum :global(.dm-context-message) { padding: .5rem; border-radius: var(--radius); }
+  .forum :global(.dm-context-message.reported) { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .forum :global(.dm-report-body), .forum :global(.dm-context-body) { white-space: pre-wrap; }
+  .forum :global(.dm-context-body) { margin: 0; }
   .forum :global(.forum-report) { display: grid; gap: .5rem; overflow-wrap: anywhere; }
   .forum :global(.forum-author) { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; }
   .forum :global(.forum-avatar) {

@@ -19,6 +19,30 @@ export type Message = {
   deleted: boolean;
 };
 
+export type DmReportReason = 'spam' | 'abuse' | 'other';
+export type DmReportStatus = 'open' | 'resolved' | 'dismissed';
+
+export type DmReport = {
+  id: number;
+  message_id: number;
+  reason: DmReportReason;
+  comment: string | null;
+  status: DmReportStatus;
+  created_at: string;
+  reporter: Author;
+  author: Author;
+  body: string;
+  message_deleted: boolean;
+  context: {
+    id: number;
+    sender_id: string;
+    sender: Author;
+    body: string | null;
+    created_at: string;
+    reported: boolean;
+  }[];
+};
+
 export type MessagePrivacy = 'everyone' | 'followers' | 'friends';
 
 async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise<T> {
@@ -39,6 +63,13 @@ export const dmMessages = (conversation: number, beforeId: number | null = null,
   rpc<Message[]>('dm_messages', { p_conversation: conversation, p_before_id: beforeId, p_limit: limit });
 export const dmMarkRead = (conversation: number) => rpc<number>('dm_mark_read', { p_conversation: conversation });
 export const dmDeleteMessage = (message: number) => rpc<boolean>('dm_delete_message', { p_message: message });
+export const dmReport = (message: number, reason: DmReportReason, comment: string | null = null) =>
+  rpc<void>('dm_report', { p_message: message, p_reason: reason, p_comment: comment });
+export const dmReportsQueue = (status: DmReportStatus | null = 'open', limit = 30, offset = 0) =>
+  rpc<DmReport[]>('dm_reports_queue', { p_status: status, p_limit: limit, p_offset: offset });
+export const dmResolveReport = (report: number, status: 'resolved' | 'dismissed') =>
+  rpc<void>('dm_resolve_report', { p_report: report, p_status: status });
+export const dmModerateDelete = (message: number) => rpc<void>('dm_moderate_delete', { p_message: message });
 export const dmUnreadCount = () => rpc<number>('dm_unread_count');
 export const dmCanMessage = (user: string) => rpc<boolean>('dm_can_message', { p_user: user });
 export const setMessagePrivacy = (value: MessagePrivacy) => rpc<unknown>('set_message_privacy', { p_value: value });
@@ -47,7 +78,9 @@ export function messageError(error: unknown): string {
   const message = (error as { message?: unknown })?.message;
   if (typeof message !== 'string') return t('Не удалось отправить');
   if (message.includes('dm:unavailable')) return t('Этому пользователю нельзя написать');
+  if (message.includes('dm:banned')) return t('Вам запрещено писать сообщения: действует блокировка');
   if (message.includes('social:rate_limited')) return t('Слишком много сообщений, попробуйте позже');
+  if (message.includes('dm:rate_limited')) return t('Слишком много жалоб, попробуйте позже');
   if (message.includes('dm:invalid')) return t('Сообщение пустое или длиннее 2000 символов');
   return t('Не удалось отправить');
 }
