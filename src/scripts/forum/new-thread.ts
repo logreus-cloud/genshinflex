@@ -22,7 +22,7 @@ export async function initNewThread(root: HTMLElement, signal: AbortSignal) {
       const { authUrl } = await import('../auth');
       if (signal.aborted) return;
       const link = document.createElement('a');
-      link.href = authUrl(BASE, 'login', location.pathname);
+      link.href = authUrl(BASE, 'login', location.pathname + location.search);
       link.textContent = t('Войдите, чтобы писать на форуме');
       status.replaceChildren(link);
       return;

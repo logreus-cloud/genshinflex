@@ -45,8 +45,11 @@ export async function initGuildList(root: HTMLElement, signal: AbortSignal) {
   const formStatus = root.querySelector<HTMLElement>('[data-create-status]')!;
   let offset = 0;
   let generation = 0;
+  let busy = false;
 
   const loadMore = async (turn: number) => {
+    if (signal.aborted || turn !== generation || busy) return;
+    busy = true;
     more.disabled = true;
     try {
       const rows = await guildList(31, offset);
@@ -58,12 +61,16 @@ export async function initGuildList(root: HTMLElement, signal: AbortSignal) {
     } catch {
       if (!signal.aborted && turn === generation) status.textContent = t('Не удалось загрузить');
     } finally {
-      more.disabled = false;
+      if (!signal.aborted && turn === generation) {
+        busy = false;
+        more.disabled = false;
+      }
     }
   };
 
   const initialize = async () => {
     const turn = ++generation;
+    busy = false;
     offset = 0;
     list.replaceChildren();
     mine.replaceChildren();
@@ -118,8 +125,11 @@ export async function initGuildPage(root: HTMLElement, slug: string, signal: Abo
   const more = root.querySelector<HTMLButtonElement>('[data-members-more]')!;
   let offset = 0;
   let generation = 0;
+  let busy = false;
 
   const loadMembers = async (turn: number) => {
+    if (signal.aborted || turn !== generation || busy) return;
+    busy = true;
     more.disabled = true;
     try {
       const rows = await guildMembers(slug, 51, offset);
@@ -138,12 +148,16 @@ export async function initGuildPage(root: HTMLElement, slug: string, signal: Abo
     } catch {
       if (!signal.aborted && turn === generation) status.textContent = t('Не удалось загрузить');
     } finally {
-      more.disabled = false;
+      if (!signal.aborted && turn === generation) {
+        busy = false;
+        more.disabled = false;
+      }
     }
   };
 
   const initialize = async () => {
     const turn = ++generation;
+    busy = false;
     offset = 0;
     head.replaceChildren();
     actions.replaceChildren();
@@ -178,18 +192,23 @@ export async function initGuildPage(root: HTMLElement, slug: string, signal: Abo
         node.className = primary ? 'btn primary' : 'btn';
         node.textContent = label;
         node.addEventListener('click', async () => {
+          if (signal.aborted || turn !== generation) return;
           for (const item of actions.querySelectorAll('button')) item.disabled = true;
           try {
             await run();
-            if (!signal.aborted) await initialize();
+            if (!signal.aborted && turn === generation) await initialize();
           } catch (error) {
-            if (!signal.aborted) status.textContent = guildError(error);
-            for (const item of actions.querySelectorAll('button')) item.disabled = false;
+            if (!signal.aborted && turn === generation) {
+              status.textContent = guildError(error);
+              for (const item of actions.querySelectorAll('button')) item.disabled = false;
+            }
           }
         }, { signal });
         actions.append(node);
       };
-      if (!await signedIn()) {
+      const loggedIn = await signedIn();
+      if (signal.aborted || turn !== generation) return;
+      if (!loggedIn) {
         const { authUrl } = await import('../auth');
         if (signal.aborted || turn !== generation) return;
         const link = document.createElement('a');
@@ -212,7 +231,7 @@ export async function initGuildPage(root: HTMLElement, slug: string, signal: Abo
       if (me?.moderator) {
         button(t('Удалить гильдию'), async () => {
           await guildModerateDelete(slug);
-          location.assign(`${BASE}/guilds/`);
+          if (!signal.aborted) location.assign(`${BASE}/guilds/`);
         });
       }
     } catch (error) {
