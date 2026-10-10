@@ -5307,6 +5307,26 @@
   "en": "Mark all as read",
   "es": "Marcar todo como leído"
  },
+ "История ваших уведомлений на сайте.": {
+  "en": "Your notification history on the site.",
+  "es": "Tu historial de notificaciones en el sitio."
+ },
+ "Войдите, чтобы видеть уведомления": {
+  "en": "Sign in to see your notifications",
+  "es": "Inicia sesión para ver tus notificaciones"
+ },
+ "Есть новые уведомления — показать": {
+  "en": "New notifications — show",
+  "es": "Hay notificaciones nuevas — mostrar"
+ },
+ "Отметить прочитанным": {
+  "en": "Mark as read",
+  "es": "Marcar como leído"
+ },
+ "Все уведомления": {
+  "en": "All notifications",
+  "es": "Todas las notificaciones"
+ },
  "Ответ от {name} в теме «{title}»": {
   "en": "Reply from {name} in “{title}”",
   "es": "Respuesta de {name} en «{title}»"

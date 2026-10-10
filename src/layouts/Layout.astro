@@ -184,6 +184,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
             <div class="notif-panel" id="notif-panel" role="dialog" aria-label={t('Уведомления')} hidden>
               <div class="notif-head"><strong>{t('Уведомления')}</strong><button class="notif-read-all" id="notif-read-all" type="button">{t('Прочитать все')}</button></div>
               <div class="notif-list" id="notif-list"></div>
+              <a class="notif-all" href={`${base}/notifications/`}>{t('Все уведомления')}</a>
             </div>
           </div>
           <a class="icon-btn profile account-link" id="profile-link" href={`${base}/profile/`} data-profile={t('Мой профиль')} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
@@ -326,6 +327,8 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .notif-list :global(.notif-item:hover) { background: var(--surface-2); }
   .notif-list :global(.notif-item time), .notif-list :global(.notif-item .notif-snippet) { font-size: .8rem; color: var(--muted); }
   .notif-list :global(.notif-empty) { margin: 0; padding: .8rem; color: var(--muted); }
+  .notif-all { display: block; text-align: center; padding: .6rem .8rem; color: var(--accent-text); text-decoration: none; }
+  .notif-all:hover { background: var(--surface-2); }
   .language { position: relative; }
   .langs { position: absolute; top: calc(100% + 12px); right: 0; display: grid; min-width: 90px; padding: .3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 32px rgb(0 0 0 / .3); }
   .langs[hidden], .search-panel[hidden] { display: none; }

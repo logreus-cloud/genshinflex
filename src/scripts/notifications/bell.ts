@@ -16,7 +16,15 @@ let refreshTimer: ReturnType<typeof setTimeout> | undefined;
 
 const notifyListeners = () => { for (const listener of listeners) listener(); };
 
-async function refreshCount() {
+export function onUnreadChange(listener: (count: number) => void, { signal }: { signal?: AbortSignal } = {}): void {
+  if (signal?.aborted) return;
+  const notify = () => listener(count);
+  listeners.add(notify);
+  signal?.addEventListener('abort', () => { listeners.delete(notify); }, { once: true });
+  notify();
+}
+
+export async function refreshCount() {
   const owner = userId;
   if (!owner) return;
   const request = ++countRequest;
@@ -197,6 +205,7 @@ onPage((signal) => {
     button.setAttribute('aria-expanded', 'true');
     void load();
   }, { signal });
+  panel.addEventListener('click', (event) => { if ((event.target as Element).closest('.notif-all')) close(); }, { signal });
   document.addEventListener('pointerdown', (event) => {
     if (!root.contains(event.target as Node)) close();
   }, { signal });
