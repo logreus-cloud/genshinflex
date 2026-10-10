@@ -1,0 +1,74 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Активные участники')} description={t('Рейтинг участников форума GenshinFlex по реакциям, ответам и просмотрам.')}>
+  <div class="forum top" data-forum-top>
+    <a href={`${base}/forum/`}>{t('Форум')}</a>
+    <h1>{t('Активные участники')}</h1>
+    <p class="small muted">{t('Очки: реакция другого участника на ваш пост — 2, ответ другого участника в вашей теме — 1, каждые 10 просмотров ваших тем — 1. Просмотры считаются от вошедших, один в день. В рейтинге только открытые профили.')}</p>
+    <p class="status" data-status aria-live="polite"></p>
+    <ol class="top-list" data-list></ol>
+    <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { BASE, t } from '../../../scripts/search';
+  import { forumLeaderboard, forumErrorText } from '../../../scripts/forum/api';
+  import { renderAuthor } from '../../../scripts/forum/author';
+
+  const PAGE = 50;
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-forum-top]');
+    if (!root) return;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-list]')!;
+    const more = root.querySelector<HTMLButtonElement>('[data-more]')!;
+    let offset = 0;
+    const load = async () => {
+      more.disabled = true;
+      try {
+        const rows = await forumLeaderboard(PAGE + 1, offset);
+        if (signal.aborted) return;
+        for (const row of rows.slice(0, PAGE)) {
+          const item = document.createElement('li');
+          item.className = 'panel top-row';
+          const points = document.createElement('strong');
+          points.className = 'top-points';
+          points.textContent = t('{n} очк.', { n: row.points });
+          const detail = document.createElement('span');
+          detail.className = 'small muted';
+          detail.textContent = t('Реакций: {r} · ответов: {a} · просмотров: {v}', { r: row.reactions, a: row.replies, v: row.views });
+          item.append(renderAuthor(row.author, BASE), points, detail);
+          list.append(item);
+        }
+        offset += Math.min(rows.length, PAGE);
+        more.hidden = rows.length <= PAGE;
+        if (!list.childElementCount) status.textContent = t('Пока пусто');
+      } catch (error) {
+        if (!signal.aborted) status.textContent = forumErrorText(error);
+      } finally {
+        more.disabled = false;
+      }
+    };
+    more.addEventListener('click', () => void load(), { signal });
+    void load();
+  });
+</script>
+
+<style>
+  .top { display: grid; gap: .8rem; max-width: 760px; }
+  .top-list { display: grid; gap: .6rem; margin: 0; padding-left: 1.6rem; }
+  .top :global(.top-row) { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .8rem; min-width: 0; overflow-wrap: anywhere; }
+  .top :global(.top-points) { margin-left: auto; }
+  .top :global(.top-row > .small) { flex-basis: 100%; }
+  .top :global(.forum-author) { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; min-width: 0; }
+  .top :global(.forum-avatar) { display: inline-grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); overflow: hidden; }
+  .top :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+</style>

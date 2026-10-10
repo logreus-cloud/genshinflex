@@ -9,7 +9,7 @@ const { base, t } = useData(Astro.currentLocale);
   <div class="forum" data-forum-index>
     <h1>{t('Форум')}</h1>
     <a class="btn primary" href={`${base}/forum/new/`}>{t('Новая тема')}</a>
-    <p class="small muted"><a href={`${base}/rules/`}>{t('Правила сообщества')}</a> · <a href={`${base}/feed/`}>{t('Лента подписок')}</a></p>
+    <p class="small muted"><a href={`${base}/rules/`}>{t('Правила сообщества')}</a> · <a href={`${base}/feed/`}>{t('Лента подписок')}</a> · <a href={`${base}/forum/top/`}>{t('Активные участники')}</a></p>
     <div class="forum-grid" data-categories></div>
     <h2>{t('Последние обсуждения')}</h2>
     <div class="forum-list" data-recent>{t('Загружаю…')}</div>

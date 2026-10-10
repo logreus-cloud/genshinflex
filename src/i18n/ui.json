@@ -5574,5 +5574,33 @@
  "Страница, к которой относится тема": {
   "en": "The page this thread is about",
   "es": "La página de la que trata el tema"
+ },
+ "Активные участники": {
+  "en": "Top members",
+  "es": "Miembros más activos"
+ },
+ "Рейтинг участников форума GenshinFlex по реакциям, ответам и просмотрам.": {
+  "en": "GenshinFlex forum members ranked by reactions, replies and views.",
+  "es": "Ranking de miembros del foro de GenshinFlex por reacciones, respuestas y vistas."
+ },
+ "Очки: реакция другого участника на ваш пост — 2, ответ другого участника в вашей теме — 1, каждые 10 просмотров ваших тем — 1. Просмотры считаются от вошедших, один в день. В рейтинге только открытые профили.": {
+  "en": "Points: a reaction from another member to your post — 2, a reply from another member in your thread — 1, every 10 views of your threads — 1. Views count from signed-in members, once a day. Only public profiles are ranked.",
+  "es": "Puntos: reacción de otro miembro a tu publicación — 2, respuesta de otro miembro en tu tema — 1, cada 10 vistas de tus temas — 1. Las vistas cuentan desde usuarios con sesión, una al día. Solo se incluyen perfiles públicos."
+ },
+ "{n} очк.": {
+  "en": "{n} pts",
+  "es": "{n} pts"
+ },
+ "Реакций: {r} · ответов: {a} · просмотров: {v}": {
+  "en": "Reactions: {r} · replies: {a} · views: {v}",
+  "es": "Reacciones: {r} · respuestas: {a} · vistas: {v}"
+ },
+ "Очки форума: {n}": {
+  "en": "Forum points: {n}",
+  "es": "Puntos del foro: {n}"
+ },
+ "место {n}": {
+  "en": "rank {n}",
+  "es": "puesto {n}"
  }
 }

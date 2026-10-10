@@ -3,7 +3,7 @@ import { pageLang } from '../i18n/client';
 import { threadHref } from '../lib/forum';
 import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
-import { forumUserPosts } from './forum/api';
+import { forumUserPosts, forumUserScore } from './forum/api';
 import { plainSnippet } from './forum/markup';
 import { block, friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unblock, unfollow, type SocialListKind, type SocialRelation } from './social/api';
 import { dmCanMessage, dmOpen, messageError } from './messages/api';
@@ -322,6 +322,16 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
       const list = $('public-forum-list');
       const more = $<HTMLButtonElement>('public-forum-more');
       const forumStatus = $('public-forum-status');
+      void forumUserScore(profileId).then((score) => {
+        if (signal.aborted || !score || score.points <= 0) return;
+        const line = $('public-forum-score');
+        const top = document.createElement('a');
+        top.href = `${BASE}/forum/top/`;
+        top.textContent = score.place ? t('место {n}', { n: score.place }) : t('Активные участники');
+        line.replaceChildren(`${t('Очки форума: {n}', { n: score.points })} · `, top);
+        line.hidden = false;
+        card.hidden = false;
+      }).catch(() => {});
       let shown = 0;
       const load = async () => {
         more.disabled = true;
@@ -343,7 +353,7 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
             list.append(item);
           }
           shown += Math.min(posts.length, 5);
-          card.hidden = shown === 0;
+          card.hidden = shown === 0 && $('public-forum-score').hidden;
           more.hidden = posts.length <= 5;
           forumStatus.textContent = '';
         } catch {

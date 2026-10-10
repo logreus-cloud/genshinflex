@@ -2,7 +2,7 @@ import { FORUM_CATEGORIES, PAGE_SIZE, REACTIONS, categoryHref, threadHref, parse
 import { pageLang } from '../../i18n/client';
 import { BASE, t } from '../search';
 import { socialBlockedIds } from '../social/api';
-import { createPost, deletePost, editPost, editThread, forumErrorText, forumMe, forumPosts, forumThread, moderateThread, report, restorePost, setReaction, type ForumPost, type ForumThread } from './api';
+import { forumView, createPost, deletePost, editPost, editThread, forumErrorText, forumMe, forumPosts, forumThread, moderateThread, report, restorePost, setReaction, type ForumPost, type ForumThread } from './api';
 import { renderAuthor } from './author';
 import { renderMarkup } from './markup';
 
@@ -46,6 +46,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       status.textContent = t('Не найдено');
       return;
     }
+    if (me) void forumView(id).catch(() => {});
   } catch (error) {
     if (!signal.aborted) status.textContent = forumErrorText(error);
     return;

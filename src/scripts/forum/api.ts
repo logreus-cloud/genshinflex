@@ -101,6 +101,13 @@ export async function forumMe(): Promise<ForumMe | null> {
 
 export const forumReportsQueue = (status = 'open', limit = 30, offset = 0) =>
   rpc<ForumReport[]>('forum_reports_queue', { p_status: status, p_limit: limit, p_offset: offset });
+export type ForumScore = { points: number; reactions: number; replies: number; views: number };
+export type LeaderboardRow = ForumScore & { author: Author };
+export const forumView = (thread: number) => rpc<void>('forum_view', { p_thread: thread });
+export const forumLeaderboard = (limit = 50, offset = 0) =>
+  rpc<LeaderboardRow[]>('forum_leaderboard', { p_limit: limit, p_offset: offset });
+export const forumUserScore = async (user: string) =>
+  (await rpc<(ForumScore & { place: number | null })[]>('forum_user_score', { p_user: user }))[0] ?? null;
 export const forumSubjectThreads = (kind: SubjectKind, id: string, limit = 5) =>
   rpc<ForumThread[]>('forum_subject_threads', { p_kind: kind, p_id: id, p_limit: limit });
 export const createThread = (

@@ -110,6 +110,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     </div>
     <section class="profile-card" id="public-forum" hidden>
       <h2>{t('На форуме')}</h2>
+      <p class="small" id="public-forum-score" hidden></p>
       <div class="public-forum-list" id="public-forum-list"></div>
       <button class="btn" id="public-forum-more" type="button" hidden>{t('Показать ещё')}</button>
       <p class="small muted" id="public-forum-status" aria-live="polite"></p>
