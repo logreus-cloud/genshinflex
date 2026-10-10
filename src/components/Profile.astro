@@ -146,7 +146,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       <div class="editor-nav" aria-label={t('Разделы профиля')}>
         {[
           ['basic', 'Основное'], ['avatar', 'Аватар и рамка'], ['cover', 'Обложка'],
-          ['background', 'Фон и эффекты'], ['color', 'Цвет'], ['favorites', 'Любимые'], ['privacy', 'Приватность'], ['transfer', 'Перенос'],
+          ['background', 'Фон и эффекты'], ['color', 'Цвет'], ['favorites', 'Любимые'], ['privacy', 'Приватность'], ['notifications', 'Уведомления'], ['transfer', 'Перенос'],
         ].map(([id, label]) => <button class="editor-nav-button" type="button" data-editor-tab={id} aria-pressed={id === 'basic' ? 'true' : 'false'}>{t(label)}</button>)}
       </div>
       <div class="dialog-body">
@@ -336,6 +336,19 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <small class="status" id="privacy-status" aria-live="polite"></small>
           </div>
         </div>
+        <div class="editor-panel" data-panel="notifications" hidden>
+          <p class="small muted" id="notify-login-note">{t('Войдите в аккаунт, чтобы настроить уведомления.')}</p>
+          <div class="editor-field" id="notify-field" hidden>
+            <h3>{t('О чём уведомлять')}</h3>
+            <label class="public-visible"><input type="checkbox" data-notify="reply" />{t('Ответы в моих темах и на мои посты')}</label>
+            <label class="public-visible"><input type="checkbox" data-notify="mention" />{t('Упоминания @ник')}</label>
+            <label class="public-visible"><input type="checkbox" data-notify="follow" />{t('Новые подписчики')}</label>
+            <label class="public-visible"><input type="checkbox" data-notify="friend_request" />{t('Заявки в друзья')}</label>
+            <label class="public-visible"><input type="checkbox" data-notify="friend_accept" />{t('Принятые заявки в друзья')}</label>
+            <small class="muted">{t('Выключенные типы не приходят ни в колокольчик, ни на страницу уведомлений.')}</small>
+            <small class="status" id="notify-status" aria-live="polite"></small>
+          </div>
+        </div>
         <div class="editor-panel" data-panel="transfer" hidden>
           <section class="editor-section">
             <h3>{t('Перенос профиля')}</h3>
@@ -464,9 +477,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 <script>
   import { onPage } from '../scripts/router';
   import { initPublicSettings } from '../scripts/profile-public-settings';
+  import { initNotifySettings } from '../scripts/notifications/settings';
 
   onPage((signal) => {
-    if (document.querySelector('.profile-root[data-mode="own"]')) initPublicSettings(signal);
+    if (document.querySelector('.profile-root[data-mode="own"]')) { initPublicSettings(signal); initNotifySettings(signal); }
   });
 </script>
 
@@ -1030,7 +1044,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     const mediaSnapshot = new Map<MediaKey, Blob>([...stagedMedia].map(([key, entry]) => [key, entry.blob]));
     const importSnapshot = confirmedImport ? structuredClone(confirmedImport) : null;
     const controls = [...dialog.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement>('button, input, textarea')]
-      .filter((control) => !control.closest('#public-field, #privacy-field'))
+      .filter((control) => !control.closest('#public-field, #privacy-field, #notify-field'))
       .map((control) => [control, control.disabled] as const);
     const release = () => { if (releaseControls !== release) return; for (const [control, disabled] of controls) control.disabled = disabled; for (const key of mediaKeys) $(`${key}-frame-preview`).removeAttribute('aria-disabled'); releaseControls = null; };
     releaseControls = release;
@@ -1564,8 +1578,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .editor-field #public-nick-status { text-align: left; }
   .editor-field .public-visible { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
   #privacy-field h3 { margin: .7rem 0 .2rem; }
+  #notify-field h3 { margin: .7rem 0 .2rem; }
   .privacy-requests { display: grid; gap: 6px; }
   #privacy-field small { text-align: left; }
+  #notify-field small { text-align: left; }
   .editor-section { min-width: 0; display: grid; gap: .7rem; }
   .editor-section h3 { margin: 0; }
   .editor-tabs, .editor-actions, .effect-choices { display: flex; flex-wrap: wrap; gap: .5rem; }

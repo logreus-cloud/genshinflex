@@ -5327,6 +5327,34 @@
   "en": "All notifications",
   "es": "Todas las notificaciones"
  },
+ "Войдите в аккаунт, чтобы настроить уведомления.": {
+  "en": "Sign in to set up notifications.",
+  "es": "Inicia sesión para configurar las notificaciones."
+ },
+ "О чём уведомлять": {
+  "en": "Notify me about",
+  "es": "Notificarme sobre"
+ },
+ "Ответы в моих темах и на мои посты": {
+  "en": "Replies in my threads and to my posts",
+  "es": "Respuestas en mis temas y a mis publicaciones"
+ },
+ "Упоминания @ник": {
+  "en": "@nickname mentions",
+  "es": "Menciones @apodo"
+ },
+ "Новые подписчики": {
+  "en": "New followers",
+  "es": "Nuevos seguidores"
+ },
+ "Принятые заявки в друзья": {
+  "en": "Accepted friend requests",
+  "es": "Solicitudes de amistad aceptadas"
+ },
+ "Выключенные типы не приходят ни в колокольчик, ни на страницу уведомлений.": {
+  "en": "Disabled types don’t appear in the bell or on the notifications page.",
+  "es": "Los tipos desactivados no aparecen ni en la campana ni en la página de notificaciones."
+ },
  "Ответ от {name} в теме «{title}»": {
   "en": "Reply from {name} in “{title}”",
   "es": "Respuesta de {name} en «{title}»"
