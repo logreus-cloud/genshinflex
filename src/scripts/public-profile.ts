@@ -4,6 +4,7 @@ import { threadHref } from '../lib/forum';
 import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
 import { forumUserPosts, forumUserScore } from './forum/api';
+import { guildOf } from './guilds/api';
 import { plainSnippet } from './forum/markup';
 import { block, friendRemove, friendRequest, friendRespond, follow, socialCounts, socialErrorText, socialRelation, unblock, unfollow, type SocialListKind, type SocialRelation } from './social/api';
 import { dmCanMessage, dmOpen, messageError } from './messages/api';
@@ -70,6 +71,15 @@ export async function initPublicProfile(root: HTMLElement, signal: AbortSignal) 
     status.textContent = '';
     const profileId = row.id;
     const connections = initConnections(root, profileId, signal);
+    void guildOf(profileId).then((guild) => {
+      if (signal.aborted || !guild) return;
+      const line = $('public-guild');
+      const link = document.createElement('a');
+      link.href = `${BASE}/guilds/?g=${encodeURIComponent(guild.slug)}`;
+      link.textContent = `[${guild.tag}] ${guild.name}`;
+      line.replaceChildren(`${t('Гильдия')}: `, link);
+      line.hidden = false;
+    }).catch(() => {});
     void (async () => {
       const card = $('public-social');
       const actions = $('public-social-actions');

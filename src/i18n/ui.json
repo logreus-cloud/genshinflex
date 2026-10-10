@@ -5602,5 +5602,101 @@
  "место {n}": {
   "en": "rank {n}",
   "es": "puesto {n}"
+ },
+ "Адрес (латиница, цифры и дефис, 3–24 символа)": {
+  "en": "Address (Latin letters, digits and hyphens, 3–24 characters)",
+  "es": "Dirección (letras latinas, números y guiones, 3–24 caracteres)"
+ },
+ "Адрес, название или тег уже заняты": {
+  "en": "The address, name or tag is already taken",
+  "es": "La dirección, el nombre o la etiqueta ya están en uso"
+ },
+ "Владелец": {
+  "en": "Owner",
+  "es": "Propietario"
+ },
+ "Войдите, чтобы вступить": {
+  "en": "Sign in to join",
+  "es": "Inicia sesión para unirte"
+ },
+ "Вступить": {
+  "en": "Join",
+  "es": "Unirse"
+ },
+ "Вы уже состоите в гильдии": {
+  "en": "You are already in a guild",
+  "es": "Ya perteneces a un gremio"
+ },
+ "Вы уже состоите в другой гильдии": {
+  "en": "You are already in another guild",
+  "es": "Ya perteneces a otro gremio"
+ },
+ "Выйти из гильдии": {
+  "en": "Leave guild",
+  "es": "Salir del gremio"
+ },
+ "Гильдии игроков GenshinFlex: вступайте и находите единомышленников.": {
+  "en": "GenshinFlex player guilds: join and find like-minded players.",
+  "es": "Gremios de jugadores de GenshinFlex: únete y encuentra afines."
+ },
+ "Гильдии": {
+  "en": "Guilds",
+  "es": "Gremios"
+ },
+ "Гильдий пока нет. Создайте первую!": {
+  "en": "No guilds yet. Create the first one!",
+  "es": "Aún no hay gremios. ¡Crea el primero!"
+ },
+ "Гильдия не найдена": {
+  "en": "Guild not found",
+  "es": "Gremio no encontrado"
+ },
+ "Гильдия": {
+  "en": "Guild",
+  "es": "Gremio"
+ },
+ "Моя гильдия": {
+  "en": "My guild",
+  "es": "Mi gremio"
+ },
+ "Не удалось выполнить действие": {
+  "en": "Couldn’t complete the action",
+  "es": "No se pudo completar la acción"
+ },
+ "Создана {date}": {
+  "en": "Created {date}",
+  "es": "Creado el {date}"
+ },
+ "Создать гильдию": {
+  "en": "Create a guild",
+  "es": "Crear un gremio"
+ },
+ "Создать": {
+  "en": "Create",
+  "es": "Crear"
+ },
+ "Состоять можно только в одной гильдии. Тег будет виден рядом с вашим именем.": {
+  "en": "You can be in only one guild. The tag will be shown next to your name.",
+  "es": "Solo puedes estar en un gremio. La etiqueta se mostrará junto a tu nombre."
+ },
+ "Тег (2–5 букв или цифр)": {
+  "en": "Tag (2–5 letters or digits)",
+  "es": "Etiqueta (2–5 letras o números)"
+ },
+ "Удалить гильдию": {
+  "en": "Delete guild",
+  "es": "Eliminar gremio"
+ },
+ "Участники": {
+  "en": "Members",
+  "es": "Miembros"
+ },
+ "Участников: {n}": {
+  "en": "Members: {n}",
+  "es": "Miembros: {n}"
+ },
+ "← Все гильдии": {
+  "en": "← All guilds",
+  "es": "← Todos los gremios"
  }
 }

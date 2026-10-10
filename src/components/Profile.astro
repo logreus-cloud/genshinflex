@@ -40,6 +40,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
               <span class="title-chip" id="profile-title" hidden></span>
             </div>
             {mode === 'public' && <p class="muted handle" id="profile-handle" hidden></p>}
+            {mode === 'public' && <p class="small" id="public-guild" hidden></p>}
             <p id="profile-about" hidden></p>
             <p class="muted" id="profile-meta" hidden></p>
           </div>

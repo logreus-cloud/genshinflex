@@ -25,7 +25,16 @@ export function renderAuthor(author: Author, base: string): HTMLElement {
     avatar.replaceChildren(img);
   }
 
-  box.append(avatar, document.createTextNode(author.name + ' '));
+  box.append(avatar);
+  if (author.guild) {
+    const guild = document.createElement('a');
+    guild.className = 'guild-tag';
+    guild.href = `${base}/guilds/?g=${encodeURIComponent(author.guild.slug)}`;
+    guild.title = author.guild.name;
+    guild.textContent = `[${author.guild.tag}]`;
+    box.append(guild, document.createTextNode(' '));
+  }
+  box.append(document.createTextNode(author.name + ' '));
   if (author.public && author.nickname) {
     const link = document.createElement('a');
     link.href = `${base}/u/${encodeURIComponent(author.nickname)}/`;

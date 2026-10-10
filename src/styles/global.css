@@ -223,3 +223,7 @@ a.gm-item:hover { outline: 1px solid var(--accent); }
   font-weight: inherit;
 }
 .cb-note { color: var(--muted); font-size: 0.78rem; padding: 0.4rem 0.6rem; cursor: default; }
+
+/* Тег гильдии в карточке автора */
+.guild-tag { font-weight: 700; font-size: .8em; color: var(--accent-text); text-decoration: none; }
+.guild-tag:hover { text-decoration: underline; }

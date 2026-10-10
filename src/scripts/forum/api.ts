@@ -7,6 +7,7 @@ export type Author = {
   public: boolean;
   custom: unknown;
   moderator: boolean;
+  guild?: { slug: string; tag: string; name: string } | null;
 } | null;
 
 export type ForumThread = {
