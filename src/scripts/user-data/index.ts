@@ -55,7 +55,7 @@ const browserStorage: KeyValueStorage = {
 
 type Listener = (value: unknown, lang: Lang) => void;
 const subscribers = new WeakMap<KeyValueStorage, Map<Key, Set<Listener>>>();
-function notifySubscribers(storage: KeyValueStorage, key: Key, value: unknown, lang: Lang, path: string, raw: string) {
+function notifySubscribers(storage: KeyValueStorage, key: Key, value: unknown, lang: Lang, path: string, raw: string | null) {
   for (const listener of subscribers.get(storage)?.get(key) ?? []) {
     try { if (storage.getItem(path) !== raw) break; } catch { break; }
     try { listener(value, lang); } catch {}
@@ -73,6 +73,23 @@ export function memoryStorage(): KeyValueStorage {
 
 export function userDataKey(key: Key, lang: Lang = 'ru'): string {
   return registry[key].key(lang);
+}
+
+export function clearUserData(storage: KeyValueStorage = browserStorage) {
+  const entries: [Key, Lang][] = [
+    ['favorites', 'ru'], ['favorites', 'en'], ['favorites', 'es'],
+    ['roster', 'ru'], ['profileUid', 'ru'], ['profileCustom', 'ru'],
+  ];
+  const removed: [Key, Lang, string][] = [];
+  for (const [key, lang] of entries) {
+    const path = userDataKey(key, lang);
+    if (storage.getItem(path) === null) continue;
+    storage.removeItem(path);
+    removed.push([key, lang, path]);
+  }
+  for (const [key, lang, path] of removed) {
+    notifySubscribers(storage, key, registry[key].fallback(), lang, path, null);
+  }
 }
 
 export function validUserData<K extends Key>(key: K, value: unknown): value is Values[K] {

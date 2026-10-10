@@ -1,6 +1,6 @@
 import { getMedia, type MediaKey } from './profile-media';
 import { hasSession, onSessionChange } from './user-data/session';
-import { cancelScheduledSync, hasStoredUserData, readStrict, userDataKey, validUserData, writePulled, type Kind, type UserDataWrite } from './user-data';
+import { cancelScheduledSync, clearUserData, hasStoredUserData, readStrict, userDataKey, validUserData, writePulled, type Kind, type UserDataWrite } from './user-data';
 import type { Entry } from './common';
 
 type Result = 'pulled' | 'pushed' | 'same' | 'skipped';
@@ -223,6 +223,15 @@ async function run(): Promise<SyncResult> {
     const id = data.session?.user.id;
     const active = () => generation === turn && hasSession();
     if (!id || !active()) return result;
+    let marker: unknown;
+    try { marker = JSON.parse(localStorage.getItem('gf:sync') || 'null'); } catch { marker = null; }
+    if (record(marker) && typeof marker.user === 'string' && marker.user && marker.user !== id) {
+      if (!active()) return result;
+      clearUserData();
+      if (!active()) return result;
+      saveMarker({ user: id, custom: { at: 0, synced: 0 }, data: { at: 0, synced: 0 } });
+      document.dispatchEvent(new CustomEvent('gf:profile-synced', { detail: { custom: 'pulled', data: 'pulled' } satisfies SyncResult }));
+    }
     const [profile, userData] = await Promise.all([
       client.from('profiles').select('custom,custom_updated_at').eq('id', id).maybeSingle(),
       client.from('user_data').select('favorites,roster,settings,updated_at').eq('user_id', id).maybeSingle(),

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createUserData, memoryStorage, readStrict, userDataKey, writePulled } from './index';
+import { clearUserData, createUserData, memoryStorage, readStrict, userDataKey, writePulled } from './index';
 
 test('defaults and damaged stored values', () => {
   const storage = memoryStorage();
@@ -18,6 +18,30 @@ test('defaults and damaged stored values', () => {
   assert.deepEqual(data.get('roster'), []);
   assert.equal(data.get('profileUid'), null);
   assert.deepEqual(data.get('profileCustom'), {});
+});
+
+test('clear removes all user data and notifies subscribers', () => {
+  const storage = memoryStorage();
+  const changed: string[] = [];
+  const data = createUserData({ storage, onChanged: (kind) => changed.push(kind) });
+  const favorite = { href: '/a', name: 'A', kind: 'character' };
+  for (const lang of ['ru', 'en', 'es'] as const) storage.setItem(userDataKey('favorites', lang), JSON.stringify([favorite]));
+  storage.setItem(userDataKey('roster'), JSON.stringify([{ s: 'amber' }]));
+  storage.setItem(userDataKey('profileUid'), JSON.stringify('123456789'));
+  storage.setItem(userDataKey('profileCustom'), JSON.stringify({ theme: 'dark' }));
+  const marker = JSON.stringify({ user: 'a', custom: { at: 1, synced: 1 }, data: { at: 1, synced: 1 } });
+  storage.setItem('gf:sync', marker);
+  const seen: [string, unknown][] = [];
+  data.subscribe('favorites', (value, lang) => seen.push([lang, value]));
+  data.subscribe('roster', (value) => seen.push(['roster', value]));
+  data.subscribe('profileUid', (value) => seen.push(['profileUid', value]));
+  data.subscribe('profileCustom', (value) => seen.push(['profileCustom', value]));
+  clearUserData(storage);
+  for (const lang of ['ru', 'en', 'es'] as const) assert.equal(storage.getItem(userDataKey('favorites', lang)), null);
+  for (const key of ['roster', 'profileUid', 'profileCustom'] as const) assert.equal(storage.getItem(userDataKey(key)), null);
+  assert.equal(storage.getItem('gf:sync'), marker);
+  assert.deepEqual(seen, [['ru', []], ['en', []], ['es', []], ['roster', []], ['profileUid', null], ['profileCustom', {}]]);
+  assert.deepEqual(changed, []);
 });
 
 test('invalid writes leave storage unchanged', () => {
