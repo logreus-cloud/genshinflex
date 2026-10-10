@@ -12,20 +12,46 @@ const { t } = useData(Astro.currentLocale);
     <div class="messages-list" data-list></div>
     <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
   </div>
+  <div class="thread" data-thread hidden>
+    <a data-back></a>
+    <h1 class="thread-head" data-thread-head></h1>
+    <p class="status" data-thread-status aria-live="polite"></p>
+    <button class="btn" type="button" data-older hidden>{t('Показать раньше')}</button>
+    <div class="thread-list" data-thread-list></div>
+    <form data-compose hidden>
+      <label for="dm-body">{t('Сообщение')}</label>
+      <textarea id="dm-body" name="body" maxlength="2000"></textarea>
+      <button class="btn" type="submit">{t('Отправить')}</button>
+    </form>
+    <p class="status" data-compose-status aria-live="polite"></p>
+    <p data-closed hidden>{t('Отправка недоступна: пользователь ограничил сообщения, заблокирован или удалил аккаунт.')}</p>
+  </div>
 </Layout>
 
 <script>
   import { onPage } from '../../scripts/router';
   import { initConversationList } from '../../scripts/messages/list';
+  import { initThread } from '../../scripts/messages/thread';
 
   onPage((signal) => {
-    const root = document.querySelector<HTMLElement>('[data-messages]');
-    if (root) void initConversationList(root, signal);
+    const list = document.querySelector<HTMLElement>('[data-messages]');
+    const thread = document.querySelector<HTMLElement>('[data-thread]');
+    const value = new URLSearchParams(location.search).get('c');
+    const id = value && /^[1-9]\d*$/.test(value) ? Number(value) : 0;
+    const showThread = Number.isSafeInteger(id) && id > 0;
+    if (list) list.hidden = showThread;
+    if (thread) thread.hidden = !showThread;
+    if (showThread) {
+      if (thread) void initThread(thread, id, signal);
+    } else if (list) {
+      void initConversationList(list, signal);
+    }
   });
 </script>
 
 <style>
   .messages :global([hidden]) { display: none !important; }
+  .thread-head { margin: 0; font-size: 1.15rem; }
   .messages { display: grid; gap: 1rem; max-width: 760px; }
   .messages-list { display: grid; gap: .7rem; }
   .messages :global(.dm-row) { position: relative; display: grid; gap: .4rem; min-width: 0; overflow-wrap: anywhere; }
@@ -56,4 +82,36 @@ const { t } = useData(Astro.currentLocale);
   .messages :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
   .messages :global(.dm-badge) { flex: none; padding: .15rem .45rem; border-radius: 1rem; background: var(--accent-soft); color: var(--accent-text); }
   .messages > [data-more] { justify-self: start; }
+  .messages[hidden], .thread[hidden], .thread :global([hidden]) { display: none !important; }
+  .thread { display: grid; gap: .75rem; max-width: 760px; min-width: 0; }
+  .thread > [data-back], .thread > [data-older] { justify-self: start; }
+  .thread-list { display: flex; flex-direction: column; gap: .7rem; min-width: 0; max-height: min(65vh, 640px); overflow-y: auto; }
+  .thread :global(.forum-author) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem;
+    overflow-wrap: anywhere;
+  }
+  .thread :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    overflow: hidden;
+  }
+  .thread :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .thread :global(.dm-msg) { align-self: flex-start; box-sizing: border-box; width: fit-content; max-width: 80%; padding: .65rem .8rem; border-radius: .8rem; background: var(--surface-2); overflow-wrap: anywhere; }
+  .thread :global(.dm-msg.mine) { align-self: flex-end; background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  .thread :global(.dm-body) { margin: 0; white-space: pre-wrap; }
+  .thread :global(.dm-body.deleted) { font-style: italic; }
+  .thread :global(.dm-time) { display: block; margin-top: .3rem; font-size: .75rem; }
+  .thread :global(.dm-delete) { display: block; margin-top: .3rem; padding: 0; border: 0; background: none; cursor: pointer; }
+  .thread form { display: grid; gap: .5rem; min-width: 0; }
+  .thread form button { justify-self: end; }
+  .thread textarea { box-sizing: border-box; width: 100%; min-width: 0; resize: vertical; }
 </style>

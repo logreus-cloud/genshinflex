@@ -5438,5 +5438,25 @@
  "Этому пользователю нельзя написать": {
   "en": "You can’t message this user",
   "es": "No puedes escribir a este usuario"
+ },
+ "Диалог не найден": {
+  "en": "Conversation not found",
+  "es": "Conversación no encontrada"
+ },
+ "Отправка недоступна: пользователь ограничил сообщения, заблокирован или удалил аккаунт.": {
+  "en": "You can’t send messages here: the user restricted messages, is blocked, or deleted their account.",
+  "es": "No puedes enviar mensajes aquí: el usuario limitó los mensajes, está bloqueado o eliminó su cuenta."
+ },
+ "Показать раньше": {
+  "en": "Show earlier",
+  "es": "Mostrar anteriores"
+ },
+ "Точно удалить?": {
+  "en": "Delete for sure?",
+  "es": "¿Eliminar seguro?"
+ },
+ "← Все сообщения": {
+  "en": "← All messages",
+  "es": "← Todos los mensajes"
  }
 }

@@ -30,6 +30,8 @@ async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise
 
 export const dmConversations = (before: { at: string; id: number } | null, limit = 20) =>
   rpc<Conversation[]>('dm_conversations', { p_before: before?.at ?? null, p_before_id: before?.id ?? null, p_limit: limit });
+export const dmConversation = async (id: number): Promise<Conversation | null> =>
+  (await rpc<Conversation[]>('dm_conversation', { p_conversation: id }))[0] ?? null;
 export const dmOpen = (user: string) => rpc<number>('dm_open', { p_user: user });
 export const dmSend = (conversation: number, body: string) =>
   rpc<{ id: number; created_at: string }[]>('dm_send', { p_conversation: conversation, p_body: body });
