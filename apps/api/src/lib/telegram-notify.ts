@@ -4,7 +4,7 @@ export type TelegramNotification = {
   id: number;
   telegram_id: number;
   kind: string;
-  actor: { name?: string; nickname?: string; public?: boolean } | null;
+  actor: { id?: string; name?: string; nickname?: string; public?: boolean } | null;
   thread_id: number | null;
   thread_title: string | null;
   post_id: number | null;
@@ -40,8 +40,10 @@ export function telegramMessage(item: TelegramNotification, site = 'https://gens
     default:
       heading = `Уведомление от ${name}`;
   }
-  let href = item.kind === 'message' ? site : `${site}/notifications/`;
-  if ((item.kind === 'reply' || item.kind === 'mention') && item.thread_id !== null)
+  let href = item.kind === 'message' ? `${site}/messages/` : `${site}/notifications/`;
+  if (item.kind === 'message' && item.actor?.id)
+    href += `?u=${encodeURIComponent(item.actor.id)}`;
+  else if ((item.kind === 'reply' || item.kind === 'mention') && item.thread_id !== null)
     href = `${site}/forum/t/${item.thread_id}/${item.post_id !== null ? `#p${item.post_id}` : ''}`;
   else if (item.kind === 'friend_request')
     href = `${site}/friends/`;

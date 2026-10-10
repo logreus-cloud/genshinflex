@@ -176,6 +176,10 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <button class="icon-btn" id="theme" type="button" aria-label={t('Сменить тему')} title={t('Сменить тему')}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z" /><path d="M15 3v3m-1.5-1.5h3M17 8v2m-1-1h2" /></svg>
           </button>
+          <a class="icon-btn dm-link" id="dm-link" href={`${base}/messages/`} aria-label={t('Сообщения')} title={t('Сообщения')} aria-current={active('/messages') ? 'page' : undefined} hidden>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 4.5h14v11H3z" /><path d="m3 5 7 6 7-6" /></svg>
+            <span class="notif-badge" id="dm-badge" hidden></span>
+          </a>
           <div class="notif" id="notif" hidden>
             <button class="icon-btn notif-button" id="notif-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="notif-panel" aria-label={t('Уведомления')} title={t('Уведомления')}>
               <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 3a4.5 4.5 0 0 0-4.5 4.5c0 4-1.5 5.5-1.5 5.5h12s-1.5-1.5-1.5-5.5A4.5 4.5 0 0 0 10 3Z" /><path d="M8.3 16a1.8 1.8 0 0 0 3.4 0" /></svg>
@@ -315,6 +319,8 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .account-link { position: relative; color: var(--muted); text-decoration: none; }
   .account-link:hover { color: var(--accent); }
   .account-letter:not([hidden]) { position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .65rem; font-weight: 700; }
+  .dm-link { position: relative; }
+  .dm-link[hidden] { display: none; }
   .notif { position: relative; }
   .notif[hidden], .notif-panel[hidden], .notif-badge[hidden] { display: none; }
   .notif-badge:not([hidden]) { position: absolute; top: -2px; right: -2px; display: grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #e5484d; color: #fff; font-size: .65rem; font-weight: 700; pointer-events: none; }

@@ -30,19 +30,50 @@ const { t } = useData(Astro.currentLocale);
 
 <script>
   import { onPage } from '../../scripts/router';
+  import { hasSession } from '../../scripts/user-data/session';
+  import { t } from '../../scripts/search';
+  import { dmOpen, messageError } from '../../scripts/messages/api';
   import { initConversationList } from '../../scripts/messages/list';
   import { initThread } from '../../scripts/messages/thread';
 
   onPage((signal) => {
     const list = document.querySelector<HTMLElement>('[data-messages]');
     const thread = document.querySelector<HTMLElement>('[data-thread]');
-    const value = new URLSearchParams(location.search).get('c');
+    const params = new URLSearchParams(location.search);
+    const value = params.get('c');
     const id = value && /^[1-9]\d*$/.test(value) ? Number(value) : 0;
-    const showThread = Number.isSafeInteger(id) && id > 0;
+    const user = value === null ? params.get('u') : null;
+    const openUser = user && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user) ? user : null;
+    const showThread = (Number.isSafeInteger(id) && id > 0) || !!openUser;
     if (list) list.hidden = showThread;
     if (thread) thread.hidden = !showThread;
-    if (showThread) {
+    const showList = (error?: unknown) => {
+      if (thread) thread.hidden = true;
+      if (!list) return;
+      list.hidden = false;
+      void (async () => {
+        await initConversationList(list, signal);
+        if (error && !signal.aborted) {
+          const status = list.querySelector<HTMLElement>('[data-status]');
+          if (status && !status.querySelector('a')) status.textContent = messageError(error);
+        }
+      })();
+    };
+    if (Number.isSafeInteger(id) && id > 0) {
       if (thread) void initThread(thread, id, signal);
+    } else if (openUser && thread) {
+      thread.querySelector<HTMLElement>('[data-thread-status]')!.textContent = t('Загрузка...');
+      void (async () => {
+        if (!hasSession()) { showList(); return; }
+        try {
+          const conversationId = await dmOpen(openUser);
+          if (signal.aborted) return;
+          history.replaceState(history.state, '', `${location.pathname}?c=${conversationId}`);
+          void initThread(thread, conversationId, signal);
+        } catch (error) {
+          if (!signal.aborted) showList(error);
+        }
+      })();
     } else if (list) {
       void initConversationList(list, signal);
     }

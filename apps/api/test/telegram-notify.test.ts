@@ -7,7 +7,7 @@ const item: TelegramNotification = {
   id: 1,
   telegram_id: 123,
   kind: 'reply',
-  actor: { name: 'Анна', nickname: 'Anna', public: true },
+  actor: { id: '123e4567-e89b-12d3-a456-426614174000', name: 'Анна', nickname: 'Anna', public: true },
   thread_id: 42,
   thread_title: 'Тема',
   post_id: 7,
@@ -21,7 +21,7 @@ test('telegramMessage formats every notification kind and link', () => {
     ['follow', 'Новый подписчик: Анна', 'https://genshinflex.com/u/Anna/'],
     ['friend_request', 'Заявка в друзья от Анна', 'https://genshinflex.com/friends/'],
     ['friend_accept', 'Анна теперь у вас в друзьях', 'https://genshinflex.com/u/Anna/'],
-    ['message', 'Сообщение от Анна', 'https://genshinflex.com'],
+    ['message', 'Сообщение от Анна', 'https://genshinflex.com/messages/?u=123e4567-e89b-12d3-a456-426614174000'],
   ];
   for (const [kind, heading, href] of cases)
     assert.equal(telegramMessage({ ...item, kind }), `${heading}\n\n<a href="${href}">Открыть на GenshinFlex</a>`);
@@ -45,7 +45,12 @@ test('telegramMessage escapes user content and handles missing destinations', ()
     /href="https:\/\/genshinflex.com\/notifications\/"/,
   );
   assert.match(telegramMessage({ ...item, snippet: 'a'.repeat(170) }), new RegExp(`^Ответ.*\n\n${'a'.repeat(160)}\n\n<a`));
-  assert.match(telegramMessage({ ...item, kind: 'message' }, 'https://site.test/a&b'), /href="https:\/\/site.test\/a&amp;b"/);
+  assert.match(telegramMessage({ ...item, kind: 'message' }, 'https://site.test/a&b'), /href="https:\/\/site.test\/a&amp;b\/messages\/\?u=123e4567-e89b-12d3-a456-426614174000"/);
+  assert.match(telegramMessage({ ...item, kind: 'message', actor: null }), /href="https:\/\/genshinflex.com\/messages\/"/);
+  assert.match(
+    telegramMessage({ ...item, kind: 'message', actor: { id: 'a&b' } }),
+    /href="https:\/\/genshinflex.com\/messages\/\?u=a%26b"/,
+  );
 });
 
 test('deliverTelegramNotifications continues after Telegram errors', async () => {

@@ -5546,5 +5546,9 @@
  "Удалить сообщение": {
   "en": "Delete message",
   "es": "Eliminar mensaje"
+ },
+ "Загрузка...": {
+  "en": "Loading...",
+  "es": "Cargando..."
  }
 }

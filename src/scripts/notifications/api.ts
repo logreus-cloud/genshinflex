@@ -52,5 +52,6 @@ export function notificationHref(item: NotificationItem, base: string): string |
   if (item.kind === 'friend_request') return `${base}/friends/`;
   if (item.kind === 'follow' || item.kind === 'friend_accept')
     return item.actor?.public && item.actor.nickname ? `${base}/u/${encodeURIComponent(item.actor.nickname)}/` : null;
+  if (item.kind === 'message') return item.actor?.id ? `${base}/messages/?u=${encodeURIComponent(item.actor.id)}` : `${base}/messages/`;
   return null;
 }

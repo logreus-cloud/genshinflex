@@ -226,7 +226,9 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     return true;
   };
   const readIfVisible = () => {
-    if (owner && loaded && document.visibilityState === 'visible') void dmMarkRead(conversationId).catch(() => {});
+    if (owner && loaded && document.visibilityState === 'visible') void dmMarkRead(conversationId).then(() => {
+      document.dispatchEvent(new Event('gf:dm-read'));
+    }).catch(() => {});
   };
   const loadOlder = async (turn: number) => {
     if (!current(turn) || !hasMore || busyOlder || oldestId === null) return;
