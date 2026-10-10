@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import AccountStrip from './AccountStrip.astro';
 import { useData } from '../lib/data';
 import namecards from '../data/generated/namecards.json';
+import { TELEGRAM_BOT } from '../lib/platform';
 
 interface Props { mode?: 'own' | 'public' }
 const { mode = 'own' } = Astro.props;
@@ -345,6 +346,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <label class="public-visible"><input type="checkbox" data-notify="follow" />{t('Новые подписчики')}</label>
             <label class="public-visible"><input type="checkbox" data-notify="friend_request" />{t('Заявки в друзья')}</label>
             <label class="public-visible"><input type="checkbox" data-notify="friend_accept" />{t('Принятые заявки в друзья')}</label>
+            <div id="notify-telegram" hidden>
+              <h3>{t('Telegram')}</h3>
+              <label class="public-visible"><input type="checkbox" id="notify-telegram-toggle" />{t('Дублировать уведомления в Telegram')}</label>
+              <small class="muted">{t('Бот пришлёт сообщение, только если вы нажали «Start» у')} <a href={`https://t.me/${TELEGRAM_BOT}`} target="_blank" rel="noopener">@{TELEGRAM_BOT}</a>.</small>
+            </div>
             <small class="muted">{t('Выключенные типы не приходят ни в колокольчик, ни на страницу уведомлений.')}</small>
             <small class="status" id="notify-status" aria-live="polite"></small>
           </div>

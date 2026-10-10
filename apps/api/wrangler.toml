@@ -5,6 +5,9 @@ compatibility_date = "2026-09-01"
 # Собственный адрес API: DNS-запись Cloudflare создаст сам при деплое (домен уже в Cloudflare)
 routes = [{ pattern = "api.genshinflex.com", custom_domain = true }]
 
+[triggers]
+crons = ["* * * * *"]
+
 [vars]
 SITE_ORIGINS = "https://genshinflex.com,https://test.genshinflex.pages.dev,https://platform.genshinflex.pages.dev,http://localhost:4321"
 SUPABASE_URL = "https://qhfufvdculphsqxuqxsw.supabase.co"

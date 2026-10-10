@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { claimsFromToken } from './lib/auth.ts';
@@ -14,6 +14,7 @@ import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
 import { telegramLogin } from './lib/telegram-login.ts';
+import { deliverTelegramNotifications } from './lib/telegram-notify.ts';
 import {
   TitleError, createTitle, deleteTitle, getUserRoles, getUserTitles, grantTitle,
   listAdminTitles, listTitles, revokeTitle, searchUsers, setActiveTitle,
@@ -21,7 +22,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.8.0';
+const version = '0.9.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -34,13 +35,17 @@ type ApiEnv = {
 type ApiContext = Context<ApiEnv>;
 type AppDeps = Partial<ApiEnv['Variables']>;
 
+function createServiceClient(env: Env): ServiceClient & Pick<SupabaseClient, 'rpc'> {
+  return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 function defaultClient(c: ApiContext): ServiceClient | Response {
   if (!c.env.SUPABASE_URL || !c.env.SUPABASE_SERVICE_ROLE_KEY) {
     return c.json({ error: 'Сервис недоступен' }, 503);
   }
-  return createClient(c.env.SUPABASE_URL, c.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  return createServiceClient(c.env);
 }
 
 function serviceClient(c: ApiContext): ServiceClient | Response {
@@ -426,4 +431,10 @@ export function createApp(deps: AppDeps = {}) {
   return instance;
 }
 
-export default createApp();
+function scheduled(_event: unknown, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
+  ctx.waitUntil(deliverTelegramNotifications(createServiceClient(env), env.TELEGRAM_BOT_TOKEN));
+}
+
+const api = createApp();
+export default Object.assign(api, { scheduled });

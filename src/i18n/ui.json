@@ -5355,6 +5355,18 @@
   "en": "Disabled types don’t appear in the bell or on the notifications page.",
   "es": "Los tipos desactivados no aparecen ni en la campana ni en la página de notificaciones."
  },
+ "Telegram": {
+  "en": "Telegram",
+  "es": "Telegram"
+ },
+ "Дублировать уведомления в Telegram": {
+  "en": "Also send notifications to Telegram",
+  "es": "Enviar también las notificaciones a Telegram"
+ },
+ "Бот пришлёт сообщение, только если вы нажали «Start» у": {
+  "en": "The bot can message you only after you press “Start” in",
+  "es": "El bot solo podrá escribirte si pulsaste «Start» en"
+ },
  "Ответ от {name} в теме «{title}»": {
   "en": "Reply from {name} in “{title}”",
   "es": "Respuesta de {name} en «{title}»"
