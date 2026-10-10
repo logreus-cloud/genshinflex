@@ -118,6 +118,9 @@ test('includes every export section without provider tokens', async () => {
       dm_conversations: [...conversations, { id: 3, pair_key: 'unrelated' }],
       dm_members: [...members, { conversation_id: 3, user_id: outboundNotification.recipient_id }],
       dm_messages: [...messages, { id: 1003, conversation_id: 3, sender_id: id, body: 'Unrelated' }],
+      guild_members: [{ user_id: id, guild_id: 7 }, { user_id: outboundNotification.recipient_id, guild_id: 7 }],
+      guilds: [{ id: 7, slug: 'mine', owner_id: id }, { id: 8, slug: 'other', owner_id: outboundNotification.recipient_id }],
+      forum_thread_views: [{ thread_id: 1, user_id: id, day: '2026-10-10' }, { thread_id: 1, user_id: outboundNotification.recipient_id, day: '2026-10-10' }],
     };
     const client = {
       from: (table: string) => table in collections ? (() => {
@@ -224,6 +227,11 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(data.forum, {
       threads, posts, reactions,
       reports, ban: rows.forum_bans,
+      views: [{ thread_id: 1, user_id: id, day: '2026-10-10' }],
+    });
+    assert.deepEqual(data.guilds, {
+      membership: [{ user_id: id, guild_id: 7 }],
+      owned: [{ id: 7, slug: 'mine', owner_id: id }],
     });
     assert.deepEqual(data.social, {
       following: [following],

@@ -97,10 +97,11 @@ test('выгружает данные через подставленный кл
     wishes: [],
     roles: [],
     telegram: null,
-    forum: { threads: [], posts: [], reactions: [], reports: [], ban: null },
+    forum: { threads: [], posts: [], reactions: [], reports: [], ban: null, views: [] },
     social: { following: [], followers: [], friendships: [], blocks: [] },
     notifications: [],
     messages: { conversations: [], members: [], messages: [] },
+    guilds: { membership: [], owned: [] },
   });
 });
 

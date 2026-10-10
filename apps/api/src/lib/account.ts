@@ -52,7 +52,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes.push(...data);
     if (data.length < 1000) break;
   }
-  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers] = await Promise.all([
+  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers, guildMembership, ownedGuilds, threadViews] = await Promise.all([
     exportRows(client, 'forum_threads', 'author_id', id, ['id']),
     exportRows(client, 'forum_posts', 'author_id', id, ['id']),
     exportRows(client, 'forum_reactions', 'user_id', id, ['post_id', 'kind']),
@@ -66,6 +66,9 @@ export async function exportAccount(client: AdminClient, id: string) {
     // Уведомления, адресованные другим, не выгружаем.
     exportRows(client, 'notifications', 'recipient_id', id, ['id']),
     exportRows(client, 'dm_members', 'user_id', id, ['conversation_id']),
+    exportRows(client, 'guild_members', 'user_id', id, ['guild_id']),
+    exportRows(client, 'guilds', 'owner_id', id, ['id']),
+    exportRows(client, 'forum_thread_views', 'user_id', id, ['thread_id', 'day']),
   ]);
   const conversationIds = ownMembers.map((member) => (member as { conversation_id: number }).conversation_id);
   const [conversations, members, messages] = await Promise.all([
@@ -105,10 +108,11 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes,
     roles: roles.data,
     telegram: telegram.data,
-    forum: { threads, posts, reactions, reports, ban: ban.data },
+    forum: { threads, posts, reactions, reports, ban: ban.data, views: threadViews },
     social: { following, followers, friendships: [...requestedFriendships, ...receivedFriendships], blocks },
     notifications,
     messages: { conversations, members, messages },
+    guilds: { membership: guildMembership, owned: ownedGuilds },
     exported_at: new Date().toISOString(),
   };
 }
