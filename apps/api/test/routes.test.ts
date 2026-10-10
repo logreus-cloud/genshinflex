@@ -100,6 +100,7 @@ test('выгружает данные через подставленный кл
     forum: { threads: [], posts: [], reactions: [], reports: [], ban: null },
     social: { following: [], followers: [], friendships: [], blocks: [] },
     notifications: [],
+    messages: { conversations: [], members: [], messages: [] },
   });
 });
 

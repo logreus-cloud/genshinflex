@@ -28,6 +28,21 @@ async function exportRows(client: AdminClient, table: string, key: string, id: s
   return rows;
 }
 
+async function exportRelatedRows(client: AdminClient, table: string, key: string, ids: number[], columns: string[]) {
+  const rows: unknown[] = [];
+  for (let batch = 0; batch < ids.length; batch += 100) {
+    for (let offset = 0; ; offset += 1000) {
+      const query = client.from(table).select('*').in(key, ids.slice(batch, batch + 100));
+      for (const column of columns) query.order(column);
+      const { data, error } = await query.range(offset, offset + 999);
+      if (error || !data) throw new Error('Account export failed');
+      rows.push(...data);
+      if (data.length < 1000) break;
+    }
+  }
+  return rows;
+}
+
 export async function exportAccount(client: AdminClient, id: string) {
   const wishes: unknown[] = [];
   for (let offset = 0; ; offset += 1000) {
@@ -37,7 +52,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes.push(...data);
     if (data.length < 1000) break;
   }
-  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications] = await Promise.all([
+  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers] = await Promise.all([
     exportRows(client, 'forum_threads', 'author_id', id, ['id']),
     exportRows(client, 'forum_posts', 'author_id', id, ['id']),
     exportRows(client, 'forum_reactions', 'user_id', id, ['post_id', 'kind']),
@@ -50,6 +65,13 @@ export async function exportAccount(client: AdminClient, id: string) {
     exportRows(client, 'social_blocks', 'blocker_id', id, ['blocked_id']),
     // Уведомления, адресованные другим, не выгружаем.
     exportRows(client, 'notifications', 'recipient_id', id, ['id']),
+    exportRows(client, 'dm_members', 'user_id', id, ['conversation_id']),
+  ]);
+  const conversationIds = ownMembers.map((member) => (member as { conversation_id: number }).conversation_id);
+  const [conversations, members, messages] = await Promise.all([
+    exportRelatedRows(client, 'dm_conversations', 'id', conversationIds, ['id']),
+    exportRelatedRows(client, 'dm_members', 'conversation_id', conversationIds, ['conversation_id', 'user_id']),
+    exportRelatedRows(client, 'dm_messages', 'conversation_id', conversationIds, ['conversation_id', 'id']),
   ]);
   // social_rate_events — суточный технический антиспам, его не выгружаем.
   const [auth, profile, userData, roles, telegram, ban] = await Promise.all([
@@ -86,6 +108,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     forum: { threads, posts, reactions, reports, ban: ban.data },
     social: { following, followers, friendships: [...requestedFriendships, ...receivedFriendships], blocks },
     notifications,
+    messages: { conversations, members, messages },
     exported_at: new Date().toISOString(),
   };
 }

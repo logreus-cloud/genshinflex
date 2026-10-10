@@ -72,6 +72,20 @@ test('includes every export section without provider tokens', async () => {
     const notification = { id: 1, recipient_id: id, actor_id: following.followee_id, kind: 'follow' };
     const anotherNotification = { id: 2, recipient_id: id, actor_id: follower.follower_id, kind: 'follow' };
     const outboundNotification = { id: 3, recipient_id: following.followee_id, actor_id: id, kind: 'follow' };
+    const conversations = [
+      { id: 1, pair_key: 'first' },
+      { id: 2, pair_key: 'second' },
+    ];
+    const members = [
+      { conversation_id: 1, user_id: id },
+      { conversation_id: 1, user_id: following.followee_id },
+      { conversation_id: 2, user_id: id },
+      { conversation_id: 2, user_id: follower.follower_id },
+    ];
+    const messages = [
+      ...Array.from({ length: 1001 }, (_, index) => ({ id: index + 1, conversation_id: 1, sender_id: index % 2 ? following.followee_id : id, body: 'Hello' })),
+      { id: 1002, conversation_id: 2, sender_id: follower.follower_id, body: '', deleted_at: '2026-09-27' },
+    ];
     const row = (data: unknown) => ({
       select: () => ({
         eq: () => ({
@@ -90,6 +104,7 @@ test('includes every export section without provider tokens', async () => {
     const ranges: { table: string; start: number; end: number }[] = [];
     const orders: { table: string; column: string }[] = [];
     const filters: { table: string; key: string; value: unknown }[] = [];
+    const inFilters: { table: string; key: string; values: unknown[] }[] = [];
     const collections: Record<string, unknown[]> = {
       wishes,
       forum_threads: threads,
@@ -100,12 +115,25 @@ test('includes every export section without provider tokens', async () => {
       social_friendships: [requestedFriendship, receivedFriendship],
       social_blocks: [block, inboundBlock],
       notifications: [notification, anotherNotification, outboundNotification],
+      dm_conversations: [...conversations, { id: 3, pair_key: 'unrelated' }],
+      dm_members: [...members, { conversation_id: 3, user_id: outboundNotification.recipient_id }],
+      dm_messages: [...messages, { id: 1003, conversation_id: 3, sender_id: id, body: 'Unrelated' }],
     };
     const client = {
-      from: (table: string) => table in collections ? {
-        select: () => ({ eq: (key: string, value: unknown) => {
-          filters.push({ table, key, value });
-          const query = {
+      from: (table: string) => table in collections ? (() => {
+        let matches = (_item: Record<string, unknown>) => true;
+        const query = {
+            select: () => query,
+            eq: (key: string, value: unknown) => {
+              filters.push({ table, key, value });
+              matches = (item: Record<string, unknown>) => item[key] === value;
+              return query;
+            },
+            in: (key: string, values: unknown[]) => {
+              inFilters.push({ table, key, values });
+              matches = (item: Record<string, unknown>) => values.includes(item[key]);
+              return query;
+            },
             order: (column: string) => {
               orders.push({ table, column });
               return query;
@@ -113,14 +141,13 @@ test('includes every export section without provider tokens', async () => {
             range: async (start: number, end: number) => {
               ranges.push({ table, start, end });
               return {
-                data: collections[table]!.filter((item) => (item as Record<string, unknown>)[key] === value).slice(start, end + 1),
+                data: collections[table]!.filter((item) => matches(item as Record<string, unknown>)).slice(start, end + 1),
                 error: null,
               };
             },
-          };
-          return query;
-        } }),
-      } : row(rows[table]),
+        };
+        return query;
+      })() : row(rows[table]),
       auth: {
         admin: {
           getUserById: async () => ({
@@ -156,6 +183,10 @@ test('includes every export section without provider tokens', async () => {
         { table, start: 1000, end: 1999 },
       ]);
     }
+    assert.deepEqual(ranges.filter((entry) => entry.table === 'dm_messages'), [
+      { table: 'dm_messages', start: 0, end: 999 },
+      { table: 'dm_messages', start: 1000, end: 1999 },
+    ]);
     const columns: Record<string, string[]> = {
       wishes: ['game_uid', 'id'],
       forum_threads: ['id'],
@@ -179,6 +210,15 @@ test('includes every export section without provider tokens', async () => {
       { table: 'notifications', key: 'recipient_id', value: id },
     ]);
     assert.deepEqual(orders.filter((entry) => entry.table === 'notifications').map((entry) => entry.column), ['id']);
+    assert.deepEqual(filters.filter((entry) => entry.table === 'dm_members'), [
+      { table: 'dm_members', key: 'user_id', value: id },
+    ]);
+    assert.deepEqual(inFilters, [
+      { table: 'dm_conversations', key: 'id', values: [1, 2] },
+      { table: 'dm_members', key: 'conversation_id', values: [1, 2] },
+      { table: 'dm_messages', key: 'conversation_id', values: [1, 2] },
+      { table: 'dm_messages', key: 'conversation_id', values: [1, 2] },
+    ]);
     assert.deepEqual(data.roles, rows.roles);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
     assert.deepEqual(data.forum, {
@@ -192,7 +232,14 @@ test('includes every export section without provider tokens', async () => {
       blocks: [block],
     });
     assert.deepEqual(data.notifications, [notification, anotherNotification]);
+    assert.deepEqual(data.messages, { conversations, members, messages });
     assert.ok(data.exported_at);
     assert.equal(JSON.stringify(data).includes('secret'), false);
     assert.equal(JSON.stringify(data).includes('provider_token'), false);
+
+    collections.dm_members = [];
+    const relatedQueries = inFilters.length;
+    const empty = await exportAccount(client, id);
+    assert.deepEqual(empty.messages, { conversations: [], members: [], messages: [] });
+    assert.equal(inFilters.length, relatedQueries);
 });
