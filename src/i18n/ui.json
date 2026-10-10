@@ -5550,5 +5550,29 @@
  "Загрузка...": {
   "en": "Loading...",
   "es": "Cargando..."
+ },
+ "Обсуждения": {
+  "en": "Discussions",
+  "es": "Debates"
+ },
+ "Создать тему о {name}": {
+  "en": "Start a thread about {name}",
+  "es": "Crear un tema sobre {name}"
+ },
+ "Пока никто не обсуждал. Начните первым!": {
+  "en": "No discussions yet. Be the first!",
+  "es": "Aún no hay debates. ¡Sé el primero!"
+ },
+ "Сообщений: {n}": {
+  "en": "Posts: {n}",
+  "es": "Mensajes: {n}"
+ },
+ "Тема о": {
+  "en": "Thread about",
+  "es": "Tema sobre"
+ },
+ "Страница, к которой относится тема": {
+  "en": "The page this thread is about",
+  "es": "La página de la que trata el tema"
  }
 }

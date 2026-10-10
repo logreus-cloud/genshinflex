@@ -1,0 +1,57 @@
+---
+import { useData } from '../lib/data';
+import { newSubjectThreadHref, type Subject } from '../lib/forum';
+
+interface Props { kind: Subject['kind']; id: string; label: string }
+const { kind, id, label } = Astro.props;
+const { base, t } = useData(Astro.currentLocale);
+const href = newSubjectThreadHref(base, { kind, id }, label);
+---
+<section class="discussions" data-discussions data-kind={kind} data-id={id} data-pagefind-ignore>
+  <h2 class="h-sec">{t('Обсуждения')}</h2>
+  <div class="panel discussions-body">
+    <p class="small muted" data-discussions-status aria-live="polite"></p>
+    <ul class="discussions-list" data-discussions-list></ul>
+    <a class="btn" href={href}>{t('Создать тему о {name}', { name: label })}</a>
+  </div>
+</section>
+
+<script>
+  import { pageLang } from '../i18n/client';
+  import { threadHref } from '../lib/forum';
+  import { onPage } from '../scripts/router';
+  import { BASE, t } from '../scripts/search';
+  import { forumSubjectThreads, type SubjectKind } from '../scripts/forum/api';
+
+  onPage((signal) => {
+    for (const root of document.querySelectorAll<HTMLElement>('[data-discussions]')) {
+      const status = root.querySelector<HTMLElement>('[data-discussions-status]')!;
+      const list = root.querySelector<HTMLElement>('[data-discussions-list]')!;
+      status.textContent = t('Загрузка...');
+      void forumSubjectThreads(root.dataset.kind as SubjectKind, root.dataset.id!, 5).then((threads) => {
+        if (signal.aborted) return;
+        status.textContent = threads.length ? '' : t('Пока никто не обсуждал. Начните первым!');
+        list.replaceChildren(...threads.map((thread) => {
+          const item = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = threadHref(BASE, thread.id);
+          link.textContent = thread.title;
+          const meta = document.createElement('span');
+          meta.className = 'small muted';
+          meta.textContent = ` · ${t('Сообщений: {n}', { n: thread.post_count })} · ${new Date(thread.last_post_at).toLocaleDateString(pageLang(), { day: 'numeric', month: 'short' })}`;
+          item.append(link, meta);
+          return item;
+        }));
+      }).catch(() => {
+        if (!signal.aborted) status.textContent = t('Не удалось загрузить');
+      });
+    }
+  });
+</script>
+
+<style>
+  .discussions-body { display: grid; gap: .6rem; justify-items: start; }
+  .discussions-body p:empty { display: none; }
+  .discussions-list { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; overflow-wrap: anywhere; }
+  .discussions-list:empty { display: none; }
+</style>

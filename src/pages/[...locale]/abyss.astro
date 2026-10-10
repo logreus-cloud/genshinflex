@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import Discussions from '../../components/Discussions.astro';
 import ModeTop from '../../components/ModeTop.astro';
 import ModeExtras from '../../components/ModeExtras.astro';
 import Enemy from '../../components/Enemy.astro';
@@ -84,6 +85,7 @@ const guides = new Map(await Promise.all(floors.map(async (f) => [f.floor, await
     </section>
   ))}
 
+  <Discussions kind="rotation" id={`abyss-${new Date(r.start).toISOString().slice(0, 10)}`} label={`${t('Витая бездна')} ${new Date(r.start).toISOString().slice(0, 10)}`} />
   <ModeExtras buffs={[]} teams={[]} sources={r.sources} />
 </Layout>
 

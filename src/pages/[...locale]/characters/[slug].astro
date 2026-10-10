@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
+import Discussions from '../../../components/Discussions.astro';
 import Team from '../../../components/Team.astro';
 import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
@@ -348,6 +349,7 @@ const jsonLd = b && {
     )}
     </>)}
 
+    <Discussions kind="character" id={c.slug} label={c.name} />
     <section class="browse" data-pagefind-ignore>
       <h2 class="h-sec">{t('Другие персонажи')}</h2>
       <div class="panel browse-grid">
