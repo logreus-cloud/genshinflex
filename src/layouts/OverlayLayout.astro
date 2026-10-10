@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { useData } from '../lib/data';
+const { lang, base, t } = useData(Astro.currentLocale);
+interface Props { title: string; active: 'search' | 'guide' | 'banners'; guideHref?: string; }
+const { title, active, guideHref } = Astro.props;
+---
+<!doctype html>
+<html lang={lang} class="ov-root">
+  <head>
+    <ClientRouter />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="gf-build" content={__GF_BUILD__} />
+    <title>{title} — GenshinFlex</title>
+  </head>
+  <body class="ov-body">
+    <div class="ov-backdrop" aria-hidden="true"></div>
+    <main class="ov-main"><slot /></main>
+    <nav class="ov-tabs" aria-label={t('Навигация')}>
+      <a class="ov-tab" href={`${base}/overlay/`} aria-current={active === 'search' ? 'page' : undefined}>{t('Поиск')}</a>
+      <a class="ov-tab" data-guide-tab href={guideHref} aria-disabled={!guideHref ? 'true' : undefined} aria-current={active === 'guide' ? 'page' : undefined}>{t('Гайд')}</a>
+      <a class="ov-tab" href={`${base}/overlay/banners/`} aria-current={active === 'banners' ? 'page' : undefined}>{t('Баннеры')}</a>
+    </nav>
+    <script>
+      import { onPage } from '../scripts/router';
+      onPage(() => {
+        const tab = document.querySelector<HTMLAnchorElement>('[data-guide-tab]');
+        if (!tab || tab.hasAttribute('href')) return;
+        try {
+          const path = localStorage.getItem('gf:overlay-guide');
+          const base = document.documentElement.lang === 'ru' ? '' : `/${document.documentElement.lang}`;
+          if (path?.startsWith(`${base}/overlay/c/`) && /^\/(?:en\/|es\/)?overlay\/c\/[a-z0-9-]+\/$/.test(path)) { tab.href = path; tab.removeAttribute('aria-disabled'); }
+        } catch {}
+      });
+    </script>
+  </body>
+</html>
+<style is:global>
+  html.ov-root { --bg: rgb(11 14 24 / .9); --bg-deep: rgb(8 11 20 / .92); --surface: rgb(25 30 44 / .82); --surface-2: rgb(39 45 61 / .85); --surface-3: rgb(55 61 78 / .85); --text: #f6f3ec; --muted: #bcc2ce; --border: rgb(255 255 255 / .18); color-scheme: dark; background: transparent; }
+  html.ov-root[data-theme] { --bg: rgb(11 14 24 / .9); --bg-deep: rgb(8 11 20 / .92); --surface: rgb(25 30 44 / .82); --surface-2: rgb(39 45 61 / .85); --surface-3: rgb(55 61 78 / .85); --text: #f6f3ec; --muted: #bcc2ce; --border: rgb(255 255 255 / .18); }
+  .ov-body { min-width: 0; min-height: 100dvh; margin: 0; background: transparent; color: var(--text); isolation: isolate; overflow-x: hidden; }
+  .ov-backdrop { position: fixed; z-index: -1; inset: 0; background: rgb(9 12 22 / .84); backdrop-filter: blur(18px); pointer-events: none; }
+  .ov-main { width: min(100%, 480px); min-width: 0; margin: auto; padding: 16px 14px calc(86px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+  .ov-main h1 { font-size: 1.5rem; margin: 0 0 .8rem; }
+  .ov-main h2 { font-size: 1.05rem; margin: 1.2rem 0 .6rem; }
+  .ov-main h3 { font-size: .95rem; margin: 0 0 .5rem; }
+  .ov-main :where(p, li, dd, b, span) { overflow-wrap: anywhere; }
+  .ov-panel { min-width: 0; padding: .85rem; margin-bottom: 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .ov-row { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; min-width: 0; }
+  .ov-link { color: var(--accent-text); }
+  .ov-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; }
+  .ov-icons a { display: grid; justify-items: center; align-content: start; gap: 3px; min-height: 72px; padding: 5px 2px; text-align: center; text-decoration: none; border-radius: 9px; font-size: .67rem; line-height: 1.15; }
+  .ov-icons a:hover, .ov-icons a:focus-visible { background: var(--surface-2); }
+  .ov-icons img { width: 48px; height: 48px; border-radius: 9px; object-fit: cover; background: var(--surface-3); }
+  .ov-tabs { position: fixed; z-index: 20; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px max(10px, calc((100vw - 480px) / 2)) calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: rgb(10 13 23 / .93); backdrop-filter: blur(18px); }
+  .ov-tab { display: grid; place-items: center; min-height: 48px; border-radius: 9px; color: var(--muted); text-decoration: none; font-weight: 600; }
+  .ov-tab[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
+  .ov-tab[aria-disabled] { opacity: .45; pointer-events: none; }
+  .ov-main :where(input, select, button) { font: inherit; }
+  .ov-main :where(a, button, summary) { touch-action: manipulation; }
+  .ov-main [hidden] { display: none !important; }
+</style>

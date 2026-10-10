@@ -5698,5 +5698,37 @@
  "← Все гильдии": {
   "en": "← All guilds",
   "es": "← Todos los gremios"
+ },
+ "Открыть на сайте": {
+  "en": "Open on website",
+  "es": "Abrir en el sitio"
+ },
+ "Подробный разбор": {
+  "en": "Detailed guide",
+  "es": "Análisis detallado"
+ },
+ "Последние 5★": {
+  "en": "Latest 5★",
+  "es": "Últimos 5★"
+ },
+ "Войдите, чтобы история была на всех устройствах.": {
+  "en": "Sign in to access your history on all devices.",
+  "es": "Inicia sesión para tener tu historial en todos los dispositivos."
+ },
+ "До гаранта осталось {n} из {max}": {
+  "en": "{n} wishes left until pity out of {max}",
+  "es": "Faltan {n} deseos para la garantía de {max}"
+ },
+ "{d}д {h}ч": {
+  "en": "{d}d {h}h",
+  "es": "{d}d {h}h"
+ },
+ "{h}ч {m}м": {
+  "en": "{h}h {m}m",
+  "es": "{h}h {m}m"
+ },
+ "В истории нет молитв поддерживаемых баннеров.": {
+  "en": "There are no wishes from supported banners in your history.",
+  "es": "Tu historial no contiene deseos de gachapones compatibles."
  }
 }

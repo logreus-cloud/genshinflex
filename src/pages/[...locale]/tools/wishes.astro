@@ -92,8 +92,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   import { onSessionChange } from '../../../scripts/user-data/session';
   import { userData } from '../../../scripts/user-data';
   import { navigate } from 'astro:transitions/client';
-
-  type Idx = { characters: { id: number | null; s: string; n: string; i: string | null; r: number }[]; weapons: { id: number; s: string; n: string; i: string | null; r: number }[] };
+  import { GROUPS, loadWishIndex, analyse, type Five } from '../../../scripts/wish-analysis';
 
   onPage((signal) => {
   const root = document.querySelector<HTMLElement>('.wt');
@@ -114,42 +113,10 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   const status = (t: string, bad = false) => { const s = $('status'); s.textContent = t; s.classList.toggle('bad', bad); };
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
-  // Баннеры: 400 — второй баннер события, у него общий гарант с 301
-  const GROUPS = [
-    { key: 'char', title: t('Событие персонажа'), types: ['301', '400'], pity: 90, soft: 74, fiftyFifty: true },
-    { key: 'weapon', title: t('Оружие'), types: ['302'], pity: 80, soft: 63, fiftyFifty: false },
-    { key: 'standard', title: t('Стандартный'), types: ['200'], pity: 90, soft: 74, fiftyFifty: false },
-    { key: 'chronicled', title: t('Хроники'), types: ['500'], pity: 90, soft: 74, fiftyFifty: false },
-  ];
   const TYPE_NAME: Record<string, string> = { '301': t('Событие'), '400': t('Событие 2'), '302': t('Оружие'), '200': t('Стандарт'), '500': t('Хроники'), '100': t('Новичка') };
 
-  const idx: Idx = await fetch(`${BASE}/data/checker.json`, { signal }).then((r) => r.json());
-  const byName = new Map<string, { i: string | null; kind: 'c' | 'w'; s: string; r?: number }>();
-  const byId = new Map<string, { n: string; kind: 'c' | 'w'; r?: number }>();
-  // История хранится с русскими именами — для показа переводим через слаг
-  const ruIdx: Idx = LANG === 'ru' ? idx : await fetch('/data/checker.json', { signal }).then((r) => r.json());
-  const ruNameBySlug = new Map([...ruIdx.characters, ...ruIdx.weapons].map((x) => [x.s, x.n]));
-  const slugByRuName = new Map([...ruIdx.characters, ...ruIdx.weapons].map((x) => [x.n.toLowerCase(), x.s]));
-  const bySlug = new Map<string, { n: string; i: string | null; kind: 'c' | 'w' }>([
-    ...idx.characters.map((c) => [c.s, { n: c.n, i: c.i, kind: 'c' as const }] as const),
-    ...idx.weapons.map((w) => [w.s, { n: w.n, i: w.i, kind: 'w' as const }] as const),
-  ]);
-  // История может прийти на любом языке: из игры по ссылке, из UIGF другого трекера (часто en-us) или вручную.
-  // Поэтому предмет узнаём по игровому ID, а если его нет — по имени на русском, английском или испанском.
-  const namesByLang = await Promise.all(['', '/en', '/es'].map((p) =>
-    fetch(`${p}/data/index.json`, { signal }).then((r) => r.json()).catch(() => ({ characters: [], weapons: [] }))));
+  const { idx, byName, byId, ruNameBySlug, slugOf, shown, characterSlugs } = await loadWishIndex(BASE, LANG, signal);
   if (signal.aborted) return;
-  const slugOfName = new Map<string, string>(slugByRuName);
-  for (const n of namesByLang) for (const x of [...n.characters, ...n.weapons]) slugOfName.set(x.n.toLowerCase(), x.s);
-  const slugOfId = new Map([...ruIdx.characters, ...ruIdx.weapons].filter((x) => x.id).map((x) => [String(x.id), x.s]));
-  const characterSlugs = new Set(ruIdx.characters.map((c) => c.s));
-  const slugOf = (w: { name: string; item_id?: string }) =>
-    (w.item_id ? slugOfId.get(String(w.item_id)) : undefined) ?? slugOfName.get(w.name.trim().toLowerCase());
-  const shown = (name: string) => { const s = slugOfName.get(name.trim().toLowerCase()); return s && bySlug.has(s) ? { ...bySlug.get(s)!, s } : undefined; };
-  for (const c of idx.characters) byName.set(c.n.toLowerCase(), { i: c.i, kind: 'c', s: c.s, r: c.r });
-  for (const w of idx.weapons) byName.set(w.n.toLowerCase(), { i: w.i, kind: 'w', s: w.s, r: w.r });
-  for (const c of ruIdx.characters) if (c.id) byId.set(String(c.id), { n: c.n, kind: 'c', r: c.r });
-  for (const w of ruIdx.weapons) byId.set(String(w.id), { n: w.n, kind: 'w', r: w.r });
   $('m-items').innerHTML = [...idx.characters.map((c) => c.n), ...idx.weapons.filter((w) => w.r >= 4).map((w) => w.n)].map((n) => `<option value="${esc(n)}">`).join('');
 
   const wishStore = await openWishStore(signal);
@@ -357,40 +324,11 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   }, { signal });
 
   // ---------- Подсчёт ----------
-  type Five = { name: string; pity: number; outcome: 'win' | 'lose' | 'guar' | null; time: string };
-  function analyse(list: Wish[], g: typeof GROUPS[number]) {
-    const ws = list.filter((w) => g.types.includes(w.gacha_type));
-    let p5 = 0, p4 = 0, guaranteed = false;
-    const fives: Five[] = [];
-    const outcomes = new Map<string, Five['outcome']>();
-    for (const w of ws) {
-      p5++; p4++;
-      if (w.rank_type === '5') {
-        let outcome: Five['outcome'] = null;
-        if (g.fiftyFifty) {
-          // Проигрыш 50/50 — стандартный 5★ персонаж; язык названий в истории не важен
-          const slug = slugOf(w);
-          const lost = !!slug && characterSlugs.has(slug) && STANDARD.has(slug);
-          outcome = lost ? 'lose' : guaranteed ? 'guar' : 'win';
-          guaranteed = lost;
-        }
-        fives.push({ name: w.name, pity: p5, outcome, time: w.time });
-        outcomes.set(w.id, outcome);
-        p5 = 0; p4 = 0;
-      } else if (w.rank_type === '4') p4 = 0;
-    }
-    const wins = fives.filter((f) => f.outcome === 'win').length, losses = fives.filter((f) => f.outcome === 'lose').length;
-    return {
-      total: ws.length, p5, p4, guaranteed, fives, outcomes,
-      avg: fives.length ? Math.round(fives.reduce((s, f) => s + f.pity, 0) / fives.length) : null,
-      rate: wins + losses ? Math.round((wins / (wins + losses)) * 100) : null,
-    };
-  }
-
   const icon = (name: string) => shown(name)?.i;
   const hrefOf = (name: string) => { const h = shown(name); return h ? `${BASE}/${h.kind === 'c' ? 'characters' : 'weapons'}/${h.s}` : null; };
   const label = (name: string) => shown(name)?.n ?? t(name);
   const OUT: Record<string, string> = { win: t('выиграл 50/50'), lose: t('проиграл 50/50'), guar: t('по гаранту') };
+  const analysisCtx = { standard: STANDARD, slugOf, characterSlugs };
 
   function render() {
     const uids = wishStore.uids();
@@ -405,12 +343,12 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
 
     const all = new Map<string, Five['outcome']>();
     $('banners').innerHTML = GROUPS.map((g) => {
-      const a = analyse(list, g);
+      const a = analyse(list, g, analysisCtx);
       a.outcomes.forEach((v, k) => all.set(k, v));
       if (!a.total) return '';
       const pct = Math.min(100, (a.p5 / g.pity) * 100);
       return `<article class="bcard panel">
-        <header><h3>${g.title}</h3>${g.fiftyFifty ? `<span class="chip ${a.guaranteed ? 'gold' : ''}">${a.guaranteed ? t('Следующий 5★ — гарант') : t('Следующий 5★ — 50/50')}</span>` : ''}</header>
+        <header><h3>${t(g.title)}</h3>${g.fiftyFifty ? `<span class="chip ${a.guaranteed ? 'gold' : ''}">${a.guaranteed ? t('Следующий 5★ — гарант') : t('Следующий 5★ — 50/50')}</span>` : ''}</header>
         <div class="pity">
           <div class="pnum"><b>${a.p5}</b><span class="muted">/ ${g.pity}</span></div>
           <div><span class="small muted">${t('до гаранта 5★: {n}', { n: g.pity - a.p5 })}</span>

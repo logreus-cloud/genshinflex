@@ -1,0 +1,153 @@
+---
+import { getCollection } from 'astro:content';
+import OverlayLayout from '../../../layouts/OverlayLayout.astro';
+import { useData, LANGS, characters as ruCharacters } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { getCharacter, getWeapon, base, t } = useData(Astro.currentLocale);
+const now = Date.now();
+const nearby = (await getCollection('banners')).map((b) => b.data).filter((b) => Date.parse(b.start) <= now + 86400000 && Date.parse(b.end) > now - 86400000);
+const standard = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari', 'yumemizuki-mizuki'].filter((slug) => ruCharacters.some((c) => c.slug === slug));
+---
+<OverlayLayout title={t('Баннеры')} active="banners">
+  <h1>{t('Баннеры')}</h1>
+  <div class="ov-region ov-row" role="group" aria-label={t('Регион сервера')}>
+    <span class="muted">{t('Сервер')}</span>
+    <button class="btn" type="button" data-region="eu" aria-pressed="false">{t('Европа')}</button>
+    <button class="btn" type="button" data-region="asia" aria-pressed="false">{t('Азия')}</button>
+    <button class="btn" type="button" data-region="na" aria-pressed="false">{t('Америка')}</button>
+  </div>
+  <section>
+    <h2>{t('Сейчас на баннере')}</h2>
+    <p class="muted" data-banners-empty hidden={nearby.some((b) => Date.parse(b.start) <= now && Date.parse(b.end) > now)}>{t('Сейчас между фазами — загляните позже.')}</p>
+    {nearby.map((b) => <article class="ov-panel" data-start={b.start} data-end={b.end} hidden={Date.parse(b.start) > now || Date.parse(b.end) <= now}>
+      <h3>{t('Версия {v}, фаза {p}', { v: b.version, p: b.phase })}</h3>
+      <p class="ov-timer">{t('До конца:')} <b data-until={b.end} data-done={t('закончился')}>…</b></p>
+      <div class="ov-icons">{[...b.featured.map((f) => f.slug), ...b.fourStars].map((slug) => { const c = getCharacter(slug); return <a href={`${base}/overlay/c/${slug}/`}><img src={c.icon} alt="" width="48" height="48" loading="lazy" /><span>{c.name}</span></a>; })}</div>
+      {b.weapons.length > 0 && <><p class="muted">{t('Баннер оружия')}</p><div class="ov-weapons">{b.weapons.map((slug) => { const w = getWeapon(slug); return <a href={`${base}/weapons/${slug}/`} target="_blank" rel="noopener"><img src={w.icon} alt="" width="40" height="40" loading="lazy" /><span>{w.name}</span></a>; })}</div></>}
+    </article>)}
+  </section>
+  <section class="ov-tracker" data-standard={JSON.stringify(standard)} data-base={base}>
+    <h2>{t('Трекер круток')}</h2>
+    <label class="ov-uid" hidden>{t('Аккаунт')} <select class="input" data-uid></select></label>
+    <div data-wishes><p class="muted">{t('Загружаю…')}</p></div>
+    <p class="muted" data-hint hidden>{t('Войдите, чтобы история была на всех устройствах.')}</p>
+  </section>
+</OverlayLayout>
+
+<script>
+  import { region, store, type Region } from '../../../scripts/common';
+  import { onPage, cleanup } from '../../../scripts/router';
+  import { openWishStore, type WishStore } from '../../../scripts/wish-store';
+  import { onSessionChange } from '../../../scripts/user-data/session';
+  import { GROUPS, loadWishIndex, analyse } from '../../../scripts/wish-analysis';
+  import { t } from '../../../scripts/search';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('.ov-tracker');
+    if (!root) return;
+    const base = root.dataset.base!;
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-region]')];
+    const paint = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
+    buttons.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); tick(); }, { signal }));
+    paint();
+    // Одно смещение для границ фазы и таймера.
+    const offset = { eu: 1, asia: 8, na: -5 };
+    const phases = [...document.querySelectorAll<HTMLElement>('[data-start][data-end]')];
+    const empty = document.querySelector<HTMLElement>('[data-banners-empty]')!;
+    const tick = () => {
+      const shift = (offset[region.get()] - offset.eu) * 3600000;
+      const now = Date.now();
+      phases.forEach((el) => { el.hidden = Date.parse(el.dataset.start!) - shift > now || Date.parse(el.dataset.end!) - shift <= now; });
+      empty.hidden = phases.some((el) => !el.hidden);
+      document.querySelectorAll<HTMLElement>('[data-until]').forEach((el) => {
+        const target = Date.parse(el.dataset.until!) - shift;
+        const seconds = Math.max(0, Math.ceil((target - now) / 1000));
+        if (!seconds) { el.textContent = el.dataset.done!; return; }
+        const days = Math.floor(seconds / 86400), hours = Math.floor(seconds % 86400 / 3600), minutes = Math.floor(seconds % 3600 / 60);
+        el.textContent = days ? t('{d}д {h}ч', { d: days, h: hours }) : t('{h}ч {m}м', { h: hours, m: minutes });
+      });
+    };
+    tick();
+    const timer = window.setInterval(tick, 60000);
+    cleanup(signal, () => clearInterval(timer));
+
+    const select = root.querySelector<HTMLSelectElement>('[data-uid]')!;
+    const listEl = root.querySelector<HTMLElement>('[data-wishes]')!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    const standard = new Set<string>(JSON.parse(root.dataset.standard!));
+    let wishStore: WishStore;
+    let uid = '';
+    let version = 0;
+    let index: Awaited<ReturnType<typeof loadWishIndex>>;
+    const render = () => {
+      const uids = wishStore.uids();
+      const choices = uid && !uids.includes(uid) ? [uid, ...uids] : uids;
+      select.innerHTML = choices.map((value) => `<option value="${esc(value)}" ${value === uid ? 'selected' : ''}>${value === 'manual' ? esc(t('Ручной ввод')) : `UID ${esc(value)}`}</option>`).join('');
+      select.parentElement!.hidden = choices.length < 2;
+      hint.hidden = wishStore.mode === 'cloud';
+      const list = uid ? wishStore.list(uid) : [];
+      const ctx = { standard, slugOf: index.slugOf, characterSlugs: index.characterSlugs };
+      const groups = GROUPS.map((group) => ({ group, a: analyse(list, group, ctx) })).filter(({ a }) => a.total);
+      if (!groups.length) {
+        const message = list.length ? t('В истории нет молитв поддерживаемых баннеров.') : t('Загрузите историю по ссылке из игры или файлом — счётчики гаранта появятся здесь.');
+        listEl.innerHTML = `<div class="ov-panel"><p>${esc(message)}</p><a class="btn" href="${base}/tools/wishes/" target="_blank" rel="noopener">${esc(t('Загрузить историю'))}</a></div>`;
+        return;
+      }
+      listEl.innerHTML = groups.map(({ group, a }) => {
+        const pct = Math.min(100, a.p5 / group.pity * 100);
+        return `<article class="ov-panel">
+          <h3>${esc(t(group.title))}</h3>
+          <p>${esc(t('До гаранта осталось {n} из {max}', { n: group.pity - a.p5, max: group.pity }))}</p>
+          <div class="ov-bar" role="img" aria-label="${esc(t('Гарант {a} из {b}', { a: a.p5, b: group.pity }))}"><i style="width:${pct}%"></i><em style="left:${group.soft / group.pity * 100}%" title="${esc(t('Мягкий гарант с {n}-й молитвы', { n: group.soft }))}"></em></div>
+          <p class="muted">4★: ${a.p4} / 10${a.p5 >= group.soft ? ` · ${esc(t('шанс 5★ уже повышен'))}` : ''}</p>
+          ${group.fiftyFifty ? `<p class="chip">${esc(a.guaranteed ? t('Следующий 5★ — гарант') : t('Следующий 5★ — 50/50'))}</p>` : ''}
+          ${a.fives.length ? `<h4>${esc(t('Последние 5★'))}</h4><ul class="ov-fives">${a.fives.slice(-5).reverse().map((f) => {
+            const hit = index.shown(f.name);
+            const outcome = f.outcome === 'win' ? t('выиграл 50/50') : f.outcome === 'lose' ? t('проиграл 50/50') : f.outcome === 'guar' ? t('по гаранту') : '';
+            return `<li>${hit?.i ? `<img src="${esc(hit.i)}" alt="" width="36" height="36" loading="lazy">` : ''}<span>${esc(hit?.n ?? t(f.name))}<small class="muted">${esc(t('{n} молитв', { n: f.pity }))}${outcome ? ` · ${esc(outcome)}` : ''}</small></span></li>`;
+          }).join('')}</ul>` : ''}
+        </article>`;
+      }).join('');
+    };
+    const load = async () => {
+      const turn = ++version;
+      try {
+        index ??= await loadWishIndex(base, document.documentElement.lang, signal);
+        const next = await openWishStore(signal);
+        if (signal.aborted || turn !== version) return;
+        wishStore = next;
+        const saved = store.get<string>('gf:wish-uid', '');
+        const uids = wishStore.uids();
+        uid = uids.includes(saved) ? saved : uids[0] ?? '';
+        if (uid && uid !== saved) store.set('gf:wish-uid', uid);
+        render();
+      } catch (error) { if (!signal.aborted && turn === version) listEl.textContent = (error as Error).message; }
+    };
+    select.addEventListener('change', () => { uid = select.value; store.set('gf:wish-uid', uid); render(); }, { signal });
+    onSessionChange(() => { void load(); }, { signal });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { paint(); tick(); void load(); } }, { signal });
+    window.addEventListener('focus', () => { paint(); tick(); void load(); }, { signal });
+    void load();
+  });
+</script>
+
+<style>
+  .ov-region { margin-bottom: 1rem; }
+  .ov-region .btn { padding: .35rem .6rem; }
+  .ov-region .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .ov-timer { margin: 0 0 .7rem; }
+  .ov-timer b { color: var(--accent-text); }
+  .ov-weapons { display: grid; gap: 5px; }
+  .ov-weapons a { display: flex; align-items: center; gap: 8px; min-height: 44px; text-decoration: none; }
+  .ov-weapons img { flex: none; border-radius: 8px; background: var(--surface-3); }
+  .ov-uid { display: flex; align-items: center; gap: 8px; margin-bottom: .8rem; }
+  .ov-uid select { max-width: 100%; }
+  .ov-tracker :global(.ov-bar) { position: relative; height: 10px; border-radius: 5px; background: var(--surface-3); }
+  .ov-tracker :global(.ov-bar i) { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); }
+  .ov-tracker :global(.ov-bar em) { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); }
+  .ov-tracker :global(.ov-fives) { list-style: none; padding: 0; display: grid; gap: 6px; }
+  .ov-tracker :global(.ov-fives li) { display: flex; align-items: center; gap: 8px; }
+  .ov-tracker :global(.ov-fives img) { flex: none; border-radius: 7px; background: var(--surface-3); }
+  .ov-tracker :global(.ov-fives small) { display: block; }
+</style>

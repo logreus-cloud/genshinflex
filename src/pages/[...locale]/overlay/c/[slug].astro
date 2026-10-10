@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import OverlayLayout from '../../../../layouts/OverlayLayout.astro';
+import { useData, LANGS, type Character } from '../../../../lib/data';
+import { makeLookup, renderGuide } from '../../../../lib/guide-markup';
+export const getStaticPaths = () => LANGS.flatMap((l) => useData(l).characters.map((c) => ({ params: { locale: l === 'ru' ? undefined : l, slug: c.slug }, props: { c } })));
+const { c } = Astro.props as { c: Character };
+const { characters, weapons, artifacts, getCharacter, getWeapon, getArtifact, ELEMENTS, TALENTS, stars, stat, base, t, lang, fmtFullDate } = useData(Astro.currentLocale);
+const build = (await getCollection('builds')).find((x) => x.data.character === c.slug);
+const b = build?.data;
+// Перевод и шаблонный разбор обрабатываются так же, как на полной странице персонажа.
+const i18nEntry = lang !== 'ru' ? (await getCollection('buildsI18n')).find((e) => e.id === `${lang}/${c.slug}`) : undefined;
+const templated = lang !== 'ru' && !i18nEntry && build?.body?.startsWith('Краткий билд по данным сообщества');
+const bodySrc = build && !templated ? (i18nEntry ?? build).body?.trim() : '';
+const bodyHtml = bodySrc ? renderGuide(bodySrc, makeLookup({ characters, weapons, artifacts, elements: ELEMENTS }, base), { tip: t('Совет'), warn: t('Важно'), info: t('На заметку') }) : '';
+const slots = { sands: t('Часы'), goblet: t('Кубок'), circlet: t('Корона') } as const;
+---
+<OverlayLayout title={c.name} active="guide" guideHref={`${base}/overlay/c/${c.slug}/`}>
+  <header class="ov-hero ov-panel" data-el={c.element}>
+    <img src={c.icon} alt="" width="64" height="64" />
+    <div>
+      <h1>{c.name}</h1>
+      <div class="ov-row"><span class="chip gold">{stars(c.rarity)}</span><span class="chip">{c.elementText}</span><span class="chip">{c.weaponText}</span></div>
+      {b && <small class="muted">{t('патч {v}, обновлено {date}', { v: b.patch, date: fmtFullDate(b.updated) })}</small>}
+    </div>
+  </header>
+  <a class="btn ov-site" href={`${base}/characters/${c.slug}/`} target="_blank" rel="noopener">{t('Открыть на сайте')}</a>
+  {b ? <>
+    <p class="muted">{t(b.role)}</p>
+    <section class="ov-panel">
+      <h2>{t('Оружие')}</h2>
+      <ol class="ov-rank">{b.weapons.map((w, i) => { const it = getWeapon(w.slug); return <li><span class="muted">{i + 1}</span><img src={it.icon} alt="" width="40" height="40" loading="lazy" /><span><a href={`${base}/weapons/${it.slug}/`} target="_blank" rel="noopener">{it.name}</a>{w.note && <small class="muted">{t(w.note)}</small>}</span></li>; })}</ol>
+    </section>
+    <section class="ov-panel">
+      <h2>{t('Артефакты')}</h2>
+      <ol class="ov-rank">{b.artifacts.map((a, i) => <li><span class="muted">{i + 1}</span><span class="ov-set-icons">{a.sets.map((s) => <img src={getArtifact(s).icon} alt="" width="40" height="40" loading="lazy" />)}</span><span><b>{a.sets.map((s) => getArtifact(s).name).join(' + ')}</b>{a.note && <small class="muted">{t(a.note)}</small>}</span></li>)}</ol>
+    </section>
+    <section class="ov-panel">
+      <h2>{t('Статы и таланты')}</h2>
+      <dl class="ov-stats">{(Object.keys(slots) as (keyof typeof slots)[]).map((slot) => <div><dt>{slots[slot]}</dt><dd>{stat(b.mainStats[slot])}</dd></div>)}</dl>
+      <p><span class="muted">{t('Доп. статы')}: </span>{b.substats.map(stat).join(' > ')}</p>
+      {b.talents.length > 0 && <p><span class="muted">{t('Прокачка талантов')}: </span>{b.talents.map((key) => TALENTS[key]).join(' > ')}</p>}
+    </section>
+    {b.teams.length > 0 && <section><h2>{t('Команды')}</h2>{b.teams.map((team) => <article class="ov-panel"><h3>{team.name ? t(team.name) : t('Команда')}</h3><div class="ov-team">{team.members.map((slug) => { const member = getCharacter(slug); return <a href={`${base}/overlay/c/${slug}/`}><img src={member.icon} alt="" width="48" height="48" loading="lazy" /><span>{member.name}</span></a>; })}</div>{team.note && <p class="muted">{t(team.note)}</p>}</article>)}</section>}
+    {b.rotations.length > 0 && <details class="ov-panel"><summary>{t('Ротация')}</summary>{b.rotations.map((r) => <div class="ov-rotation">{r.name && <h3>{t(r.name)}</h3>}<p>{r.steps.split(/\s*(?:→|->)\s*/).filter(Boolean).map((step) => t(step)).join(' → ')}</p>{r.note && <p class="muted">{t(r.note)}</p>}</div>)}</details>}
+    {bodyHtml && <details class="ov-panel"><summary>{t('Подробный разбор')}</summary><div class="ov-prose" set:html={bodyHtml} /></details>}
+    {templated && <p class="ov-panel">{t('Краткий билд по данным сообщества: роль — {role}, порядок вариантов — от лучшего к запасному. Подробный разбор ещё не написан.', { role: t(b.role).toLowerCase() })}</p>}
+  </> : <p class="ov-panel muted">{t('Билда для этого персонажа пока нет — он появится в одном из ближайших обновлений.')}</p>}
+</OverlayLayout>
+
+<script>
+  import { onPage } from '../../../../scripts/router';
+  onPage(() => {
+    if (!document.querySelector('.ov-hero')) return;
+    try { localStorage.setItem('gf:overlay-guide', location.pathname); } catch {}
+  });
+</script>
+
+<style>
+  .ov-hero { display: flex; align-items: center; gap: 12px; }
+  .ov-hero > img { flex: none; border-radius: 12px; background: var(--surface-3); }
+  .ov-hero h1 { margin: 0 0 .4rem; }
+  .ov-hero small { display: block; margin-top: .5rem; }
+  .ov-site { display: flex; justify-content: center; min-height: 44px; margin-bottom: 1rem; }
+  .ov-rank { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .ov-rank li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .ov-rank li > span:last-child { min-width: 0; }
+  .ov-rank img { flex: none; border-radius: 8px; background: var(--surface-3); }
+  .ov-rank small { display: block; }
+  .ov-set-icons { display: flex; flex: none; }
+  .ov-set-icons img + img { margin-left: -12px; }
+  .ov-stats { display: grid; gap: 5px; margin: 0; }
+  .ov-stats div { display: flex; justify-content: space-between; gap: 8px; }
+  .ov-stats dt { color: var(--muted); }
+  .ov-stats dd { margin: 0; font-weight: 600; text-align: right; }
+  .ov-team { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  .ov-team a { display: grid; justify-items: center; gap: 3px; text-align: center; text-decoration: none; font-size: .7rem; }
+  .ov-team img { width: 48px; height: 48px; border-radius: 9px; background: var(--surface-3); }
+  .ov-rotation + .ov-rotation { border-top: 1px solid var(--border); margin-top: .8rem; padding-top: .8rem; }
+  .ov-panel summary { min-height: 32px; cursor: pointer; font-weight: 600; }
+  .ov-prose { padding-top: .8rem; overflow-wrap: anywhere; }
+  .ov-prose :global(img) { max-width: 100%; height: auto; }
+</style>

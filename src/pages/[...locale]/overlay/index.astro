@@ -1,0 +1,93 @@
+---
+import { getCollection } from 'astro:content';
+import OverlayLayout from '../../../layouts/OverlayLayout.astro';
+import { useData, LANGS } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { characters, getCharacter, base, t, lang } = useData(Astro.currentLocale);
+const now = new Date();
+const current = (await getCollection('banners')).map((b) => b.data).filter((b) => new Date(b.start) <= now && new Date(b.end) > now);
+const featured = [...new Set(current.flatMap((b) => [...b.featured.map((f) => f.slug), ...b.fourStars]))].map((slug) => getCharacter(slug));
+const built = new Set((await getCollection('builds')).map((b) => b.data.character));
+const others = characters.filter((c) => built.has(c.slug) && !featured.some((f) => f.slug === c.slug)).sort((a, b) => a.name.localeCompare(b.name, lang));
+---
+<OverlayLayout title={t('Поиск')} active="search">
+  <h1>{t('Поиск')}</h1>
+  <div class="ov-search" data-ov-search>
+    <input class="input" type="search" autofocus placeholder={t('Персонаж, оружие, артефакт…')} aria-label={t('Поиск по сайту')} role="combobox" aria-expanded="false" aria-controls="ov-results" aria-autocomplete="list" autocomplete="off" />
+    <ul id="ov-results" role="listbox" hidden></ul>
+  </div>
+  {featured.length > 0 && <section><h2>{t('Сейчас на баннере')}</h2><div class="ov-icons">{featured.map((c) => <a href={`${base}/overlay/c/${c.slug}/`}><img src={c.icon} alt="" width="48" height="48" loading="lazy" /><span>{c.name}</span></a>)}</div></section>}
+  <section><h2>{t('Все персонажи')}</h2><div class="ov-icons">{others.map((c) => <a href={`${base}/overlay/c/${c.slug}/`}><img src={c.icon} alt="" width="48" height="48" loading="lazy" /><span>{c.name}</span></a>)}</div></section>
+</OverlayLayout>
+
+<script>
+  import { searchNames, t } from '../../../scripts/search';
+  import { onPage, cleanup } from '../../../scripts/router';
+  import { navigate } from 'astro:transitions/client';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-ov-search]');
+    if (!root) return;
+    const input = root.querySelector<HTMLInputElement>('input')!;
+    const list = root.querySelector<HTMLUListElement>('ul')!;
+    const base = document.documentElement.lang === 'ru' ? '' : `/${document.documentElement.lang}`;
+    let active = -1;
+    let version = 0;
+    let closeTimer: number | undefined;
+    const close = () => { version++; list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
+    const highlight = () => [...list.children].forEach((li, i) => li.setAttribute('aria-selected', String(i === active)));
+    const open = (a: HTMLAnchorElement) => { if (a.target === '_blank') window.open(a.href, '_blank', 'noopener'); else void navigate(a.href); };
+
+    input.addEventListener('input', async () => {
+      close();
+      const q = input.value;
+      const turn = version;
+      if (!q.trim()) return;
+      const items = await searchNames(q, 8);
+      if (signal.aborted || turn !== version || q !== input.value || document.activeElement !== input) return;
+      list.replaceChildren(...items.map((it) => {
+        const li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        const a = document.createElement('a');
+        const path = new URL(it.href, location.origin).pathname;
+        const slug = path.match(/^\/(?:en\/|es\/)?characters\/([a-z0-9-]+)\/?$/)?.[1];
+        a.href = slug ? `${base}/overlay/c/${slug}/` : it.href;
+        if (!slug) { a.target = '_blank'; a.rel = 'noopener'; }
+        if (it.icon) { const img = document.createElement('img'); img.src = it.icon; img.alt = ''; img.width = 28; img.height = 28; img.loading = 'lazy'; a.append(img); }
+        const name = document.createElement('span');
+        const kind = document.createElement('small');
+        name.textContent = it.name; kind.textContent = it.kind;
+        a.append(name, kind); li.append(a);
+        return li;
+      }));
+      if (!items.length && q.trim()) { const li = document.createElement('li'); li.textContent = t('Ничего не нашлось — попробуйте имя на английском'); list.append(li); }
+      list.hidden = !q.trim();
+      input.setAttribute('aria-expanded', String(!list.hidden));
+      active = -1;
+    }, { signal });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { close(); input.blur(); return; }
+      if (list.hidden) return;
+      const n = list.querySelectorAll('[role="option"]').length;
+      if (e.key === 'ArrowDown' && n) { e.preventDefault(); active = (active + 1) % n; highlight(); }
+      else if (e.key === 'ArrowUp' && n) { e.preventDefault(); active = active < 0 ? n - 1 : (active - 1 + n) % n; highlight(); }
+      else if (e.key === 'Enter') { const a = list.querySelectorAll<HTMLAnchorElement>('a')[Math.max(active, 0)]; if (a) { e.preventDefault(); open(a); } }
+    }, { signal });
+    // Закрываем, только когда фокус ушёл из поиска целиком: Tab по результатам выдачу не прячет
+    root.addEventListener('focusout', () => { closeTimer = window.setTimeout(() => { if (!root.contains(document.activeElement)) close(); }, 150); }, { signal });
+    root.addEventListener('focusin', () => { if (closeTimer !== undefined) clearTimeout(closeTimer); }, { signal });
+    input.addEventListener('focus', () => { if (closeTimer !== undefined) clearTimeout(closeTimer); }, { signal });
+    cleanup(signal, () => { if (closeTimer !== undefined) clearTimeout(closeTimer); });
+    input.focus();
+  });
+</script>
+
+<style>
+  .ov-search { position: relative; }
+  .ov-search input { width: 100%; height: 48px; min-width: 0; }
+  .ov-search ul { position: absolute; z-index: 10; top: 100%; left: 0; right: 0; max-height: 55dvh; overflow-y: auto; list-style: none; margin: 4px 0 0; padding: 4px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-deep); }
+  .ov-search :global(li a) { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 6px; border-radius: 7px; text-decoration: none; }
+  .ov-search :global(li[aria-selected="true"] a), .ov-search :global(li a:hover) { background: var(--surface-2); }
+  .ov-search :global(li img) { width: 28px; height: 28px; border-radius: 6px; }
+  .ov-search :global(li small) { margin-left: auto; color: var(--muted); }
+</style>
