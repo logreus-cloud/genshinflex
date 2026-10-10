@@ -5402,5 +5402,41 @@
  "Уведомлений пока нет": {
   "en": "No notifications yet",
   "es": "Aún no hay notificaciones"
+ },
+ "Сообщения": {
+  "en": "Messages",
+  "es": "Mensajes"
+ },
+ "Личные сообщения.": {
+  "en": "Private messages.",
+  "es": "Mensajes privados."
+ },
+ "Войдите, чтобы читать сообщения": {
+  "en": "Sign in to read your messages",
+  "es": "Inicia sesión para leer tus mensajes"
+ },
+ "Вы:": {
+  "en": "You:",
+  "es": "Tú:"
+ },
+ "Не удалось отправить": {
+  "en": "Couldn’t send",
+  "es": "No se pudo enviar"
+ },
+ "Слишком много сообщений, попробуйте позже": {
+  "en": "Too many messages, try again later",
+  "es": "Demasiados mensajes, inténtalo más tarde"
+ },
+ "Сообщение пустое или длиннее 2000 символов": {
+  "en": "The message is empty or longer than 2000 characters",
+  "es": "El mensaje está vacío o supera los 2000 caracteres"
+ },
+ "Сообщений пока нет. Написать можно с публичной страницы профиля.": {
+  "en": "No messages yet. You can write to someone from their public profile page.",
+  "es": "Aún no hay mensajes. Puedes escribir a alguien desde su perfil público."
+ },
+ "Этому пользователю нельзя написать": {
+  "en": "You can’t message this user",
+  "es": "No puedes escribir a este usuario"
  }
 }

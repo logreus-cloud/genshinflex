@@ -1,0 +1,59 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Сообщения')} description={t('Личные сообщения.')} noindex>
+  <div class="messages" data-messages>
+    <h1>{t('Сообщения')}</h1>
+    <p class="status" data-status aria-live="polite"></p>
+    <div class="messages-list" data-list></div>
+    <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../scripts/router';
+  import { initConversationList } from '../../scripts/messages/list';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-messages]');
+    if (root) void initConversationList(root, signal);
+  });
+</script>
+
+<style>
+  .messages :global([hidden]) { display: none !important; }
+  .messages { display: grid; gap: 1rem; max-width: 760px; }
+  .messages-list { display: grid; gap: .7rem; }
+  .messages :global(.dm-row) { position: relative; display: grid; gap: .4rem; min-width: 0; overflow-wrap: anywhere; }
+  .messages :global(.dm-person) { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; min-width: 0; }
+  .messages :global(.dm-summary) { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-width: 0; }
+  .messages :global(.dm-open) { min-width: 0; overflow-wrap: anywhere; }
+  .messages :global(.dm-open)::after { content: ''; position: absolute; inset: 0; }
+  .messages :global(.dm-row.unread) { border-color: var(--accent-text); }
+  .messages :global(.forum-author) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem;
+    overflow-wrap: anywhere;
+  }
+  .messages :global(.forum-author a) { position: relative; z-index: 1; }
+  .messages :global(.forum-avatar) {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    overflow: hidden;
+  }
+  .messages :global(.forum-avatar img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .messages :global(.dm-badge) { flex: none; padding: .15rem .45rem; border-radius: 1rem; background: var(--accent-soft); color: var(--accent-text); }
+  .messages > [data-more] { justify-self: start; }
+</style>
