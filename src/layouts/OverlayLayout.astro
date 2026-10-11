@@ -7,7 +7,8 @@ interface Props { title: string; active?: 'search' | 'guide' | 'banners'; guideH
 const { title, active, guideHref } = Astro.props;
 ---
 <!doctype html>
-<html lang={lang} class="ov-root">
+<!-- Панель всегда тёмная: при светлой теме системы карточки становились белыми на тёмном фоне -->
+<html lang={lang} class="ov-root" data-theme="dark">
   <head>
     <ClientRouter />
     <meta charset="utf-8" />
