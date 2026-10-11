@@ -1,3 +1,5 @@
+mod wish_cache;
+
 use serde::Deserialize;
 use std::{fs, thread, time::Duration};
 use sysinfo::{ProcessesToUpdate, System};
@@ -6,6 +8,7 @@ use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     WebviewUrl, WebviewWindowBuilder,
     window::Color,
+    webview::PageLoadEvent,
     AppHandle, Manager, Url, WindowEvent,
 };
 use tauri_plugin_autostart::ManagerExt;
@@ -146,6 +149,7 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
 
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let settings = settings(app.handle());
+    app.manage(wish_cache::WishLinkState::default());
     let origin = settings.base.origin().ascii_serialization();
     let script = format!(r#"
         if (location.origin === {origin:?}) {{
@@ -198,6 +202,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         }
     });
     // Неверная клавиша из settings.json — возвращаемся к Alt+G, чтобы окно можно было открыть
+    wish_cache::start(app.handle().clone(), window);
     let mut settings = settings;
     let register = |app: &tauri::App, shortcut: &str| app.global_shortcut().on_shortcut(shortcut, |app, _, event| {
         if event.state == ShortcutState::Pressed { toggle(app); }
@@ -239,5 +244,11 @@ pub fn run() -> tauri::Result<()> {
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
+        .on_page_load(|webview, payload| {
+            // on_page_load отдаёт Webview, а ссылку шлём в окно main
+            if matches!(payload.event(), PageLoadEvent::Finished) {
+                if let Some(window) = webview.app_handle().get_webview_window("main") { wish_cache::resend(&window); }
+            }
+        })
         .run(tauri::generate_context!())
 }

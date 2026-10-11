@@ -5746,5 +5746,25 @@
  "Продолжите вход в открывшемся браузере.": {
   "en": "Continue signing in in the browser that opened.",
   "es": "Continúa el inicio de sesión en el navegador que se abrió."
+ },
+ "Обновляю историю молитв…": {
+  "en": "Updating wish history…",
+  "es": "Actualizando el historial de deseos…"
+ },
+ "Добавлено {n} новых молитв": {
+  "en": "Added {n} new wishes",
+  "es": "Se añadieron {n} deseos nuevos"
+ },
+ "Новых молитв нет": {
+  "en": "No new wishes",
+  "es": "No hay deseos nuevos"
+ },
+ "Ссылка из игры устарела — откройте историю молитв ещё раз": {
+  "en": "The game link expired — open wish history again",
+  "es": "El enlace del juego ha caducado: vuelve a abrir el historial de deseos"
+ },
+ "Не удалось обновить историю молитв": {
+  "en": "Could not update wish history",
+  "es": "No se pudo actualizar el historial de deseos"
  }
 }

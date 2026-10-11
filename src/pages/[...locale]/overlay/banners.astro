@@ -126,6 +126,7 @@ const standard = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari'
     };
     select.addEventListener('change', () => { uid = select.value; store.set('gf:wish-uid', uid); render(); }, { signal });
     onSessionChange(() => { void load(); }, { signal });
+    window.addEventListener('gf:wishes-changed', () => { void load(); }, { signal });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { paint(); tick(); void load(); } }, { signal });
     window.addEventListener('focus', () => { paint(); tick(); void load(); }, { signal });
     void load();

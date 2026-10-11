@@ -93,6 +93,7 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   import { userData } from '../../../scripts/user-data';
   import { navigate } from 'astro:transitions/client';
   import { GROUPS, loadWishIndex, analyse, type Five } from '../../../scripts/wish-analysis';
+  import { importFromLink, WishImportError } from '../../../scripts/wish-import';
 
   onPage((signal) => {
   const root = document.querySelector<HTMLElement>('.wt');
@@ -149,64 +150,24 @@ const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m
   $('ps-cmd').textContent = `iex (irm "${location.origin}/wish-url.ps1")`;
   $('copy-cmd').addEventListener('click', () => navigator.clipboard?.writeText($('ps-cmd').textContent!).then(() => { if (!signal.aborted) status(t('Команда скопирована.')); }), { signal });
 
-  const sleep = (ms: number) => new Promise<void>((resolve) => {
-    const done = () => { clearTimeout(timer); signal.removeEventListener('abort', done); resolve(); };
-    const timer = setTimeout(done, ms);
-    signal.addEventListener('abort', done, { once: true });
-    if (signal.aborted) done();
-  });
   $('import-link').addEventListener('click', async () => {
     const raw = $<HTMLInputElement>('wish-url').value.trim();
-    let params: URLSearchParams;
-    try { params = new URL(raw).searchParams; } catch { return status(t('Это не похоже на ссылку. Скопируйте её скриптом ещё раз.'), true); }
-    if (!params.get('authkey')) return status(t('В ссылке нет authkey. Откройте историю молитв в игре и запустите скрипт снова.'), true);
     if (writing) return;
     setWriting(true);
     let savingHistory = false;
     try {
-      let total = 0;
-      let foundUid = '';
-      for (const type of ['301', '302', '200', '500', '100']) {
-        if (signal.aborted) return;
-        let endId = '0';
-        const known = new Set(foundUid ? wishStore.list(foundUid).map((w) => w.id) : []);
-        const got: Wish[] = [];
-        for (let page = 1; ; page++) {
-          status(t('Загружаю «{type}», страница {page}…', { type: TYPE_NAME[type], page }));
-          const q = new URLSearchParams({ authkey: params.get('authkey')!, authkey_ver: params.get('authkey_ver') ?? '1', sign_type: params.get('sign_type') ?? '2',
-            lang: 'ru', gacha_type: type, page: String(page), end_id: endId, game_biz: params.get('game_biz') ?? 'hk4e_global', region: params.get('region') ?? '' });
-          const res = await fetch(`/api/gacha?${q}`, { signal });
-          const body = await res.json().catch(() => null);
-          if (signal.aborted) return;
-          if (!body) throw new Error(t('Сервер не ответил. Попробуйте ещё раз через минуту.'));
-          if (body.retcode === -110) { await sleep(1500); if (signal.aborted) return; page--; continue; }
-          if (body.retcode === -101) throw new Error(t('Ссылка устарела (живёт сутки). Откройте историю в игре и получите новую.'));
-          if (body.retcode !== 0) throw new Error(t(body.error ?? body.message ?? 'Не удалось загрузить историю.'));
-          const list: Wish[] = body.data?.list ?? [];
-          if (!list.length) break;
-          foundUid ||= list[0].uid;
-          const fresh = list.filter((w) => !known.has(w.id));
-          got.push(...fresh);
-          if (fresh.length < list.length) break; // дошли до уже сохранённых
-          endId = list.at(-1)!.id;
-          await sleep(350);
-          if (signal.aborted) return;
-        }
-        if (foundUid && got.length) {
-          savingHistory = true;
-          const added = await wishStore.merge(foundUid, got);
-          if (signal.aborted) return;
-          total += added;
-          savingHistory = false;
-        }
-      }
-      if (!foundUid) return status(t('История пуста: на этом аккаунте ещё не было молитв за последние 6 месяцев.'));
-      if (uid !== foundUid) resetWipe();
-      uid = foundUid; store.set('gf:wish-uid', uid);
-      status(t('Готово: добавлено {n} новых молитв.', { n: total }));
+      const result = await importFromLink(raw, wishStore, {
+        signal,
+        onProgress: (type, page) => status(t('Загружаю «{type}», страница {page}…', { type: TYPE_NAME[type], page })),
+        onSaving: (saving) => { savingHistory = saving; },
+      });
+      if (signal.aborted) return;
+      if (uid !== result.uid) resetWipe();
+      uid = result.uid; store.set('gf:wish-uid', uid);
+      status(t('Готово: добавлено {n} новых молитв.', { n: result.added }));
       render();
     } catch (e) {
-      if (!signal.aborted) status(savingHistory ? writeError(e) : (e as Error).message, true);
+      if (!signal.aborted) status(savingHistory ? writeError(e) : t((e as Error).message), e instanceof WishImportError ? e.code !== 'empty' : true);
     } finally { if (!signal.aborted) setWriting(false); }
   }, { signal });
 

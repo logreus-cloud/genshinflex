@@ -31,6 +31,7 @@ const { title, active, guideHref } = Astro.props;
       <a class="ov-tab" data-guide-tab href={guideHref} aria-disabled={!guideHref ? 'true' : undefined} aria-current={active === 'guide' ? 'page' : undefined}>{t('Гайд')}</a>
       <a class="ov-tab" href={`${base}/overlay/banners/`} aria-current={active === 'banners' ? 'page' : undefined}>{t('Баннеры')}</a>
     </nav>
+    <div class="ov-toast" role="status" transition:persist hidden></div>
     <script>
       import { onPage } from '../scripts/router';
       onPage(() => {
@@ -73,6 +74,79 @@ const { title, active, guideHref } = Astro.props;
         onSessionChange(() => void refresh(), { signal });
       });
     </script>
+    <script>
+      import { store } from '../scripts/common';
+      import { t } from '../scripts/search';
+      import { openWishStore } from '../scripts/wish-store';
+      import { importFromLink, WishImportError } from '../scripts/wish-import';
+
+      if (window.__GF_OVERLAY_APP__) {
+        const key = 'gf:overlay-wish-links';
+        let pending: { link: string; hash: string } | undefined;
+        let current: string | undefined;
+        let running = false;
+        let incoming: Promise<void> = Promise.resolve();
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const hashes = (): string[] => {
+          try {
+            const saved: unknown = JSON.parse(sessionStorage.getItem(key) ?? '[]');
+            return Array.isArray(saved) ? saved.filter((value): value is string => typeof value === 'string').slice(-10) : [];
+          } catch { return []; }
+        };
+        const remember = (hash: string) => {
+          try { sessionStorage.setItem(key, JSON.stringify([...hashes().filter((value) => value !== hash), hash].slice(-10))); } catch {}
+        };
+        const digest = async (link: string) => {
+          const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(link));
+          return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+        };
+        const toast = (message: string, hide = false) => {
+          clearTimeout(timer);
+          const el = document.querySelector<HTMLElement>('.ov-toast');
+          if (!el) return;
+          el.textContent = message;
+          el.hidden = false;
+          if (hide) timer = setTimeout(() => { const current = document.querySelector<HTMLElement>('.ov-toast'); if (current) current.hidden = true; }, 4000);
+        };
+        const drain = async () => {
+          running = true;
+          while (pending !== undefined) {
+            const { link, hash } = pending;
+            pending = undefined;
+            current = hash;
+            try {
+              if (hashes().includes(hash)) continue;
+              toast(t('Обновляю историю молитв…'));
+              const signal = new AbortController().signal;
+              const wishStore = await openWishStore(signal);
+              const { uid, added } = await importFromLink(link, wishStore, { signal });
+              store.set('gf:wish-uid', uid);
+              window.dispatchEvent(new CustomEvent('gf:wishes-changed'));
+              remember(hash);
+              toast(added ? t('Добавлено {n} новых молитв', { n: added }) : t('Новых молитв нет'), true);
+            } catch (error) {
+              toast(error instanceof WishImportError && error.code === 'expired'
+                ? t('Ссылка из игры устарела — откройте историю молитв ещё раз')
+                : t('Не удалось обновить историю молитв'), true);
+            } finally {
+              current = undefined;
+            }
+          }
+          running = false;
+        };
+        window.addEventListener('gf:wish-link', (event) => {
+          const link = (event as CustomEvent<unknown>).detail;
+          if (typeof link !== 'string') return;
+          const active = current;
+          incoming = incoming.then(async () => {
+            const hash = await digest(link);
+            if (hashes().includes(hash) || active === hash || current === hash || pending?.hash === hash) return;
+            pending = { link, hash };
+            if (!running) void drain();
+          }).catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
 <style is:global>
@@ -93,6 +167,8 @@ const { title, active, guideHref } = Astro.props;
   .ov-icons a:hover, .ov-icons a:focus-visible { background: var(--surface-2); }
   .ov-icons img { width: 48px; height: 48px; border-radius: 9px; object-fit: cover; background: var(--surface-3); }
   .ov-tabs { position: fixed; z-index: 20; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px max(10px, calc((100vw - 480px) / 2)) calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: rgb(10 13 23 / .93); backdrop-filter: blur(18px); }
+  .ov-toast { position: fixed; z-index: 21; inset: auto 14px calc(78px + env(safe-area-inset-bottom)); margin: auto; width: fit-content; max-width: min(400px, calc(100% - 28px)); padding: .55rem .8rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); box-shadow: 0 8px 24px rgb(0 0 0 / .3); text-align: center; font-size: .85rem; pointer-events: none; }
+  .ov-toast[hidden] { display: none; }
   .ov-tab { display: grid; place-items: center; min-height: 48px; border-radius: 9px; color: var(--muted); text-decoration: none; font-weight: 600; }
   .ov-tab[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
   .ov-tab[aria-disabled] { opacity: .45; pointer-events: none; }
