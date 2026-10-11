@@ -174,7 +174,8 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
     });
     content = `Тикет создан: <#${threadId}>`;
     ticketId = undefined;
-  } catch {
+  } catch (error) {
+    console.warn('discord ticket create failed', String(error));
     // Запись удаляем только после подтверждённой очистки: иначе ветка осталась бы без учёта
     const cleaned = threadId ? await archiveThread(deps, threadId) : true;
     if (cleaned && ticketId !== undefined && client) {
@@ -236,7 +237,8 @@ async function closeTicket(interaction: DiscordInteraction, deps: TicketDeps, di
     await ticketRpc(client, 'discord_ticket_close_finish', { p_id: result.id, p_ok: true, p_token: token });
     claimedId = undefined;
     content = 'Тикет закрыт';
-  } catch {
+  } catch (error) {
+    console.warn('discord ticket close failed', String(error));
     if (claimedId !== undefined) {
       try {
         await ticketRpc(deps.client(), 'discord_ticket_close_finish', { p_id: claimedId, p_ok: false, p_token: token });

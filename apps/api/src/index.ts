@@ -33,7 +33,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.19.0';
+const version = '0.19.1';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -641,7 +641,8 @@ export function createApp(deps: AppDeps = {}) {
     c.set('discordPity', deps.discordPity || loadDiscordPity);
     c.set('discordRoleLink', deps.discordRoleLink || linkDiscordRoles);
     c.set('discordTicketClient', deps.discordTicketClient || createServiceClient);
-    c.set('discordTicketFetch', deps.discordTicketFetch || fetch);
+    // В Workers fetch нельзя вызывать как метод другого объекта (Illegal invocation) — оборачиваем
+    c.set('discordTicketFetch', deps.discordTicketFetch || ((input, init) => fetch(input, init)));
     c.set('discordTicketWaitUntil', deps.discordTicketWaitUntil || ((context, promise) => context.executionCtx.waitUntil(promise)));
     return next();
   });
