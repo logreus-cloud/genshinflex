@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build",
+    "tauri": "tauri",
     "icon": "tauri icon ../../public/icon-512.png"
   },
   "devDependencies": {

@@ -1,0 +1,50 @@
+name: Release Overlay
+
+on:
+  push:
+    tags:
+      - 'overlay-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/overlay/src-tauri
+      - name: Установить зависимости
+        run: npm ci
+      - name: Проверить версию тега
+        if: github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $tagVersion = $env:GITHUB_REF_NAME -replace '^overlay-v', ''
+          $configVersion = (Get-Content -LiteralPath 'apps/overlay/src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json).version
+          if ($tagVersion -ne $configVersion) {
+            throw "Версия тега ($tagVersion) не совпадает с версией оверлея ($configVersion)"
+          }
+
+      - uses: tauri-apps/tauri-action@v0
+        with:
+          projectPath: apps/overlay
+          tagName: ${{ github.ref_name }}
+          releaseName: 'GenshinFlex Overlay v__VERSION__'
+          releaseBody: >-
+            Скачайте NSIS-установщик (.exe) из файлов релиза и запустите его.
+            При предупреждении SmartScreen нажмите «Подробнее → Выполнить в любом случае».
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}

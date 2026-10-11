@@ -1,7 +1,7 @@
 mod wish_cache;
 
 use serde::Deserialize;
-use std::{fs, thread, time::Duration};
+use std::{fs, sync::{Arc, Mutex}, thread, time::Duration};
 use sysinfo::{ProcessesToUpdate, System};
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem},
@@ -15,6 +15,7 @@ use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_opener::OpenerExt;
+use tauri_plugin_updater::UpdaterExt;
 use tauri_plugin_window_state::StateFlags;
 
 const DEFAULT_URL: &str = "https://genshinflex.com";
@@ -29,6 +30,13 @@ struct SettingsFile {
 struct Settings {
     base: Url,
     shortcut: String,
+}
+
+#[derive(Default)]
+struct UpdateState {
+    pending: Option<tauri_plugin_updater::Update>,
+    installing: bool,
+    available: bool,
 }
 
 fn valid_base(value: &str) -> Option<Url> {
@@ -103,11 +111,15 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
     let show_item = MenuItem::with_id(app, "toggle", "Показать/скрыть", true, None::<&str>)?;
     let autostart = CheckMenuItem::with_id(app, "autostart", "Автозапуск", true,
         app.autolaunch().is_enabled().unwrap_or(false), None::<&str>)?;
+    let update_item = MenuItem::with_id(app, "update", "Обновлений нет", false, None::<&str>)?;
     let site = MenuItem::with_id(app, "site", "Открыть сайт", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Выход", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show_item, &autostart, &site, &quit])?;
+    let menu = Menu::with_items(app, &[&show_item, &autostart, &update_item, &site, &quit])?;
     let base = settings.base.to_string();
     let check = autostart.clone();
+    let updates = Arc::new(Mutex::new(UpdateState::default()));
+    let menu_updates = updates.clone();
+    let menu_update = update_item.clone();
     let mut builder = TrayIconBuilder::new().menu(&menu).show_menu_on_left_click(false)
         .tooltip(format!("GenshinFlex — {}", settings.shortcut))
         .on_menu_event(move |app, event| match event.id().as_ref() {
@@ -117,6 +129,35 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
                 let result = if enabled { app.autolaunch().disable() } else { app.autolaunch().enable() };
                 if let Err(error) = result { eprintln!("Автозапуск: {error}"); }
                 let _ = check.set_checked(app.autolaunch().is_enabled().unwrap_or(enabled));
+            }
+            "update" => {
+                let update = {
+                    let mut state = menu_updates.lock().unwrap();
+                    if state.installing { None } else {
+                        let update = state.pending.take();
+                        state.installing = update.is_some();
+                        update
+                    }
+                };
+                if let Some(update) = update {
+                    let version = update.version.clone();
+                    if let Err(error) = menu_update.set_text("Загрузка обновления…") { eprintln!("Трей: {error}"); }
+                    if let Err(error) = menu_update.set_enabled(false) { eprintln!("Трей: {error}"); }
+                    let (app, item, updates) = (app.clone(), menu_update.clone(), menu_updates.clone());
+                    tauri::async_runtime::spawn(async move {
+                        if let Err(error) = update.download_and_install(|_, _| {}, || {}).await {
+                            eprintln!("Обновление: {error}");
+                            let mut state = updates.lock().unwrap();
+                            state.pending = Some(update);
+                            state.installing = false;
+                            drop(state);
+                            if let Err(error) = item.set_text(format!("Обновить до {version}")) { eprintln!("Трей: {error}"); }
+                            if let Err(error) = item.set_enabled(true) { eprintln!("Трей: {error}"); }
+                        } else {
+                            app.restart();
+                        }
+                    });
+                }
             }
             "site" => { if let Err(error) = app.opener().open_url(base.clone(), None::<&str>) { eprintln!("Браузер: {error}"); } }
             "quit" => app.exit(0),
@@ -129,6 +170,39 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
         });
     if let Some(icon) = app.default_window_icon().cloned() { builder = builder.icon(icon); }
     let tray = builder.build(app)?;
+    let update_handle = app.handle().clone();
+    let check_item = update_item.clone();
+    let check_updates = updates.clone();
+    thread::spawn(move || {
+        thread::sleep(Duration::from_secs(20));
+        loop {
+            match tauri::async_runtime::block_on(async { update_handle.updater()?.check().await }) {
+                Ok(update) => {
+                    let mut state = check_updates.lock().unwrap();
+                    if !state.installing {
+                        state.available = update.is_some();
+                        state.pending = update;
+                        let label = state.pending.as_ref()
+                            .map(|update| format!("Обновить до {}", update.version))
+                            .unwrap_or_else(|| "Обновлений нет".into());
+                        let enabled = state.available;
+                        drop(state);
+                        if let Err(error) = check_item.set_text(label) { eprintln!("Трей: {error}"); }
+                        if let Err(error) = check_item.set_enabled(enabled) { eprintln!("Трей: {error}"); }
+                        // Пока писали меню, могли нажать «Обновить» — не затираем «Загрузка обновления…»
+                        // (меню меняется в главном потоке, поэтому под мьютексом его не трогаем)
+                        if check_updates.lock().unwrap().installing {
+                            let _ = check_item.set_text("Загрузка обновления…");
+                            let _ = check_item.set_enabled(false);
+                        }
+                    }
+                }
+                Err(error) => eprintln!("Проверка обновления: {error}"),
+            }
+            thread::sleep(Duration::from_secs(6 * 60 * 60));
+        }
+    });
+    let tray_updates = updates.clone();
     let shortcut = settings.shortcut.clone();
     thread::spawn(move || {
         let mut system = System::new();
@@ -138,8 +212,9 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
                 let name = p.name().to_string_lossy();
                 name.eq_ignore_ascii_case("GenshinImpact.exe") || name.eq_ignore_ascii_case("YuanShen.exe")
             });
-            let tip = if running { format!("GenshinFlex — {shortcut}") }
+            let mut tip = if running { format!("GenshinFlex — {shortcut}") }
                 else { format!("GenshinFlex — {shortcut} · игра не запущена") };
+            if tray_updates.lock().unwrap().available { tip.push_str(" · доступно обновление"); }
             if let Err(error) = tray.set_tooltip(Some(tip)) { eprintln!("Трей: {error}"); }
             thread::sleep(Duration::from_secs(10));
         }
@@ -243,6 +318,7 @@ pub fn run() -> tauri::Result<()> {
             .with_state_flags(StateFlags::POSITION | StateFlags::SIZE).build())
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(setup)
         .on_page_load(|webview, payload| {
             // on_page_load отдаёт Webview, а ссылку шлём в окно main
