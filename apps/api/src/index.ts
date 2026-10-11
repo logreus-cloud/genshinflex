@@ -10,6 +10,8 @@ import {
 } from './lib/accounts.ts';
 import type { AccountClient } from './lib/accounts.ts';
 import type { Env } from './lib/env.ts';
+import { createBuildsLoader, handleInteraction, verifyDiscordRequest } from './lib/discord.ts';
+import type { DiscordBuild, DiscordInteraction } from './lib/discord.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
@@ -22,7 +24,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.12.0';
+const version = '0.13.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -30,10 +32,13 @@ type ApiEnv = {
   Variables: {
     adminClient: (c: ApiContext) => ServiceClient | Response;
     claims: typeof claimsFromToken;
+    discordBuilds: (url: string) => Promise<DiscordBuild[]>;
   };
 };
 type ApiContext = Context<ApiEnv>;
 type AppDeps = Partial<ApiEnv['Variables']>;
+
+const discordLoaders = new Map<string, ReturnType<typeof createBuildsLoader>>();
 
 function createServiceClient(env: Env): ServiceClient & Pick<SupabaseClient, 'rpc'> {
   return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -90,7 +95,17 @@ function logAdminAction(admin: string, action: string, target: string): void {
   console.log(JSON.stringify({ at: new Date().toISOString(), admin, action, target }));
 }
 
+function loadDiscordBuilds(url: string): Promise<DiscordBuild[]> {
+  let loader = discordLoaders.get(url);
+  if (!loader) {
+    loader = createBuildsLoader(url);
+    discordLoaders.set(url, loader);
+  }
+  return loader();
+}
+
 app.use('*', async (c, next) => {
+  if (c.req.path === '/discord/interactions') return next();
   const origin = c.req.header('Origin');
   const allowed = origin && c.env.SITE_ORIGINS?.split(',').map((item) => item.trim()).includes(origin);
   if (!allowed) return next();
@@ -107,6 +122,26 @@ app.use('*', async (c, next) => {
 });
 
 app.get('/health', (c) => c.json({ ok: true, version }));
+
+app.post('/discord/interactions', async (c) => {
+  if (!c.env.DISCORD_PUBLIC_KEY) return c.json({ error: 'Сервис недоступен' }, 503);
+  const body = await c.req.text();
+  const signature = c.req.header('X-Signature-Ed25519');
+  const timestamp = c.req.header('X-Signature-Timestamp');
+  if (!signature || !timestamp || !await verifyDiscordRequest(c.env.DISCORD_PUBLIC_KEY, signature, timestamp, body)) {
+    return c.json({ error: 'Неверная подпись' }, 401);
+  }
+  let interaction: DiscordInteraction;
+  try {
+    interaction = JSON.parse(body) as DiscordInteraction;
+  } catch {
+    return c.json({ error: 'Неверный JSON' }, 400);
+  }
+  const url = c.env.DISCORD_DATA_URL || 'https://genshinflex.com/data/discord-builds.json';
+  return c.json(await handleInteraction(interaction, {
+    loadBuilds: () => c.get('discordBuilds')(url), site: 'https://genshinflex.com',
+  }));
+});
 
 app.get('/titles', async (c) => {
   const client = serviceClient(c);
@@ -423,6 +458,7 @@ export function createApp(deps: AppDeps = {}) {
   instance.use('*', async (c, next) => {
     c.set('adminClient', deps.adminClient || defaultClient);
     c.set('claims', deps.claims || claimsFromToken);
+    c.set('discordBuilds', deps.discordBuilds || loadDiscordBuilds);
     return next();
   });
   instance.route('/', app);
