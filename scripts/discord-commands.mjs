@@ -10,6 +10,17 @@ export const commands = [{
     autocomplete: true,
     max_length: 100,
   }],
+}, {
+  name: 'профиль',
+  description: 'Публичный профиль GenshinFlex',
+  type: 1,
+  options: [{
+    type: 3,
+    name: 'ник',
+    description: 'Ник на сайте; без него — ваш профиль',
+    required: false,
+    max_length: 24,
+  }],
 }];
 
 try { process.loadEnvFile('.env'); } catch {}

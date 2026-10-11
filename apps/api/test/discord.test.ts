@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { createApp } from '../src/index.ts';
 import { createBuildsLoader, handleInteraction, verifyDiscordRequest } from '../src/lib/discord.ts';
 import type { DiscordBuild } from '../src/lib/discord.ts';
+import type { PublicProfileCard } from '../src/lib/discord-profile.ts';
 import type { Env } from '../src/lib/env.ts';
 
 const hex = (bytes: ArrayBuffer) => Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
@@ -199,4 +200,88 @@ test('прерывает зависший JSON и использует стар�
   assert.deepEqual(oldResult, { status: 'fulfilled', value: [build] });
   assert.equal(newResult.status, 'rejected');
   assert.deepEqual(signals.map((signal) => signal.aborted), [true, true]);
+});
+
+test('отдаёт публичный профиль по нику и Discord ID', async () => {
+  const profile: PublicProfileCard = {
+    nickname: 'traveler', name: 'Путешественник', color: 0xEF7938,
+    avatar: 'https://example.com/avatar.png', createdAt: '2026-09-01',
+    title: 'Искатель', guild: '[GF] Гильдия',
+    forum: { points: 42, place: 3 }, followers: 5, friends: 2, uid: '123456789',
+  };
+  const profileDeps = {
+    ...deps,
+    loadProfile: async () => profile,
+    findLinkedProfile: async () => ({ nickname: 'traveler', is_public: true }),
+  };
+  const byNick = await handleInteraction({
+    type: 2, data: { name: 'профиль', options: [{ name: 'ник', value: 'traveler' }] },
+  }, profileDeps) as any;
+  assert.equal(byNick.data.flags, undefined);
+  assert.equal(byNick.data.embeds[0].author.name, 'Путешественник');
+  assert.equal(byNick.data.embeds[0].author.icon_url, profile.avatar);
+  assert.equal(byNick.data.embeds[0].thumbnail.url, profile.avatar);
+  assert.equal(byNick.data.embeds[0].title, '@traveler');
+  assert.equal(byNick.data.embeds[0].color, 0xEF7938);
+  assert.equal(byNick.data.embeds[0].fields.length, 6);
+  assert.ok(byNick.data.embeds[0].fields.every((field: { inline: boolean }) => field.inline));
+  assert.equal(byNick.data.embeds[0].fields[2].value, '42 очк. · #3');
+  assert.equal(byNick.data.embeds[0].footer.text, 'На GenshinFlex с сентябрь 2026 г.');
+  assert.equal(byNick.data.components[0].components[0].url, 'https://genshinflex.com/u/traveler/');
+  const linked = await handleInteraction({ type: 2, data: { name: 'профиль' }, member: { user: { id: '123' } } }, profileDeps) as any;
+  assert.deepEqual(linked.data.embeds, byNick.data.embeds);
+  const hiddenLists = await handleInteraction({
+    type: 2, data: { name: 'профиль', options: [{ name: 'ник', value: 'traveler' }] },
+  }, { ...profileDeps, loadProfile: async () => ({ ...profile, listsHidden: true }) }) as any;
+  assert.equal(hiddenLists.data.embeds[0].fields.some((field: { name: string }) => field.name === 'Друзья'), false);
+});
+
+test('профиль отвечает эфемерно при отсутствии данных и ошибках', async () => {
+  const command = { type: 2, data: { name: 'профиль' } };
+  const profileDeps = {
+    ...deps,
+    loadProfile: async () => null,
+    findLinkedProfile: async (): Promise<{ nickname: string; is_public: boolean } | null> => null,
+  };
+  const unlinked = await handleInteraction({ ...command, user: { id: '123' } }, profileDeps) as any;
+  assert.equal(unlinked.data.flags, 64);
+  assert.match(unlinked.data.content, /account\/$/);
+  const hidden = await handleInteraction({ ...command, user: { id: '123' } }, {
+    ...profileDeps, findLinkedProfile: async () => ({ nickname: 'traveler', is_public: false }),
+  }) as any;
+  assert.equal(hidden.data.flags, 64);
+  assert.match(hidden.data.content, /profile\/$/);
+  const missing = await handleInteraction({
+    ...command, data: { name: 'профиль', options: [{ name: 'ник', value: 'missing' }] },
+  }, profileDeps) as any;
+  assert.equal(missing.data.flags, 64);
+  assert.match(missing.data.content, /не найден или скрыт/);
+  const failed = await handleInteraction({
+    ...command, data: { name: 'профиль', options: [{ name: 'ник', value: 'traveler' }] },
+  }, { ...profileDeps, loadProfile: async () => { throw new Error('offline'); } });
+  assert.deepEqual(failed, { type: 4, data: {
+    content: 'Профиль временно недоступен, попробуйте позже', flags: 64,
+  } });
+  assert.equal((await handleInteraction({
+    type: 2, data: { name: 'гайд', options: [{ name: 'персонаж', value: 'aino' }] },
+  }, profileDeps) as any).data.embeds[0].title, 'Айно — гайд');
+});
+
+test('отменяет зависший основной запрос профиля по дедлайну', async () => {
+  let signal: AbortSignal | undefined;
+  const started = Date.now();
+  const result = await handleInteraction({
+    type: 2, data: { name: 'профиль', options: [{ name: 'ник', value: 'traveler' }] },
+  }, {
+    ...deps,
+    loadProfile: async (_nickname, requestSignal) => {
+      signal = requestSignal;
+      return new Promise<PublicProfileCard | null>(() => {});
+    },
+  });
+  assert.deepEqual(result, { type: 4, data: {
+    content: 'Профиль временно недоступен, попробуйте позже', flags: 64,
+  } });
+  assert.equal(signal?.aborted, true);
+  assert.ok(Date.now() - started < 2_500);
 });

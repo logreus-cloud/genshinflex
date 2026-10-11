@@ -12,6 +12,8 @@ import type { AccountClient } from './lib/accounts.ts';
 import type { Env } from './lib/env.ts';
 import { createBuildsLoader, handleInteraction, verifyDiscordRequest } from './lib/discord.ts';
 import type { DiscordBuild, DiscordInteraction } from './lib/discord.ts';
+import { loadDiscordProfile } from './lib/discord-profile.ts';
+import type { PublicProfileCard } from './lib/discord-profile.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
@@ -24,7 +26,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.13.0';
+const version = '0.14.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -33,6 +35,8 @@ type ApiEnv = {
     adminClient: (c: ApiContext) => ServiceClient | Response;
     claims: typeof claimsFromToken;
     discordBuilds: (url: string) => Promise<DiscordBuild[]>;
+    discordProfile: (nickname: string, env: Env, signal: AbortSignal, auxiliaryDeadline: number) => Promise<PublicProfileCard | null>;
+    discordLinkedProfile: (discordId: string, env: Env, signal: AbortSignal) => Promise<{ nickname: string; is_public: boolean } | null>;
   };
 };
 type ApiContext = Context<ApiEnv>;
@@ -104,6 +108,28 @@ function loadDiscordBuilds(url: string): Promise<DiscordBuild[]> {
   return loader();
 }
 
+function loadDiscordPublicProfile(
+  nickname: string, env: Env, signal: AbortSignal, auxiliaryDeadline: number,
+): Promise<PublicProfileCard | null> {
+  const anonKey = (env as Env & { SUPABASE_ANON_KEY?: string }).SUPABASE_ANON_KEY;
+  if (!env.SUPABASE_URL || !anonKey) throw new Error('Нет публичного клиента Supabase');
+  const client = createClient(env.SUPABASE_URL, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return loadDiscordProfile(client, nickname, 'https://genshinflex.com', fetch, signal, auxiliaryDeadline);
+}
+
+async function findDiscordLinkedProfile(discordId: string, env: Env, signal: AbortSignal) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Нет сервисного клиента Supabase');
+  const client = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await client.rpc('discord_profile', { p_discord_id: discordId }).abortSignal(signal);
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : null;
+  return row && typeof row.nickname === 'string' && typeof row.is_public === 'boolean' ? row : null;
+}
+
 app.use('*', async (c, next) => {
   if (c.req.path === '/discord/interactions') return next();
   const origin = c.req.header('Origin');
@@ -140,6 +166,8 @@ app.post('/discord/interactions', async (c) => {
   const url = c.env.DISCORD_DATA_URL || 'https://genshinflex.com/data/discord-builds.json';
   return c.json(await handleInteraction(interaction, {
     loadBuilds: () => c.get('discordBuilds')(url), site: 'https://genshinflex.com',
+    loadProfile: (nickname, signal, deadline) => c.get('discordProfile')(nickname, c.env, signal, deadline),
+    findLinkedProfile: (discordId, signal) => c.get('discordLinkedProfile')(discordId, c.env, signal),
   }));
 });
 
@@ -459,6 +487,8 @@ export function createApp(deps: AppDeps = {}) {
     c.set('adminClient', deps.adminClient || defaultClient);
     c.set('claims', deps.claims || claimsFromToken);
     c.set('discordBuilds', deps.discordBuilds || loadDiscordBuilds);
+    c.set('discordProfile', deps.discordProfile || loadDiscordPublicProfile);
+    c.set('discordLinkedProfile', deps.discordLinkedProfile || findDiscordLinkedProfile);
     return next();
   });
   instance.route('/', app);

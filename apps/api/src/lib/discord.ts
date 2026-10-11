@@ -1,3 +1,5 @@
+import type { PublicProfileCard } from './discord-profile.ts';
+
 export type DiscordBuild = {
   s: string; n: string; e?: string; el?: string; r?: number; i?: string; url: string;
   role?: string; patch?: string; updated?: string;
@@ -15,7 +17,7 @@ export type DiscordInteraction = {
   user?: { id: string };
 };
 
-const colors: Record<string, number> = {
+export const colors: Record<string, number> = {
   pyro: 0xEF7938,
   hydro: 0x4CC2F1,
   anemo: 0x74C2A8,
@@ -48,22 +50,14 @@ const length = (value: string) => Array.from(value).length;
 const clip = (value: string, limit: number) => limit <= 0 ? '' : length(value) <= limit ? value : `${Array.from(value).slice(0, limit - 1).join('')}…`;
 const unknownCommand = { type: 4, data: { content: 'Неизвестная команда', flags: 64 } };
 const unavailable = { type: 4, data: { content: 'Гайды временно недоступны, попробуйте позже', flags: 64 } };
+const profileUnavailable = { type: 4, data: { content: 'Профиль временно недоступен, попробуйте позже', flags: 64 } };
 
-function buildEmbed(build: DiscordBuild, site: string) {
-  const url = `${site}${build.url}`;
-  const title = clip(`${build.n} — гайд`, 256);
-  const footer = clip(build.patch ? `GenshinFlex · патч ${build.patch}` : 'GenshinFlex', 2048);
-  let description = build.role ? clip(build.role, 4096) : '';
-  const fields: { name: string; value: string; inline: false }[] = [];
-  const add = (name: string, value: string) => {
-    if (value) fields.push({ name, value: clip(value, 1024), inline: false });
-  };
-  if (build.weapons?.length) add('Оружие', build.weapons.slice(0, 5).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
-  if (build.artifacts?.length) add('Артефакты', build.artifacts.slice(0, 4).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
-  if (build.mainStats) add('Основные статы', `Пески: ${build.mainStats.sands}\nКубок: ${build.mainStats.goblet}\nКорона: ${build.mainStats.circlet}`);
-  if (build.substats?.length) add('Доп. статы', build.substats.join(' > '));
-  if (build.teams?.length) add('Команды', build.teams.slice(0, 3).map((team) => `**${team.name}**: ${team.members.join(', ')}`).join('\n'));
-  const size = () => length(title) + length(description) + length(footer)
+function fitEmbed(
+  title: string, initialDescription: string, footer: string,
+  fields: { name: string; value: string; inline: boolean }[], author = '',
+) {
+  let description = initialDescription;
+  const size = () => length(author) + length(title) + length(description) + length(footer)
     + fields.reduce((total, field) => total + length(field.name) + length(field.value), 0);
   let excess = size() - 6000;
   if (excess > 0 && description) {
@@ -76,6 +70,24 @@ function buildEmbed(build: DiscordBuild, site: string) {
     if (!field.value) fields.splice(i, 1);
     excess = size() - 6000;
   }
+  return description;
+}
+
+function buildEmbed(build: DiscordBuild, site: string) {
+  const url = `${site}${build.url}`;
+  const title = clip(`${build.n} — гайд`, 256);
+  const footer = clip(build.patch ? `GenshinFlex · патч ${build.patch}` : 'GenshinFlex', 2048);
+  const initialDescription = build.role ? clip(build.role, 4096) : '';
+  const fields: { name: string; value: string; inline: false }[] = [];
+  const add = (name: string, value: string) => {
+    if (value) fields.push({ name, value: clip(value, 1024), inline: false });
+  };
+  if (build.weapons?.length) add('Оружие', build.weapons.slice(0, 5).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
+  if (build.artifacts?.length) add('Артефакты', build.artifacts.slice(0, 4).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
+  if (build.mainStats) add('Основные статы', `Пески: ${build.mainStats.sands}\nКубок: ${build.mainStats.goblet}\nКорона: ${build.mainStats.circlet}`);
+  if (build.substats?.length) add('Доп. статы', build.substats.join(' > '));
+  if (build.teams?.length) add('Команды', build.teams.slice(0, 3).map((team) => `**${team.name}**: ${team.members.join(', ')}`).join('\n'));
+  const description = fitEmbed(title, initialDescription, footer, fields);
   return {
     title,
     url, color: (build.el && Object.hasOwn(colors, build.el) ? colors[build.el] : undefined) ?? 0x5865F2,
@@ -86,10 +98,95 @@ function buildEmbed(build: DiscordBuild, site: string) {
   };
 }
 
+function profileEmbed(profile: PublicProfileCard, site: string) {
+  const url = `${site}/u/${encodeURIComponent(profile.nickname)}/`;
+  const author = clip(profile.name, 256);
+  const title = clip(`@${profile.nickname}`, 256);
+  const date = profile.createdAt ? new Date(profile.createdAt) : null;
+  const footer = date && !Number.isNaN(date.getTime())
+    ? `На GenshinFlex с ${date.toLocaleDateString('ru', { month: 'long', year: 'numeric' })}` : 'GenshinFlex';
+  const fields: { name: string; value: string; inline: true }[] = [];
+  const add = (name: string, value: string | undefined) => {
+    if (value) fields.push({ name, value: clip(value, 1024), inline: true });
+  };
+  add('Титул', profile.title);
+  add('Гильдия', profile.guild);
+  if (profile.forum) add('Рейтинг форума',
+    `${profile.forum.points} очк.${profile.forum.place ? ` · #${profile.forum.place}` : ''}`);
+  if (profile.followers !== undefined) add('Подписчики', String(profile.followers));
+  if (profile.listsHidden !== true && profile.friends !== undefined) add('Друзья', String(profile.friends));
+  add('UID', profile.uid);
+  fitEmbed(title, '', footer, fields, author);
+  return {
+    author: { name: author, ...(profile.avatar ? { icon_url: profile.avatar } : {}) },
+    title, url, color: profile.color,
+    ...(profile.avatar ? { thumbnail: { url: profile.avatar } } : {}),
+    ...(fields.length ? { fields } : {}),
+    footer: { text: footer },
+  };
+}
+
+type InteractionDeps = {
+  loadBuilds(): Promise<DiscordBuild[]>;
+  site: string;
+  loadProfile?(nickname: string, signal: AbortSignal, auxiliaryDeadline: number): Promise<PublicProfileCard | null>;
+  findLinkedProfile?(discordId: string, signal: AbortSignal): Promise<{ nickname: string; is_public: boolean } | null>;
+};
+
 export async function handleInteraction(
-  interaction: DiscordInteraction, deps: { loadBuilds(): Promise<DiscordBuild[]>; site: string },
+  interaction: DiscordInteraction, deps: InteractionDeps,
 ) {
   if (interaction.type === 1) return { type: 1 };
+  if (interaction.type === 2 && interaction.data?.name === 'профиль') {
+    const controller = new AbortController();
+    const auxiliaryDeadline = Date.now() + 1_600;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        (async () => {
+          if (!deps.loadProfile) throw new Error('Нет загрузчика профилей');
+          const option = interaction.data?.options?.find((item) => item.name === 'ник');
+          let nickname: string;
+          if (option && typeof option.value === 'string') {
+            nickname = option.value;
+          } else {
+            const discordId = interaction.member?.user?.id ?? interaction.user?.id;
+            if (!discordId || !deps.findLinkedProfile) throw new Error('Нет привязки Discord');
+            const linked = await deps.findLinkedProfile(discordId, controller.signal);
+            if (!linked) return { type: 4, data: {
+              content: `Discord не привязан к аккаунту GenshinFlex. Войдите на сайт через Discord или привяжите его в настройках: ${deps.site}/account/`,
+              flags: 64,
+            } };
+            if (!linked.is_public) return { type: 4, data: {
+              content: `Ваш профиль скрыт. Открыть его можно в настройках профиля: ${deps.site}/profile/`,
+              flags: 64,
+            } };
+            nickname = linked.nickname;
+          }
+          const profile = await deps.loadProfile(nickname, controller.signal, auxiliaryDeadline);
+          if (!profile) return { type: 4, data: {
+            content: `Профиль «${clip(nickname, 100)}» не найден или скрыт.`, flags: 64,
+          } };
+          const url = `${deps.site}/u/${encodeURIComponent(profile.nickname)}/`;
+          return { type: 4, data: {
+            embeds: [profileEmbed(profile, deps.site)],
+            components: [{ type: 1, components: [{ type: 2, style: 5, label: 'Открыть профиль', url }] }],
+          } };
+        })(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => {
+            controller.abort();
+            reject(new Error('Превышено время загрузки профиля'));
+          }, 1_800);
+        }),
+      ]);
+    } catch {
+      return profileUnavailable;
+    } finally {
+      if (timer) clearTimeout(timer);
+      controller.abort();
+    }
+  }
   if (interaction.type === 4 && interaction.data?.name === 'гайд') {
     const option = interaction.data.options?.find((item) => item.name === 'персонаж');
     const query = fold(option?.value || '');
