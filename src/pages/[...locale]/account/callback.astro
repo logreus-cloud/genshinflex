@@ -7,7 +7,8 @@ const { base, t } = useData(Astro.currentLocale);
 <Layout title={t('Подтверждение входа')} noindex>
   <div class="auth-page" id="callback" data-base={base}
     data-loading={t('Подтверждаем вход…')} data-done={t('Почта подтверждена.')}
-    data-error={t('Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.')}>
+    data-error={t('Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.')}
+    data-identity-taken={t('Этот аккаунт Discord или Google уже привязан к другому аккаунту GenshinFlex. Войдите в тот аккаунт и отвяжите его там или удалите тот аккаунт.')}>
     <h1>{t('Подтверждение входа')}</h1>
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite">{t('Подтверждаем вход…')}</p>
@@ -34,6 +35,11 @@ const { base, t } = useData(Astro.currentLocale);
     };
     if (query.has('error') || query.has('error_description') || hash.has('error') || hash.has('error_description')) {
       failed();
+      // Привязка Discord/Google, который уже принадлежит другому аккаунту
+      if ((query.get('error_code') || hash.get('error_code')) === 'identity_already_exists') {
+        status.textContent = root.dataset.identityTaken || '';
+        login.href = `${base}/account/`;
+      }
       return;
     }
     const auth = getSupabase().auth;

@@ -12,7 +12,8 @@ const { base, t } = useData(Astro.currentLocale);
     data-delete-error={t('Не удалось удалить аккаунт. Попробуйте позже.')}
     data-reauth={t('Для удаления войдите заново.')}
     data-session-changed={t('Сессия изменилась. Проверьте данные аккаунта и повторите действие.')}
-    data-delete-word={t('УДАЛИТЬ')}>
+    data-delete-word={t('УДАЛИТЬ')}
+    data-link-error={t('Не удалось изменить способы входа. Попробуйте позже.')}>
     <h1>{t('Аккаунт')}</h1>
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite"></p>
@@ -21,6 +22,14 @@ const { base, t } = useData(Astro.currentLocale);
         <p><strong>{t('Отображаемое имя')}:</strong> <span data-field="display_name">—</span></p>
         <p><strong>{t('Email')}:</strong> <span data-field="email">—</span></p>
         <p><strong>{t('Способы входа')}:</strong> <span data-field="providers">—</span></p>
+        <div class="auth-actions" id="identities">
+          <button class="btn" type="button" data-link="discord" hidden>{t('Привязать Discord')}</button>
+          <button class="btn" type="button" data-link="google" hidden>{t('Привязать Google')}</button>
+          <button class="btn" type="button" data-unlink="discord" hidden>{t('Отвязать Discord')}</button>
+          <button class="btn" type="button" data-unlink="google" hidden>{t('Отвязать Google')}</button>
+        </div>
+        <p class="muted small">{t('Discord и Google можно привязать только к одному аккаунту GenshinFlex. Последний способ входа отвязать нельзя.')}</p>
+        <p class="status small" id="identity-status" aria-live="polite"></p>
         <p class="muted">{t('Профиль и синхронизация — скоро.')}</p>
         <div class="auth-actions">
           <a class="btn" data-page="reset" href={`${base}/account/reset/`} hidden>{t('Сменить пароль')}</a>
@@ -111,6 +120,13 @@ const { base, t } = useData(Astro.currentLocale);
         const reset = root.querySelector<HTMLAnchorElement>('[data-page="reset"]')!;
         reset.href = authUrl(base, 'reset');
         reset.hidden = !providers.has('email');
+        const identities = user.identities || [];
+        for (const button of root.querySelectorAll<HTMLButtonElement>('[data-link]')) {
+          button.hidden = providers.has(button.dataset.link!);
+        }
+        for (const button of root.querySelectorAll<HTMLButtonElement>('[data-unlink]')) {
+          button.hidden = identities.length < 2 || !identities.some((identity) => identity.provider === button.dataset.unlink);
+        }
         loadedUserId = user.id;
         details.forEach((detail) => { detail.hidden = false; });
       } catch {
@@ -149,6 +165,46 @@ const { base, t } = useData(Astro.currentLocale);
       const { data } = await getSupabase().auth.getSession();
       return loadedUserId === userId && data.session?.user.id === userId;
     };
+    const identityStatus = root.querySelector<HTMLElement>('#identity-status')!;
+    const identityError = () => {
+      identityStatus.textContent = root.dataset.linkError || '';
+      identityStatus.className = 'status small bad';
+    };
+    // Привязка уходит на страницу провайдера и возвращается через /account/callback/ обратно сюда
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-link]')) {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        identityStatus.textContent = '';
+        try {
+          const callback = new URL(authUrl(base, 'callback', `${base}/account/`), location.origin).toString();
+          const { error } = await getSupabase().auth.linkIdentity({
+            provider: button.dataset.link as 'discord' | 'google',
+            options: { redirectTo: callback },
+          });
+          if (error) identityError();
+        } catch { identityError(); }
+        finally { button.disabled = false; }
+      });
+    }
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-unlink]')) {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        identityStatus.textContent = '';
+        try {
+          const auth = getSupabase().auth;
+          const { data, error } = await auth.getUserIdentities();
+          if (error) throw error;
+          const identity = data.identities.find((item) => item.provider === button.dataset.unlink);
+          if (!identity || data.identities.length < 2) throw new Error('identity');
+          const { error: unlinkError } = await auth.unlinkIdentity(identity);
+          if (unlinkError) throw unlinkError;
+          await auth.refreshSession();
+          notifySessionChanged();
+          await load();
+        } catch { identityError(); }
+        finally { button.disabled = false; }
+      });
+    }
     root.querySelector<HTMLButtonElement>('#export-data')!.addEventListener('click', async (event) => {
       const button = event.currentTarget as HTMLButtonElement;
       button.disabled = true;

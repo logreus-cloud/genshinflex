@@ -5782,5 +5782,33 @@
  "Вступить на сервер": {
   "en": "Join the server",
   "es": "Unirse al servidor"
+ },
+ "Не удалось изменить способы входа. Попробуйте позже.": {
+  "en": "Couldn't change sign-in methods. Try again later.",
+  "es": "No se pudieron cambiar los métodos de inicio de sesión. Inténtalo más tarde."
+ },
+ "Привязать Discord": {
+  "en": "Link Discord",
+  "es": "Vincular Discord"
+ },
+ "Привязать Google": {
+  "en": "Link Google",
+  "es": "Vincular Google"
+ },
+ "Отвязать Discord": {
+  "en": "Unlink Discord",
+  "es": "Desvincular Discord"
+ },
+ "Отвязать Google": {
+  "en": "Unlink Google",
+  "es": "Desvincular Google"
+ },
+ "Discord и Google можно привязать только к одному аккаунту GenshinFlex. Последний способ входа отвязать нельзя.": {
+  "en": "A Discord or Google account can be linked to only one GenshinFlex account. You can't unlink your last sign-in method.",
+  "es": "Una cuenta de Discord o Google solo puede vincularse a una cuenta de GenshinFlex. No puedes desvincular tu último método de inicio de sesión."
+ },
+ "Этот аккаунт Discord или Google уже привязан к другому аккаунту GenshinFlex. Войдите в тот аккаунт и отвяжите его там или удалите тот аккаунт.": {
+  "en": "This Discord or Google account is already linked to another GenshinFlex account. Sign in to that account and unlink it there, or delete that account.",
+  "es": "Esta cuenta de Discord o Google ya está vinculada a otra cuenta de GenshinFlex. Inicia sesión en esa cuenta y desvincúlala allí, o elimina esa cuenta."
  }
 }
