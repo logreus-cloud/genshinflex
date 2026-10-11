@@ -49,6 +49,7 @@ export function fakeClient() {
   };
   const client = {
     from,
+    rpc: async () => ({ data: 'ok', error: null }),
     storage: {
       from: () => ({
         list: async () => ({ data: [], error: null }),
@@ -72,7 +73,13 @@ export function fakeClient() {
           error: null,
         }),
         createUser: async () => ({ data: { user: { id: telegramUserId } }, error: null }),
-        generateLink: async () => ({ data: { properties: { hashed_token: 'fake-token-hash' } }, error: null }),
+        generateLink: async (value: { email: string }) => ({
+          data: {
+            user: { id: value.email === 'tg12345@telegram.genshinflex.com' ? telegramUserId : userId },
+            properties: { hashed_token: 'fake-token-hash' },
+          },
+          error: null,
+        }),
         listUsers: async () => ({ data: { users: [] }, error: null }),
         deleteUser: async (id: string) => {
           deleted.push(id);

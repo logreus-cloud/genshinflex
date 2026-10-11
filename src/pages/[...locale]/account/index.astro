@@ -253,6 +253,7 @@ const { base, t } = useData(Astro.currentLocale);
           if (userData.user.app_metadata?.telegram_id) providers.add('telegram');
           const identity = data.identities.find((item) => item.provider === button.dataset.unlink);
           if (!identity || ![...providers].some((provider) => provider !== identity.provider)) throw new Error('identity');
+          if (!await sameUser(expected)) { refreshAccount(); return; }
           const { error: unlinkError } = await auth.unlinkIdentity(identity);
           if (unlinkError) throw unlinkError;
           await auth.refreshSession();

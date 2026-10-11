@@ -57,7 +57,7 @@ const profileUrl = `${base}/profile/`;
         } catch { /* При сбое запроса показываем email. */ }
         if (signal.aborted || turn !== request) return;
         name.textContent = nickname || user.email || '';
-        const synthetic = /^tg\d+@telegram\.genshinflex\.com$/i.test(user.email || '');
+        const synthetic = /^tg\d+(-\d+)?@telegram\.genshinflex\.com$/i.test(user.email || '');
         email.textContent = synthetic
           ? `${root.dataset.telegram} @${user.user_metadata?.telegram_username || user.app_metadata?.telegram_id || ''}`
           : user.email || '';

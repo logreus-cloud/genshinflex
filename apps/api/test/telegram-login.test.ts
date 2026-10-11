@@ -13,8 +13,9 @@ function fakeClient() {
       assert.equal(table, 'telegram_accounts');
       return {
         select() {
-          return { eq(_key: string, id: string) {
-            return { async maybeSingle() { return { data: links.get(id) || null, error: null }; } };
+          return { eq(key: string, id: string) {
+            const link = key === 'telegram_id' ? links.get(id) : [...links.values()].find((row) => row.user_id === id);
+            return { async maybeSingle() { return { data: link || null, error: null }; } };
           } };
         },
         async insert(value: { telegram_id: string; user_id: string; username: string | null }) {
@@ -45,8 +46,16 @@ function fakeClient() {
         return { data: { user }, error: null };
       },
       async getUserById(id: string) { return { data: { user: users.get(id) }, error: null }; },
-      async generateLink() { return { data: { properties: { hashed_token: 'token-hash' } }, error: null }; },
+      async generateLink(value: { email: string }) {
+        const user = [...users.values()].find((entry) => entry.email === value.email);
+        return { data: { user, properties: { hashed_token: 'token-hash' } }, error: null };
+      },
       async listUsers() { return { data: { users: [...users.values()] }, error: null }; },
+      async updateUserById(id: string, value: { email: string; email_confirm: boolean }) {
+        const user = users.get(id)!;
+        user.email = value.email;
+        return { data: { user }, error: null };
+      },
     } },
   };
   return { client, links, users, get creates() { return creates; }, setRace() { race = true; } };
@@ -82,6 +91,7 @@ test('не привязывает чужой аккаунт с синтетич�
   fake.users.set('foreign', {
     id: 'foreign', email: 'tg12345@telegram.genshinflex.com', app_metadata: {},
   });
+  fake.links.set('999', { user_id: 'foreign', username: null });
   await assert.rejects(telegramLogin(fake.client as never, { id: '12345' }),
     (error: unknown) => (error as { status?: number }).status === 409);
   assert.equal(fake.links.has('12345'), false);
@@ -119,49 +129,35 @@ type Account = {
 
 function linkClient(accounts: Account[], rows: { telegram_id: string; user_id: string }[] = []) {
   const users = new Map(accounts.map((account) => [account.id, account]));
-  let failUpdate = false;
+  let failRpc = false;
+  const calls: { name: string; args: { p_user: string; p_telegram?: string; p_username?: string | null } }[] = [];
   const client = {
-    from(table: string) {
-      assert.equal(table, 'telegram_accounts');
-      const find = (key: string, value: string) => rows.find((row) => String(row[key as 'user_id']) === value) || null;
-      return {
-        select() {
-          return { eq(key: string, value: string) {
-            return { async maybeSingle() { return { data: find(key, value), error: null }; } };
-          } };
-        },
-        async insert(value: { telegram_id: string; user_id: string }) {
-          if (find('telegram_id', value.telegram_id) || find('user_id', value.user_id)) return { error: { code: '23505' } };
-          rows.push({ telegram_id: value.telegram_id, user_id: value.user_id });
-          return { error: null };
-        },
-        update() {
-          return { eq() { return Promise.resolve({ error: null }); } };
-        },
-        delete() {
-          return { eq(key: string, value: string) {
-            const index = rows.findIndex((row) => String(row[key as 'user_id']) === value);
-            if (index >= 0) rows.splice(index, 1);
-            return Promise.resolve({ error: null });
-          } };
-        },
-      };
+    async rpc(name: string, args: { p_user: string; p_telegram?: string; p_username?: string | null }) {
+      calls.push({ name, args });
+      if (failRpc) return { data: null, error: { message: 'boom' } };
+      const user = users.get(args.p_user)!;
+      if (name === 'telegram_link') {
+        const owner = rows.find((row) => row.telegram_id === args.p_telegram);
+        if (owner && owner.user_id !== args.p_user) return { data: 'telegram_taken', error: null };
+        const linked = rows.find((row) => row.user_id === args.p_user);
+        if (linked && linked.telegram_id !== args.p_telegram) return { data: 'telegram_already_linked', error: null };
+        if (!linked) rows.push({ telegram_id: args.p_telegram!, user_id: args.p_user });
+        user.app_metadata.telegram_id = args.p_telegram;
+        if (args.p_username !== null && args.p_username !== undefined) user.user_metadata.telegram_username = args.p_username;
+        return { data: 'ok', error: null };
+      }
+      assert.equal(name, 'telegram_unlink');
+      if (/^tg\d+(-\d+)?@telegram\.genshinflex\.com$/i.test(user.email)
+        && !user.identities.some((identity) => identity.provider !== 'email')) {
+        return { data: 'last_method', error: null };
+      }
+      const index = rows.findIndex((row) => row.user_id === args.p_user);
+      if (index >= 0) rows.splice(index, 1);
+      delete user.app_metadata.telegram_id;
+      return { data: 'ok', error: null };
     },
-    auth: { admin: {
-      async getUserById(id: string) { return { data: { user: users.get(id) || null }, error: null }; },
-      async updateUserById(id: string, value: { app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> }) {
-        if (failUpdate) return { data: { user: null }, error: { message: 'boom' } };
-        const user = users.get(id)!;
-        if (value.app_metadata) {
-          user.app_metadata = { ...user.app_metadata, ...value.app_metadata };
-          for (const [key, item] of Object.entries(user.app_metadata)) if (item === null) delete user.app_metadata[key];
-        }
-        if (value.user_metadata) user.user_metadata = value.user_metadata;
-        return { data: { user }, error: null };
-      },
-    } },
   };
-  return { client: client as never, rows, users, failUpdate() { failUpdate = true; } };
+  return { client: client as never, rows, users, calls, failRpc() { failRpc = true; } };
 }
 
 const account = (id: string, email = `${id}@example.com`, providers = ['email']): Account => ({
@@ -174,6 +170,7 @@ const conflict = (code: string) => (error: unknown) =>
 test('привязывает свободный Telegram и сохраняет прочие метаданные', async () => {
   const fake = linkClient([account('main')]);
   await linkTelegram(fake.client, 'main', { id: '777', username: 'paimon' });
+  assert.deepEqual(fake.calls[0], { name: 'telegram_link', args: { p_user: 'main', p_telegram: '777', p_username: 'paimon' } });
   assert.deepEqual(fake.rows, [{ telegram_id: '777', user_id: 'main' }]);
   assert.deepEqual(fake.users.get('main')!.app_metadata, { provider: 'email', roles: ['x'], telegram_id: '777' });
   assert.equal(fake.users.get('main')!.user_metadata.telegram_username, 'paimon');
@@ -190,9 +187,9 @@ test('не привязывает чужой или второй Telegram', asyn
   assert.equal(fake.users.get('main')!.app_metadata.telegram_id, undefined);
 });
 
-test('откатывает привязку, если не удалось обновить пользователя', async () => {
+test('передаёт ошибку RPC без изменения привязки', async () => {
   const fake = linkClient([account('main')]);
-  fake.failUpdate();
+  fake.failRpc();
   await assert.rejects(linkTelegram(fake.client, 'main', { id: '777' }));
   assert.deepEqual(fake.rows, []);
 });
@@ -215,4 +212,27 @@ test('не отвязывает Telegram, если это единственны
   assert.equal(fake.rows.length, 2);
   await unlinkTelegram(fake.client, 'both');
   assert.deepEqual(fake.rows, [{ telegram_id: '777', user_id: 'tg' }]);
+});
+
+test('создаёт новый аккаунт после отвязки Telegram', async () => {
+  const fake = fakeClient();
+  fake.users.set('old', {
+    id: 'old', email: 'tg12345@telegram.genshinflex.com', app_metadata: {},
+  });
+  assert.equal(await telegramLogin(fake.client as never, { id: '12345' }), 'token-hash');
+  assert.match(fake.users.get('old')!.email, /^tg12345-\d+@telegram\.genshinflex\.com$/);
+  assert.equal(fake.creates, 1);
+  assert.equal(fake.links.get('12345')?.user_id, 'user-1');
+});
+
+test('не отдаёт ссылку, если почта уже принадлежит другому аккаунту', async () => {
+  const fake = fakeClient();
+  await telegramLogin(fake.client as never, { id: '12345' });
+  const original = fake.client.auth.admin.generateLink;
+  fake.client.auth.admin.generateLink = (async () => ({
+    data: { user: { id: 'someone-else' }, properties: { hashed_token: 'token-hash' } }, error: null,
+  })) as never;
+  await assert.rejects(telegramLogin(fake.client as never, { id: '12345' }),
+    (error: unknown) => (error as { status?: number }).status === 409);
+  fake.client.auth.admin.generateLink = original;
 });

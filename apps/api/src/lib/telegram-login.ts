@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 type AdminClient = {
   from: SupabaseClient['from'];
+  rpc: SupabaseClient['rpc'];
   auth: { admin: Pick<SupabaseClient['auth']['admin'], 'getUserById' | 'createUser' | 'generateLink' | 'listUsers' | 'updateUserById'> };
 };
 
@@ -18,6 +19,13 @@ async function linkedUser(client: AdminClient, telegramId: string) {
     .select('user_id').eq('telegram_id', telegramId).maybeSingle();
   if (error) throw error;
   return data?.user_id as string | undefined;
+}
+
+async function linkedTelegram(client: AdminClient, userId: string) {
+  const { data, error } = await client.from('telegram_accounts')
+    .select('telegram_id').eq('user_id', userId).maybeSingle();
+  if (error) throw error;
+  return data ? String(data.telegram_id) : undefined;
 }
 
 async function userByEmail(client: AdminClient, email: string) {
@@ -40,66 +48,21 @@ function accountConflict(code?: string) {
   return Object.assign(new Error('Account conflict'), { status: 409, ...(code ? { code } : {}) });
 }
 
-const syntheticEmail = /^tg\d+@telegram\.genshinflex\.com$/i;
-
-async function linkedTelegram(client: AdminClient, userId: string) {
-  const { data, error } = await client.from('telegram_accounts')
-    .select('telegram_id').eq('user_id', userId).maybeSingle();
-  if (error) throw error;
-  return data ? String(data.telegram_id) : undefined;
-}
-
 // Привязка Telegram к уже существующему аккаунту: дальше вход через Telegram выдаёт ссылку на его почту
 export async function linkTelegram(client: AdminClient, userId: string, telegram: TelegramUser) {
-  const owner = await linkedUser(client, telegram.id);
-  if (owner && owner !== userId) throw accountConflict('telegram_taken');
-  if (!owner) {
-    if (await linkedTelegram(client, userId)) throw accountConflict('telegram_already_linked');
-    const { error } = await client.from('telegram_accounts')
-      .insert({ telegram_id: telegram.id, user_id: userId, username: telegram.username || null });
-    if (error) {
-      if (error.code !== '23505') throw error;
-      const linked = await linkedUser(client, telegram.id);
-      throw accountConflict(linked && linked !== userId ? 'telegram_taken' : 'telegram_already_linked');
-    }
-  }
-
-  try {
-    const { data, error } = await client.auth.admin.getUserById(userId);
-    if (error || !data.user) throw error || new Error('User missing');
-    const { error: updateError } = await client.auth.admin.updateUserById(userId, {
-      app_metadata: { ...data.user.app_metadata, telegram_id: telegram.id },
-      ...(telegram.username
-        ? { user_metadata: { ...data.user.user_metadata, telegram_username: telegram.username } } : {}),
-    });
-    if (updateError) throw updateError;
-  } catch (error) {
-    if (!owner) await client.from('telegram_accounts').delete().eq('telegram_id', telegram.id);
-    throw error;
-  }
-
-  if (owner) {
-    const { error } = await client.from('telegram_accounts')
-      .update({ username: telegram.username || null, updated_at: new Date().toISOString() })
-      .eq('telegram_id', telegram.id);
-    if (error) throw error;
-  }
+  const { data, error } = await client.rpc('telegram_link', {
+    p_user: userId, p_telegram: telegram.id, p_username: telegram.username || null,
+  });
+  if (error) throw error;
+  if (data === 'telegram_taken' || data === 'telegram_already_linked') throw accountConflict(data);
+  if (data !== 'ok') throw new Error('Telegram link failed');
 }
 
 export async function unlinkTelegram(client: AdminClient, userId: string) {
-  const { data, error } = await client.auth.admin.getUserById(userId);
-  if (error || !data.user) throw error || new Error('User missing');
-  const other = (data.user.identities || []).some((identity) => identity.provider !== 'email');
-  if (syntheticEmail.test(data.user.email || '') && !other) throw accountConflict('last_method');
-
-  const { error: deleteError } = await client.from('telegram_accounts').delete().eq('user_id', userId);
-  if (deleteError) throw deleteError;
-  if (data.user.app_metadata?.telegram_id === undefined) return;
-  // GoTrue удаляет из app_metadata ключи со значением null
-  const { error: updateError } = await client.auth.admin.updateUserById(userId, {
-    app_metadata: { telegram_id: null },
-  });
-  if (updateError) throw updateError;
+  const { data, error } = await client.rpc('telegram_unlink', { p_user: userId });
+  if (error) throw error;
+  if (data === 'last_method') throw accountConflict(data);
+  if (data !== 'ok') throw new Error('Telegram unlink failed');
 }
 
 export async function telegramLogin(client: AdminClient, telegram: TelegramUser, lang?: string) {
@@ -108,7 +71,7 @@ export async function telegramLogin(client: AdminClient, telegram: TelegramUser,
 
   if (!userId) {
     const displayName = [telegram.first_name, telegram.last_name].filter(Boolean).join(' ').trim();
-    const { data, error } = await client.auth.admin.createUser({
+    const input = {
       email,
       email_confirm: true,
       user_metadata: {
@@ -118,16 +81,27 @@ export async function telegramLogin(client: AdminClient, telegram: TelegramUser,
         avatar_url: telegram.photo_url,
       },
       app_metadata: { telegram_id: telegram.id },
-    });
+    };
+    const { data, error } = await client.auth.admin.createUser(input);
     if (error) {
       if (!emailConflict(error)) throw error;
       userId = await linkedUser(client, telegram.id);
       if (!userId) {
         const existing = await userByEmail(client, email);
-        if (!existing || String(existing.app_metadata?.telegram_id) !== telegram.id) throw accountConflict();
-        userId = existing.id;
+        if (!existing) throw accountConflict();
+        if (String(existing.app_metadata?.telegram_id) === telegram.id) {
+          userId = existing.id;
+        } else {
+          if (existing.app_metadata?.telegram_id || await linkedTelegram(client, existing.id)) throw accountConflict();
+          const { error: updateError } = await client.auth.admin.updateUserById(existing.id, {
+            email: `tg${telegram.id}-${Date.now()}@telegram.genshinflex.com`, email_confirm: true,
+          });
+          if (updateError) throw updateError;
+          const { data: retry, error: retryError } = await client.auth.admin.createUser(input);
+          if (retryError) throw retryError;
+          userId = retry.user?.id;
+        }
       }
-      if (!userId) throw error;
     } else {
       userId = data.user?.id;
     }
@@ -156,5 +130,7 @@ export async function telegramLogin(client: AdminClient, telegram: TelegramUser,
     email: userData.user.email,
   });
   if (linkError || !link.properties?.hashed_token) throw linkError || new Error('Telegram token missing');
+  // Почта могла перейти к другому аккаунту, пока шёл вход: ссылку на чужой аккаунт не отдаём
+  if (link.user?.id !== userId) throw accountConflict();
   return link.properties.hashed_token;
 }
