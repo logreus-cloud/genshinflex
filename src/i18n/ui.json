@@ -5930,5 +5930,29 @@
  "Мы не можем гарантировать позицию HoYoverse по сторонним программам, но приложение работает так же, как популярные трекеры круток.": {
   "en": "We cannot guarantee HoYoverse’s position on third-party software, but the app works like popular wish trackers.",
   "es": "No podemos garantizar la postura de HoYoverse sobre programas de terceros, pero la aplicación funciona como los rastreadores de deseos populares."
+ },
+ "Загрузка обновления… приложение перезапустится": {
+  "en": "Downloading the update… the app will restart",
+  "es": "Descargando la actualización… la aplicación se reiniciará"
+ },
+ "Загрузка…": {
+  "en": "Downloading…",
+  "es": "Descargando…"
+ },
+ "Не удалось обновить": {
+  "en": "Update failed",
+  "es": "No se pudo actualizar"
+ },
+ "Повторить": {
+  "en": "Retry",
+  "es": "Reintentar"
+ },
+ "Скрыть до перезапуска": {
+  "en": "Hide until restart",
+  "es": "Ocultar hasta reiniciar"
+ },
+ "Доступна версия {version}": {
+  "en": "Version {version} is available",
+  "es": "La versión {version} está disponible"
  }
 }

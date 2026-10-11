@@ -27,6 +27,11 @@ const { title, active, guideHref } = Astro.props;
       </a>
     </header>
     <main class="ov-main"><slot /></main>
+    <div class="ov-update" role="status" transition:persist hidden>
+      <span data-update-message></span>
+      <button type="button" data-update-install>{t('Обновить')}</button>
+      <button type="button" class="ov-update-dismiss" data-update-dismiss aria-label={t('Скрыть до перезапуска')} title={t('Скрыть до перезапуска')}>×</button>
+    </div>
     <nav class="ov-tabs" aria-label={t('Навигация')}>
       <a class="ov-tab" href={`${base}/overlay/`} aria-current={active === 'search' ? 'page' : undefined}>{t('Поиск')}</a>
       <a class="ov-tab" data-guide-tab href={guideHref} aria-disabled={!guideHref ? 'true' : undefined} aria-current={active === 'guide' ? 'page' : undefined}>{t('Гайд')}</a>
@@ -74,6 +79,75 @@ const { title, active, guideHref } = Astro.props;
         void refresh();
         onSessionChange(() => void refresh(), { signal });
       });
+    </script>
+    <script>
+      import { t } from '../scripts/search';
+
+      if (window.__GF_OVERLAY_APP__) {
+        type Update = { state: 'available' | 'installing' | 'error'; version: string };
+        let update: Update | undefined;
+        let requested = false;
+        let observed: HTMLElement | undefined;
+        const observer = new ResizeObserver(() => syncToast());
+        const syncToast = () => {
+          const banner = document.querySelector<HTMLElement>('.ov-update');
+          document.body.style.setProperty('--ov-update-height', banner && !banner.hidden ? `${banner.offsetHeight + 8}px` : '0px');
+        };
+        const render = () => {
+          const banner = document.querySelector<HTMLElement>('.ov-update');
+          if (!banner) return;
+          if (observed !== banner) {
+            if (observed) observer.unobserve(observed);
+            observer.observe(banner);
+            observed = banner;
+          }
+          const message = banner.querySelector<HTMLElement>('[data-update-message]')!;
+          const install = banner.querySelector<HTMLButtonElement>('[data-update-install]')!;
+          const dismiss = banner.querySelector<HTMLButtonElement>('[data-update-dismiss]')!;
+          let dismissed = false;
+          try { dismissed = !!update && sessionStorage.getItem('gf:update-dismissed') === update.version; } catch {}
+          banner.hidden = !update || update.state === 'available' && dismissed;
+          if (!update) { syncToast(); return; }
+          message.textContent = update.state === 'available'
+            ? t('Доступна версия {version}', { version: update.version })
+            : update.state === 'installing'
+              ? t('Загрузка обновления… приложение перезапустится')
+              : t('Не удалось обновить');
+          install.hidden = update.state === 'installing';
+          install.disabled = requested;
+          install.textContent = requested ? t('Загрузка…') : update.state === 'error' ? t('Повторить') : t('Обновить');
+          dismiss.hidden = update.state !== 'available';
+          syncToast();
+        };
+        window.addEventListener('gf:update', (event) => {
+          const detail = (event as CustomEvent<unknown>).detail;
+          // Обновление пропало (или установка не началась) — убираем полоску и снимаем «Загрузка…»
+          if (detail && typeof detail === 'object' && 'state' in detail && detail.state === 'none') {
+            update = undefined;
+            requested = false;
+            render();
+            return;
+          }
+          if (!detail || typeof detail !== 'object' || !('state' in detail) || !('version' in detail)
+            || !['available', 'installing', 'error'].includes(String(detail.state)) || typeof detail.version !== 'string') return;
+          if (update?.version !== detail.version || detail.state === 'error') requested = false;
+          update = detail as Update;
+          render();
+        });
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          if (target.closest('[data-update-install]') && update && update.state !== 'installing' && !requested) {
+            requested = true;
+            render();
+            location.href = 'gf-overlay://update';
+          } else if (target.closest('[data-update-dismiss]') && update) {
+            try { sessionStorage.setItem('gf:update-dismissed', update.version); } catch {}
+            render();
+          }
+        });
+        document.addEventListener('astro:after-swap', render);
+      }
     </script>
     <script>
       import { store } from '../scripts/common';
@@ -155,7 +229,7 @@ const { title, active, guideHref } = Astro.props;
   html.ov-root[data-theme] { --bg: rgb(11 14 24 / .9); --bg-deep: rgb(8 11 20 / .92); --surface: rgb(25 30 44 / .82); --surface-2: rgb(39 45 61 / .85); --surface-3: rgb(55 61 78 / .85); --text: #f6f3ec; --muted: #bcc2ce; --border: rgb(255 255 255 / .18); }
   .ov-body { min-width: 0; min-height: 100dvh; margin: 0; background: transparent; color: var(--text); isolation: isolate; overflow-x: hidden; }
   .ov-backdrop { position: fixed; z-index: -1; inset: 0; background: rgb(9 12 22 / .84); backdrop-filter: blur(18px); pointer-events: none; }
-  .ov-main { width: min(100%, 480px); min-width: 0; margin: auto; padding: 16px 14px calc(86px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+  .ov-main { width: min(100%, 480px); min-width: 0; margin: auto; padding: 16px 14px calc(86px + env(safe-area-inset-bottom) + var(--ov-update-height, 0px)); box-sizing: border-box; }
   .ov-main h1 { font-size: 1.5rem; margin: 0 0 .8rem; }
   .ov-main h2 { font-size: 1.05rem; margin: 1.2rem 0 .6rem; }
   .ov-main h3 { font-size: .95rem; margin: 0 0 .5rem; }
@@ -168,7 +242,13 @@ const { title, active, guideHref } = Astro.props;
   .ov-icons a:hover, .ov-icons a:focus-visible { background: var(--surface-2); }
   .ov-icons img { width: 48px; height: 48px; border-radius: 9px; object-fit: cover; background: var(--surface-3); }
   .ov-tabs { position: fixed; z-index: 20; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px max(10px, calc((100vw - 480px) / 2)) calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: rgb(10 13 23 / .93); backdrop-filter: blur(18px); }
-  .ov-toast { position: fixed; z-index: 21; inset: auto 14px calc(78px + env(safe-area-inset-bottom)); margin: auto; width: fit-content; max-width: min(400px, calc(100% - 28px)); padding: .55rem .8rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); box-shadow: 0 8px 24px rgb(0 0 0 / .3); text-align: center; font-size: .85rem; pointer-events: none; }
+  .ov-update { position: fixed; z-index: 21; inset: auto 14px calc(78px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; box-sizing: border-box; max-width: 452px; margin: auto; padding: .55rem .65rem; border: 1px solid var(--accent); border-radius: 10px; background: var(--surface-2); box-shadow: 0 8px 24px rgb(0 0 0 / .3); font-size: .8rem; }
+  .ov-update[hidden], .ov-update [hidden] { display: none; }
+  .ov-update [data-update-message] { flex: 1; min-width: 0; }
+  .ov-update button { flex: none; padding: .35rem .55rem; border: 0; border-radius: 7px; background: var(--accent-soft); color: var(--accent-text); font: inherit; font-weight: 600; cursor: pointer; }
+  .ov-update button:disabled { opacity: .6; cursor: default; }
+  .ov-update .ov-update-dismiss { padding: .2rem .4rem; background: transparent; color: var(--muted); font-size: 1.2rem; }
+  .ov-toast { position: fixed; z-index: 22; inset: auto 14px calc(78px + env(safe-area-inset-bottom) + var(--ov-update-height, 0px)); margin: auto; width: fit-content; max-width: min(400px, calc(100% - 28px)); padding: .55rem .8rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); box-shadow: 0 8px 24px rgb(0 0 0 / .3); text-align: center; font-size: .85rem; pointer-events: none; }
   .ov-toast[hidden] { display: none; }
   .ov-tab { display: grid; place-items: center; min-height: 48px; border-radius: 9px; color: var(--muted); text-decoration: none; font-weight: 600; }
   .ov-tab[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
