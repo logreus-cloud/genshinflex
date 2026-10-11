@@ -69,6 +69,11 @@ fn settings(app: &AppHandle) -> Settings {
     Settings { base, shortcut: saved.shortcut.filter(|s| !s.trim().is_empty()).unwrap_or_else(|| DEFAULT_SHORTCUT.into()) }
 }
 
+fn in_panel(path: &str) -> bool {
+    let path = path.strip_prefix("/en").or_else(|| path.strip_prefix("/es")).filter(|rest| rest.starts_with('/')).unwrap_or(path);
+    ["/overlay", "/account"].iter().any(|prefix| path == *prefix || path.starts_with(&format!("{prefix}/")))
+}
+
 fn toggle(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let result = if window.is_visible().unwrap_or(false) {
@@ -255,7 +260,9 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .on_navigation(move |url| {
             // blob:/data: и прочие схемы не пускаем, даже если origin совпадает
             if !matches!(url.scheme(), "http" | "https") { return false; }
-            if url.origin() == base.origin() { return true; }
+            // В панели — только компактные страницы и вход по почте; остальной сайт открываем в браузере,
+            // иначе полная страница (оружие, персонаж) втискивается в узкое окно
+            if url.origin() == base.origin() && in_panel(url.path()) { return true; }
             if let Err(error) = handle.opener().open_url(url.to_string(), None::<&str>) { eprintln!("Браузер: {error}"); }
             false
         });
@@ -327,4 +334,19 @@ pub fn run() -> tauri::Result<()> {
             }
         })
         .run(tauri::generate_context!())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::in_panel;
+
+    #[test]
+    fn panel_keeps_only_overlay_and_account() {
+        for path in ["/overlay/", "/overlay/c/furina/", "/en/overlay/banners/", "/es/account/login/", "/account/"] {
+            assert!(in_panel(path), "{path}");
+        }
+        for path in ["/", "/weapons/x/", "/characters/furina/", "/en/", "/overlayx/", "/enoverlay/", "/en"] {
+            assert!(!in_panel(path), "{path}");
+        }
+    }
 }
