@@ -85,7 +85,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     client.from('telegram_accounts').select('telegram_id,user_id,username,created_at,updated_at').eq('user_id', id).maybeSingle(),
     client.from('forum_bans').select('*').eq('user_id', id).maybeSingle(),
     // OAuth-токены Discord не выгружаем: это секрет доступа, а не данные пользователя
-    client.from('discord_role_connections').select('discord_id,metadata,synced_at,created_at').eq('user_id', id).maybeSingle(),
+    client.from('discord_role_connections').select('discord_id,metadata,synced_at,created_at').eq('user_id', id),
   ]);
   if (auth.error || !auth.data.user || profile.error || userData.error || roles.error || telegram.error
     || ban.error || discordRoles.error) {

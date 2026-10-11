@@ -125,99 +125,181 @@ async function loadStates(client: RoleClient, discordIds: string[]): Promise<Map
 
 export type LinkResult = { status: 'linked'; nickname: string } | { status: 'no_account' };
 
-// Обработка возврата из OAuth: токены → Discord ID → аккаунт → метаданные → запись в базе
+const LEASE_MS = 120_000;
+
+// Аренда записи: одну запись в каждый момент обрабатывает один владелец (cron или OAuth callback).
+// Все изменения условны по владельцу, а запись токенов ещё и по прочитанному token (версии)
+// until — нижняя оценка срока аренды: время до запроса к базе + LEASE_MS или lease_until из базы
+function leaseOf(client: RoleClient, discordId: string, owner: string, token: string, until: number) {
+  const lease = {
+    token,
+    // Перед внешним запросом: если аренда почти истекла — продлить; не вышло — запись уже не наша
+    async extend(): Promise<boolean> {
+      if (until - Date.now() > 30_000) return true;
+      const requested = Date.now();
+      const next = requested + LEASE_MS;
+      const { data, error } = await client.from('discord_role_connections')
+        .update({ lease_until: new Date(next).toISOString() })
+        .eq('discord_id', discordId).eq('lease_owner', owner).select('discord_id').maybeSingle();
+      if (error) throw error;
+      if (!data) return false;
+      until = next;
+      return until - Date.now() > 30_000;
+    },
+    async update(value: Record<string, unknown>): Promise<boolean> {
+      const { data, error } = await client.from('discord_role_connections').update(value)
+        .eq('discord_id', discordId).eq('token', lease.token).eq('lease_owner', owner)
+        .select('discord_id').maybeSingle();
+      if (error) throw error;
+      return Boolean(data);
+    },
+    async remove(): Promise<boolean> {
+      const { data, error } = await client.from('discord_role_connections').delete()
+        .eq('discord_id', discordId).eq('lease_owner', owner).select('discord_id').maybeSingle();
+      if (error) throw error;
+      return Boolean(data);
+    },
+    async release(checked: boolean): Promise<void> {
+      const { error } = await client.from('discord_role_connections').update({
+        lease_owner: null, lease_until: null, ...(checked ? { checked_at: new Date().toISOString() } : {}),
+      }).eq('discord_id', discordId).eq('lease_owner', owner);
+      if (error) throw error;
+    },
+  };
+  return lease;
+}
+
+async function releaseQuietly(lease: ReturnType<typeof leaseOf>, discordId: string, checked: boolean) {
+  try {
+    await lease.release(checked);
+  } catch (failure) {
+    console.warn('discord role lease release failed', discordId, String(failure));
+  }
+}
+
+// Обработка возврата из OAuth: токены → Discord ID → аренда записи → актуальное состояние аккаунта → метаданные
 export async function completeLink(
   client: RoleClient, config: RoleConfig, code: string, redirectUri: string,
   fetchImpl: typeof fetch = fetch, now = Date.now(),
 ): Promise<LinkResult> {
   const tokens = await exchangeCode(fetchImpl, config, code, redirectUri, now);
   const discordId = await discordUserId(fetchImpl, tokens.a);
-  const state = (await loadStates(client, [discordId])).get(discordId);
-  if (!state) {
-    // Без аккаунта сбрасываем метаданные: роль «привязан GenshinFlex» не выдаётся
-    await pushMetadata(fetchImpl, config.applicationId, tokens.a, null);
-    return { status: 'no_account' };
-  }
-  const metadata = metadataOf(state);
-  await pushMetadata(fetchImpl, config.applicationId, tokens.a, metadata);
+  const owner = crypto.randomUUID();
   const token = await encryptTokens(config.clientSecret, tokens);
-  // Discord мог раньше принадлежать другому аккаунту сайта
-  const removed = await client.from('discord_role_connections').delete().eq('discord_id', discordId).neq('user_id', state.user_id);
-  if (removed.error) throw removed.error;
-  const { error } = await client.from('discord_role_connections').upsert({
-    user_id: state.user_id, discord_id: discordId, token, metadata, synced_at: new Date(now).toISOString(),
-  }, { onConflict: 'user_id' });
+  const requested = Date.now();
+  const { data: leased, error } = await client.rpc('discord_role_lease', {
+    p_discord_id: discordId, p_token: token, p_owner: owner,
+  });
   if (error) throw error;
-  return { status: 'linked', nickname: state.nickname };
+  if (!leased) throw new Error('Запись Discord уже обрабатывается');
+  const lease = leaseOf(client, discordId, owner, token, requested + LEASE_MS);
+  try {
+    // Состояние читаем только под арендой: до неё Discord могли привязать или отвязать
+    const state = (await loadStates(client, [discordId])).get(discordId);
+    if (!state) {
+      // Без аккаунта сбрасываем метаданные: роль «привязан GenshinFlex» не выдаётся
+      if (!await lease.extend()) throw new Error('Аренда записи Discord потеряна');
+      await pushMetadata(fetchImpl, config.applicationId, tokens.a, null);
+      if (!await lease.remove()) throw new Error('Аренда записи Discord потеряна');
+      return { status: 'no_account' };
+    }
+    if (!await lease.update({ user_id: state.user_id })) throw new Error('Аренда записи Discord потеряна');
+    const metadata = metadataOf(state);
+    if (!await lease.extend()) throw new Error('Аренда записи Discord потеряна');
+    await pushMetadata(fetchImpl, config.applicationId, tokens.a, metadata);
+    const at = new Date().toISOString();
+    await lease.update({ metadata, synced_at: at, checked_at: at });
+    await lease.release(false);
+    return { status: 'linked', nickname: state.nickname };
+  } catch (failure) {
+    // Без отметки checked_at: cron доберётся до записи сразу после снятия аренды
+    await releaseQuietly(lease, discordId, false);
+    throw failure;
+  }
 }
 
-type Row = { user_id: string; discord_id: string; token: string; metadata: unknown };
+type Row = { user_id: string | null; discord_id: string; token: string; metadata: unknown; synced_at: string | null; lease_until: string | null };
 
-// Cron: сверяет метаданные и отправляет в Discord только изменившиеся
+// Cron: по одной записи под арендой сверяет метаданные и подтверждает доступ к Discord не реже раза в сутки
 export async function syncRoleConnections(
-  client: RoleClient, config: RoleConfig, fetchImpl: typeof fetch = fetch, now = Date.now(), limit = 50,
+  client: RoleClient, config: RoleConfig, fetchImpl: typeof fetch = fetch, limit = 25, budgetMs = 45_000,
 ): Promise<{ checked: number; pushed: number; removed: number }> {
-  const { data, error } = await client.from('discord_role_connections')
-    .select('user_id,discord_id,token,metadata')
-    .order('synced_at', { ascending: true, nullsFirst: true })
-    .limit(limit);
-  if (error) throw error;
-  const rows = (data ?? []) as Row[];
-  if (!rows.length) return { checked: 0, pushed: 0, removed: 0 };
-  const states = await loadStates(client, rows.map((row) => row.discord_id));
+  const started = Date.now();
+  const owner = crypto.randomUUID();
+  let checked = 0;
   let pushed = 0;
   let removed = 0;
-  const remove = async (row: Row) => {
-    const result = await client.from('discord_role_connections').delete().eq('user_id', row.user_id).eq('discord_id', row.discord_id);
-    if (result.error) throw result.error;
-    removed++;
-  };
-  for (const row of rows) {
-    const state = states.get(row.discord_id);
-    const current = state && state.user_id === row.user_id ? metadataOf(state) : null;
-    const syncedAt = new Date(now).toISOString();
+  while (checked < limit && Date.now() - started < budgetMs) {
+    const { data, error } = await client.rpc('discord_role_claim', { p_owner: owner });
+    if (error) throw error;
+    const row = (Array.isArray(data) ? data[0] : data) as Row | null | undefined;
+    if (!row) break;
+    checked++;
+    const leasedUntil = row.lease_until ? Date.parse(row.lease_until) : Number.NaN;
+    const lease = leaseOf(client, row.discord_id, owner, row.token, Number.isFinite(leasedUntil) ? leasedUntil : 0);
+    let stop = false;
     try {
-      if (current && sameMetadata(row.metadata, current)) {
-        const result = await client.from('discord_role_connections').update({ synced_at: syncedAt }).eq('user_id', row.user_id);
-        if (result.error) throw result.error;
-        continue;
-      }
+      const state = (await loadStates(client, [row.discord_id])).get(row.discord_id);
+      const current = state && state.user_id === row.user_id ? metadataOf(state) : null;
+      if (current && sameMetadata(row.metadata, current) && row.synced_at
+        && Date.now() - Date.parse(row.synced_at) < 86_400_000) continue;
       let tokens: Tokens;
       try {
         tokens = await decryptTokens(config.clientSecret, row.token);
       } catch {
-        await remove(row);
+        if (await lease.remove()) removed++;
         continue;
       }
       let refreshed = false;
-      if (tokens.e - 60_000 <= now) {
-        tokens = await tokenRequest(fetchImpl, config, { grant_type: 'refresh_token', refresh_token: tokens.r }, now);
+      const refresh = async () => {
+        if (!await lease.extend()) return false;
+        const next = await tokenRequest(fetchImpl, config,
+          { grant_type: 'refresh_token', refresh_token: tokens.r }, Date.now());
+        const token = await encryptTokens(config.clientSecret, next);
+        if (!await lease.update({ token })) return false;
+        lease.token = token;
+        tokens = next;
         refreshed = true;
+        return true;
+      };
+      const push = async () => {
+        if (!await lease.extend()) return false;
+        await pushMetadata(fetchImpl, config.applicationId, tokens.a, current);
+        return true;
+      };
+      if (tokens.e - 60_000 <= Date.now() && !await refresh()) continue;
+      try {
+        if (!await push()) continue;
+      } catch (failure) {
+        if (!(failure instanceof DiscordAuthError) || refreshed) throw failure;
+        if (!await refresh() || !await push()) continue;
       }
-      await pushMetadata(fetchImpl, config.applicationId, tokens.a, current);
-      // Discord отвязан от аккаунта: метаданные сброшены, запись больше не нужна
+      // Discord отвязан от аккаунта или аккаунт удалён: метаданные сброшены, запись больше не нужна
       if (!current) {
-        await remove(row);
+        if (await lease.remove()) removed++;
         continue;
       }
-      const result = await client.from('discord_role_connections').update({
-        metadata: current, synced_at: syncedAt,
-        ...(refreshed ? { token: await encryptTokens(config.clientSecret, tokens) } : {}),
-      }).eq('user_id', row.user_id);
-      if (result.error) throw result.error;
-      pushed++;
+      if (await lease.update({ metadata: current, synced_at: new Date().toISOString() })) pushed++;
     } catch (failure) {
-      if (failure instanceof DiscordRateLimit) break;
-      // Пользователь отозвал доступ приложения в Discord
       if (failure instanceof DiscordAuthError) {
-        await remove(row);
-        continue;
+        // Пользователь отозвал доступ приложения в Discord
+        try {
+          if (await lease.remove()) removed++;
+        } catch (removeFailure) {
+          console.warn('discord role remove failed', row.discord_id, String(removeFailure));
+        }
+      } else if (failure instanceof DiscordRateLimit) {
+        stop = true;
+      } else {
+        console.warn('discord role sync failed', row.discord_id, String(failure));
       }
-      console.warn('discord role sync failed', row.discord_id, String(failure));
+    } finally {
+      await releaseQuietly(lease, row.discord_id, true);
     }
+    if (stop) break;
   }
-  if (pushed || removed) console.log('discord linked roles', { checked: rows.length, pushed, removed });
-  return { checked: rows.length, pushed, removed };
+  if (pushed || removed) console.log('discord linked roles', { checked, pushed, removed });
+  return { checked, pushed, removed };
 }
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) =>

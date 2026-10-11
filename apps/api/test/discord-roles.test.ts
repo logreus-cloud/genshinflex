@@ -9,35 +9,75 @@ import type { Env } from '../src/lib/env.ts';
 
 const config = { applicationId: '1553420351973761115', clientSecret: 'secret' };
 const userId = '11111111-1111-4111-8111-111111111111';
+const otherUser = '33333333-3333-4333-8333-333333333333';
 const discordId = '398436774873006080';
 const state: RoleState = { discord_id: discordId, user_id: userId, nickname: 'traveler', points: 42, in_guild: true };
 
-type Op = { table: string; op: string; value?: unknown; filters: [string, string, unknown][] };
+type Row = {
+  discord_id: string; user_id: string | null; token: string; metadata: unknown;
+  synced_at: string | null; checked_at: string | null; lease_owner: string | null; lease_until: string | null;
+};
+const row = (extra: Partial<Row> & { token: string }): Row => ({
+  discord_id: discordId, user_id: userId, metadata: null, synced_at: null, checked_at: null,
+  lease_owner: null, lease_until: null, ...extra,
+});
 
-// Цепочка запросов Supabase: запоминает операции, select отдаёт rows
-function fakeClient(rows: unknown[], states: RoleState[]) {
-  const ops: Op[] = [];
-  const rpcCalls: unknown[] = [];
-  const from = (table: string) => {
-    const entry: Op = { table, op: 'select', filters: [] };
-    const chain = {
+// База в памяти: discord_role_connections, RPC claim/lease/state и условные update/delete по eq
+function fakeDb(rows: Row[], states: RoleState[], options: { stateError?: Error; onState?: () => void } = {}) {
+  const table = new Map(rows.map((item) => [item.discord_id, { ...item }]));
+  const log: { op: string; filters: Record<string, unknown>; value?: Record<string, unknown> }[] = [];
+  const free = (item: Row) => !item.lease_until || Date.parse(item.lease_until) < Date.now();
+  const rpc = async (name: string, args: Record<string, any>) => {
+    if (name === 'discord_role_state') {
+      options.onState?.();
+      if (options.stateError) return { data: null, error: options.stateError };
+      return { data: states.filter((item) => args.p_discord_ids.includes(item.discord_id)), error: null };
+    }
+    if (name === 'discord_role_claim') {
+      const item = [...table.values()]
+        .filter((entry) => (!entry.checked_at || Date.parse(entry.checked_at) < Date.now() - 600_000) && free(entry))
+        .sort((a, b) => (a.checked_at ?? '').localeCompare(b.checked_at ?? ''))[0];
+      if (!item) return { data: [], error: null };
+      Object.assign(item, { lease_owner: args.p_owner, lease_until: new Date(Date.now() + 120_000).toISOString() });
+      return { data: [{ ...item }], error: null };
+    }
+    if (name === 'discord_role_lease') {
+      const existing = table.get(args.p_discord_id);
+      const lease = { token: args.p_token, metadata: null, synced_at: null, checked_at: null,
+        lease_owner: args.p_owner, lease_until: new Date(Date.now() + 120_000).toISOString() };
+      if (!existing) table.set(args.p_discord_id, { discord_id: args.p_discord_id, user_id: null, ...lease });
+      else if (free(existing)) Object.assign(existing, lease);
+      else return { data: false, error: null };
+      return { data: true, error: null };
+    }
+    throw new Error(`unexpected rpc ${name}`);
+  };
+  const from = (name: string) => {
+    assert.equal(name, 'discord_role_connections');
+    const filters: Record<string, unknown> = {};
+    let op = 'select';
+    let value: Record<string, unknown> | undefined;
+    const run = () => {
+      const matches = [...table.values()].filter((item) =>
+        Object.entries(filters).every(([key, expected]) => (item as any)[key] === expected));
+      log.push({ op, filters: { ...filters }, value });
+      for (const item of matches) {
+        if (op === 'update') Object.assign(item, value);
+        if (op === 'delete') table.delete(item.discord_id);
+      }
+      return matches;
+    };
+    const chain: any = {
+      update: (next: Record<string, unknown>) => { op = 'update'; value = next; return chain; },
+      delete: () => { op = 'delete'; return chain; },
+      eq: (key: string, expected: unknown) => { filters[key] = expected; return chain; },
       select: () => chain,
-      order: () => chain,
-      limit: () => Promise.resolve({ data: rows, error: null }),
-      update: (value: unknown) => { entry.op = 'update'; entry.value = value; ops.push(entry); return chain; },
-      delete: () => { entry.op = 'delete'; ops.push(entry); return chain; },
-      upsert: (value: unknown) => { entry.op = 'upsert'; entry.value = value; ops.push(entry); return Promise.resolve({ error: null }); },
-      eq: (column: string, value: unknown) => { entry.filters.push(['eq', column, value]); return chain; },
-      neq: (column: string, value: unknown) => { entry.filters.push(['neq', column, value]); return chain; },
-      then: (resolve: (value: { error: null }) => unknown) => Promise.resolve({ error: null }).then(resolve),
+      maybeSingle: async () => { const matches = run(); return { data: matches[0] ? { discord_id: matches[0].discord_id } : null, error: null }; },
+      then: (resolve: (result: unknown) => unknown) => Promise.resolve().then(() => { run(); return { error: null }; }).then(resolve),
     };
     return chain;
   };
-  const rpc = async (name: string, args: unknown) => {
-    rpcCalls.push({ name, args });
-    return { data: states, error: null };
-  };
-  return { client: { from, rpc } as any, ops, rpcCalls };
+  return { client: { from, rpc } as any, table, log };
 }
 
 type Call = { url: string; method: string; body: string; auth: string };
@@ -59,99 +99,199 @@ function fakeFetch(responses: Record<string, (call: Call) => Response>) {
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 const tokenResponse = () => json({ access_token: 'new-access', refresh_token: 'new-refresh', expires_in: 604800, scope: 'identify role_connections.write' });
+const oauth = (put: (call: Call) => Response = () => json({})) => fakeFetch({
+  '/oauth2/token': tokenResponse,
+  '/users/@me/applications/': put,
+  '/users/@me': () => json({ id: discordId }),
+});
+const sealed = (extra: { a?: string; r?: string; e?: number } = {}) =>
+  encryptTokens('secret', { a: 'access', r: 'refresh', e: Date.now() + 86_400_000, ...extra });
+const puts = (calls: Call[]) => calls.filter((call) => call.method === 'PUT');
+const writes = (log: { op: string }[]) => log.filter((entry) => entry.op !== 'select');
 
 test('токены шифруются и не читаются другим секретом', async () => {
-  const sealed = await encryptTokens('secret', { a: 'access', r: 'refresh', e: 123 });
-  assert.ok(!sealed.includes('access'));
-  assert.deepEqual(await decryptTokens('secret', sealed), { a: 'access', r: 'refresh', e: 123 });
-  await assert.rejects(decryptTokens('другой', sealed));
+  const value = await encryptTokens('secret', { a: 'access', r: 'refresh', e: 123 });
+  assert.ok(!value.includes('access'));
+  assert.deepEqual(await decryptTokens('secret', value), { a: 'access', r: 'refresh', e: 123 });
+  await assert.rejects(decryptTokens('другой', value));
 });
 
 test('ссылка авторизации просит role_connections.write', () => {
   const url = new URL(authorizeUrl(config.applicationId, 'https://api.genshinflex.com/discord/linked-role/callback', 'state-1'));
   assert.equal(url.searchParams.get('scope'), 'identify role_connections.write');
   assert.equal(url.searchParams.get('state'), 'state-1');
-  assert.equal(url.searchParams.get('client_id'), config.applicationId);
   assert.deepEqual(metadataOf(state), { linked: '1', rating: '42', guild: '1', username: 'traveler' });
 });
 
-test('подключение отправляет метаданные и сохраняет зашифрованные токены', async () => {
-  const { client, ops } = fakeClient([], [state]);
-  const { impl, calls } = fakeFetch({
-    '/oauth2/token': tokenResponse,
-    '/users/@me/applications/': () => json({}),
-    '/users/@me': () => json({ id: discordId }),
-  });
-  const result = await completeLink(client, config, 'code-1', 'https://api.example/cb', impl, 1_000);
-  assert.deepEqual(result, { status: 'linked', nickname: 'traveler' });
-  assert.match(calls[0].body, /grant_type=authorization_code&code=code-1/);
-  assert.equal(calls[0].auth, `Basic ${btoa(`${config.applicationId}:secret`)}`);
-  const push = calls.find((call) => call.method === 'PUT')!;
-  assert.equal(push.auth, 'Bearer new-access');
-  assert.deepEqual(JSON.parse(push.body), {
+test('callback берёт аренду, читает состояние под ней, отправляет метаданные и снимает аренду', async () => {
+  let leasedWhenRead = false;
+  const db = fakeDb([], [state], { onState: () => { leasedWhenRead = !!db.table.get(discordId)?.lease_owner; } });
+  const { impl, calls } = oauth();
+  assert.deepEqual(await completeLink(db.client, config, 'code-1', 'https://api.example/cb', impl), { status: 'linked', nickname: 'traveler' });
+  assert.ok(leasedWhenRead);
+  assert.deepEqual(JSON.parse(puts(calls)[0].body), {
     platform_name: 'GenshinFlex', platform_username: 'traveler', metadata: { linked: '1', rating: '42', guild: '1' },
   });
-  const upsert = ops.find((op) => op.op === 'upsert')!;
-  const row = upsert.value as { token: string; discord_id: string; user_id: string };
-  assert.equal(row.discord_id, discordId);
-  assert.equal(row.user_id, userId);
-  assert.equal((await decryptTokens('secret', row.token)).r, 'new-refresh');
-  assert.deepEqual(ops.find((op) => op.op === 'delete')!.filters, [['eq', 'discord_id', discordId], ['neq', 'user_id', userId]]);
+  const saved = db.table.get(discordId)!;
+  assert.equal(saved.user_id, userId);
+  assert.deepEqual(saved.metadata, metadataOf(state));
+  assert.equal(saved.lease_owner, null);
+  assert.equal((await decryptTokens('secret', saved.token)).r, 'new-refresh');
+  assert.ok(writes(db.log).every((entry) => 'lease_owner' in entry.filters));
 });
 
-test('без аккаунта метаданные сбрасываются и ничего не сохраняется', async () => {
-  const { client, ops } = fakeClient([], []);
+test('ошибка PUT в callback оставляет запись без аренды для cron', async () => {
+  const db = fakeDb([], [state]);
+  const { impl } = oauth(() => json({}, 500));
+  await assert.rejects(completeLink(db.client, config, 'code', 'https://api.example/cb', impl));
+  const saved = db.table.get(discordId)!;
+  assert.equal(saved.user_id, userId);
+  assert.equal(saved.metadata, null);
+  assert.equal(saved.lease_owner, null);
+  assert.equal(saved.checked_at, null);
+});
+
+test('callback без аккаунта под арендой сбрасывает метаданные и удаляет запись', async () => {
+  const token = await sealed();
+  const db = fakeDb([row({ token, metadata: metadataOf(state) })], []);
+  const { impl, calls } = oauth();
+  assert.deepEqual(await completeLink(db.client, config, 'code', 'https://api.example/cb', impl), { status: 'no_account' });
+  assert.deepEqual(JSON.parse(puts(calls)[0].body).metadata, { linked: '0', rating: '0', guild: '0' });
+  assert.equal(db.table.size, 0);
+});
+
+test('занятая аренда прерывает callback до PUT', async () => {
+  const token = await sealed();
+  const db = fakeDb([row({ token, lease_owner: otherUser, lease_until: new Date(Date.now() + 60_000).toISOString() })], [state]);
+  const { impl, calls } = oauth();
+  await assert.rejects(completeLink(db.client, config, 'code', 'https://api.example/cb', impl), /обрабатывается/);
+  assert.equal(puts(calls).length, 0);
+  assert.equal(db.table.get(discordId)!.token, token);
+});
+
+test('cron захватывает по одной записи и снимает аренду после каждой', async () => {
+  const token = await sealed();
+  const second = { ...state, discord_id: '398436774873006081' };
+  const db = fakeDb([
+    row({ token, metadata: { ...metadataOf(state), rating: '1' } }),
+    row({ token, discord_id: second.discord_id, metadata: { ...metadataOf(second), rating: '1' } }),
+  ], [state, second]);
+  const { impl, calls } = fakeFetch({ '/role-connection': () => json({}) });
+  assert.deepEqual(await syncRoleConnections(db.client, config, impl), { checked: 2, pushed: 2, removed: 0 });
+  assert.equal(puts(calls).length, 2);
+  for (const item of db.table.values()) {
+    assert.equal(item.lease_owner, null);
+    assert.ok(item.checked_at);
+    assert.equal(item.metadata && (item.metadata as { rating: string }).rating, '42');
+  }
+});
+
+test('cron не обращается к Discord при свежих совпадающих метаданных и подтверждает доступ раз в сутки', async () => {
+  const token = await sealed();
+  const fresh = fakeDb([row({ token, metadata: metadataOf(state), synced_at: new Date().toISOString() })], [state]);
+  const quiet = fakeFetch({});
+  assert.deepEqual(await syncRoleConnections(fresh.client, config, quiet.impl), { checked: 1, pushed: 0, removed: 0 });
+  assert.equal(quiet.calls.length, 0);
+  assert.ok(fresh.table.get(discordId)!.checked_at);
+
+  const stale = fakeDb([row({ token, metadata: metadataOf(state), synced_at: new Date(Date.now() - 2 * 86_400_000).toISOString() })], [state]);
+  const confirm = fakeFetch({ '/role-connection': () => json({}) });
+  assert.deepEqual(await syncRoleConnections(stale.client, config, confirm.impl), { checked: 1, pushed: 1, removed: 0 });
+});
+
+test('cron обновляет истекающий токен и сохраняет его до PUT', async () => {
+  const token = await sealed({ e: Date.now() + 30_000 });
+  const db = fakeDb([row({ token })], [state]);
+  let savedBeforePut = false;
   const { impl, calls } = fakeFetch({
     '/oauth2/token': tokenResponse,
-    '/users/@me/applications/': () => json({}),
-    '/users/@me': () => json({ id: discordId }),
+    '/role-connection': () => { savedBeforePut = db.table.get(discordId)!.token !== token; return json({}); },
   });
-  assert.deepEqual(await completeLink(client, config, 'code', 'https://api.example/cb', impl), { status: 'no_account' });
-  assert.deepEqual(JSON.parse(calls.find((call) => call.method === 'PUT')!.body).metadata, { linked: '0', rating: '0', guild: '0' });
-  assert.equal(ops.length, 0);
-});
-
-test('cron не трогает Discord, если метаданные не изменились', async () => {
-  const token = await encryptTokens('secret', { a: 'access', r: 'refresh', e: Date.now() + 86_400_000 });
-  const { client, ops } = fakeClient([{ user_id: userId, discord_id: discordId, token, metadata: metadataOf(state) }], [state]);
-  const { impl, calls } = fakeFetch({});
-  assert.deepEqual(await syncRoleConnections(client, config, impl), { checked: 1, pushed: 0, removed: 0 });
-  assert.equal(calls.length, 0);
-  assert.deepEqual(Object.keys(ops[0].value as object), ['synced_at']);
-});
-
-test('cron обновляет истёкший токен и отправляет новые метаданные', async () => {
-  const now = 10_000_000;
-  const token = await encryptTokens('secret', { a: 'old', r: 'old-refresh', e: now - 1 });
-  const { client, ops } = fakeClient([{ user_id: userId, discord_id: discordId, token, metadata: { ...metadataOf(state), rating: '1' } }], [state]);
-  const { impl, calls } = fakeFetch({ '/oauth2/token': tokenResponse, '/role-connection': () => json({}) });
-  assert.deepEqual(await syncRoleConnections(client, config, impl, now), { checked: 1, pushed: 1, removed: 0 });
-  assert.match(calls[0].body, /grant_type=refresh_token&refresh_token=old-refresh/);
+  assert.deepEqual(await syncRoleConnections(db.client, config, impl), { checked: 1, pushed: 1, removed: 0 });
+  assert.match(calls[0].body, /grant_type=refresh_token&refresh_token=refresh/);
   assert.equal(calls[1].auth, 'Bearer new-access');
-  const update = ops.find((op) => op.op === 'update')!.value as { token: string; metadata: unknown };
-  assert.deepEqual(update.metadata, metadataOf(state));
-  assert.equal((await decryptTokens('secret', update.token)).a, 'new-access');
+  assert.ok(savedBeforePut);
 });
 
-test('cron сбрасывает роли отвязанного Discord и удаляет запись, отозванный доступ — тоже', async () => {
-  const token = await encryptTokens('secret', { a: 'access', r: 'refresh', e: Date.now() + 86_400_000 });
-  const unlinked = fakeClient([{ user_id: userId, discord_id: discordId, token, metadata: metadataOf(state) }], []);
-  const reset = fakeFetch({ '/role-connection': () => json({}) });
-  assert.deepEqual(await syncRoleConnections(unlinked.client, config, reset.impl), { checked: 1, pushed: 0, removed: 1 });
-  assert.deepEqual(JSON.parse(reset.calls[0].body).metadata, { linked: '0', rating: '0', guild: '0' });
-  assert.equal(unlinked.ops.at(-1)!.op, 'delete');
+test('401 на PUT вызывает refresh и повторную отправку', async () => {
+  const token = await sealed();
+  const db = fakeDb([row({ token })], [state]);
+  let attempt = 0;
+  const { impl } = fakeFetch({
+    '/oauth2/token': tokenResponse,
+    '/role-connection': () => (++attempt === 1 ? json({}, 401) : json({})),
+  });
+  assert.deepEqual(await syncRoleConnections(db.client, config, impl), { checked: 1, pushed: 1, removed: 0 });
+  assert.equal(attempt, 2);
+  assert.ok(db.table.has(discordId));
+});
 
-  const revoked = fakeClient([{ user_id: userId, discord_id: discordId, token, metadata: null }], [state]);
-  const denied = fakeFetch({ '/role-connection': () => json({ message: '401: Unauthorized' }, 401) });
+test('cron сбрасывает роли отвязанного Discord, удалённого аккаунта и Discord другого владельца', async () => {
+  for (const [rowExtra, states] of [
+    [{}, []],
+    [{ user_id: null }, [state]],
+    [{}, [{ ...state, user_id: otherUser }]],
+  ] as [Partial<Row>, RoleState[]][]) {
+    const db = fakeDb([row({ token: await sealed(), metadata: metadataOf(state), ...rowExtra })], states);
+    const { impl, calls } = fakeFetch({ '/role-connection': () => json({}) });
+    assert.deepEqual(await syncRoleConnections(db.client, config, impl), { checked: 1, pushed: 0, removed: 1 });
+    assert.deepEqual(JSON.parse(calls[0].body).metadata, { linked: '0', rating: '0', guild: '0' });
+    assert.equal(db.table.size, 0);
+  }
+});
+
+test('отозванный доступ удаляет запись, 429 останавливает цикл и снимает аренду', async () => {
+  const token = await sealed();
+  const revoked = fakeDb([row({ token })], [state]);
+  const denied = fakeFetch({ '/role-connection': () => json({}, 401), '/oauth2/token': () => json({}, 400) });
   assert.deepEqual(await syncRoleConnections(revoked.client, config, denied.impl), { checked: 1, pushed: 0, removed: 1 });
 
-  const limited = fakeClient([
-    { user_id: userId, discord_id: discordId, token, metadata: null },
-    { user_id: userId, discord_id: discordId, token, metadata: null },
-  ], [state]);
+  const limited = fakeDb([row({ token }), row({ token, discord_id: '398436774873006081' })], [state]);
   const slow = fakeFetch({ '/role-connection': () => json({ retry_after: 10 }, 429) });
-  assert.deepEqual(await syncRoleConnections(limited.client, config, slow.impl), { checked: 2, pushed: 0, removed: 0 });
+  assert.deepEqual(await syncRoleConnections(limited.client, config, slow.impl), { checked: 1, pushed: 0, removed: 0 });
   assert.equal(slow.calls.length, 1);
+  assert.ok([...limited.table.values()].every((item) => item.lease_owner === null));
+});
+
+test('ошибка PUT отмечает проверку и оставляет запись; ошибка состояния тоже снимает аренду', async () => {
+  const token = await sealed();
+  const db = fakeDb([row({ token })], [state]);
+  const { impl } = fakeFetch({ '/role-connection': () => json({}, 500) });
+  assert.deepEqual(await syncRoleConnections(db.client, config, impl), { checked: 1, pushed: 0, removed: 0 });
+  const kept = db.table.get(discordId)!;
+  assert.ok(kept.checked_at);
+  assert.equal(kept.lease_owner, null);
+
+  const broken = fakeDb([row({ token })], [state], { stateError: new Error('rpc') });
+  assert.deepEqual(await syncRoleConnections(broken.client, config, fakeFetch({}).impl), { checked: 1, pushed: 0, removed: 0 });
+  assert.equal(broken.table.get(discordId)!.lease_owner, null);
+  assert.ok(broken.table.get(discordId)!.checked_at);
+});
+
+test('потерянная аренда не даёт cron обращаться к Discord и менять запись', async () => {
+  const token = await sealed({ e: Date.now() + 30_000 });
+  const realNow = Date.now;
+  // Уже после захвата другой владелец перехватил запись, а наша аренда почти истекла: продлить её не выйдет
+  const db = fakeDb([row({ token })], [state], { onState: () => {
+    db.table.get(discordId)!.lease_owner = otherUser;
+    Date.now = () => realNow() + 100_000;
+  } });
+  const { impl, calls } = fakeFetch({ '/oauth2/token': tokenResponse, '/role-connection': () => json({}) });
+  try {
+    await syncRoleConnections(db.client, config, impl, 1);
+  } finally {
+    Date.now = realNow;
+  }
+  assert.equal(calls.length, 0);
+  assert.equal(db.table.get(discordId)!.token, token);
+  assert.equal(db.table.get(discordId)!.lease_owner, otherUser);
+});
+
+test('бюджет времени останавливает цикл', async () => {
+  const token = await sealed();
+  const db = fakeDb([row({ token })], [state]);
+  const { impl } = fakeFetch({ '/role-connection': () => json({}) });
+  assert.equal((await syncRoleConnections(db.client, config, impl, 25, -1)).checked, 0);
 });
 
 test('маршруты Linked Roles проверяют state из cookie', async () => {

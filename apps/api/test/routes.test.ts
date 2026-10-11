@@ -79,7 +79,13 @@ test('отдаёт профиль с титулами и ролями', async ()
 
 test('выгружает данные через подставленный клиент', async () => {
   const { client } = fakeClient();
-  const app = createApp({ adminClient: () => client, claims });
+  const exportClient = {
+    ...client,
+    from: ((table: string) => table === 'discord_role_connections'
+      ? { select: () => ({ eq: async () => ({ data: [], error: null }) }) }
+      : client.from(table)) as typeof client.from,
+  };
+  const app = createApp({ adminClient: () => exportClient, claims });
   const response = await send(app, { method: 'GET', path: '/me/export' }, 'user');
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Content-Disposition'), 'attachment; filename="genshinflex-data.json"');
@@ -99,7 +105,7 @@ test('выгружает данные через подставленный кл
     wishes: [],
     roles: [],
     telegram: null,
-    discord_linked_roles: null,
+    discord_linked_roles: [],
     forum: { threads: [], posts: [], reactions: [], reports: [], ban: null, views: [] },
     social: { following: [], followers: [], friendships: [], blocks: [] },
     notifications: [],

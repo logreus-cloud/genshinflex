@@ -32,7 +32,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.18.0';
+const version = '0.18.1';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -629,12 +629,11 @@ export function createApp(deps: AppDeps = {}) {
   return instance;
 }
 
-function scheduled(event: { scheduledTime?: number }, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
+function scheduled(_event: { scheduledTime?: number }, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
   const client = createServiceClient(env);
-  // Cron раз в минуту; метаданные Linked Roles сверяем раз в 10 минут
-  const roles = env.DISCORD_APPLICATION_ID && env.DISCORD_CLIENT_SECRET
-    && new Date(event.scheduledTime ?? Date.now()).getUTCMinutes() % 10 === 0;
+  // Cron раз в минуту; очередь Linked Roles сама ограничивает частоту проверок
+  const roles = env.DISCORD_APPLICATION_ID && env.DISCORD_CLIENT_SECRET;
   ctx.waitUntil(Promise.allSettled([
     deliverTelegramNotifications(client, env.TELEGRAM_BOT_TOKEN),
     deliverDiscordNotifications(client, env.DISCORD_BOT_TOKEN || ''),
