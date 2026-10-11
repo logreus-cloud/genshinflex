@@ -144,28 +144,32 @@ const { base, t } = useData(Astro.currentLocale);
         field('nickname', String(profile?.nickname || ''));
         field('display_name', String(profile?.display_name || user.user_metadata?.display_name || ''));
         const telegram = user.app_metadata?.telegram_id;
-        const synthetic = /^tg\d+@telegram\.genshinflex\.com$/i.test(user.email || '');
+        const synthetic = /^tg\d+(-\d+)?@telegram\.genshinflex\.com$/i.test(user.email || '');
         field('email', synthetic
           ? `${root.dataset.telegram} @${user.user_metadata?.telegram_username || telegram || ''}`
           : user.email || '');
-        const providers = new Set((user.identities || []).map((identity) => identity.provider));
+        // Техническая почта tg…@telegram — не способ входа: войти по ней нельзя
+        const identities = user.identities || [];
+        const providers = new Set(identities
+          .filter((identity) => !synthetic || identity.provider !== 'email')
+          .map((identity) => identity.provider));
         if (telegram) providers.add('telegram');
         field('providers', [...providers].map((provider) => provider === 'telegram' ? root.dataset.telegram || 'Telegram' : provider).join(', '));
         const reset = root.querySelector<HTMLAnchorElement>('[data-page="reset"]')!;
         reset.href = authUrl(base, 'reset');
         reset.hidden = !providers.has('email');
-        const identities = user.identities || [];
         for (const button of root.querySelectorAll<HTMLButtonElement>('[data-link]')) {
           button.hidden = providers.has(button.dataset.link!);
         }
         for (const button of root.querySelectorAll<HTMLButtonElement>('[data-unlink]')) {
-          button.hidden = identities.length < 2 || !identities.some((identity) => identity.provider === button.dataset.unlink);
+          button.hidden = !providers.has(button.dataset.unlink!)
+            || ![...providers].some((provider) => provider !== button.dataset.unlink);
         }
         // Telegram не провайдер Supabase: привязка хранится в app_metadata.telegram_id
         telegramLink.hidden = Boolean(telegram);
         if (!telegram) showTelegramWidget();
         root.querySelector<HTMLButtonElement>('[data-unlink-telegram]')!.hidden = !telegram
-          || (synthetic && !identities.some((identity) => identity.provider !== 'email'));
+          || providers.size < 2;
         loadedUserId = user.id;
         details.forEach((detail) => { detail.hidden = false; });
       } catch {
@@ -212,10 +216,13 @@ const { base, t } = useData(Astro.currentLocale);
     // Привязка уходит на страницу провайдера и возвращается через /account/callback/ обратно сюда
     for (const button of root.querySelectorAll<HTMLButtonElement>('[data-link]')) {
       button.addEventListener('click', async () => {
+        const expected = loadedUserId;
+        if (!expected) return;
         button.disabled = true;
         identityStatus.textContent = '';
         try {
           const callback = new URL(authUrl(base, 'callback', `${base}/account/`), location.origin).toString();
+          if (!await sameUser(expected)) { refreshAccount(); return; }
           const { error } = await getSupabase().auth.linkIdentity({
             provider: button.dataset.link as 'discord' | 'google',
             options: { redirectTo: callback },
@@ -227,14 +234,25 @@ const { base, t } = useData(Astro.currentLocale);
     }
     for (const button of root.querySelectorAll<HTMLButtonElement>('[data-unlink]')) {
       button.addEventListener('click', async () => {
+        const expected = loadedUserId;
+        if (!expected) return;
         button.disabled = true;
         identityStatus.textContent = '';
         try {
           const auth = getSupabase().auth;
+          if (!await sameUser(expected)) { refreshAccount(); return; }
           const { data, error } = await auth.getUserIdentities();
           if (error) throw error;
+          if (!await sameUser(expected)) { refreshAccount(); return; }
+          const { data: userData, error: userError } = await auth.getUser();
+          if (userError || userData.user?.id !== expected) throw new Error('user');
+          const synthetic = /^tg\d+(-\d+)?@telegram\.genshinflex\.com$/i.test(userData.user.email || '');
+          const providers = new Set(data.identities
+            .filter((item) => !synthetic || item.provider !== 'email')
+            .map((item) => item.provider));
+          if (userData.user.app_metadata?.telegram_id) providers.add('telegram');
           const identity = data.identities.find((item) => item.provider === button.dataset.unlink);
-          if (!identity || data.identities.length < 2) throw new Error('identity');
+          if (!identity || ![...providers].some((provider) => provider !== identity.provider)) throw new Error('identity');
           const { error: unlinkError } = await auth.unlinkIdentity(identity);
           if (unlinkError) throw unlinkError;
           await auth.refreshSession();
