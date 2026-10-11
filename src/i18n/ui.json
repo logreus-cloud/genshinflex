@@ -5775,9 +5775,9 @@
   "en": "Also send notifications to Discord DMs",
   "es": "Enviar también las notificaciones por mensaje directo en Discord"
  },
- "Бот пишет только участникам сервера GenshinFlex с открытыми личными сообщениями.": {
-  "en": "The bot can only message members of the GenshinFlex server who have DMs open.",
-  "es": "El bot solo puede escribir a miembros del servidor de GenshinFlex con los mensajes directos abiertos."
+ "Бот пишет только участникам сервера GenshinFlex. Если сообщения не приходят, откройте меню сервера → «Настройки конфиденциальности» и включите «Личные сообщения».": {
+  "en": "The bot can only message members of the GenshinFlex server. If messages don't arrive, open the server menu → “Privacy Settings” and turn on “Direct Messages”.",
+  "es": "El bot solo puede escribir a miembros del servidor de GenshinFlex. Si no llegan los mensajes, abre el menú del servidor → «Ajustes de privacidad» y activa «Mensajes directos»."
  },
  "Вступить на сервер": {
   "en": "Join the server",

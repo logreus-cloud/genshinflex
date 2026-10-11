@@ -366,7 +366,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <div id="notify-discord" hidden>
               <h3>{t('Discord')}</h3>
               <label class="public-visible"><input type="checkbox" id="notify-discord-toggle" />{t('Дублировать уведомления в личные сообщения Discord')}</label>
-              <small class="muted">{t('Бот пишет только участникам сервера GenshinFlex с открытыми личными сообщениями.')} <a href={social.discord} target="_blank" rel="noopener">{t('Вступить на сервер')}</a></small>
+              <small class="muted">{t('Бот пишет только участникам сервера GenshinFlex. Если сообщения не приходят, откройте меню сервера → «Настройки конфиденциальности» и включите «Личные сообщения».')} <a href={social.discord} target="_blank" rel="noopener">{t('Вступить на сервер')}</a></small>
             </div>
             <small class="muted">{t('Выключенные типы не приходят ни в колокольчик, ни на страницу уведомлений.')}</small>
             <small class="status" id="notify-status" aria-live="polite"></small>

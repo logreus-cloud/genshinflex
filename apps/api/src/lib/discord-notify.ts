@@ -33,7 +33,7 @@ async function logFailure(id: number, response: Response): Promise<void> {
   const text = await response.text().catch(() => '');
   let code: unknown;
   try { code = (JSON.parse(text) as { code?: unknown }).code; } catch {}
-  if (code === 50007) console.warn('discord dm closed', id);
+  if (code === 50007 || code === 50278) console.warn('discord dm closed', id);
   else console.warn('discord send failed', id, response.status, text);
 }
 

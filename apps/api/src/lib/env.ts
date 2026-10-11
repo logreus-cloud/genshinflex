@@ -25,4 +25,5 @@ export interface Env {
   DISCORD_APPLICATION_ID?: string;
   DISCORD_GUILD_ID?: string;
   DISCORD_DATA_URL?: string;
+  DISCORD_BANNERS_URL?: string;
 }

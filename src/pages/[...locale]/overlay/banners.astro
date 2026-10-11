@@ -2,11 +2,12 @@
 import { getCollection } from 'astro:content';
 import OverlayLayout from '../../../layouts/OverlayLayout.astro';
 import { useData, LANGS, characters as ruCharacters } from '../../../lib/data';
+import { STANDARD_CHARACTERS } from '../../../data/standard-banner';
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { getCharacter, getWeapon, base, t } = useData(Astro.currentLocale);
 const now = Date.now();
 const nearby = (await getCollection('banners')).map((b) => b.data).filter((b) => Date.parse(b.start) <= now + 86400000 && Date.parse(b.end) > now - 86400000);
-const standard = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari', 'yumemizuki-mizuki'].filter((slug) => ruCharacters.some((c) => c.slug === slug));
+const standard = STANDARD_CHARACTERS.filter((slug) => ruCharacters.some((c) => c.slug === slug));
 ---
 <OverlayLayout title={t('Баннеры')} active="banners">
   <h1>{t('Баннеры')}</h1>

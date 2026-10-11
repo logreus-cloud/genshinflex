@@ -6,6 +6,7 @@ import WeaponIcon from '../../components/WeaponIcon.astro';
 import BannerPhase from '../../components/BannerPhase.astro';
 import history from '../../data/generated/banner-history.json';
 import { useData, LANGS } from '../../lib/data';
+import { STANDARD_CHARACTERS as STANDARD_CHARS } from '../../data/standard-banner';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { getCharacter, getWeapon, fmtServerDate, stars, base, t } = useData(Astro.currentLocale);
@@ -19,7 +20,6 @@ const next = all.filter((b) => new Date(b.start) > now);
 const livePhase = [...history].reverse().find((p) => new Date(p.start.replace(' ', 'T')) <= now) ?? history.at(-1)!;
 const lastChronicled = [...history].reverse().find((p) => p.chronicled);
 const chronicledLive = livePhase.chronicled;
-const STANDARD_CHARS = ['diluc', 'jean', 'keqing', 'mona', 'qiqi', 'tighnari', 'dehya', 'yumemizuki-mizuki'];
 const STANDARD_WEAPONS = ['amos-bow', 'aquila-favonia', 'lost-prayer-to-the-sacred-winds', 'primordial-jade-winged-spear', 'skyward-atlas',
   'skyward-blade', 'skyward-harp', 'skyward-pride', 'skyward-spine', 'wolf-s-gravestone'];
 // История: версии от новых к старым

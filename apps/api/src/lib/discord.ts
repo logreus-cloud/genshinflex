@@ -1,4 +1,6 @@
 import type { PublicProfileCard } from './discord-profile.ts';
+import { bannersReply, pityReply } from './discord-wishes.ts';
+import type { DiscordBannersData, PityData } from './discord-wishes.ts';
 
 export type DiscordBuild = {
   s: string; n: string; e?: string; el?: string; r?: number; i?: string; url: string;
@@ -51,6 +53,8 @@ const clip = (value: string, limit: number) => limit <= 0 ? '' : length(value) <
 const unknownCommand = { type: 4, data: { content: 'Неизвестная команда', flags: 64 } };
 const unavailable = { type: 4, data: { content: 'Гайды временно недоступны, попробуйте позже', flags: 64 } };
 const profileUnavailable = { type: 4, data: { content: 'Профиль временно недоступен, попробуйте позже', flags: 64 } };
+const bannersUnavailable = { type: 4, data: { content: 'Баннеры временно недоступны, попробуйте позже', flags: 64 } };
+const pityUnavailable = { type: 4, data: { content: 'Гарант временно недоступен, попробуйте позже', flags: 64 } };
 
 function fitEmbed(
   title: string, initialDescription: string, footer: string,
@@ -131,12 +135,59 @@ type InteractionDeps = {
   site: string;
   loadProfile?(nickname: string, signal: AbortSignal, auxiliaryDeadline: number): Promise<PublicProfileCard | null>;
   findLinkedProfile?(discordId: string, signal: AbortSignal): Promise<{ nickname: string; is_public: boolean } | null>;
+  loadBanners?(): Promise<DiscordBannersData>;
+  loadPity?(discordId: string, signal: AbortSignal): Promise<PityData | null>;
 };
 
 export async function handleInteraction(
   interaction: DiscordInteraction, deps: InteractionDeps,
 ) {
   if (interaction.type === 1) return { type: 1 };
+  if (interaction.type === 2 && interaction.data?.name === 'баннеры') {
+    try {
+      if (!deps.loadBanners) throw new Error('Нет загрузчика баннеров');
+      return bannersReply(await deps.loadBanners(), deps.site, colors);
+    } catch {
+      return bannersUnavailable;
+    }
+  }
+  if (interaction.type === 2 && interaction.data?.name === 'гарант') {
+    const controller = new AbortController();
+    const auxiliaryDeadline = Date.now() + 1_600;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        (async () => {
+          const discordId = interaction.member?.user?.id ?? interaction.user?.id;
+          if (!discordId || !deps.loadPity) throw new Error('Нет загрузчика гаранта');
+          // Без данных баннеров счётчики всё равно показываем, только без строки про 50/50
+          const standard = deps.loadBanners
+            ? deps.loadBanners().then((data) => data.standard, () => null)
+            : Promise.resolve(null);
+          const pity = await deps.loadPity(discordId, controller.signal);
+          if (!pity) return pityReply(null, null, deps.site);
+          let wait: ReturnType<typeof setTimeout> | undefined;
+          const late = new Promise<null>((resolve) => { wait = setTimeout(() => resolve(null), Math.max(0, auxiliaryDeadline - Date.now())); });
+          try {
+            return pityReply(pity, await Promise.race([standard, late]), deps.site);
+          } finally {
+            clearTimeout(wait);
+          }
+        })(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => {
+            controller.abort();
+            reject(new Error('Превышено время загрузки гаранта'));
+          }, 1_800);
+        }),
+      ]);
+    } catch {
+      return pityUnavailable;
+    } finally {
+      if (timer) clearTimeout(timer);
+      controller.abort();
+    }
+  }
   if (interaction.type === 2 && interaction.data?.name === 'профиль') {
     const controller = new AbortController();
     const auxiliaryDeadline = Date.now() + 1_600;
@@ -243,15 +294,28 @@ function isDiscordBuild(value: unknown): value is DiscordBuild {
   return true;
 }
 
-const cache = new Map<string, { builds: DiscordBuild[]; expires: number }>();
-const inFlight = new Map<string, Promise<DiscordBuild[]>>();
+const cache = new Map<string, { data: unknown; expires: number }>();
+const inFlight = new Map<string, Promise<unknown>>();
+
+function parseBuilds(data: unknown): DiscordBuild[] {
+  const builds = isRecord(data) ? data.builds : undefined;
+  if (!Array.isArray(builds) || !builds.every(isDiscordBuild)) throw new Error('Неверные данные гайдов');
+  return builds;
+}
 
 export function createBuildsLoader(url: string, fetchImpl: typeof fetch = fetch, ttlMs = 300_000, timeoutMs = 2_000) {
-  return (): Promise<DiscordBuild[]> => {
+  return createJsonLoader(url, parseBuilds, fetchImpl, ttlMs, timeoutMs);
+}
+
+// Загрузчик JSON с сайта: кэш на ttlMs, общий запрос для параллельных вызовов, старый кэш при ошибке
+export function createJsonLoader<T>(
+  url: string, parse: (data: unknown) => T, fetchImpl: typeof fetch = fetch, ttlMs = 300_000, timeoutMs = 2_000,
+) {
+  return (): Promise<T> => {
     const cached = cache.get(url);
-    if (cached && cached.expires > Date.now()) return Promise.resolve(cached.builds);
+    if (cached && cached.expires > Date.now()) return Promise.resolve(cached.data as T);
     const running = inFlight.get(url);
-    if (running) return running;
+    if (running) return running as Promise<T>;
     const pending = Promise.resolve().then(async () => {
       const controller = new AbortController();
       let timer: ReturnType<typeof setTimeout> | undefined;
@@ -267,20 +331,19 @@ export function createBuildsLoader(url: string, fetchImpl: typeof fetch = fetch,
           new Promise<never>((_, reject) => {
             timer = setTimeout(() => {
               controller.abort();
-              reject(new Error('Превышено время загрузки гайдов'));
+              reject(new Error(`Превышено время загрузки ${url}`));
             }, timeoutMs);
           }),
         ]);
-        const builds = isRecord(data) ? data.builds : undefined;
-        if (!Array.isArray(builds) || !builds.every(isDiscordBuild)) throw new Error('Неверные данные гайдов');
-        cache.set(url, { builds, expires: Date.now() + ttlMs });
-        return builds;
+        const parsed = parse(data);
+        cache.set(url, { data: parsed, expires: Date.now() + ttlMs });
+        return parsed;
       } finally {
         if (timer) clearTimeout(timer);
       }
     }).catch((error) => {
       const stale = cache.get(url);
-      if (stale) return stale.builds;
+      if (stale) return stale.data as T;
       throw error;
     }).finally(() => {
       inFlight.delete(url);

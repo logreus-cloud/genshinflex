@@ -10,11 +10,13 @@ import {
 } from './lib/accounts.ts';
 import type { AccountClient } from './lib/accounts.ts';
 import type { Env } from './lib/env.ts';
-import { createBuildsLoader, handleInteraction, verifyDiscordRequest } from './lib/discord.ts';
+import { createBuildsLoader, createJsonLoader, handleInteraction, verifyDiscordRequest } from './lib/discord.ts';
 import type { DiscordBuild, DiscordInteraction } from './lib/discord.ts';
 import { loadDiscordProfile } from './lib/discord-profile.ts';
 import type { PublicProfileCard } from './lib/discord-profile.ts';
 import { deliverDiscordNotifications } from './lib/discord-notify.ts';
+import { isPityData, parseBannersData } from './lib/discord-wishes.ts';
+import type { DiscordBannersData, PityData } from './lib/discord-wishes.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
@@ -27,7 +29,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.15.0';
+const version = '0.16.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -38,12 +40,15 @@ type ApiEnv = {
     discordBuilds: (url: string) => Promise<DiscordBuild[]>;
     discordProfile: (nickname: string, env: Env, signal: AbortSignal, auxiliaryDeadline: number) => Promise<PublicProfileCard | null>;
     discordLinkedProfile: (discordId: string, env: Env, signal: AbortSignal) => Promise<{ nickname: string; is_public: boolean } | null>;
+    discordBanners: (url: string) => Promise<DiscordBannersData>;
+    discordPity: (discordId: string, env: Env, signal: AbortSignal) => Promise<PityData | null>;
   };
 };
 type ApiContext = Context<ApiEnv>;
 type AppDeps = Partial<ApiEnv['Variables']>;
 
 const discordLoaders = new Map<string, ReturnType<typeof createBuildsLoader>>();
+const bannerLoaders = new Map<string, () => Promise<DiscordBannersData>>();
 
 function createServiceClient(env: Env): ServiceClient & Pick<SupabaseClient, 'rpc'> {
   return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -131,6 +136,27 @@ async function findDiscordLinkedProfile(discordId: string, env: Env, signal: Abo
   return row && typeof row.nickname === 'string' && typeof row.is_public === 'boolean' ? row : null;
 }
 
+function loadDiscordBanners(url: string): Promise<DiscordBannersData> {
+  let loader = bannerLoaders.get(url);
+  if (!loader) {
+    loader = createJsonLoader(url, parseBannersData);
+    bannerLoaders.set(url, loader);
+  }
+  return loader();
+}
+
+async function loadDiscordPity(discordId: string, env: Env, signal: AbortSignal): Promise<PityData | null> {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Нет сервисного клиента Supabase');
+  const client = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await client.rpc('discord_wish_pity', { p_discord_id: discordId }).abortSignal(signal);
+  if (error) throw error;
+  if (data === null) return null;
+  if (!isPityData(data)) throw new Error('Неверные данные гаранта');
+  return data;
+}
+
 app.use('*', async (c, next) => {
   if (c.req.path === '/discord/interactions') return next();
   const origin = c.req.header('Origin');
@@ -165,10 +191,13 @@ app.post('/discord/interactions', async (c) => {
     return c.json({ error: 'Неверный JSON' }, 400);
   }
   const url = c.env.DISCORD_DATA_URL || 'https://genshinflex.com/data/discord-builds.json';
+  const bannersUrl = c.env.DISCORD_BANNERS_URL || 'https://genshinflex.com/data/discord-banners.json';
   return c.json(await handleInteraction(interaction, {
     loadBuilds: () => c.get('discordBuilds')(url), site: 'https://genshinflex.com',
     loadProfile: (nickname, signal, deadline) => c.get('discordProfile')(nickname, c.env, signal, deadline),
     findLinkedProfile: (discordId, signal) => c.get('discordLinkedProfile')(discordId, c.env, signal),
+    loadBanners: () => c.get('discordBanners')(bannersUrl),
+    loadPity: (discordId, signal) => c.get('discordPity')(discordId, c.env, signal),
   }));
 });
 
@@ -490,6 +519,8 @@ export function createApp(deps: AppDeps = {}) {
     c.set('discordBuilds', deps.discordBuilds || loadDiscordBuilds);
     c.set('discordProfile', deps.discordProfile || loadDiscordPublicProfile);
     c.set('discordLinkedProfile', deps.discordLinkedProfile || findDiscordLinkedProfile);
+    c.set('discordBanners', deps.discordBanners || loadDiscordBanners);
+    c.set('discordPity', deps.discordPity || loadDiscordPity);
     return next();
   });
   instance.route('/', app);

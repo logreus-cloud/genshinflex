@@ -21,6 +21,14 @@ export const commands = [{
     required: false,
     max_length: 24,
   }],
+}, {
+  name: 'баннеры',
+  description: 'Текущие баннеры и время до конца',
+  type: 1,
+}, {
+  name: 'гарант',
+  description: 'Счётчики гаранта по вашей истории молитв',
+  type: 1,
 }];
 
 try { process.loadEnvFile('.env'); } catch {}

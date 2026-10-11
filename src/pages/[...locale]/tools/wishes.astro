@@ -1,14 +1,14 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { useData, LANGS, characters as ruCharacters } from '../../../lib/data';
+import { STANDARD_CHARACTERS } from '../../../data/standard-banner';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { t } = useData(Astro.currentLocale);
 
 // Стандартный пул 5★ (слаги): выпадение такого персонажа на баннере события — проигранные 50/50.
 // Молитвы сопоставляются со слагом по ID предмета или имени на любом языке — см. slugOf в скрипте.
-const STANDARD = ['qiqi', 'mona', 'jean', 'diluc', 'dehya', 'keqing', 'tighnari', 'yumemizuki-mizuki']
-  .filter((s) => ruCharacters.some((c) => c.slug === s));
+const STANDARD = STANDARD_CHARACTERS.filter((s) => ruCharacters.some((c) => c.slug === s));
 const script = await import('../../../../public/wish-url.ps1?raw').then((m) => m.default as string);
 ---
 <Layout title={t('Трекер круток')} description={t('Счётчик гаранта, история молитв и статистика 50/50 в Genshin Impact.')}>
