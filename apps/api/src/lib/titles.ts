@@ -190,15 +190,33 @@ export async function grantTitle(client: TitleClient, id: string, input: unknown
   if (error?.code === '23505') throw new TitleError('Титул уже выдан', 409);
   if (error?.code === '23503') throw new TitleError('Пользователь или титул не найден', 404);
   if (error) throw error;
+  // Без активного титула новый сразу виден в профиле и в Discord; выбранный пользователем не трогаем
+  const active = await client.from('profiles')
+    .update({ active_title: value.title }).eq('id', id).is('active_title', null);
+  if (active.error) throw active.error;
   return { ok: true };
 }
 
 export async function revokeTitle(client: TitleClient, id: string, title: string) {
   validateUserId(id);
   validateTitleId(title);
+  const profile = await client.from('profiles').select('active_title').eq('id', id).maybeSingle();
+  if (profile.error) throw profile.error;
+  const wasActive = profile.data?.active_title === title;
   const { data, error } = await client.from('user_titles')
     .delete().eq('user_id', id).eq('title_id', title).select('title_id').maybeSingle();
   if (error) throw error;
   if (!data) throw new TitleError('Титул не выдан', 404);
+  // Отозвали активный титул — база обнулила active_title: показываем последний из оставшихся.
+  // Осознанный выбор «без титула» не трогаем
+  if (!wasActive) return { ok: true };
+  const rest = await client.from('user_titles').select('title_id')
+    .eq('user_id', id).order('granted_at', { ascending: false }).limit(1).maybeSingle();
+  if (rest.error) throw rest.error;
+  if (rest.data) {
+    const active = await client.from('profiles')
+      .update({ active_title: rest.data.title_id }).eq('id', id).is('active_title', null);
+    if (active.error) throw active.error;
+  }
   return { ok: true };
 }
