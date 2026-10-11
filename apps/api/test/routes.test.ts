@@ -83,6 +83,7 @@ test('выгружает данные через подставленный кл
     ...client,
     from: ((table: string) => table === 'discord_role_connections'
       ? { select: () => ({ eq: async () => ({ data: [], error: null }) }) }
+      : table === 'discord_tickets' ? { select: () => ({ eq: () => ({ order: () => ({ range: async () => ({ data: [], error: null }) }) }) }) }
       : client.from(table)) as typeof client.from,
   };
   const app = createApp({ adminClient: () => exportClient, claims });
@@ -106,6 +107,7 @@ test('выгружает данные через подставленный кл
     roles: [],
     telegram: null,
     discord_linked_roles: [],
+    discord_tickets: [],
     forum: { threads: [], posts: [], reactions: [], reports: [], ban: null, views: [] },
     social: { following: [], followers: [], friendships: [], blocks: [] },
     notifications: [],

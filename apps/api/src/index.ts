@@ -18,6 +18,7 @@ import type { PublicProfileCard } from './lib/discord-profile.ts';
 import { deliverDiscordNotifications } from './lib/discord-notify.ts';
 import { isPityData, parseBannersData } from './lib/discord-wishes.ts';
 import { authorizeUrl, completeLink, rolePage, syncRoleConnections } from './lib/discord-roles.ts';
+import type { TicketDeps } from './lib/discord-tickets.ts';
 import type { LinkResult } from './lib/discord-roles.ts';
 import type { DiscordBannersData, PityData } from './lib/discord-wishes.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
@@ -32,7 +33,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.18.1';
+const version = '0.19.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -46,6 +47,9 @@ type ApiEnv = {
     discordBanners: (url: string) => Promise<DiscordBannersData>;
     discordPity: (discordId: string, env: Env, signal: AbortSignal) => Promise<PityData | null>;
     discordRoleLink: (code: string, redirectUri: string, env: Env) => Promise<LinkResult>;
+    discordTicketClient: (env: Env) => ReturnType<TicketDeps['client']>;
+    discordTicketFetch: typeof fetch;
+    discordTicketWaitUntil: (c: ApiContext, promise: Promise<unknown>) => void;
   };
 };
 type ApiContext = Context<ApiEnv>;
@@ -195,6 +199,10 @@ app.post('/discord/interactions', async (c) => {
   if (!signature || !timestamp || !await verifyDiscordRequest(c.env.DISCORD_PUBLIC_KEY, signature, timestamp, body)) {
     return c.json({ error: 'Неверная подпись' }, 401);
   }
+  if (!/^\d+$/.test(timestamp) || !Number.isSafeInteger(Number(timestamp))
+    || Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp)) > 300) {
+    return c.json({ error: 'Неверная подпись' }, 401);
+  }
   let interaction: DiscordInteraction;
   try {
     interaction = JSON.parse(body) as DiscordInteraction;
@@ -209,6 +217,17 @@ app.post('/discord/interactions', async (c) => {
     findLinkedProfile: (discordId, signal) => c.get('discordLinkedProfile')(discordId, c.env, signal),
     loadBanners: () => c.get('discordBanners')(bannersUrl),
     loadPity: (discordId, signal) => c.get('discordPity')(discordId, c.env, signal),
+    ticket: {
+      client: () => c.get('discordTicketClient')(c.env),
+      fetchImpl: c.get('discordTicketFetch'),
+      waitUntil: (promise) => c.get('discordTicketWaitUntil')(c, promise),
+      findLinkedProfile: (discordId, signal) => c.get('discordLinkedProfile')(discordId, c.env, signal),
+      channelId: c.env.DISCORD_SUPPORT_CHANNEL_ID,
+      botToken: c.env.DISCORD_BOT_TOKEN,
+      applicationId: c.env.DISCORD_APPLICATION_ID,
+      supportRoleIds: (c.env.DISCORD_SUPPORT_ROLE_IDS || '').split(',')
+        .map((id) => id.trim()).filter((id) => /^[0-9]{5,25}$/.test(id)),
+    },
   }));
 });
 
@@ -621,6 +640,9 @@ export function createApp(deps: AppDeps = {}) {
     c.set('discordBanners', deps.discordBanners || loadDiscordBanners);
     c.set('discordPity', deps.discordPity || loadDiscordPity);
     c.set('discordRoleLink', deps.discordRoleLink || linkDiscordRoles);
+    c.set('discordTicketClient', deps.discordTicketClient || createServiceClient);
+    c.set('discordTicketFetch', deps.discordTicketFetch || fetch);
+    c.set('discordTicketWaitUntil', deps.discordTicketWaitUntil || ((context, promise) => context.executionCtx.waitUntil(promise)));
     return next();
   });
   instance.route('/', app);

@@ -29,6 +29,10 @@ export const commands = [{
   name: 'гарант',
   description: 'Счётчики гаранта по вашей истории молитв',
   type: 1,
+}, {
+  name: 'тикет',
+  description: 'Создать тикет в техподдержку',
+  type: 1,
 }];
 
 // Метаданные Linked Roles (apps/api/src/lib/discord-roles.ts): type 7 — «равно да/нет», type 2 — «не меньше»

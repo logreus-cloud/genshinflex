@@ -1,5 +1,7 @@
 import type { PublicProfileCard } from './discord-profile.ts';
+import { handleTicketInteraction, isTicketInteraction } from './discord-tickets.ts';
 import { bannersReply, pityReply } from './discord-wishes.ts';
+import type { TicketDeps } from './discord-tickets.ts';
 import type { DiscordBannersData, PityData } from './discord-wishes.ts';
 
 export type DiscordBuild = {
@@ -13,9 +15,16 @@ export type DiscordBuild = {
 };
 
 export type DiscordInteraction = {
+  id?: string;
+  token?: string;
+  channel_id?: string;
   type: number;
-  data?: { name?: string; options?: { name: string; value?: string; focused?: boolean }[] };
-  member?: { user?: { id: string } };
+  data?: {
+    name?: string; custom_id?: string;
+    options?: { name: string; value?: string; focused?: boolean }[];
+    components?: { components?: { custom_id?: string; value?: string }[] }[];
+  };
+  member?: { user?: { id: string }; roles?: string[]; permissions?: string };
   user?: { id: string };
 };
 
@@ -137,12 +146,14 @@ type InteractionDeps = {
   findLinkedProfile?(discordId: string, signal: AbortSignal): Promise<{ nickname: string; is_public: boolean } | null>;
   loadBanners?(): Promise<DiscordBannersData>;
   loadPity?(discordId: string, signal: AbortSignal): Promise<PityData | null>;
+  ticket?: TicketDeps;
 };
 
 export async function handleInteraction(
   interaction: DiscordInteraction, deps: InteractionDeps,
 ) {
   if (interaction.type === 1) return { type: 1 };
+  if (isTicketInteraction(interaction)) return handleTicketInteraction(interaction, deps.ticket);
   if (interaction.type === 2 && interaction.data?.name === 'баннеры') {
     try {
       if (!deps.loadBanners) throw new Error('Нет загрузчика баннеров');

@@ -137,7 +137,7 @@ test('маршрут передаёт загрузчики баннеров и �
     discordPity: async (id, bindings) => { pityId = id; assert.equal(bindings, env); return null; },
   });
   const send = async (body: string) => {
-    const timestamp = '123456';
+    const timestamp = String(Math.floor(Date.now() / 1000));
     const signature = hex(await crypto.subtle.sign('Ed25519', pair.privateKey, new TextEncoder().encode(timestamp + body)));
     const response = await app.request('/discord/interactions', {
       method: 'POST', body, headers: { 'X-Signature-Timestamp': timestamp, 'X-Signature-Ed25519': signature },

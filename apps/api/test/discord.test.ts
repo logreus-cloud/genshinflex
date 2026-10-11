@@ -88,7 +88,7 @@ test('маршрут требует подпись Discord', async () => {
   const { pair, publicKey } = await keys();
   const app = createApp({ discordBuilds: async () => [build] });
   const body = '{"type":1}';
-  const timestamp = '123456';
+  const timestamp = String(Math.floor(Date.now() / 1000));
   const env = { SITE_ORIGINS: '', DISCORD_PUBLIC_KEY: publicKey } as Env;
   const send = (headers: Record<string, string>, bindings = env) =>
     app.request('/discord/interactions', { method: 'POST', headers, body }, bindings);

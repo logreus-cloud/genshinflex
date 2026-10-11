@@ -15,10 +15,10 @@ function cleanMetadata(value: unknown): unknown {
   ).map(([key, item]) => [key, cleanMetadata(item)]));
 }
 
-async function exportRows(client: AdminClient, table: string, key: string, id: string, columns: string[]) {
+async function exportRows(client: AdminClient, table: string, key: string, id: string, columns: string[], selection = '*') {
   const rows: unknown[] = [];
   for (let offset = 0; ; offset += 1000) {
-    const query = client.from(table).select('*').eq(key, id);
+    const query = client.from(table).select(selection).eq(key, id);
     for (const column of columns) query.order(column);
     const { data, error } = await query.range(offset, offset + 999);
     if (error || !data) throw new Error('Account export failed');
@@ -92,6 +92,11 @@ export async function exportAccount(client: AdminClient, id: string) {
     throw new Error('Account export failed');
   }
   const user = auth.data.user;
+  const discordId = user.identities?.find((identity) => identity.provider === 'discord')?.id;
+  const discordTickets = discordId && /^[0-9]{5,25}$/.test(discordId)
+    ? await exportRows(client, 'discord_tickets', 'discord_id', discordId, ['id'],
+      'id,thread_id,status,created_at,closed_at')
+    : [];
   return {
     auth: {
       id: user.id,
@@ -111,6 +116,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     roles: roles.data,
     telegram: telegram.data,
     discord_linked_roles: discordRoles.data,
+    discord_tickets: discordTickets,
     forum: { threads, posts, reactions, reports, ban: ban.data, views: threadViews },
     social: { following, followers, friendships: [...requestedFriendships, ...receivedFriendships], blocks },
     notifications,
