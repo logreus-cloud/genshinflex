@@ -8,7 +8,7 @@ name = "genshinflex_overlay_lib"
 crate-type = ["rlib"]
 
 [build-dependencies]
-tauri-build = "2"
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = ["tray-icon"] }
