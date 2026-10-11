@@ -1,6 +1,7 @@
 ---
 import { useData, LANGS } from '../../../lib/data';
 import Layout from '../../../layouts/Layout.astro';
+import { TELEGRAM_BOT } from '../../../lib/platform';
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { base, t } = useData(Astro.currentLocale);
 ---
@@ -13,7 +14,8 @@ const { base, t } = useData(Astro.currentLocale);
     data-reauth={t('Для удаления войдите заново.')}
     data-session-changed={t('Сессия изменилась. Проверьте данные аккаунта и повторите действие.')}
     data-delete-word={t('УДАЛИТЬ')}
-    data-link-error={t('Не удалось изменить способы входа. Попробуйте позже.')}>
+    data-link-error={t('Не удалось изменить способы входа. Попробуйте позже.')}
+    data-telegram-taken={t('Этот Telegram уже привязан к другому аккаунту GenshinFlex. Войдите через Telegram, удалите тот аккаунт и повторите привязку.')}>
     <h1>{t('Аккаунт')}</h1>
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite"></p>
@@ -27,8 +29,14 @@ const { base, t } = useData(Astro.currentLocale);
           <button class="btn" type="button" data-link="google" hidden>{t('Привязать Google')}</button>
           <button class="btn" type="button" data-unlink="discord" hidden>{t('Отвязать Discord')}</button>
           <button class="btn" type="button" data-unlink="google" hidden>{t('Отвязать Google')}</button>
+          <button class="btn" type="button" data-unlink-telegram hidden>{t('Отвязать Telegram')}</button>
         </div>
-        <p class="muted small">{t('Discord и Google можно привязать только к одному аккаунту GenshinFlex. Последний способ входа отвязать нельзя.')}</p>
+        <div class="telegram-link" data-bot={TELEGRAM_BOT} hidden>
+          <p class="small">{t('Привязать Telegram')}:</p>
+          <div class="telegram-link-widget"></div>
+          <p class="muted small telegram-link-domain" hidden>{t('Привязка Telegram работает только на genshinflex.com.')}</p>
+        </div>
+        <p class="muted small">{t('Discord, Google и Telegram можно привязать только к одному аккаунту GenshinFlex. Последний способ входа отвязать нельзя.')}</p>
         <p class="status small" id="identity-status" aria-live="polite"></p>
         <p class="muted">{t('Профиль и синхронизация — скоро.')}</p>
         <div class="auth-actions">
@@ -64,6 +72,13 @@ const { base, t } = useData(Astro.currentLocale);
   import { authUrl, getSupabase, onPage, signOut } from '../../../scripts/auth';
   import { API_URL } from '../../../lib/platform';
   import { notifySessionChanged, onSessionChange } from '../../../scripts/user-data/session';
+
+  declare global {
+    interface Window {
+      onGenshinFlexTelegramLink?: (auth: Record<string, unknown>) => void;
+    }
+  }
+
   onPage('#account', (root) => {
     const base = root.dataset.base || '';
     const status = root.querySelector<HTMLElement>('.status')!;
@@ -85,6 +100,25 @@ const { base, t } = useData(Astro.currentLocale);
     let loadRequest = 0;
     const updateSubmit = () => {
       submit.disabled = deleting || word.value.trim().toLocaleUpperCase() !== (root.dataset.deleteWord || '').toLocaleUpperCase();
+    };
+    const telegramLink = root.querySelector<HTMLElement>('.telegram-link')!;
+    let telegramWidget = false;
+    const showTelegramWidget = () => {
+      if (telegramWidget) return;
+      telegramWidget = true;
+      // Бот привязан к genshinflex.com: на других адресах виджет показывает только «Bot domain invalid»
+      if (!/(^|\.)genshinflex\.com$/.test(location.hostname)) {
+        telegramLink.querySelector<HTMLElement>('.telegram-link-domain')!.hidden = false;
+        return;
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://telegram.org/js/telegram-widget.js?22';
+      script.dataset.telegramLogin = telegramLink.dataset.bot || '';
+      script.dataset.size = 'large';
+      script.dataset.requestAccess = 'write';
+      script.dataset.onauth = 'onGenshinFlexTelegramLink(user)';
+      telegramLink.querySelector<HTMLElement>('.telegram-link-widget')!.append(script);
     };
     if (location.hash === '#delete') root.querySelector<HTMLDetailsElement>('#delete-account')!.open = true;
     const load = async () => {
@@ -127,6 +161,11 @@ const { base, t } = useData(Astro.currentLocale);
         for (const button of root.querySelectorAll<HTMLButtonElement>('[data-unlink]')) {
           button.hidden = identities.length < 2 || !identities.some((identity) => identity.provider === button.dataset.unlink);
         }
+        // Telegram не провайдер Supabase: привязка хранится в app_metadata.telegram_id
+        telegramLink.hidden = Boolean(telegram);
+        if (!telegram) showTelegramWidget();
+        root.querySelector<HTMLButtonElement>('[data-unlink-telegram]')!.hidden = !telegram
+          || (synthetic && !identities.some((identity) => identity.provider !== 'email'));
         loadedUserId = user.id;
         details.forEach((detail) => { detail.hidden = false; });
       } catch {
@@ -205,6 +244,35 @@ const { base, t } = useData(Astro.currentLocale);
         finally { button.disabled = false; }
       });
     }
+    const telegramRequest = async (method: 'POST' | 'DELETE', body?: unknown) => {
+      identityStatus.textContent = '';
+      try {
+        const access = await accessToken();
+        if (!access) return;
+        const response = await fetch(`${API_URL}/me/telegram`, {
+          method,
+          headers: { Authorization: `Bearer ${access.token}`, 'Content-Type': 'application/json' },
+          ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+        });
+        if (!await sameUser(access.userId)) { refreshAccount(); return; }
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({})) as { code?: string };
+          identityStatus.textContent = (data.code === 'telegram_taken' ? root.dataset.telegramTaken : root.dataset.linkError) || '';
+          identityStatus.className = 'status small bad';
+          return;
+        }
+        await getSupabase().auth.refreshSession();
+        notifySessionChanged();
+        await load();
+      } catch { identityError(); }
+    };
+    window.onGenshinFlexTelegramLink = (auth) => { void telegramRequest('POST', { auth }); };
+    root.querySelector<HTMLButtonElement>('[data-unlink-telegram]')!.addEventListener('click', async (event) => {
+      const button = event.currentTarget as HTMLButtonElement;
+      button.disabled = true;
+      try { await telegramRequest('DELETE'); }
+      finally { button.disabled = false; }
+    });
     root.querySelector<HTMLButtonElement>('#export-data')!.addEventListener('click', async (event) => {
       const button = event.currentTarget as HTMLButtonElement;
       button.disabled = true;

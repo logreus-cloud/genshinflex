@@ -35,6 +35,8 @@ const routes: Route[] = [
   { method: 'DELETE', path: `/admin/accounts/${userId}`, body: { confirm: 'traveler' }, admin: true },
   { method: 'GET', path: '/me/export' },
   { method: 'DELETE', path: '/me', body: { confirm: 'DELETE' } },
+  { method: 'POST', path: '/me/telegram', body: { auth: {} } },
+  { method: 'DELETE', path: '/me/telegram' },
 ];
 
 function send(

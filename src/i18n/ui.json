@@ -5803,9 +5803,25 @@
   "en": "Unlink Google",
   "es": "Desvincular Google"
  },
- "Discord и Google можно привязать только к одному аккаунту GenshinFlex. Последний способ входа отвязать нельзя.": {
-  "en": "A Discord or Google account can be linked to only one GenshinFlex account. You can't unlink your last sign-in method.",
-  "es": "Una cuenta de Discord o Google solo puede vincularse a una cuenta de GenshinFlex. No puedes desvincular tu último método de inicio de sesión."
+ "Discord, Google и Telegram можно привязать только к одному аккаунту GenshinFlex. Последний способ входа отвязать нельзя.": {
+  "en": "Discord, Google and Telegram accounts can each be linked to only one GenshinFlex account. You can't unlink your last sign-in method.",
+  "es": "Las cuentas de Discord, Google y Telegram solo pueden vincularse a una cuenta de GenshinFlex. No puedes desvincular tu último método de inicio de sesión."
+ },
+ "Привязать Telegram": {
+  "en": "Link Telegram",
+  "es": "Vincular Telegram"
+ },
+ "Отвязать Telegram": {
+  "en": "Unlink Telegram",
+  "es": "Desvincular Telegram"
+ },
+ "Привязка Telegram работает только на genshinflex.com.": {
+  "en": "Telegram linking only works on genshinflex.com.",
+  "es": "La vinculación de Telegram solo funciona en genshinflex.com."
+ },
+ "Этот Telegram уже привязан к другому аккаунту GenshinFlex. Войдите через Telegram, удалите тот аккаунт и повторите привязку.": {
+  "en": "This Telegram account is already linked to another GenshinFlex account. Sign in with Telegram, delete that account and try linking again.",
+  "es": "Esta cuenta de Telegram ya está vinculada a otra cuenta de GenshinFlex. Inicia sesión con Telegram, elimina esa cuenta y vuelve a vincularla."
  },
  "Этот аккаунт Discord или Google уже привязан к другому аккаунту GenshinFlex. Войдите в тот аккаунт и отвяжите его там или удалите тот аккаунт.": {
   "en": "This Discord or Google account is already linked to another GenshinFlex account. Sign in to that account and unlink it there, or delete that account.",

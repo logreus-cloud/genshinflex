@@ -23,7 +23,7 @@ import type { DiscordBannersData, PityData } from './lib/discord-wishes.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
-import { telegramLogin } from './lib/telegram-login.ts';
+import { linkTelegram, telegramLogin, unlinkTelegram } from './lib/telegram-login.ts';
 import { deliverTelegramNotifications } from './lib/telegram-notify.ts';
 import {
   TitleError, createTitle, deleteTitle, getUserRoles, getUserTitles, grantTitle,
@@ -32,7 +32,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.17.1';
+const version = '0.18.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -500,6 +500,56 @@ app.delete('/me', async (c) => {
     return c.json({ ok: true });
   } catch {
     return c.json({ error: 'Не удалось удалить аккаунт' }, 500);
+  }
+});
+
+const telegramConflicts: Record<string, string> = {
+  telegram_taken: 'Этот Telegram уже привязан к другому аккаунту',
+  telegram_already_linked: 'К аккаунту уже привязан другой Telegram',
+  last_method: 'Нельзя отвязать последний способ входа',
+};
+
+function telegramFailure(c: ApiContext, error: unknown): Response {
+  const code = (error as { code?: unknown } | null)?.code;
+  if ((error as { status?: unknown } | null)?.status === 409 && typeof code === 'string' && telegramConflicts[code]) {
+    return c.json({ error: telegramConflicts[code], code }, 409);
+  }
+  return c.json({ error: 'Сервис недоступен' }, 500);
+}
+
+app.post('/me/telegram', async (c) => {
+  const claims = await requireUser(c, c.get('claims'));
+  if (claims instanceof Response) return claims;
+  const supabase = serviceClient(c);
+  if (supabase instanceof Response) return supabase;
+  if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: 'Неверный JSON' }, 400);
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return c.json({ error: 'Неверные данные' }, 400);
+  const telegram = await verifyTelegram((body as { auth?: unknown }).auth, c.env.TELEGRAM_BOT_TOKEN, Date.now(), 3_600_000);
+  if (!telegram) return c.json({ error: 'Неверная подпись Telegram' }, 401);
+  try {
+    await linkTelegram(supabase, claims.sub, telegram);
+    return c.json({ ok: true });
+  } catch (error) {
+    return telegramFailure(c, error);
+  }
+});
+
+app.delete('/me/telegram', async (c) => {
+  const claims = await requireUser(c, c.get('claims'));
+  if (claims instanceof Response) return claims;
+  const supabase = serviceClient(c);
+  if (supabase instanceof Response) return supabase;
+  try {
+    await unlinkTelegram(supabase, claims.sub);
+    return c.json({ ok: true });
+  } catch (error) {
+    return telegramFailure(c, error);
   }
 });
 
