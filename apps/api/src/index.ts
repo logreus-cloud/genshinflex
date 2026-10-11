@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { claimsFromToken } from './lib/auth.ts';
 import type { TokenClaims } from './lib/auth.ts';
 import { deleteAccount, exportAccount } from './lib/account.ts';
@@ -16,6 +17,8 @@ import { loadDiscordProfile } from './lib/discord-profile.ts';
 import type { PublicProfileCard } from './lib/discord-profile.ts';
 import { deliverDiscordNotifications } from './lib/discord-notify.ts';
 import { isPityData, parseBannersData } from './lib/discord-wishes.ts';
+import { authorizeUrl, completeLink, rolePage, syncRoleConnections } from './lib/discord-roles.ts';
+import type { LinkResult } from './lib/discord-roles.ts';
 import type { DiscordBannersData, PityData } from './lib/discord-wishes.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
@@ -29,7 +32,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.16.0';
+const version = '0.17.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -42,6 +45,7 @@ type ApiEnv = {
     discordLinkedProfile: (discordId: string, env: Env, signal: AbortSignal) => Promise<{ nickname: string; is_public: boolean } | null>;
     discordBanners: (url: string) => Promise<DiscordBannersData>;
     discordPity: (discordId: string, env: Env, signal: AbortSignal) => Promise<PityData | null>;
+    discordRoleLink: (code: string, redirectUri: string, env: Env) => Promise<LinkResult>;
   };
 };
 type ApiContext = Context<ApiEnv>;
@@ -157,6 +161,13 @@ async function loadDiscordPity(discordId: string, env: Env, signal: AbortSignal)
   return data;
 }
 
+function linkDiscordRoles(code: string, redirectUri: string, env: Env): Promise<LinkResult> {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Нет сервисного клиента Supabase');
+  return completeLink(createServiceClient(env), {
+    applicationId: env.DISCORD_APPLICATION_ID || '', clientSecret: env.DISCORD_CLIENT_SECRET || '',
+  }, code, redirectUri);
+}
+
 app.use('*', async (c, next) => {
   if (c.req.path === '/discord/interactions') return next();
   const origin = c.req.header('Origin');
@@ -199,6 +210,44 @@ app.post('/discord/interactions', async (c) => {
     loadBanners: () => c.get('discordBanners')(bannersUrl),
     loadPity: (discordId, signal) => c.get('discordPity')(discordId, c.env, signal),
   }));
+});
+
+// Linked Roles: URL верификации в настройках Discord-приложения ведёт сюда
+const ROLE_COOKIE = 'gf_linked_role';
+const roleRedirectUri = (c: ApiContext) => new URL('/discord/linked-role/callback', c.req.url).toString();
+
+app.get('/discord/linked-role', (c) => {
+  if (!c.env.DISCORD_APPLICATION_ID || !c.env.DISCORD_CLIENT_SECRET) {
+    return c.html(rolePage('Сервис недоступен', 'Роли GenshinFlex временно недоступны, попробуйте позже.'), 503);
+  }
+  const state = crypto.randomUUID();
+  setCookie(c, ROLE_COOKIE, state, { path: '/discord/linked-role', httpOnly: true, secure: true, sameSite: 'Lax', maxAge: 600 });
+  return c.redirect(authorizeUrl(c.env.DISCORD_APPLICATION_ID, roleRedirectUri(c), state));
+});
+
+app.get('/discord/linked-role/callback', async (c) => {
+  const saved = getCookie(c, ROLE_COOKIE);
+  deleteCookie(c, ROLE_COOKIE, { path: '/discord/linked-role', secure: true });
+  const { code, state, error } = c.req.query();
+  if (error) return c.html(rolePage('Подключение отменено', 'Роли GenshinFlex не подключены. Откройте Linked Roles в Discord, если передумаете.'));
+  if (!code || !state || !saved || state !== saved) {
+    return c.html(rolePage('Ссылка устарела', 'Откройте Linked Roles в Discord ещё раз.'), 400);
+  }
+  if (!c.env.DISCORD_APPLICATION_ID || !c.env.DISCORD_CLIENT_SECRET) {
+    return c.html(rolePage('Сервис недоступен', 'Роли GenshinFlex временно недоступны, попробуйте позже.'), 503);
+  }
+  try {
+    const result = await c.get('discordRoleLink')(code, roleRedirectUri(c), c.env);
+    if (result.status === 'no_account') {
+      return c.html(rolePage('Discord не привязан к GenshinFlex',
+        'Войдите на сайт и привяжите Discord в настройках аккаунта, затем откройте Linked Roles в Discord снова.',
+        { href: 'https://genshinflex.com/account/', label: 'Настройки аккаунта' }));
+    }
+    return c.html(rolePage('Готово', `Аккаунт @${result.nickname} подключён. Вернитесь в Discord: роли появятся в течение минуты.`));
+  } catch (failure) {
+    console.warn('discord linked role failed', String(failure));
+    return c.html(rolePage('Не получилось', 'Не удалось подключить роли GenshinFlex. Попробуйте ещё раз чуть позже.'), 502);
+  }
 });
 
 app.get('/titles', async (c) => {
@@ -521,6 +570,7 @@ export function createApp(deps: AppDeps = {}) {
     c.set('discordLinkedProfile', deps.discordLinkedProfile || findDiscordLinkedProfile);
     c.set('discordBanners', deps.discordBanners || loadDiscordBanners);
     c.set('discordPity', deps.discordPity || loadDiscordPity);
+    c.set('discordRoleLink', deps.discordRoleLink || linkDiscordRoles);
     return next();
   });
   instance.route('/', app);
@@ -529,15 +579,20 @@ export function createApp(deps: AppDeps = {}) {
   return instance;
 }
 
-function scheduled(_event: unknown, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
+function scheduled(event: { scheduledTime?: number }, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
   const client = createServiceClient(env);
+  // Cron раз в минуту; метаданные Linked Roles сверяем раз в 10 минут
+  const roles = env.DISCORD_APPLICATION_ID && env.DISCORD_CLIENT_SECRET
+    && new Date(event.scheduledTime ?? Date.now()).getUTCMinutes() % 10 === 0;
   ctx.waitUntil(Promise.allSettled([
     deliverTelegramNotifications(client, env.TELEGRAM_BOT_TOKEN),
     deliverDiscordNotifications(client, env.DISCORD_BOT_TOKEN || ''),
-  ]).then(([telegram, discord]) => {
+    roles ? syncRoleConnections(client, { applicationId: env.DISCORD_APPLICATION_ID!, clientSecret: env.DISCORD_CLIENT_SECRET! }) : null,
+  ]).then(([telegram, discord, linkedRoles]) => {
     if (telegram.status === 'rejected') console.error('telegram notifications failed', String(telegram.reason));
     if (discord.status === 'rejected') console.error('discord notifications failed', String(discord.reason));
+    if (linkedRoles.status === 'rejected') console.error('discord linked roles failed', String(linkedRoles.reason));
   }));
 }
 

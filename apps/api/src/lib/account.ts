@@ -77,16 +77,18 @@ export async function exportAccount(client: AdminClient, id: string) {
     exportRelatedRows(client, 'dm_messages', 'conversation_id', conversationIds, ['conversation_id', 'id']),
   ]);
   // social_rate_events — суточный технический антиспам, его не выгружаем.
-  const [auth, profile, userData, roles, telegram, ban] = await Promise.all([
+  const [auth, profile, userData, roles, telegram, ban, discordRoles] = await Promise.all([
     client.auth.admin.getUserById(id),
     client.from('profiles').select('*').eq('id', id).maybeSingle(),
     client.from('user_data').select('*').eq('user_id', id).maybeSingle(),
     client.from('roles').select('*').eq('user_id', id),
     client.from('telegram_accounts').select('telegram_id,user_id,username,created_at,updated_at').eq('user_id', id).maybeSingle(),
     client.from('forum_bans').select('*').eq('user_id', id).maybeSingle(),
+    // OAuth-токены Discord не выгружаем: это секрет доступа, а не данные пользователя
+    client.from('discord_role_connections').select('discord_id,metadata,synced_at,created_at').eq('user_id', id).maybeSingle(),
   ]);
   if (auth.error || !auth.data.user || profile.error || userData.error || roles.error || telegram.error
-    || ban.error) {
+    || ban.error || discordRoles.error) {
     throw new Error('Account export failed');
   }
   const user = auth.data.user;
@@ -108,6 +110,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     wishes,
     roles: roles.data,
     telegram: telegram.data,
+    discord_linked_roles: discordRoles.data,
     forum: { threads, posts, reactions, reports, ban: ban.data, views: threadViews },
     social: { following, followers, friendships: [...requestedFriendships, ...receivedFriendships], blocks },
     notifications,

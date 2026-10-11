@@ -97,6 +97,7 @@ test('выгружает данные через подставленный кл
     wishes: [],
     roles: [],
     telegram: null,
+    discord_linked_roles: null,
     forum: { threads: [], posts: [], reactions: [], reports: [], ban: null, views: [] },
     social: { following: [], followers: [], friendships: [], blocks: [] },
     notifications: [],
