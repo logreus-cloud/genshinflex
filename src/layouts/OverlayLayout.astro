@@ -3,7 +3,7 @@ import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import { useData } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
-interface Props { title: string; active: 'search' | 'guide' | 'banners'; guideHref?: string; }
+interface Props { title: string; active?: 'search' | 'guide' | 'banners'; guideHref?: string; }
 const { title, active, guideHref } = Astro.props;
 ---
 <!doctype html>
@@ -15,9 +15,16 @@ const { title, active, guideHref } = Astro.props;
     <meta name="robots" content="noindex" />
     <meta name="gf-build" content={__GF_BUILD__} />
     <title>{title} — GenshinFlex</title>
+    <script is:inline data-astro-rerun>if (window.__GF_OVERLAY_APP__) document.documentElement.classList.add('ov-app');</script>
   </head>
   <body class="ov-body">
     <div class="ov-backdrop" aria-hidden="true"></div>
+    <header class="ov-account" data-ov-account>
+      <a data-ov-guest href={`${base}/overlay/login/`}>{t('Войти')}</a>
+      <a data-ov-profile href={`${base}/account/`} hidden>
+        <img data-ov-avatar alt="" width="24" height="24" hidden /><span data-ov-name></span> · {t('Профиль')}
+      </a>
+    </header>
     <main class="ov-main"><slot /></main>
     <nav class="ov-tabs" aria-label={t('Навигация')}>
       <a class="ov-tab" href={`${base}/overlay/`} aria-current={active === 'search' ? 'page' : undefined}>{t('Поиск')}</a>
@@ -34,6 +41,36 @@ const { title, active, guideHref } = Astro.props;
           const base = document.documentElement.lang === 'ru' ? '' : `/${document.documentElement.lang}`;
           if (path?.startsWith(`${base}/overlay/c/`) && /^\/(?:en\/|es\/)?overlay\/c\/[a-z0-9-]+\/$/.test(path)) { tab.href = path; tab.removeAttribute('aria-disabled'); }
         } catch {}
+      });
+    </script>
+    <script>
+      import { currentUser } from '../scripts/auth';
+      import { onPage } from '../scripts/router';
+      import { onSessionChange } from '../scripts/user-data/session';
+
+      declare global { interface Window { __GF_OVERLAY_APP__?: string } }
+
+      onPage((signal) => {
+        if (/\/overlay\/auth\/?$/.test(location.pathname)) return;
+        const root = document.querySelector<HTMLElement>('[data-ov-account]');
+        if (!root) return;
+        const guest = root.querySelector<HTMLAnchorElement>('[data-ov-guest]')!;
+        const profile = root.querySelector<HTMLAnchorElement>('[data-ov-profile]')!;
+        const avatar = root.querySelector<HTMLImageElement>('[data-ov-avatar]')!;
+        const name = root.querySelector<HTMLElement>('[data-ov-name]')!;
+        const refresh = async () => {
+          const user = await currentUser().catch(() => null);
+          if (signal.aborted) return;
+          guest.hidden = !!user;
+          profile.hidden = !user;
+          if (!user) return;
+          name.textContent = user.user_metadata?.user_name || user.user_metadata?.full_name || user.email || '';
+          const image = user.user_metadata?.avatar_url;
+          avatar.hidden = !image;
+          if (image) avatar.src = image;
+        };
+        void refresh();
+        onSessionChange(() => void refresh(), { signal });
       });
     </script>
   </body>
@@ -62,4 +99,12 @@ const { title, active, guideHref } = Astro.props;
   .ov-main :where(input, select, button) { font: inherit; }
   .ov-main :where(a, button, summary) { touch-action: manipulation; }
   .ov-main [hidden] { display: none !important; }
+  .ov-account { position: relative; z-index: 21; display: flex; justify-content: flex-end; align-items: center; min-height: 36px; padding: 6px 14px 0; font-size: .8rem; }
+  .ov-account a { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-text); }
+  .ov-account img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+  .ov-account [hidden] { display: none !important; }
+  html.ov-root.ov-app, html.ov-root.ov-app .ov-body { background: transparent; }
+  /* В прозрачном окне приложения backdrop-filter не размывает рабочий стол — фон почти непрозрачный, иначе текст под окном мешает читать */
+  .ov-app .ov-backdrop { inset: 6px; border: 1px solid var(--border); border-radius: 16px; background: rgb(9 12 22 / .97); }
+  .ov-app .ov-tabs { inset: auto 6px 6px; border: 1px solid var(--border); border-radius: 0 0 14px 14px; }
 </style>

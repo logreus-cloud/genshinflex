@@ -5730,5 +5730,21 @@
  "В истории нет молитв поддерживаемых баннеров.": {
   "en": "There are no wishes from supported banners in your history.",
   "es": "Tu historial no contiene deseos de gachapones compatibles."
+ },
+ "Войти по почте": {
+  "en": "Sign in with email",
+  "es": "Iniciar sesión con correo"
+ },
+ "Вход через Telegram в приложении недоступен.": {
+  "en": "Telegram sign-in is unavailable in the app.",
+  "es": "El acceso con Telegram no está disponible en la aplicación."
+ },
+ "Попробовать снова": {
+  "en": "Try again",
+  "es": "Intentarlo de nuevo"
+ },
+ "Продолжите вход в открывшемся браузере.": {
+  "en": "Continue signing in in the browser that opened.",
+  "es": "Continúa el inicio de sesión en el navegador que se abrió."
  }
 }

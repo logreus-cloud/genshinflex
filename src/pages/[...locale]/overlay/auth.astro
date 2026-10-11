@@ -1,0 +1,54 @@
+---
+import OverlayLayout from '../../../layouts/OverlayLayout.astro';
+import { useData, LANGS } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<OverlayLayout title={t('Подтверждение входа')}>
+  <section class="ov-panel" data-ov-auth data-base={base}
+    data-failed={t('Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.')}
+    data-pending={t('Подтверждаем вход…')}>
+    <h1>{t('Подтверждение входа')}</h1>
+    <p class="ov-auth-status" role="status" aria-live="polite">{t('Подтверждаем вход…')}</p>
+    <a class="ov-link" href={`${base}/overlay/login/`} hidden>{t('Попробовать снова')}</a>
+  </section>
+</OverlayLayout>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  import { SUPABASE_KEY, SUPABASE_URL } from '../../../lib/platform';
+  import { onPage } from '../../../scripts/auth';
+  import { SESSION_KEY, notifySessionChanged } from '../../../scripts/user-data/session';
+
+  onPage('[data-ov-auth]', async (root) => {
+    const base = root.dataset.base || '';
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    const error = params.get('error');
+    history.replaceState(history.state, '', location.pathname);
+    const status = root.querySelector<HTMLElement>('.ov-auth-status')!;
+    const retry = root.querySelector<HTMLAnchorElement>('a')!;
+    if (error || !code || !/^[A-Za-z0-9._~-]{1,512}$/.test(code) || !window.__GF_OVERLAY_APP__) {
+      status.textContent = root.dataset.failed || '';
+      retry.hidden = false;
+      return;
+    }
+    try {
+      const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: { flowType: 'pkce', storageKey: SESSION_KEY, persistSession: true, detectSessionInUrl: false },
+      });
+      const { error: exchangeError } = await client.auth.exchangeCodeForSession(code);
+      if (exchangeError) throw exchangeError;
+      notifySessionChanged();
+      location.replace(`${base}/overlay/`);
+    } catch {
+      status.textContent = root.dataset.failed || '';
+      retry.hidden = false;
+    }
+  });
+</script>
+
+<style>
+  .ov-auth-status { margin-bottom: 1rem; }
+  .ov-auth-status:empty { display: none; }
+</style>

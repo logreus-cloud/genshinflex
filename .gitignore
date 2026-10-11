@@ -1,5 +1,6 @@
 # build output
 dist/
+!apps/overlay/dist/
 # generated types
 .astro/
 

@@ -1,0 +1,70 @@
+---
+import OverlayLayout from '../../../layouts/OverlayLayout.astro';
+import { useData, LANGS } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<OverlayLayout title={t('Войти')}>
+  <section class="ov-panel" data-ov-login data-base={base} data-error={t('Не удалось войти. Попробуйте ещё раз.')} data-browser={t('Продолжите вход в открывшемся браузере.')}>
+    <h1>{t('Войти')}</h1>
+    <p>{t('Войдите в свой аккаунт GenshinFlex.')}</p>
+    <div class="ov-login-buttons">
+      <button class="btn" type="button" data-provider="discord">{t('Войти через Discord')}</button>
+      <button class="btn" type="button" data-provider="google">{t('Войти через Google')}</button>
+    </div>
+    <a class="ov-link" href={`${base}/account/login/?next=${encodeURIComponent(`${base}/overlay/`)}`}>{t('Войти по почте')}</a>
+    <p class="muted small">{t('Вход через Telegram в приложении недоступен.')}</p>
+    <p class="ov-login-status" role="status" aria-live="polite"></p>
+  </section>
+</OverlayLayout>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  import { SUPABASE_KEY, SUPABASE_URL } from '../../../lib/platform';
+  import { onPage } from '../../../scripts/auth';
+  import { SESSION_KEY } from '../../../scripts/user-data/session';
+
+  onPage('[data-ov-login]', (root) => {
+    const base = root.dataset.base || '';
+    if (!window.__GF_OVERLAY_APP__) {
+      location.replace(`${base}/account/login/?next=${encodeURIComponent(`${base}/overlay/`)}`);
+      return;
+    }
+    const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { flowType: 'pkce', storageKey: SESSION_KEY, persistSession: true, detectSessionInUrl: false },
+    });
+    const status = root.querySelector<HTMLElement>('.ov-login-status')!;
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-provider]')];
+    for (const button of buttons) {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        status.textContent = '';
+        try {
+          const { data, error } = await client.auth.signInWithOAuth({
+            provider: button.dataset.provider as 'discord' | 'google',
+            options: { redirectTo: 'genshinflex://auth', skipBrowserRedirect: true },
+          });
+          if (error || !data.url) throw error || new Error('oauth');
+          // Приложение откроет адрес в системном браузере и отменит переход — страница остаётся на месте
+          location.href = data.url;
+          status.classList.remove('bad');
+          status.textContent = root.dataset.browser || '';
+          // Новый вход перезапишет verifier прошлого — блокируем все кнопки, пока браузер открывается
+          for (const other of buttons) other.disabled = true;
+          setTimeout(() => { for (const other of buttons) other.disabled = false; }, 3000);
+        } catch {
+          status.classList.add('bad');
+          status.textContent = root.dataset.error || '';
+          button.disabled = false;
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .ov-login-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: 1rem 0; }
+  .ov-login-buttons .btn { min-width: 0; }
+  .ov-login-status.bad { color: var(--bad); }
+  @media (max-width: 400px) { .ov-login-buttons { grid-template-columns: 1fr; } }
+</style>
