@@ -9,6 +9,8 @@ export function initNotifySettings(signal: AbortSignal) {
   const status = document.getElementById('notify-status');
   const telegram = document.getElementById('notify-telegram');
   const telegramToggle = document.getElementById('notify-telegram-toggle') as HTMLInputElement | null;
+  const discord = document.getElementById('notify-discord');
+  const discordToggle = document.getElementById('notify-discord-toggle') as HTMLInputElement | null;
   const controls = field ? [...field.querySelectorAll<HTMLInputElement>('input[data-notify]')] : [];
   const keys = ['reply', 'mention', 'follow', 'friend_request', 'friend_accept'];
   if (!field || !loginNote || !status || !telegram || !telegramToggle || controls.length !== keys.length || keys.some((key) => !controls.some((control) => control.dataset.notify === key))) return;
@@ -28,6 +30,11 @@ export function initNotifySettings(signal: AbortSignal) {
     telegram.hidden = true;
     telegramToggle.checked = false;
     telegramToggle.disabled = false;
+    if (discord && discordToggle) {
+      discord.hidden = true;
+      discordToggle.checked = false;
+      discordToggle.disabled = false;
+    }
     for (const control of controls) { control.checked = true; control.disabled = false; }
     setStatus('');
   };
@@ -65,6 +72,19 @@ export function initNotifySettings(signal: AbortSignal) {
         }
       } catch {
         if (!current()) return;
+      }
+      if (discord && discordToggle) {
+        try {
+          const { data: discordStatus, error: discordError } = await client.rpc('notify_discord_status');
+          if (!current()) return;
+          if (!discordError && isRecord(discordStatus) && discordStatus.linked === true) {
+            discord.hidden = false;
+            discordToggle.checked = discordStatus.enabled === true;
+            notify = { ...notify, discord: discordStatus.enabled === true };
+          }
+        } catch {
+          if (!current()) return;
+        }
       }
     } catch {
       if (!current()) return;
@@ -119,6 +139,29 @@ export function initNotifySettings(signal: AbortSignal) {
       setStatus(t('Не удалось сохранить'), true);
     } finally {
       if (current()) telegramToggle.disabled = false;
+    }
+  }, { signal });
+
+  if (discord && discordToggle) discordToggle.addEventListener('change', async () => {
+    const id = userId, request = loadRequest, next = discordToggle.checked;
+    const current = () => !signal.aborted && request === loadRequest && userId === id;
+    if (!id || discordToggle.disabled) { discordToggle.checked = notify.discord === true; return; }
+    discordToggle.disabled = true;
+    setStatus('');
+    try {
+      const { getSupabase } = await import('../auth');
+      if (!current()) return;
+      const { data, error } = await getSupabase().rpc('set_notify_setting', { p_kind: 'discord', p_value: next });
+      if (!current()) return;
+      if (error || !isRecord(data) || (data.discord === true) !== next) throw new Error();
+      notify = { ...notify, discord: data.discord === true };
+      discordToggle.checked = notify.discord === true;
+    } catch {
+      if (!current()) return;
+      discordToggle.checked = notify.discord === true;
+      setStatus(t('Не удалось сохранить'), true);
+    } finally {
+      if (current()) discordToggle.disabled = false;
     }
   }, { signal });
 

@@ -1,8 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export type TelegramNotification = {
+export type NotificationItem = {
   id: number;
-  telegram_id: number;
   kind: string;
   actor: { id?: string; name?: string; nickname?: string; public?: boolean } | null;
   thread_id: number | null;
@@ -10,11 +9,12 @@ export type TelegramNotification = {
   post_id: number | null;
   snippet: string | null;
 };
+export type TelegramNotification = NotificationItem & { telegram_id: number };
 
 const escapes: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
 const escapeHtml = (value: string) => value.replace(/[&<>]/g, (char) => escapes[char]);
 
-export function telegramMessage(item: TelegramNotification, site = 'https://genshinflex.com'): string {
+export function notificationParts(item: NotificationItem, site = 'https://genshinflex.com'): { heading: string; snippet: string; href: string } {
   const name = item.actor?.name ?? 'Удалённый пользователь';
   const topic = item.thread_title ? ` в теме «${item.thread_title}»` : '';
   let heading: string;
@@ -51,9 +51,14 @@ export function telegramMessage(item: TelegramNotification, site = 'https://gens
     href = `${site}/u/${encodeURIComponent(item.actor.nickname)}/`;
   const snippet = item.snippet?.replace(/\s+/g, ' ').trim();
   const short = snippet ? Array.from(snippet).slice(0, 160).join('') : '';
+  return { heading, snippet: short, href };
+}
+
+export function telegramMessage(item: TelegramNotification, site = 'https://genshinflex.com'): string {
+  const { heading, snippet, href } = notificationParts(item, site);
   return [
     escapeHtml(heading),
-    ...(short ? [escapeHtml(short)] : []),
+    ...(snippet ? [escapeHtml(snippet)] : []),
     `<a href="${escapeHtml(href)}">Открыть на GenshinFlex</a>`,
   ].join('\n\n');
 }

@@ -5766,5 +5766,21 @@
  "Не удалось обновить историю молитв": {
   "en": "Could not update wish history",
   "es": "No se pudo actualizar el historial de deseos"
+ },
+ "Discord": {
+  "en": "Discord",
+  "es": "Discord"
+ },
+ "Дублировать уведомления в личные сообщения Discord": {
+  "en": "Also send notifications to Discord DMs",
+  "es": "Enviar también las notificaciones por mensaje directo en Discord"
+ },
+ "Бот пишет только участникам сервера GenshinFlex с открытыми личными сообщениями.": {
+  "en": "The bot can only message members of the GenshinFlex server who have DMs open.",
+  "es": "El bot solo puede escribir a miembros del servidor de GenshinFlex con los mensajes directos abiertos."
+ },
+ "Вступить на сервер": {
+  "en": "Join the server",
+  "es": "Unirse al servidor"
  }
 }

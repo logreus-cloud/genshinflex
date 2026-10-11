@@ -14,6 +14,7 @@ import { createBuildsLoader, handleInteraction, verifyDiscordRequest } from './l
 import type { DiscordBuild, DiscordInteraction } from './lib/discord.ts';
 import { loadDiscordProfile } from './lib/discord-profile.ts';
 import type { PublicProfileCard } from './lib/discord-profile.ts';
+import { deliverDiscordNotifications } from './lib/discord-notify.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
@@ -26,7 +27,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.14.0';
+const version = '0.15.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -499,7 +500,14 @@ export function createApp(deps: AppDeps = {}) {
 
 function scheduled(_event: unknown, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
-  ctx.waitUntil(deliverTelegramNotifications(createServiceClient(env), env.TELEGRAM_BOT_TOKEN));
+  const client = createServiceClient(env);
+  ctx.waitUntil(Promise.allSettled([
+    deliverTelegramNotifications(client, env.TELEGRAM_BOT_TOKEN),
+    deliverDiscordNotifications(client, env.DISCORD_BOT_TOKEN || ''),
+  ]).then(([telegram, discord]) => {
+    if (telegram.status === 'rejected') console.error('telegram notifications failed', String(telegram.reason));
+    if (discord.status === 'rejected') console.error('discord notifications failed', String(discord.reason));
+  }));
 }
 
 const api = createApp();
