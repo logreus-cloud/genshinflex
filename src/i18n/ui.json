@@ -5826,5 +5826,109 @@
  "Этот аккаунт Discord или Google уже привязан к другому аккаунту GenshinFlex. Войдите в тот аккаунт и отвяжите его там или удалите тот аккаунт.": {
   "en": "This Discord or Google account is already linked to another GenshinFlex account. Sign in to that account and unlink it there, or delete that account.",
   "es": "Esta cuenta de Discord o Google ya está vinculada a otra cuenta de GenshinFlex. Inicia sesión en esa cuenta y desvincúlala allí, o elimina esa cuenta."
+ },
+ "Оверлей для ПК": {
+  "en": "PC overlay",
+  "es": "Superposición para PC"
+ },
+ "GenshinFlex для ПК": {
+  "en": "GenshinFlex for PC",
+  "es": "GenshinFlex para PC"
+ },
+ "Скачать для Windows": {
+  "en": "Download for Windows",
+  "es": "Descargar para Windows"
+ },
+ "Что умеет": {
+  "en": "Features",
+  "es": "Funciones"
+ },
+ "Как пользоваться": {
+  "en": "How to use it",
+  "es": "Cómo usarlo"
+ },
+ "Безопасно ли это": {
+  "en": "Is it safe?",
+  "es": "¿Es seguro?"
+ },
+ "Открыть компактный режим в браузере": {
+  "en": "Open compact mode in the browser",
+  "es": "Abrir el modo compacto en el navegador"
+ },
+ "Панель поверх игры: гайд персонажа, баннеры и трекер круток. Открывается по Alt+G.": {
+  "en": "An overlay with character guides, banners and a wish tracker. Press Alt+G to open it.",
+  "es": "Una superposición con guías de personajes, banners y seguimiento de deseos. Pulsa Alt+G para abrirla."
+ },
+ "Скачивание временно недоступно, попробуйте позже.": {
+  "en": "The download is temporarily unavailable. Please try again later.",
+  "es": "La descarga no está disponible temporalmente. Inténtalo más tarde."
+ },
+ "Windows 10/11, около 3 МБ. Бесплатно, без рекламы.": {
+  "en": "Windows 10/11, about 3 MB. Free, with no ads.",
+  "es": "Windows 10/11, unos 3 MB. Gratis y sin anuncios."
+ },
+ "Гайд персонажа поверх игры": {
+  "en": "Character guide over the game",
+  "es": "Guía de personaje sobre el juego"
+ },
+ "Баннеры и трекер гаранта": {
+  "en": "Banners and pity tracker",
+  "es": "Banners y contador de garantía"
+ },
+ "Гайд любого персонажа в узкой панели.": {
+  "en": "A guide for any character in a narrow panel.",
+  "es": "Una guía de cualquier personaje en un panel estrecho."
+ },
+ "Текущие баннеры и счётчик гаранта.": {
+  "en": "Current banners and a pity counter.",
+  "es": "Banners actuales y contador de garantía."
+ },
+ "Новые крутки подтягиваются сами, когда открываете историю молитв в игре.": {
+  "en": "New wishes appear automatically when you open wish history in the game.",
+  "es": "Los nuevos deseos aparecen automáticamente al abrir el historial de deseos en el juego."
+ },
+ "Вход в аккаунт GenshinFlex по почте, через Discord или Google; история синхронизируется с сайтом.": {
+  "en": "Sign in to GenshinFlex with email, Discord or Google; your history syncs with the site.",
+  "es": "Inicia sesión en GenshinFlex con correo, Discord o Google; tu historial se sincroniza con el sitio."
+ },
+ "Приложение обновляется само; проверить обновления можно в меню трея.": {
+  "en": "The app updates automatically; you can check for updates in the tray menu.",
+  "es": "La aplicación se actualiza automáticamente; puedes buscar actualizaciones en el menú de la bandeja."
+ },
+ "Установите приложение.": {
+  "en": "Install the app.",
+  "es": "Instala la aplicación."
+ },
+ "Нажмите Alt+G, чтобы показать или скрыть панель.": {
+  "en": "Press Alt+G to show or hide the panel.",
+  "es": "Pulsa Alt+G para mostrar u ocultar el panel."
+ },
+ "Запустите игру в режиме «В окне» или «Без рамки»: в полноэкранном режиме панель не видна.": {
+  "en": "Run the game in Windowed or Borderless mode: the panel is not visible in Fullscreen mode.",
+  "es": "Ejecuta el juego en modo Ventana o Sin bordes: el panel no se ve en pantalla completa."
+ },
+ "Через значок в трее можно включить автозапуск или выйти из приложения.": {
+  "en": "Use the tray icon to enable startup or quit the app.",
+  "es": "Usa el icono de la bandeja para activar el inicio automático o salir de la aplicación."
+ },
+ "Windows может предупредить о неизвестном издателе — нажмите „Подробнее“ → „Выполнить в любом случае“.": {
+  "en": "Windows may warn you about an unknown publisher — select ‘More info’ → ‘Run anyway’.",
+  "es": "Windows puede advertirte sobre un editor desconocido: selecciona «Más información» → «Ejecutar de todas formas»."
+ },
+ "Приложение не вмешивается в игру: не внедряется в процесс, не читает память и не перехватывает графику.": {
+  "en": "The app does not interfere with the game: it does not inject into its process, read memory or intercept graphics.",
+  "es": "La aplicación no interfiere con el juego: no se inyecta en su proceso, no lee la memoria ni intercepta los gráficos."
+ },
+ "Оно читает только файл кэша игры, чтобы найти ссылку на историю молитв — так же работает скрипт на странице трекера. Ссылка уходит только в HoYoverse через наш сервер и не сохраняется.": {
+  "en": "It only reads the game cache file to find the wish history link, as the tracker page script does. The link goes only to HoYoverse through our server and is not stored.",
+  "es": "Solo lee el archivo de caché del juego para encontrar el enlace al historial de deseos, igual que el script de la página del rastreador. El enlace solo se envía a HoYoverse a través de nuestro servidor y no se guarda."
+ },
+ "Внутри приложения открываются страницы сайта GenshinFlex; у них нет доступа к вашему компьютеру.": {
+  "en": "The app opens GenshinFlex website pages; they cannot access your computer.",
+  "es": "La aplicación abre páginas del sitio de GenshinFlex; estas no pueden acceder a tu ordenador."
+ },
+ "Мы не можем гарантировать позицию HoYoverse по сторонним программам, но приложение работает так же, как популярные трекеры круток.": {
+  "en": "We cannot guarantee HoYoverse’s position on third-party software, but the app works like popular wish trackers.",
+  "es": "No podemos garantizar la postura de HoYoverse sobre programas de terceros, pero la aplicación funciona como los rastreadores de deseos populares."
  }
 }

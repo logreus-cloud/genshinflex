@@ -1,0 +1,76 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('GenshinFlex для ПК')} description={t('Панель поверх игры: гайд персонажа, баннеры и трекер круток. Открывается по Alt+G.')}>
+  <h1>{t('GenshinFlex для ПК')}</h1>
+  <div class="prose">
+    <p class="lead">{t('Панель поверх игры: гайд персонажа, баннеры и трекер круток. Открывается по Alt+G.')}</p>
+
+    <div class="download">
+      <p id="download-unavailable" class="download-error" hidden>{t('Скачивание временно недоступно, попробуйте позже.')}</p>
+      <a class="btn primary" href="/download/overlay">{t('Скачать для Windows')}</a>
+      <small>{t('Windows 10/11, около 3 МБ. Бесплатно, без рекламы.')}</small>
+    </div>
+
+    <div class="screenshots">
+      <figure>
+        <img src="/app/guide.png" width="380" loading="lazy" alt={t('Гайд персонажа поверх игры')} />
+        <figcaption>{t('Гайд персонажа поверх игры')}</figcaption>
+      </figure>
+      <figure>
+        <img src="/app/banners.png" width="380" loading="lazy" alt={t('Баннеры и трекер гаранта')} />
+        <figcaption>{t('Баннеры и трекер гаранта')}</figcaption>
+      </figure>
+    </div>
+
+    <h2 class="h-sec">{t('Что умеет')}</h2>
+    <ul>
+      <li>{t('Гайд любого персонажа в узкой панели.')}</li>
+      <li>{t('Текущие баннеры и счётчик гаранта.')}</li>
+      <li>{t('Новые крутки подтягиваются сами, когда открываете историю молитв в игре.')}</li>
+      <li>{t('Вход в аккаунт GenshinFlex по почте, через Discord или Google; история синхронизируется с сайтом.')}</li>
+      <li>{t('Приложение обновляется само; проверить обновления можно в меню трея.')}</li>
+    </ul>
+
+    <h2 class="h-sec">{t('Как пользоваться')}</h2>
+    <ol>
+      <li>{t('Установите приложение.')}</li>
+      <li>{t('Нажмите Alt+G, чтобы показать или скрыть панель.')}</li>
+      <li>{t('Запустите игру в режиме «В окне» или «Без рамки»: в полноэкранном режиме панель не видна.')}</li>
+      <li>{t('Через значок в трее можно включить автозапуск или выйти из приложения.')}</li>
+    </ol>
+    <p>{t('Windows может предупредить о неизвестном издателе — нажмите „Подробнее“ → „Выполнить в любом случае“.')}</p>
+
+    <h2 class="h-sec">{t('Безопасно ли это')}</h2>
+    <p>{t('Приложение не вмешивается в игру: не внедряется в процесс, не читает память и не перехватывает графику.')}</p>
+    <p>{t('Оно читает только файл кэша игры, чтобы найти ссылку на историю молитв — так же работает скрипт на странице трекера. Ссылка уходит только в HoYoverse через наш сервер и не сохраняется.')}</p>
+    <p>{t('Внутри приложения открываются страницы сайта GenshinFlex; у них нет доступа к вашему компьютеру.')}</p>
+    <p>{t('Мы не можем гарантировать позицию HoYoverse по сторонним программам, но приложение работает так же, как популярные трекеры круток.')}</p>
+
+    <p><a href={`${base}/overlay/`}>{t('Открыть компактный режим в браузере')}</a></p>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const notice = document.getElementById('download-unavailable');
+    if (notice) notice.hidden = new URLSearchParams(location.search).get('download') !== 'unavailable';
+  });
+</script>
+
+<style>
+  .prose { max-width: 75ch; }
+  .download { display: grid; justify-items: start; gap: .5rem; margin: 1.5rem 0; }
+  .download .btn { justify-content: center; }
+  .download small { color: var(--muted); }
+  .download-error { margin: 0; color: var(--bad); }
+  .screenshots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 2rem 0; }
+  figure { margin: 0; }
+  img { display: block; width: 100%; height: auto; border-radius: var(--radius); }
+  figcaption { margin-top: .5rem; color: var(--muted); font-size: .85rem; }
+  ul, ol { padding-left: 1.2rem; display: grid; gap: .5rem; }
+  @media (max-width: 600px) { .screenshots { grid-template-columns: 1fr; } }
+</style>
