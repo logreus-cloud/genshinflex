@@ -34,3 +34,7 @@ Abre [tu perfil](/profile/) → «Personalizar perfil»:
 Si todavía no tienes recompensas, solo verás las opciones normales.
 
 Con el movimiento reducido activado en el sistema, el marco y el brillo se muestran sin animación.
+
+### Y una cosa más
+
+La cabecera del sitio ahora muestra tu avatar en lugar del icono con la primera letra de tu apodo: la imagen que subiste o el personaje que elegiste. Si no tienes avatar, se queda el icono de siempre.

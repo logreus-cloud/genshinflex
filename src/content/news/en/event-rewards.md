@@ -34,3 +34,7 @@ Open [your profile](/profile/) → “Customize profile”:
 If you don’t have any rewards yet, you’ll only see the regular options there.
 
 With reduced motion turned on in your system settings, the frame and glow are shown without animation.
+
+### One more thing
+
+The site header now shows your avatar instead of an icon with the first letter of your nickname: your uploaded picture or the character you picked. If you haven’t set an avatar, the old icon stays.
