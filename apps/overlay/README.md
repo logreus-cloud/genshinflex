@@ -15,6 +15,16 @@ npm run build
 Установщик NSIS появится в `src-tauri/target/release/bundle/nsis/`. Для локального сайта задайте `GF_OVERLAY_URL` (например, `http://localhost:4321`). В `settings.json` в каталоге конфигурации приложения можно указать `base_url` и `shortcut`.
 Для входа через Discord и Google добавьте `genshinflex://auth` в Supabase → Authentication → URL Configuration → Redirect URLs.
 
+## Распознавание экрана
+
+Оверлей распознаёт заголовок экрана молитв или персонажа и открывает соответствующую страницу. Распознавание можно отключить в трее или через `"screen_detection": false` в `settings.json`. Снимки не сохраняются и никуда не отправляются.
+
+Тест на скриншотах запускается из `src-tauri`:
+
+```sh
+GF_SCREEN_SAMPLES=<папка> cargo test samples -- --ignored --nocapture
+```
+
 ## Релиз
 
 Поднимите версию в `src-tauri/tauri.conf.json` и `src-tauri/Cargo.toml`, затем сделайте коммит. Создайте и отправьте тег: `git tag overlay-vX.Y.Z && git push origin overlay-vX.Y.Z`.

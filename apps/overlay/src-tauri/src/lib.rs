@@ -1,8 +1,10 @@
 mod updates;
 mod wish_cache;
+#[cfg(windows)] mod screen;
+mod screen_text;
 
 use serde::Deserialize;
-use std::{fs, sync::{atomic::{AtomicU64, Ordering}, mpsc, Arc}, thread, time::Duration};
+use std::{fs, sync::{atomic::{AtomicBool, AtomicU64, Ordering}, mpsc, Arc}, thread, time::Duration};
 use sysinfo::{ProcessesToUpdate, System};
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem},
@@ -25,11 +27,13 @@ const DEFAULT_SHORTCUT: &str = "Alt+G";
 struct SettingsFile {
     base_url: Option<String>,
     shortcut: Option<String>,
+    screen_detection: Option<bool>,
 }
 
 struct Settings {
     base: Url,
     shortcut: String,
+    screen_detection: bool,
 }
 
 fn valid_base(value: &str) -> Option<Url> {
@@ -59,7 +63,31 @@ fn settings(app: &AppHandle) -> Settings {
         if let Some(value) = base { eprintln!("Недопустимый адрес оверлея: {value}"); }
         valid_base(DEFAULT_URL).unwrap()
     });
-    Settings { base, shortcut: saved.shortcut.filter(|s| !s.trim().is_empty()).unwrap_or_else(|| DEFAULT_SHORTCUT.into()) }
+    Settings { base, shortcut: saved.shortcut.filter(|s| !s.trim().is_empty()).unwrap_or_else(|| DEFAULT_SHORTCUT.into()), screen_detection: saved.screen_detection.unwrap_or(true) }
+}
+
+fn save_screen_detection(app: &AppHandle, enabled: bool) {
+    let path = match app.path().app_config_dir() {
+        Ok(dir) => dir.join("settings.json"),
+        Err(error) => { eprintln!("Настройки: {error}"); return; }
+    };
+    let mut value = match fs::read_to_string(&path) {
+        Ok(raw) => match serde_json::from_str::<serde_json::Value>(&raw) {
+            Ok(value) if value.is_object() => value,
+            Ok(_) => serde_json::json!({}),
+            Err(error) => { eprintln!("Некорректный settings.json: {error}"); serde_json::json!({}) }
+        },
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => serde_json::json!({}),
+        Err(error) => { eprintln!("Настройки: {error}"); return; }
+    };
+    value["screen_detection"] = enabled.into();
+    if let Some(parent) = path.parent() {
+        if let Err(error) = fs::create_dir_all(parent) { eprintln!("Настройки: {error}"); return; }
+    }
+    match serde_json::to_vec_pretty(&value) {
+        Ok(data) => if let Err(error) = fs::write(path, data) { eprintln!("Настройки: {error}"); },
+        Err(error) => eprintln!("Настройки: {error}"),
+    }
 }
 
 fn in_panel(path: &str) -> bool {
@@ -142,13 +170,15 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
     let show_item = MenuItem::with_id(app, "toggle", "Показать/скрыть", true, None::<&str>)?;
     let autostart = CheckMenuItem::with_id(app, "autostart", "Автозапуск", true,
         app.autolaunch().is_enabled().unwrap_or(false), None::<&str>)?;
+    let screen_item = CheckMenuItem::with_id(app, "screen", "Распознавание экрана", true, settings.screen_detection, None::<&str>)?;
     let update_item = MenuItem::with_id(app, "update", "Обновлений нет", false, None::<&str>)?;
     let site = MenuItem::with_id(app, "site", "Открыть сайт", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Выход", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show_item, &autostart, &update_item, &site, &quit])?;
+    let menu = Menu::with_items(app, &[&show_item, &autostart, &screen_item, &update_item, &site, &quit])?;
     updates::set_menu_item(app.handle(), update_item);
     let base = settings.base.to_string();
     let check = autostart.clone();
+    let screen_check = screen_item.clone();
     let mut builder = TrayIconBuilder::new().menu(&menu).show_menu_on_left_click(false)
         .tooltip(format!("GenshinFlex — {}", settings.shortcut))
         .on_menu_event(move |app, event| match event.id().as_ref() {
@@ -158,6 +188,13 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
                 let result = if enabled { app.autolaunch().disable() } else { app.autolaunch().enable() };
                 if let Err(error) = result { eprintln!("Автозапуск: {error}"); }
                 let _ = check.set_checked(app.autolaunch().is_enabled().unwrap_or(enabled));
+            }
+            "screen" => {
+                let state = app.state::<Arc<AtomicBool>>();
+                let enabled = !state.load(Ordering::SeqCst);
+                state.store(enabled, Ordering::SeqCst);
+                let _ = screen_check.set_checked(enabled);
+                save_screen_detection(app, enabled);
             }
             "update" => updates::install(app),
             "site" => { if let Err(error) = app.opener().open_url(base.clone(), None::<&str>) { eprintln!("Браузер: {error}"); } }
@@ -194,6 +231,8 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
 
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let settings = settings(app.handle());
+    let detection = Arc::new(AtomicBool::new(settings.screen_detection));
+    app.manage(detection.clone());
     app.manage(wish_cache::WishLinkState::default());
     app.manage(updates::UpdateState::default());
     let origin = settings.base.origin().ascii_serialization();
@@ -277,7 +316,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         }
     });
     // Неверная клавиша из settings.json — возвращаемся к Alt+G, чтобы окно можно было открыть
-    wish_cache::start(app.handle().clone(), window);
+    wish_cache::start(app.handle().clone(), window.clone());
     let mut settings = settings;
     let register = |app: &tauri::App, shortcut: &str| app.global_shortcut().on_shortcut(shortcut, |app, _, event| {
         if event.state == ShortcutState::Pressed { toggle(app); }
@@ -289,7 +328,8 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
             if let Err(error) = register(app, DEFAULT_SHORTCUT) { eprintln!("Горячая клавиша {DEFAULT_SHORTCUT}: {error}"); }
         }
     }
-    app.manage(Settings { base: settings.base.clone(), shortcut: settings.shortcut.clone() });
+    app.manage(Settings { base: settings.base.clone(), shortcut: settings.shortcut.clone(), screen_detection: settings.screen_detection });
+    screen::start(app.handle().clone(), window, detection);
     tray(app, &settings)?;
     let deep_handle = app.handle().clone();
     app.deep_link().on_open_url(move |event| {

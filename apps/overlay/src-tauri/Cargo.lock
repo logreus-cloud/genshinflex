@@ -1332,6 +1332,7 @@ dependencies = [
 name = "genshinflex-overlay"
 version = "0.1.4"
 dependencies = [
+ "png 0.17.16",
  "serde",
  "serde_json",
  "sysinfo",
@@ -1344,6 +1345,7 @@ dependencies = [
  "tauri-plugin-single-instance",
  "tauri-plugin-updater",
  "tauri-plugin-window-state",
+ "windows",
 ]
 
 [[package]]
