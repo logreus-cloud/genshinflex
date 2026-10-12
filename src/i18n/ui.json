@@ -5879,6 +5879,18 @@
   "en": "A guide for any character in a narrow panel.",
   "es": "Una guía de cualquier personaje en un panel estrecho."
  },
+ "Само переключается на гайд персонажа или баннеры, когда вы открываете их в игре.": {
+  "en": "Switches to the character guide or banners by itself when you open them in the game.",
+  "es": "Cambia solo a la guía del personaje o a los banners cuando los abres en el juego."
+ },
+ "Оно читает файл кэша игры, чтобы найти ссылку на историю молитв — так же работает скрипт на странице трекера. Ссылка уходит только в HoYoverse через наш сервер и не сохраняется.": {
+  "en": "It reads the game cache file to find the wish history link, as the tracker page script does. The link goes only to HoYoverse through our server and is not stored.",
+  "es": "Lee el archivo de caché del juego para encontrar el enlace al historial de deseos, igual que el script de la página del rastreador. El enlace solo se envía a HoYoverse a través de nuestro servidor y no se guarda."
+ },
+ "Чтобы понять, какой экран открыт, приложение раз в секунду смотрит на заголовок в левом верхнем углу игры и распознаёт текст встроенными средствами Windows. Снимки не сохраняются и никуда не отправляются, а распознавание можно выключить в меню трея.": {
+  "en": "To know which screen is open, the app looks at the title in the top-left corner of the game about once a second and reads the text with built-in Windows tools. Captures are not saved or sent anywhere, and recognition can be turned off in the tray menu.",
+  "es": "Para saber qué pantalla está abierta, la aplicación mira el título en la esquina superior izquierda del juego más o menos una vez por segundo y lee el texto con las herramientas integradas de Windows. Las capturas no se guardan ni se envían a ningún sitio, y el reconocimiento se puede desactivar en el menú de la bandeja."
+ },
  "Текущие баннеры и счётчик гаранта.": {
   "en": "Current banners and a pity counter.",
   "es": "Banners actuales y contador de garantía."
