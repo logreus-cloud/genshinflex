@@ -26,6 +26,7 @@ import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
 import { linkTelegram, telegramLogin, unlinkTelegram } from './lib/telegram-login.ts';
 import { deliverTelegramNotifications } from './lib/telegram-notify.ts';
+import { RewardError, getUserRewards, grantReward, listRewards, revokeReward } from './lib/rewards.ts';
 import {
   TitleError, createTitle, deleteTitle, getUserRoles, getUserTitles, grantTitle,
   listAdminTitles, listTitles, revokeTitle, searchUsers, setActiveTitle,
@@ -33,7 +34,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.19.1';
+const version = '0.20.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -106,6 +107,19 @@ async function titleBody(c: ApiContext): Promise<unknown> {
     return await c.req.json();
   } catch {
     throw new TitleError('Неверный JSON', 400);
+  }
+}
+
+function rewardFailure(c: ApiContext, error: unknown): Response {
+  if (error instanceof RewardError) return c.json({ error: error.message }, error.status);
+  return c.json({ error: 'Внутренняя ошибка' }, 500);
+}
+
+async function rewardBody(c: ApiContext): Promise<unknown> {
+  try {
+    return await c.req.json();
+  } catch {
+    throw new RewardError('Неверный JSON', 400);
   }
 }
 
@@ -288,11 +302,12 @@ app.get('/me', async (c) => {
   const { data, error } = await client.from('profiles').select('*').eq('id', user.sub).single();
   if (error || !data) return c.json({ error: 'Профиль не найден' }, 404);
   try {
-    const [titles, roles] = await Promise.all([
+    const [titles, roles, rewards] = await Promise.all([
       getUserTitles(client, user.sub),
       getUserRoles(client, user.sub),
+      getUserRewards(client, user.sub),
     ]);
-    return c.json({ ...data, titles, roles });
+    return c.json({ ...data, titles, roles, rewards });
   } catch (failure) {
     return titleFailure(c, failure);
   }
@@ -319,6 +334,18 @@ app.get('/admin/titles', async (c) => {
     return c.json(await listAdminTitles(client));
   } catch (error) {
     return titleFailure(c, error);
+  }
+});
+
+app.get('/admin/rewards', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  try {
+    return c.json(await listRewards(client));
+  } catch (error) {
+    return rewardFailure(c, error);
   }
 });
 
@@ -389,6 +416,36 @@ app.delete('/admin/users/:userId/titles/:titleId', async (c) => {
     return c.json(result);
   } catch (error) {
     return titleFailure(c, error);
+  }
+});
+
+app.post('/admin/users/:userId/rewards', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  try {
+    const body = await rewardBody(c);
+    const result = await grantReward(client, c.req.param('userId'), body, admin.sub);
+    const reward = (body as { reward: string }).reward;
+    logAdminAction(admin.sub, 'grant_reward', `${c.req.param('userId')}:${reward}`);
+    return c.json(result, 201);
+  } catch (error) {
+    return rewardFailure(c, error);
+  }
+});
+
+app.delete('/admin/users/:userId/rewards/:rewardId', async (c) => {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  const admin = await requireAdmin(c, client, c.get('claims'));
+  if (admin instanceof Response) return admin;
+  try {
+    const result = await revokeReward(client, c.req.param('userId'), c.req.param('rewardId'));
+    logAdminAction(admin.sub, 'revoke_reward', `${c.req.param('userId')}:${c.req.param('rewardId')}`);
+    return c.json(result);
+  } catch (error) {
+    return rewardFailure(c, error);
   }
 });
 

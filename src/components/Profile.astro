@@ -296,6 +296,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
             <input id="effect-intensity" type="range" min="25" max="100" />
             <p class="small muted" id="effect-reduced" hidden>{t('Эффекты отключены настройками системы')}</p>
           </section>
+          <section class="editor-section">
+            <h3>{t('Свечение')}</h3>
+            <div class="effect-choices" id="glow-choices"></div>
+            <small class="muted">{t('Свечение и эксклюзивные рамки выдаются за ивенты')}</small>
+          </section>
         </div>
         <div class="editor-panel" data-panel="color" hidden>
           <section class="editor-section">
@@ -519,7 +524,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   import {
     type Avatar, type BackgroundType, type CoverType, type Custom, type Framing, type PickerChar,
     accentHex, applyFraming, colors, colorNames, createEffect, effects, el, emptyCustom, extraColors,
-    frameMarks, frames, framingOf, hexOk, iconUrl, img, mediaKeys, readPickerChars,
+    exclusiveRewardIds, frameMarks, frames, framingOf, glows, hexOk, iconUrl, img, mediaKeys, readPickerChars, rewardFrames,
     fetchShowcase, loadChars, renderAppearance, renderAvatar, renderCover, renderEntryList,
     renderRosterList, renderShowcase, renderWishSummary, safeHref, usesMedia, validCustom, validRoster,
     type Char, type Profile, type RosterEntry, type WishSummary,
@@ -551,7 +556,8 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   reduced.addEventListener('change', () => { $('effect-reduced').hidden = !reduced.matches; }, { signal });
   let pendingImport: ImportData | null = null, confirmedImport: ImportData | null = null, keepChanges = false;
   let editorSession = 0, importSelection = 0, saving = false, exporting = false;
-  let sessionGeneration = 0, editorGeneration = 0, customLoad = 0;
+  let sessionGeneration = 0, editorGeneration = 0, customLoad = 0, rewardLoad = 0;
+  let ownedRewards = new Set<string>(), rewardsKnown = false;
   // Снять блокировку элементов редактора текущей операции сохранения (и при успехе, и при смене аккаунта)
   let releaseControls: (() => void) | null = null;
   const exportUrls = new Set<string>();
@@ -773,10 +779,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     for (const [key, name, hex] of extraColors) addColorChoice(colorBox, key, name, hex);
     const frameBox = $('frame-choices');
     frameBox.replaceChildren();
-    for (const [key, name] of frames) {
+    for (const [key, name] of [...frames, ...rewardFrames.filter(([id]) => ownedRewards.has(id))]) {
       const button = el('button', 'frame-choice');
       button.type = 'button';
-      button.setAttribute('aria-pressed', String(draft.frame === key));
+      button.setAttribute('aria-pressed', String(draft.frame === key && (!exclusiveRewardIds.has(key) || ownedRewards.has(key))));
       button.dataset.focusKey = `frame:${key}`;
       const shell = el('span', 'avatar-shell preview-shell');
       shell.dataset.frame = key;
@@ -788,6 +794,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       frameMarks(shell);
       button.append(shell, el('span', '', t(name)));
       button.addEventListener('click', () => { draft.frame = key; renderPersonal(); renderPickers(); });
+      if (exclusiveRewardIds.has(key)) button.append(el('small', 'reward-label', t('Ивент')));
       frameBox.append(button);
     }
     const effectBox = $('effect-choices');
@@ -799,6 +806,16 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
       button.setAttribute('aria-pressed', String(draft.effect === key));
       button.addEventListener('click', () => { draft.effect = key; renderPersonal(); renderPickers(); });
       effectBox.append(button);
+    }
+    const glowBox = $('glow-choices');
+    glowBox.replaceChildren();
+    for (const [key, name] of glows.filter(([id]) => id === 'none' || ownedRewards.has(id))) {
+      const button = el('button', 'btn', t(name));
+      button.type = 'button';
+      button.dataset.focusKey = `glow:${key}`;
+      button.setAttribute('aria-pressed', String(draft.glow === key && (key === 'none' || ownedRewards.has(key))));
+      button.addEventListener('click', () => { draft.glow = key; renderPersonal(); renderPickers(); });
+      glowBox.append(button);
     }
     syncControls();
     const focusTarget = (key: string) => [...dialog.querySelectorAll<HTMLElement>('[data-focus-key]')].find((node) => node.dataset.focusKey === key && !(node instanceof HTMLButtonElement && node.disabled));
@@ -818,6 +835,26 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     button.style.setProperty('--choice-color', value);
     button.addEventListener('click', () => { draft.color = color; $('color-status').textContent = ''; renderPersonal(); renderPickers(); });
     box.append(button);
+  }
+  async function loadRewards() {
+    const request = ++rewardLoad;
+    ownedRewards = new Set();
+    rewardsKnown = false;
+    if (dialog.open && !saving) renderPickers();
+    try {
+      const { getSupabase } = await import('../scripts/auth');
+      if (signal.aborted || request !== rewardLoad) return;
+      const client = getSupabase();
+      const { data: session } = await client.auth.getSession();
+      if (signal.aborted || request !== rewardLoad) return;
+      const userId = session.session?.user.id;
+      if (!userId) { rewardsKnown = true; return; }
+      const { data, error } = await client.from('user_rewards').select('reward_id').eq('user_id', userId);
+      if (signal.aborted || request !== rewardLoad || error) return;
+      ownedRewards = new Set((data ?? []).map((row) => row.reward_id).filter((id): id is string => typeof id === 'string'));
+      rewardsKnown = true;
+      if (dialog.open && !saving) renderPickers();
+    } catch { /* Без выдач редактор показывает только обычные варианты */ }
   }
   function syncControls() {
     for (const button of document.querySelectorAll<HTMLButtonElement>('[data-cover-type]')) button.setAttribute('aria-pressed', String(button.dataset.coverType === draft.coverType));
@@ -899,8 +936,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     }
   };
   void loadWishes();
+  void loadRewards();
   onSessionChange(() => {
     sessionGeneration++;
+    void loadRewards();
     cancelShowcase();
     if (dialog.open) { saving = false; releaseControls?.(); closeEditor(); }
     // Оформление прежнего аккаунта нельзя редактировать: перечитываем его, текущая загрузка устаревает
@@ -1076,6 +1115,9 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     for (const key of mediaKeys) mediaOperations[key]++;
     importSelection++;
     let version = '', written: MediaKey[] = [], switched = false;
+    // Пока выдачи не загружены, награды не сбрасываем: невыданную всё равно обнулит база
+    if (rewardsKnown && exclusiveRewardIds.has(snapshot.frame) && !ownedRewards.has(snapshot.frame)) snapshot.frame = 'none';
+    if (rewardsKnown && exclusiveRewardIds.has(snapshot.glow) && !ownedRewards.has(snapshot.glow)) snapshot.glow = 'none';
     try {
       const changes: Partial<Record<MediaKey, Blob>> = {};
       snapshot.media = {};
@@ -1456,6 +1498,17 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 <style>
   .profile-root { --profile-accent: var(--accent); --profile-accent-ink: var(--accent-ink); }
   .profile-page { display: grid; gap: 14px; min-width: 0; }
+  @property --gf-aura-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  .profile-card.hero[data-glow="crimson-aura"] { position: relative; box-shadow: 0 0 0 1px rgb(255 42 58 / .55), 0 0 28px rgb(255 20 40 / .28), 0 0 70px rgb(180 0 20 / .18); animation: crimson-aura-breathe 4s ease-in-out infinite, crimson-aura-glitch 7s linear infinite; }
+  .profile-card.hero[data-glow="crimson-aura"]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--gf-aura-angle), transparent 0 70%, #ff2a3a 80%, #ffb3b8 83%, #ff2a3a 86%, transparent 95%); mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); pointer-events: none; animation: crimson-aura-turn 6s linear infinite; }
+  @keyframes crimson-aura-turn { to { --gf-aura-angle: 360deg; } }
+  @keyframes crimson-aura-breathe {
+    50% { box-shadow: 0 0 0 1px rgb(255 42 58 / .65), 0 0 38px rgb(255 20 40 / .38), 0 0 85px rgb(180 0 20 / .24); }
+  }
+  @keyframes crimson-aura-glitch {
+    0%, 95%, 99%, 100% { filter: none; }
+    96%, 98% { filter: drop-shadow(-3px 0 10px #ff2a3a) drop-shadow(3px 0 10px #3ff0ff); }
+  }
   .profile-page > :not(.profile-bg, .profile-effect, .profile-dialog) { position: relative; z-index: 1; }
   .profile-bg { position: fixed; inset: var(--top-h) 0 0; z-index: 0; overflow: hidden; pointer-events: none; }
   .profile-bg-image { position: absolute; inset: 0; background-position: center; background-size: cover; }
@@ -1478,6 +1531,12 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .banner, .preview-banner { position: relative; height: 180px; overflow: hidden; background: linear-gradient(135deg, var(--profile-accent), var(--surface-2)); }
   .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgb(0 0 0 / .5)); pointer-events: none; }
   .banner img, .preview-banner img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-root :global([data-frame="crimson-ring"] .frame-ring) { border: 2px solid #ff2a3a; box-shadow: 0 0 10px #ff1f2e, 0 0 22px rgb(255 20 40 / .45), inset 0 0 8px rgb(255 40 50 / .6); animation: crimson-ring-pulse 3.2s ease-in-out infinite, crimson-ring-glitch 7s linear infinite; }
+  .profile-root :global([data-frame="crimson-ring"] .frame-ring::before) { content: ""; position: absolute; inset: 5px; border: 1px solid rgb(255 90 90 / .55); border-radius: 50%; }
+  .profile-root :global([data-frame="crimson-ring"] .frame-ring::after) { content: ""; position: absolute; inset: -5px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #ff3b4a 0deg 2deg, transparent 2deg 10deg); mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px)); animation: frame-turn 14s linear infinite; }
+  .profile-root :global([data-frame="crimson-ring"] .frame-mark) { display: block; width: 2px; height: 8px; background: #ff3b4a; box-shadow: 0 0 7px #ff1f2e; transform: rotate(calc(var(--mark-index) * 45deg)) translateY(-55px); }
+  @keyframes crimson-ring-pulse { 50% { box-shadow: 0 0 16px #ff1f2e, 0 0 30px rgb(255 20 40 / .6), inset 0 0 12px rgb(255 40 50 / .75); } }
+  @keyframes crimson-ring-glitch { 0%, 95%, 98%, 100% { transform: translate(0); filter: brightness(1); } 96% { transform: translate(2px, -1px); filter: brightness(1.8); } 97% { transform: translate(-1px, 1px); filter: brightness(1.4); } }
   .edit-profile { position: absolute; z-index: 1; top: 1rem; right: 1rem; background: var(--surface); border-color: var(--profile-accent); }
   .edit-profile svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
   .hero-content { display: grid; gap: 1rem; padding: 0 1.2rem 1.2rem; }
@@ -1584,6 +1643,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .editor-nav-button[aria-pressed="true"] { border-color: var(--profile-accent); color: var(--profile-accent); }
   .dialog-body { min-height: 0; overflow-y: auto; padding: 1.2rem; display: grid; align-content: start; gap: 1.2rem; }
   .dialog-foot { justify-content: flex-end; border-top: 1px solid var(--border); }
+  .frame-choices :global(.reward-label) { color: #ff6b76; font-size: .68rem; }
   .editor-preview { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
   .preview-banner { height: auto; aspect-ratio: var(--banner-ratio, 4); }
   .preview-banner img { position: absolute; inset: 0; }
@@ -1646,7 +1706,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .danger { border-color: var(--bad); color: var(--bad); }
   [hidden] { display: none !important; }
   @media (prefers-reduced-motion: reduce) {
-    .profile-root :global(.frame-decoration), .profile-root :global(.frame-ring) { animation: none !important; }
+    .profile-root :global(.frame-decoration), .profile-root :global(.frame-ring), .profile-root :global(.frame-ring::after), .profile-card.hero[data-glow="crimson-aura"], .profile-card.hero[data-glow="crimson-aura"]::after { animation: none !important; }
   }
   @media (max-width: 900px) { .profile-grid { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 700px) {
@@ -1678,6 +1738,10 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
     box-shadow: 0 0 12px color-mix(in srgb, var(--title-color) 30%, transparent);
   }
   .title-chip[hidden] { display: none; }
+  :global(:root[data-theme="light"]) .profile-card.hero[data-glow="crimson-aura"] { animation: none; box-shadow: 0 0 0 1px rgb(255 42 58 / .28), 0 0 28px rgb(255 20 40 / .14), 0 0 70px rgb(180 0 20 / .09); }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .profile-card.hero[data-glow="crimson-aura"] { animation: none; box-shadow: 0 0 0 1px rgb(255 42 58 / .28), 0 0 28px rgb(255 20 40 / .14), 0 0 70px rgb(180 0 20 / .09); }
+  }
   .title-mark { font-size: .7em; }
   :global(:root[data-theme="light"]) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); }
   @media (prefers-color-scheme: light) { :global(:root:not([data-theme])) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); } }

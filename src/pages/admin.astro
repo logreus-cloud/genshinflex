@@ -98,7 +98,8 @@ onPage(async (signal) => {
       weapons?: { slug: string; note?: string }[]; artifacts?: { sets: string[]; note?: string }[]; external?: { title: string; url: string }[] };
   };
   type Title = { id: string; name_ru: string; name_en: string | null; name_es: string | null; color: string; description: string | null; holders: number };
-  type TitleUser = { id: string; nickname: string; display_name: string | null; titles: string[]; roles: string[] };
+  type Reward = { id: string; kind: 'frame' | 'glow'; name_ru: string; name_en: string | null; name_es: string | null };
+  type TitleUser = { id: string; nickname: string; display_name: string | null; titles: string[]; rewards: string[]; roles: string[] };
   type Feedback = { id: number; created_at: string; kind: string; page: string | null; message: string; contact: string | null; status: string };
 
   const KIND = { data: 'Ошибка в данных', idea: 'Идея', bug: 'Баг', other: 'Другое' } as Record<string, string>;
@@ -114,6 +115,7 @@ onPage(async (signal) => {
   });
 
   let titleItems: Title[] = [];
+  let rewardItems: Reward[] = [];
   let titleLoad = 0;
   let userLoad = 0;
   let searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -126,6 +128,10 @@ onPage(async (signal) => {
   const titleName = (t: Title) => {
     const lang = document.documentElement.lang.slice(0, 2);
     return (lang === 'en' ? t.name_en : lang === 'es' ? t.name_es : t.name_ru) || t.name_ru;
+  };
+  const rewardName = (reward: Reward) => {
+    const lang = document.documentElement.lang.slice(0, 2);
+    return (lang === 'en' ? reward.name_en : lang === 'es' ? reward.name_es : reward.name_ru) || reward.name_ru;
   };
   const titleChip = (t: Title) => {
     const chip = make('span', `◆ ${titleName(t)}`, 'title-chip');
@@ -192,10 +198,11 @@ onPage(async (signal) => {
     const current = ++titleLoad;
     $('#titles-error').hidden = true;
     try {
-      const items = await titleApi<Title[]>('/admin/titles');
+      const [items, rewards] = await Promise.all([titleApi<Title[]>('/admin/titles'), titleApi<Reward[]>('/admin/rewards')]);
       if (signal.aborted || current !== titleLoad) return;
       titleItems = items;
       showTitleAccess(null);
+      rewardItems = rewards;
       renderTitles();
     } catch (error) {
       if (current === titleLoad) titleError(error, '#titles-error');
@@ -246,6 +253,44 @@ onPage(async (signal) => {
       grant.disabled = select.options.length === 1;
       actions.append(select, note, grant);
       card.append(actions);
+      const rewards = make('section', '', 'reward-user');
+      rewards.append(make('h3', 'Награды'));
+      const owned = make('div', '', 'row reward-user-chips');
+      for (const id of user.rewards) {
+        const reward = rewardItems.find((item) => item.id === id);
+        const line = make('span', reward ? rewardName(reward) : id, 'reward-chip');
+        const revoke = make('button', 'Отозвать', 'btn small');
+        revoke.type = 'button';
+        revoke.dataset.rewardAction = 'revoke';
+        revoke.dataset.rewardId = id;
+        revoke.setAttribute('aria-label', `Отозвать награду ${reward ? rewardName(reward) : id} у ${user.nickname}`);
+        line.append(revoke);
+        owned.append(line);
+      }
+      if (!user.rewards.length) owned.append(make('span', 'Наград нет', 'muted small'));
+      rewards.append(owned);
+      const rewardActions = make('div', '', 'row reward-user-actions');
+      const rewardSelect = make('select');
+      rewardSelect.setAttribute('aria-label', `Награда для ${user.nickname}`);
+      const rewardPlaceholder = make('option', 'Выберите награду');
+      rewardPlaceholder.value = '';
+      rewardSelect.append(rewardPlaceholder);
+      for (const reward of rewardItems.filter((item) => !user.rewards.includes(item.id))) {
+        const option = make('option', rewardName(reward));
+        option.value = reward.id;
+        rewardSelect.append(option);
+      }
+      const rewardNote = make('input');
+      rewardNote.placeholder = 'За что выдана (необязательно)';
+      rewardNote.maxLength = 200;
+      rewardNote.setAttribute('aria-label', `Причина выдачи награды для ${user.nickname}`);
+      const rewardGrant = make('button', 'Выдать', 'btn small primary');
+      rewardGrant.type = 'button';
+      rewardGrant.dataset.rewardAction = 'grant';
+      rewardGrant.disabled = rewardSelect.options.length === 1;
+      rewardActions.append(rewardSelect, rewardNote, rewardGrant);
+      rewards.append(rewardActions);
+      card.append(rewards);
       return card;
     }));
   }
@@ -312,11 +357,12 @@ onPage(async (signal) => {
     timers.add(searchTimer);
   }, { signal });
   $('#titles').addEventListener('click', async (event) => {
-    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-title-action]');
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-title-action], button[data-reward-action]');
     if (!button) return;
-    const action = button.dataset.titleAction;
+    const rewardAction = button.dataset.rewardAction;
+    const action = button.dataset.titleAction || rewardAction;
     const userId = button.closest<HTMLElement>('[data-user-id]')?.dataset.userId;
-    const id = button.dataset.titleId;
+    const id = button.dataset.titleId || button.dataset.rewardId;
     // Подтверждение — повторным нажатием не раньше чем через 0,6 с (двойной щелчок не удаляет), через 5 с сбрасывается
     if (action === 'delete' || action === 'revoke') {
       const armedAt = Number(button.dataset.armedAt || 0);
@@ -336,13 +382,21 @@ onPage(async (signal) => {
     button.disabled = true;
     try {
       if (action === 'delete' && id) await titleApi(`/admin/titles/${encodeURIComponent(id)}`, 'DELETE');
-      if (action === 'revoke' && userId && id) await titleApi(`/admin/users/${encodeURIComponent(userId)}/titles/${encodeURIComponent(id)}`, 'DELETE');
-      if (action === 'grant' && userId) {
+      if (action === 'revoke' && !rewardAction && userId && id) await titleApi(`/admin/users/${encodeURIComponent(userId)}/titles/${encodeURIComponent(id)}`, 'DELETE');
+      if (action === 'grant' && !rewardAction && userId) {
         const card = button.closest<HTMLElement>('[data-user-id]')!;
         const title = card.querySelector<HTMLSelectElement>('select')!.value;
         if (!title) { button.disabled = false; return; }
         const note = card.querySelector<HTMLInputElement>('input')!.value.trim();
         await titleApi(`/admin/users/${encodeURIComponent(userId)}/titles`, 'POST', { title, note });
+      }
+      if (rewardAction === 'revoke' && userId && id) await titleApi(`/admin/users/${encodeURIComponent(userId)}/rewards/${encodeURIComponent(id)}`, 'DELETE');
+      if (rewardAction === 'grant' && userId) {
+        const actions = button.closest<HTMLElement>('.reward-user-actions')!;
+        const reward = actions.querySelector<HTMLSelectElement>('select')!.value;
+        if (!reward) { button.disabled = false; return; }
+        const note = actions.querySelector<HTMLInputElement>('input')!.value.trim();
+        await titleApi(`/admin/users/${encodeURIComponent(userId)}/rewards`, 'POST', { reward, note });
       }
       if (signal.aborted) return;
       await loadTitles();
@@ -552,4 +606,9 @@ onPage(async (signal) => {
   @media (prefers-color-scheme: light) {
     :global(:root:not([data-theme])) .titles :global(.title-chip) { color: color-mix(in srgb, var(--title-color) 70%, #000); }
   }
+  .titles :global(.reward-user) { display: grid; gap: .5rem; border-top: 1px solid var(--border); padding-top: .7rem; }
+  .titles :global(.reward-user h3) { margin: 0; font-size: .95rem; }
+  .titles :global(.reward-user-chips), .titles :global(.reward-user-actions), .titles :global(.reward-chip) { align-items: center; flex-wrap: wrap; }
+  .titles :global(.reward-chip) { display: inline-flex; gap: .4rem; }
+  .titles :global(.reward-user-actions input) { flex: 1 1 220px; }
 </style>

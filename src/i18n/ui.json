@@ -5958,5 +5958,25 @@
  "Переместить панель": {
   "en": "Move panel",
   "es": "Mover panel"
+ },
+ "Багровый взгляд": {
+  "en": "Crimson Gaze",
+  "es": "Mirada carmesí"
+ },
+ "Багровая аура": {
+  "en": "Crimson Aura",
+  "es": "Aura carmesí"
+ },
+ "Без свечения": {
+  "en": "No glow",
+  "es": "Sin brillo"
+ },
+ "Свечение": {
+  "en": "Glow",
+  "es": "Brillo"
+ },
+ "Свечение и эксклюзивные рамки выдаются за ивенты": {
+  "en": "Glows and exclusive frames are awarded for events",
+  "es": "Los brillos y marcos exclusivos se otorgan en eventos"
  }
 }

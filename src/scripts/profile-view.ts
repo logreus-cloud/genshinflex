@@ -10,10 +10,11 @@ export type WishSummary = { label: string; total: number; fives: number; pity: {
 export type Avatar = { type: 'none' } | { type: 'character'; slug: string } | { type: 'upload' };
 export type CoverType = 'none' | 'namecard' | 'upload';
 export type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
-export type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss';
+export type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss' | 'crimson-ring';
+export type Glow = 'none' | 'crimson-aura';
 export type Effect = 'none' | 'snow' | 'sparks' | 'petals' | 'stars' | 'fireflies' | 'blizzard';
 export type Framing = { x: number; y: number; zoom: number };
-export type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; framing: Partial<Record<MediaKey, Framing>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
+export type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; framing: Partial<Record<MediaKey, Framing>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; glow: Glow; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
 type MediaSource = (key: MediaKey) => string | null;
 type EffectView = ReturnType<typeof createEffect>;
 
@@ -27,13 +28,16 @@ export const extraColors = [
   ['lavender', 'Лавандовый', '#a78bfa'], ['scarlet', 'Алый', '#ff4d5e'], ['silver', 'Серебро', '#c9d3e3'],
 ] as const;
 export const frames: [Frame, string][] = [['none', 'Без рамки'], ['gold', 'Золото'], ['accent', 'Цвет профиля'], ['ice', 'Лёд'], ['constellation', 'Созвездие'], ['flame', 'Пламя'], ['petals', 'Лепестки'], ['abyss', 'Бездна']];
+export const rewardFrames: [Frame, string][] = [['crimson-ring', 'Багровый взгляд']];
+export const glows: [Glow, string][] = [['none', 'Без свечения'], ['crimson-aura', 'Багровая аура']];
+export const exclusiveRewardIds = new Set<string>([...rewardFrames.map(([id]) => id), ...glows.filter(([id]) => id !== 'none').map(([id]) => id)]);
 export const effects: [Effect, string][] = [['none', 'Нет'], ['snow', 'Снегопад'], ['sparks', 'Искры'], ['petals', 'Лепестки'], ['stars', 'Звёздное небо'], ['fireflies', 'Светлячки'], ['blizzard', 'Метель']];
 export const elements = ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'];
 export const mediaKeys: MediaKey[] = ['avatar', 'cover', 'background'];
 export const hexOk = (value: unknown): value is string => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
 export const colorOk = (value: unknown): value is string => typeof value === 'string' && (hexOk(value) || colors.some((color) => color === value) || extraColors.some(([key]) => key === value));
 export const bounded = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max;
-export const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, framing: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
+export const emptyCustom = (): Custom => ({ v: 1, nick: '', about: '', avatar: { type: 'none' }, media: {}, framing: {}, cover: '', coverType: 'none', coverPosition: 50, color: 'accent', favorites: [], frame: 'none', glow: 'none', effect: 'none', intensity: 50, background: { type: 'default', slug: '', darken: 30, blur: 0, gradient: true } });
 export const framingOf = (custom: Custom, key: MediaKey): Framing => custom.framing[key] ?? { x: 50, y: key === 'cover' && custom.coverType === 'upload' ? custom.coverPosition : 50, zoom: 100 };
 export const usesMedia = (custom: Custom, key: MediaKey) => key === 'avatar' ? custom.avatar.type === 'upload' : key === 'cover' ? custom.coverType === 'upload' : custom.background.type === 'upload';
 const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
@@ -151,7 +155,8 @@ export function validCustom(value: unknown, pickerBySlug: ReadonlyMap<string, Pi
     }
   }
   if (colorOk(value.color)) result.color = value.color; else valid = false;
-  if (value.frame === undefined || frames.some(([key]) => key === value.frame)) result.frame = value.frame as Frame ?? 'none'; else valid = false;
+  if (value.frame === undefined || [...frames, ...rewardFrames].some(([key]) => key === value.frame)) result.frame = value.frame as Frame ?? 'none'; else valid = false;
+  if (glows.some(([key]) => key === value.glow)) result.glow = value.glow as Glow;
   if (value.effect === undefined || effects.some(([key]) => key === value.effect)) result.effect = value.effect as Effect ?? 'none'; else valid = false;
   if (value.intensity === undefined || bounded(value.intensity, 25, 100)) result.intensity = value.intensity as number ?? 50; else valid = false;
   if (value.background !== undefined) {
@@ -323,6 +328,7 @@ export function renderAppearance(root: HTMLElement, custom: Custom, pickerBySlug
   renderAvatar($('profile-avatar'), $('profile-avatar-shell'), custom, pickerBySlug, mediaSource, placeholder);
   renderFavorites($('profile-favorites'), $('profile-favorites-list'), custom, pickerBySlug);
   renderBackground($('profile-bg'), custom, pickerBySlug, mediaSource);
+  root.querySelector<HTMLElement>('.profile-card.hero')!.dataset.glow = custom.glow;
   effect.render();
 }
 

@@ -164,18 +164,22 @@ export async function searchUsers(client: TitleClient, input: string) {
   if (!profiles.data?.length) return [];
 
   const ids = profiles.data.map((row) => row.id);
-  const [grants, roles] = await Promise.all([
+  const [grants, roles, rewards] = await Promise.all([
     client.from('user_titles').select('user_id,title_id').in('user_id', ids),
     client.from('roles').select('user_id,role').in('user_id', ids),
+    client.from('user_rewards').select('user_id,reward_id').in('user_id', ids),
   ]);
   if (grants.error) throw grants.error;
   if (roles.error) throw roles.error;
+  if (rewards.error) throw rewards.error;
   return profiles.data.map((profile) => ({
     ...profile,
     titles: (grants.data || []).filter((row) => row.user_id === profile.id)
       .map((row) => row.title_id),
     roles: (roles.data || []).filter((row) => row.user_id === profile.id)
       .map((row) => row.role),
+    rewards: (rewards.data || []).filter((row) => row.user_id === profile.id)
+      .map((row) => row.reward_id),
   }));
 }
 
