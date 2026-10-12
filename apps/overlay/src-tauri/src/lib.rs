@@ -64,8 +64,11 @@ fn settings(app: &AppHandle) -> Settings {
 
 fn in_panel(path: &str) -> bool {
     let path = path.strip_prefix("/en").or_else(|| path.strip_prefix("/es")).filter(|rest| rest.starts_with('/')).unwrap_or(path);
-    ["/overlay", "/account"].iter().any(|prefix| path == *prefix || path.starts_with(&format!("{prefix}/")))
+    // Из /account/ — только вход и регистрация: страница аккаунта целиком без вкладок и ручки в панели не нужна
+    const PANEL: [&str; 6] = ["/overlay", "/account/login", "/account/register", "/account/forgot", "/account/reset", "/account/callback"];
+    PANEL.iter().any(|prefix| path == *prefix || path.starts_with(&format!("{prefix}/")))
 }
+
 fn fit_to_work_area(window: &tauri::WebviewWindow) -> tauri::Result<()> {
     let monitor = match window.current_monitor()? {
         Some(monitor) => monitor,
@@ -334,11 +337,11 @@ mod tests {
     use super::in_panel;
 
     #[test]
-    fn panel_keeps_only_overlay_and_account() {
-        for path in ["/overlay/", "/overlay/c/furina/", "/en/overlay/banners/", "/es/account/login/", "/account/"] {
+    fn panel_keeps_only_overlay_and_sign_in() {
+        for path in ["/overlay/", "/overlay/c/furina/", "/en/overlay/banners/", "/es/account/login/", "/account/register/", "/account/callback/"] {
             assert!(in_panel(path), "{path}");
         }
-        for path in ["/", "/weapons/x/", "/characters/furina/", "/en/", "/overlayx/", "/enoverlay/", "/en"] {
+        for path in ["/", "/weapons/x/", "/characters/furina/", "/en/", "/overlayx/", "/enoverlay/", "/en", "/account/", "/es/account/", "/account/deleted/", "/profile/"] {
             assert!(!in_panel(path), "{path}");
         }
     }

@@ -24,7 +24,7 @@ const { title, active, guideHref } = Astro.props;
     <header class="ov-account" data-ov-account>
       <button type="button" class="ov-drag" data-ov-drag aria-label={t('Переместить панель')} title={t('Переместить панель')}>⠿</button>
       <a data-ov-guest href={`${base}/overlay/login/`}>{t('Войти')}</a>
-      <a data-ov-profile href={`${base}/account/`} hidden>
+      <a data-ov-profile href={`${base}/profile/`} target="_blank" rel="noopener" hidden>
         <img data-ov-avatar alt="" width="24" height="24" hidden /><span data-ov-name></span> · {t('Профиль')}
       </a>
     </header>
