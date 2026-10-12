@@ -2,6 +2,7 @@ mod updates;
 mod wish_cache;
 #[cfg(windows)] mod screen;
 mod screen_text;
+#[cfg(windows)] mod webview_crash;
 
 use serde::Deserialize;
 use std::{fs, sync::{atomic::{AtomicBool, AtomicU64, Ordering}, mpsc, Arc}, thread, time::Duration};
@@ -288,6 +289,8 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         builder = builder.inner_size(420.0, height).position(x + w - 420.0 - 24.0, y + ((h - height) / 2.0).max(0.0));
     }
     let window = builder.build()?;
+    #[cfg(windows)]
+    webview_crash::watch(&window);
     let close_window = window.clone();
     let (fit_tx, fit_rx) = mpsc::channel();
     let fit_window = window.clone();
