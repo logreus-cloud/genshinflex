@@ -36,7 +36,7 @@ const standard = STANDARD_CHARACTERS.filter((slug) => ruCharacters.some((c) => c
 </OverlayLayout>
 
 <script>
-  import { region, store, type Region } from '../../../scripts/common';
+  import { region, serverMoment, store, type Region } from '../../../scripts/common';
   import { onPage, cleanup } from '../../../scripts/router';
   import { openWishStore, type WishStore } from '../../../scripts/wish-store';
   import { onSessionChange } from '../../../scripts/user-data/session';
@@ -51,22 +51,14 @@ const standard = STANDARD_CHARACTERS.filter((slug) => ruCharacters.some((c) => c
     const paint = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === region.get())));
     buttons.forEach((b) => b.addEventListener('click', () => { region.set(b.dataset.region as Region); paint(); tick(); }, { signal }));
     paint();
-    // Одно смещение для границ фазы и таймера.
-    const offset = { eu: 1, asia: 8, na: -5 };
+    // Время в данных — время сервера без пояса: переводим через serverMoment, как весь сайт.
+    // Текст «До конца» обновляет общий таймер из common.ts — здесь только показываем нужные фазы.
     const phases = [...document.querySelectorAll<HTMLElement>('[data-start][data-end]')];
     const empty = document.querySelector<HTMLElement>('[data-banners-empty]')!;
     const tick = () => {
-      const shift = (offset[region.get()] - offset.eu) * 3600000;
       const now = Date.now();
-      phases.forEach((el) => { el.hidden = Date.parse(el.dataset.start!) - shift > now || Date.parse(el.dataset.end!) - shift <= now; });
+      phases.forEach((el) => { el.hidden = serverMoment(el.dataset.start!) > now || serverMoment(el.dataset.end!) <= now; });
       empty.hidden = phases.some((el) => !el.hidden);
-      document.querySelectorAll<HTMLElement>('[data-until]').forEach((el) => {
-        const target = Date.parse(el.dataset.until!) - shift;
-        const seconds = Math.max(0, Math.ceil((target - now) / 1000));
-        if (!seconds) { el.textContent = el.dataset.done!; return; }
-        const days = Math.floor(seconds / 86400), hours = Math.floor(seconds % 86400 / 3600), minutes = Math.floor(seconds % 3600 / 60);
-        el.textContent = days ? t('{d}д {h}ч', { d: days, h: hours }) : t('{h}ч {m}м', { h: hours, m: minutes });
-      });
     };
     tick();
     const timer = window.setInterval(tick, 60000);
