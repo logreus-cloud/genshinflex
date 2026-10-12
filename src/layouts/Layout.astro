@@ -193,6 +193,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           </div>
           <a class="icon-btn profile account-link" id="profile-link" href={`${base}/profile/`} data-profile={t('Мой профиль')} aria-label={t('Мой профиль')} title={t('Мой профиль')} aria-current={active('/profile') ? 'page' : undefined}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="7" r="3.2" /><path d="M4 17c0-3.2 2.6-5.2 6-5.2s6 2 6 5.2" /></svg>
+            <span class="account-avatar-frame" hidden><img class="account-avatar" alt="" width="24" height="24" /></span>
             <span class="account-letter" hidden></span>
           </a>
           <a class="icon-btn tg" href={linked.telegram} target="_blank" rel="noopener" aria-label={t('Telegram-канал проекта')} title={t('Telegram-канал проекта')}>
@@ -318,6 +319,11 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
   .account-link { position: relative; color: var(--muted); text-decoration: none; }
   .account-link:hover { color: var(--accent); }
+  .account-link.has-avatar > svg { display: none; }
+  .account-avatar-frame { display: block; width: 24px; height: 24px; border-radius: 50%; overflow: hidden; }
+  .account-avatar-frame[hidden] { display: none; }
+  .account-avatar { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .account-link:hover .account-avatar-frame, .account-link[aria-current] .account-avatar-frame { box-shadow: 0 0 0 1px var(--accent); }
   .account-letter:not([hidden]) { position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .65rem; font-weight: 700; }
   .dm-link { position: relative; }
   .dm-link[hidden] { display: none; }

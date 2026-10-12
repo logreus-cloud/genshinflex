@@ -1,4 +1,5 @@
 import { pageLang } from '../i18n/client';
+import { SUPABASE_URL } from '../lib/platform';
 import { userData, type Lang } from './user-data';
 import { hasSession, onSessionChange } from './user-data/session';
 // Общие клиентские утилиты: безопасное хранилище, недавние/избранное, таймеры по времени сервера.
@@ -88,6 +89,7 @@ setInterval(tick, 30_000);
 document.addEventListener('gf:region', tick);
 
 let accountLinkRequest = 0;
+let avatarIcons: Promise<Record<string, string>> | null = null;
 
 async function updateAccountLink() {
   const link = document.getElementById('profile-link') as HTMLAnchorElement | null;
@@ -96,28 +98,67 @@ async function updateAccountLink() {
   link.setAttribute('aria-label', label);
   link.title = label;
   const letter = link.querySelector<HTMLElement>('.account-letter');
+  const frame = link.querySelector<HTMLElement>('.account-avatar-frame');
+  const avatar = frame?.querySelector<HTMLImageElement>('img');
+  if (avatar) { avatar.onload = null; avatar.onerror = null; avatar.removeAttribute('src'); avatar.removeAttribute('style'); }
+  if (frame) frame.hidden = true;
+  link.classList.remove('has-avatar');
   if (letter) { letter.textContent = ''; letter.hidden = true; }
   const turn = ++accountLinkRequest;
+  const current = () => link.isConnected && turn === accountLinkRequest;
 
   try {
     if (!hasSession()) return;
     const { getSupabase } = await import('./auth');
     const supabase = getSupabase();
     const { data } = await supabase.auth.getSession();
-    if (!data.session || !link.isConnected || turn !== accountLinkRequest) return;
+    if (!data.session || !current()) return;
     const user = data.session.user;
-    let nickname = '';
+    let nickname = '', custom: unknown = null;
     try {
       const { data: profile, error } = await supabase.from('profiles')
-        .select('nickname').eq('id', user.id).maybeSingle();
-      if (!error) nickname = String(profile?.nickname || '');
+        .select('nickname, custom').eq('id', user.id).maybeSingle();
+      if (!error) { nickname = String(profile?.nickname || ''); custom = profile?.custom; }
     } catch { /* При сбое запроса показываем email. */ }
-    if (!link.isConnected || turn !== accountLinkRequest) return;
+    if (!current()) return;
     const name = nickname || user.email || '';
     const title = name ? `${label} · ${name}` : label;
     link.setAttribute('aria-label', title);
     link.title = title;
     if (letter && name) { letter.textContent = Array.from(name)[0].toLocaleUpperCase(); letter.hidden = false; }
+    const rawAvatar = custom && typeof custom === 'object' && !Array.isArray(custom)
+      ? (custom as Record<string, unknown>).avatar : null;
+    if (!avatar || !frame || !rawAvatar || typeof rawAvatar !== 'object' || Array.isArray(rawAvatar)) return;
+    const choice = rawAvatar as Record<string, unknown>;
+    const { applyFraming, framingOf, iconUrl, usesMedia, validCustom } = await import('./profile-view');
+    if (!current()) return;
+    const value = validCustom(custom, new Map()).value;
+    let src: string | null = null;
+    if (choice.type === 'character' && typeof choice.slug === 'string' && /^[a-z0-9-]+$/.test(choice.slug)) {
+      const icons = await (avatarIcons ??= fetch('/data/avatar-icons.json').then(async (response) => {
+        if (!response.ok) throw new Error();
+        return await response.json() as Record<string, string>;
+      }).catch((error) => { avatarIcons = null; throw error; }));
+      if (!current()) return;
+      src = iconUrl(icons[choice.slug]);
+    } else if (usesMedia(value, 'avatar') && value.media.avatar) {
+      src = `${SUPABASE_URL}/storage/v1/object/public/profile-media/${encodeURIComponent(user.id)}/avatar-${value.media.avatar}`;
+      applyFraming(avatar, framingOf(value, 'avatar'));
+    }
+    if (!src) return;
+    avatar.onload = () => {
+      if (!current() || avatar.src !== src) return;
+      frame.hidden = false;
+      link.classList.add('has-avatar');
+      if (letter) letter.hidden = true;
+    };
+    avatar.onerror = () => {
+      if (!current() || avatar.src !== src) return;
+      frame.hidden = true;
+      link.classList.remove('has-avatar');
+      if (letter) letter.hidden = !name;
+    };
+    avatar.src = src;
   } catch { /* Хранилище и сеть могут быть недоступны. */ }
 }
 
