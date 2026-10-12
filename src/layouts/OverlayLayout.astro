@@ -8,7 +8,8 @@ const { title, active, guideHref } = Astro.props;
 ---
 <!doctype html>
 <!-- Панель всегда тёмная: при светлой теме системы карточки становились белыми на тёмном фоне -->
-<html lang={lang} class="ov-root" data-theme="dark">
+<!-- transition:animate="none": плавная смена страниц в прозрачном окне показывала игру сквозь панель -->
+<html lang={lang} class="ov-root" data-theme="dark" transition:animate="none">
   <head>
     <ClientRouter />
     <meta charset="utf-8" />
@@ -21,6 +22,7 @@ const { title, active, guideHref } = Astro.props;
   <body class="ov-body">
     <div class="ov-backdrop" aria-hidden="true"></div>
     <header class="ov-account" data-ov-account>
+      <button type="button" class="ov-drag" data-ov-drag aria-label={t('Переместить панель')} title={t('Переместить панель')}>⠿</button>
       <a data-ov-guest href={`${base}/overlay/login/`}>{t('Войти')}</a>
       <a data-ov-profile href={`${base}/account/`} hidden>
         <img data-ov-avatar alt="" width="24" height="24" hidden /><span data-ov-name></span> · {t('Профиль')}
@@ -49,6 +51,15 @@ const { title, active, guideHref } = Astro.props;
           if (path?.startsWith(`${base}/overlay/c/`) && /^\/(?:en\/|es\/)?overlay\/c\/[a-z0-9-]+\/$/.test(path)) { tab.href = path; tab.removeAttribute('aria-disabled'); }
         } catch {}
       });
+    </script>
+    <script>
+      if (window.__GF_OVERLAY_APP__) {
+        document.addEventListener('pointerdown', (event) => {
+          if (event.button !== 0 || !(event.target instanceof Element) || !event.target.closest('[data-ov-drag]')) return;
+          event.preventDefault();
+          location.href = 'gf-overlay://drag';
+        });
+      }
     </script>
     <script>
       import { currentUser } from '../scripts/auth';
@@ -242,13 +253,13 @@ const { title, active, guideHref } = Astro.props;
   .ov-icons a:hover, .ov-icons a:focus-visible { background: var(--surface-2); }
   .ov-icons img { width: 48px; height: 48px; border-radius: 9px; object-fit: cover; background: var(--surface-3); }
   .ov-tabs { position: fixed; z-index: 20; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px max(10px, calc((100vw - 480px) / 2)) calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: rgb(10 13 23 / .93); backdrop-filter: blur(18px); }
-  .ov-update { position: fixed; z-index: 21; inset: auto 14px calc(78px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; box-sizing: border-box; max-width: 452px; margin: auto; padding: .55rem .65rem; border: 1px solid var(--accent); border-radius: 10px; background: var(--surface-2); box-shadow: 0 8px 24px rgb(0 0 0 / .3); font-size: .8rem; }
+  .ov-update { position: fixed; z-index: 21; inset: auto 14px calc(78px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; box-sizing: border-box; max-width: 452px; margin: auto; padding: .55rem .65rem; border: 1px solid var(--accent); border-radius: 10px; background: rgb(24 29 43); /* непрозрачный: сквозь --surface-2 читался список */ box-shadow: 0 8px 24px rgb(0 0 0 / .3); font-size: .8rem; }
   .ov-update[hidden], .ov-update [hidden] { display: none; }
   .ov-update [data-update-message] { flex: 1; min-width: 0; }
   .ov-update button { flex: none; padding: .35rem .55rem; border: 0; border-radius: 7px; background: var(--accent-soft); color: var(--accent-text); font: inherit; font-weight: 600; cursor: pointer; }
   .ov-update button:disabled { opacity: .6; cursor: default; }
   .ov-update .ov-update-dismiss { padding: .2rem .4rem; background: transparent; color: var(--muted); font-size: 1.2rem; }
-  .ov-toast { position: fixed; z-index: 22; inset: auto 14px calc(78px + env(safe-area-inset-bottom) + var(--ov-update-height, 0px)); margin: auto; width: fit-content; max-width: min(400px, calc(100% - 28px)); padding: .55rem .8rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); box-shadow: 0 8px 24px rgb(0 0 0 / .3); text-align: center; font-size: .85rem; pointer-events: none; }
+  .ov-toast { position: fixed; z-index: 22; inset: auto 14px calc(78px + env(safe-area-inset-bottom) + var(--ov-update-height, 0px)); margin: auto; width: fit-content; max-width: min(400px, calc(100% - 28px)); padding: .55rem .8rem; border: 1px solid var(--border); border-radius: 10px; background: rgb(24 29 43); box-shadow: 0 8px 24px rgb(0 0 0 / .3); text-align: center; font-size: .85rem; pointer-events: none; }
   .ov-toast[hidden] { display: none; }
   .ov-tab { display: grid; place-items: center; min-height: 48px; border-radius: 9px; color: var(--muted); text-decoration: none; font-weight: 600; }
   .ov-tab[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
@@ -257,11 +268,17 @@ const { title, active, guideHref } = Astro.props;
   .ov-main :where(a, button, summary) { touch-action: manipulation; }
   .ov-main [hidden] { display: none !important; }
   .ov-account { position: relative; z-index: 21; display: flex; justify-content: flex-end; align-items: center; min-height: 36px; padding: 6px 14px 0; font-size: .8rem; }
+  .ov-drag { display: none; margin-right: auto; width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 1.3rem; cursor: grab; touch-action: none; }
+  .ov-app .ov-drag { display: grid; place-items: center; }
   .ov-account a { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-text); }
   .ov-account img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
   .ov-account [hidden] { display: none !important; }
   html.ov-root.ov-app, html.ov-root.ov-app .ov-body { background: transparent; }
   /* В прозрачном окне приложения backdrop-filter не размывает рабочий стол — фон почти непрозрачный, иначе текст под окном мешает читать */
-  .ov-app .ov-backdrop { inset: 6px; border: 1px solid var(--border); border-radius: 16px; background: rgb(9 12 22 / .97); }
-  .ov-app .ov-tabs { inset: auto 6px 6px; border: 1px solid var(--border); border-radius: 0 0 14px 14px; }
+  .ov-app .ov-backdrop { inset: 6px; border: 1px solid var(--border); border-radius: 16px; background: rgb(9 12 22); }
+  .ov-app .ov-tabs { inset: auto 6px 6px; border: 1px solid var(--border); border-radius: 0 0 14px 14px; background: rgb(10 13 23); }
+  /* В приложении прокручивается сама панель: содержимое обрезается по её скруглённым краям
+     и не вылезает в прозрачные поля окна под нижним меню */
+  html.ov-root.ov-app { overflow: hidden; }
+  .ov-app .ov-body { position: fixed; inset: 6px; min-height: 0; height: auto; overflow-y: auto; border-radius: 16px; scrollbar-width: thin; }
 </style>

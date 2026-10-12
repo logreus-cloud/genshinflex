@@ -2,7 +2,7 @@ mod updates;
 mod wish_cache;
 
 use serde::Deserialize;
-use std::{fs, thread, time::Duration};
+use std::{fs, sync::{atomic::{AtomicU64, Ordering}, mpsc, Arc}, thread, time::Duration};
 use sysinfo::{ProcessesToUpdate, System};
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem},
@@ -66,13 +66,43 @@ fn in_panel(path: &str) -> bool {
     let path = path.strip_prefix("/en").or_else(|| path.strip_prefix("/es")).filter(|rest| rest.starts_with('/')).unwrap_or(path);
     ["/overlay", "/account"].iter().any(|prefix| path == *prefix || path.starts_with(&format!("{prefix}/")))
 }
+fn fit_to_work_area(window: &tauri::WebviewWindow) -> tauri::Result<()> {
+    let monitor = match window.current_monitor()? {
+        Some(monitor) => monitor,
+        None => match window.primary_monitor()? {
+            Some(monitor) => monitor,
+            None => return Ok(()),
+        },
+    };
+    let area = monitor.work_area();
+    let outer = window.outer_size()?;
+    let inner = window.inner_size()?;
+    let position = window.outer_position()?;
+    let scale = monitor.scale_factor();
+    let frame_width = outer.width.saturating_sub(inner.width);
+    let frame_height = outer.height.saturating_sub(inner.height);
+    let min_width = ((360.0 * scale).ceil() as u32).saturating_add(frame_width);
+    let min_height = ((480.0 * scale).ceil() as u32).saturating_add(frame_height);
+    let width = outer.width.min(area.size.width.max(min_width));
+    let height = outer.height.min(area.size.height.max(min_height));
+    if width != outer.width || height != outer.height {
+        window.set_size(tauri::PhysicalSize::new(width.saturating_sub(frame_width), height.saturating_sub(frame_height)))?;
+    }
+    let x = (position.x as i64).clamp(area.position.x as i64, area.position.x as i64 + area.size.width.saturating_sub(width) as i64) as i32;
+    let y = (position.y as i64).clamp(area.position.y as i64, area.position.y as i64 + area.size.height.saturating_sub(height) as i64) as i32;
+    if x != position.x || y != position.y {
+        window.set_position(tauri::PhysicalPosition::new(x, y))?;
+    }
+    Ok(())
+}
+
 
 fn toggle(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let result = if window.is_visible().unwrap_or(false) {
             window.hide()
         } else {
-            window.show().and_then(|_| window.set_focus())
+            window.show().and_then(|_| fit_to_work_area(&window)).and_then(|_| window.set_focus())
         };
         if let Err(error) = result { eprintln!("Окно: {error}"); }
     }
@@ -80,7 +110,7 @@ fn toggle(app: &AppHandle) {
 
 fn show(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
-        if let Err(error) = window.show().and_then(|_| window.set_focus()) { eprintln!("Окно: {error}"); }
+        if let Err(error) = window.show().and_then(|_| fit_to_work_area(&window)).and_then(|_| window.set_focus()) { eprintln!("Окно: {error}"); }
     }
 }
 
@@ -192,6 +222,12 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .initialization_script(script)
         .on_navigation(move |url| {
             if url.scheme() == "gf-overlay" && url.host_str() == Some("update") { updates::install(&handle); return false; }
+            if url.scheme() == "gf-overlay" && url.host_str() == Some("drag") {
+                if let Some(window) = handle.get_webview_window("main") {
+                    if let Err(error) = window.start_dragging() { eprintln!("Перетаскивание: {error}"); }
+                }
+                return false;
+            }
             // blob:/data: и прочие схемы не пускаем, даже если origin совпадает
             if !matches!(url.scheme(), "http" | "https") { return false; }
             // В панели — только компактные страницы и вход по почте; остальной сайт открываем в браузере,
@@ -211,10 +247,30 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     }
     let window = builder.build()?;
     let close_window = window.clone();
+    let (fit_tx, fit_rx) = mpsc::channel();
+    let fit_window = window.clone();
+    // Номер последнего движения окна: подгонка, поставленная в очередь до нового движения, пропускается
+    let moves = Arc::new(AtomicU64::new(0));
+    let fit_moves = moves.clone();
+    thread::spawn(move || {
+        while fit_rx.recv().is_ok() {
+            while fit_rx.recv_timeout(Duration::from_millis(300)).is_ok() {}
+            let window = fit_window.clone();
+            let (moves, seen) = (fit_moves.clone(), fit_moves.load(Ordering::SeqCst));
+            if let Err(error) = fit_window.app_handle().run_on_main_thread(move || {
+                if moves.load(Ordering::SeqCst) != seen { return; }
+                if let Err(error) = fit_to_work_area(&window) { eprintln!("Окно: {error}"); }
+            }) { eprintln!("Окно: {error}"); }
+        }
+    });
     window.on_window_event(move |event| {
-        if let WindowEvent::CloseRequested { api, .. } = event {
-            api.prevent_close();
-            let _ = close_window.hide();
+        match event {
+            WindowEvent::CloseRequested { api, .. } => {
+                api.prevent_close();
+                let _ = close_window.hide();
+            }
+            WindowEvent::Moved(_) | WindowEvent::Resized(_) => { moves.fetch_add(1, Ordering::SeqCst); let _ = fit_tx.send(()); }
+            _ => {}
         }
     });
     // Неверная клавиша из settings.json — возвращаемся к Alt+G, чтобы окно можно было открыть

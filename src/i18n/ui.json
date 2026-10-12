@@ -5954,5 +5954,9 @@
  "Доступна версия {version}": {
   "en": "Version {version} is available",
   "es": "La versión {version} está disponible"
+ },
+ "Переместить панель": {
+  "en": "Move panel",
+  "es": "Mover panel"
  }
 }
