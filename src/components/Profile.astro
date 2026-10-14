@@ -1515,6 +1515,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .profile-bg::after { content: ""; position: absolute; inset: 0; background: rgb(0 0 0 / var(--profile-darken, 0)); backdrop-filter: blur(var(--profile-blur, 0px)); }
   .profile-effect { position: fixed; top: var(--top-h); left: 0; z-index: 5; pointer-events: none; }
   :global(html.profile-custom-bg .season-scene), :global(html.profile-custom-bg .season-snow) { display: none; }
+  :global(html.profile-custom-bg .footer) { position: relative; z-index: 1; }
   .profile-card { min-width: 0; padding: 1.2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
   .profile-card:hover { border-color: var(--profile-accent); box-shadow: 0 0 18px color-mix(in srgb, var(--profile-accent) 15%, transparent); }
   .profile-card h2 { margin: 0 0 .8rem; font-size: 1.15rem; }
