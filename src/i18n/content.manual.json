@@ -2082,5 +2082,69 @@
  "Странник и Заряжение": {
   "en": "Wanderer Electro-Charged",
   "es": "Trotamundos y Electrocargado"
+ },
+ "Версия 7.1 — этажи 9–12": {
+  "en": "Version 7.1 — Floors 9–12",
+  "es": "Versión 7.1 — pisos 9–12"
+ },
+ "Звёздное сияние": {
+  "en": "Stellar Glimmer",
+  "es": "Destello Estelar"
+ },
+ "Благословение Бездны: Сверхпроводник, Звёздный проводник, Крио-рассеивание, Звёздное рассеивание, Заморозка и Раскол вызывают ударную волну с истинным уроном (раз в 2 с.)": {
+  "en": "Abyssal Moon blessing: Superconduct, Stellar-Conduct, Cryo Swirl, Stellar Swirl, Frozen and Shatter release a shockwave dealing True DMG (once every 2 s)",
+  "es": "Bendición de la Luna Abisal: Superconductor, Superconductor Estelar, Torbellino Cryo, Torbellino Estelar, Congelado y Fragmentación liberan una onda de choque de Daño Verdadero (una vez cada 2 s)"
+ },
+ "Бафф этажа на Звёздное сияние и благословение": {
+  "en": "Fits both the floor's Stellar Glimmer buff and the blessing",
+  "es": "Encaja con el bonus de Destello Estelar del piso y con la bendición"
+ },
+ "Быстро снимает Электро-щит химеры-льва": {
+  "en": "Quickly breaks the Winged Lion's Electro shield",
+  "es": "Rompe rápido el escudo Electro del León Alado"
+ },
+ "1-я половина: Мидзуки": {
+  "en": "1st half: Mizuki",
+  "es": "1.ª mitad: Mizuki"
+ },
+ "2-я половина: Крио Скирк": {
+  "en": "2nd half: Cryo Skirk",
+  "es": "2.ª mitad: Skirk Cryo"
+ },
+ "Главный выбор: бонус Крио урона этажа и частые Крио-удары против Надсмотрщика": {
+  "en": "Top pick: the floor's Cryo DMG Bonus and frequent Cryo hits against the Overseer Device",
+  "es": "Opción principal: la Bonificación de Daño Cryo del piso y golpes Cryo frecuentes contra el Supervisor"
+ },
+ "2-я половина: Заморозка Аяки": {
+  "en": "2nd half: Ayaka Freeze",
+  "es": "2.ª mitad: Congelado de Ayaka"
+ },
+ "Заморозка ломает доспех Хильетты и щиты Крестителя": {
+  "en": "Freeze breaks Hiljetta's armor and the Baptist's shields",
+  "es": "Congelado rompe la armadura de Hiljetta y los escudos del Bautista"
+ },
+ "2-я половина: Звёздный проводник": {
+  "en": "2nd half: Stellar-Conduct",
+  "es": "2.ª mitad: Superconductor Estelar"
+ },
+ "Game8 — этаж 12": {
+  "en": "Game8 — Floor 12",
+  "es": "Game8 — piso 12"
+ },
+ "1-я половина: Звёздное сияние": {
+  "en": "1st half: Stellar Glimmer",
+  "es": "1.ª mitad: Destello Estelar"
+ },
+ "Нужны Крио и Анемо или Электро: этаж усиливает реакции Звёздного сияния на 75%, а благословение срабатывает от Звёздного рассеивания и Звёздного проводника. Все враги — одиночные боссы, химера-лев закрывается Электро-щитом.": {
+  "en": "You need Cryo plus Anemo or Electro: the floor boosts Stellar Glimmer reactions by 75%, and the blessing triggers on Stellar Swirl and Stellar-Conduct. Every enemy is a single boss, and the Winged Lion hides behind an Electro shield.",
+  "es": "Necesitas Cryo y Anemo o Electro: el piso potencia las reacciones de Destello Estelar un 75% y la bendición se activa con Torbellino Estelar y Superconductor Estelar. Todos los enemigos son jefes únicos y el León Alado se cubre con un escudo Electro."
+ },
+ "2-я половина: Крио": {
+  "en": "2nd half: Cryo",
+  "es": "2.ª mitad: Cryo"
+ },
+ "Нужен Крио-отряд: этаж даёт +75% бонуса Крио урона, благословение срабатывает от Заморозки и Раскола, а Надсмотрщик и доспех Хильетты слабеют именно от частых Крио-ударов.": {
+  "en": "You need a Cryo team: the floor grants +75% Cryo DMG Bonus, the blessing triggers on Frozen and Shatter, and both the Overseer Device and Hiljetta's armor give way to frequent Cryo hits.",
+  "es": "Necesitas un equipo Cryo: el piso otorga +75% de Bonificación de Daño Cryo, la bendición se activa con Congelado y Fragmentación, y tanto el Supervisor como la armadura de Hiljetta ceden ante golpes Cryo frecuentes."
  }
 }

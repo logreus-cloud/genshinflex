@@ -5990,5 +5990,85 @@
  "Свечение и эксклюзивные рамки выдаются за ивенты": {
   "en": "Glows and exclusive frames are awarded for events",
   "es": "Los brillos y marcos exclusivos se otorgan en eventos"
+ },
+ "2-я половина: бонус Крио урона +60%": {
+  "en": "2nd half: Cryo DMG Bonus +60%",
+  "es": "2.ª mitad: Bonificación de Daño Cryo +60%"
+ },
+ "защита монолита, 8 волн по 3 врага": {
+  "en": "Monolith defense, 8 waves of 3 enemies",
+  "es": "defensa del monolito, 8 oleadas de 3 enemigos"
+ },
+ "защита монолита: нужен сбор врагов или провокация и частое Крио": {
+  "en": "Monolith defense: bring grouping or a taunt plus frequent Cryo",
+  "es": "defensa del monolito: lleva agrupamiento o provocación y Cryo frecuente"
+ },
+ "кокон Лучезарного мечерога снимается лечением": {
+  "en": "the Radiant Bladehorn's cocoon is removed by healing",
+  "es": "el capullo del Cuernoespada Radiante se elimina con curación"
+ },
+ "4 врага, 2 волны; нужен хилер против разъедания": {
+  "en": "4 enemies, 2 waves; bring a healer for Corrosion",
+  "es": "4 enemigos, 2 oleadas; lleva un sanador contra la corrosión"
+ },
+ "жемчужину снимают Крио-атаки или Звёздный проводник": {
+  "en": "Cryo attacks or Stellar-Conduct remove the pearl",
+  "es": "los ataques Cryo o el Superconductor Estelar eliminan la perla"
+ },
+ "Бонус Анемо урона этажа и благословение": {
+  "en": "Floor Anemo DMG Bonus plus the blessing",
+  "es": "Bonificación de Daño Anemo del piso y la bendición"
+ },
+ "1-я половина: Мидзуки": {
+  "en": "1st half: Mizuki",
+  "es": "1.ª mitad: Mizuki"
+ },
+ "Сахароза собирает врагов у монолита": {
+  "en": "Sucrose groups enemies near the Monolith",
+  "es": "Sacarosa agrupa a los enemigos junto al monolito"
+ },
+ "2-я половина: Крио Скирк": {
+  "en": "2nd half: Cryo Skirk",
+  "es": "2.ª mitad: Skirk Cryo"
+ },
+ "Бонус Крио урона этажа ровно под неё": {
+  "en": "The floor's Cryo DMG Bonus is made for her",
+  "es": "La Bonificación de Daño Cryo del piso le va perfecta"
+ },
+ "2-я половина: Звёздный проводник": {
+  "en": "2nd half: Stellar-Conduct",
+  "es": "2.ª mitad: Superconductor Estelar"
+ },
+ "1-я половина: урон реакций Звёздного сияния +75%": {
+  "en": "1st half: Stellar Glimmer reaction DMG +75%",
+  "es": "1.ª mitad: daño de reacciones de Destello Estelar +75%"
+ },
+ "2-я половина: бонус Крио урона +75%": {
+  "en": "2nd half: Cryo DMG Bonus +75%",
+  "es": "2.ª mitad: Bonificación de Daño Cryo +75%"
+ },
+ "один босс; бейте корни, как только появляются": {
+  "en": "single boss; hit the roots as soon as they spawn",
+  "es": "un solo jefe; golpea las raíces en cuanto aparezcan"
+ },
+ "Креститель меняет щиты Электро → Гидро → Пиро; их снимают Заморозка и Звёздный проводник": {
+  "en": "the Baptist cycles Electro → Hydro → Pyro shields; Freeze and Stellar-Conduct break them",
+  "es": "el Bautista alterna escudos Electro → Hydro → Pyro; Congelado y Superconductor Estelar los rompen"
+ },
+ "один босс; кокон снимается лечением": {
+  "en": "single boss; healing removes the cocoon",
+  "es": "un solo jefe; la curación elimina el capullo"
+ },
+ "один босс; посреди боя надевает доспех — его ломают Заморозка или Перегрузка": {
+  "en": "single boss; puts on battle armor mid-fight — Freeze or Overloaded breaks it",
+  "es": "un solo jefe; a mitad del combate se pone una armadura — Congelado o Sobrecarga la rompen"
+ },
+ "один босс; сначала снимите Электро-щит": {
+  "en": "single boss; break the Electro shield first",
+  "es": "un solo jefe; rompe primero el escudo Electro"
+ },
+ "один босс; заряд сбивает частота Крио-ударов, а не урон": {
+  "en": "single boss; its momentum drops with frequent Cryo hits, not with damage",
+  "es": "un solo jefe; su impulso baja con golpes Cryo frecuentes, no con el daño"
  }
 }

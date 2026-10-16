@@ -1,14 +1,14 @@
 {
   "mode": "abyss",
-  "cycle": "Версия 7.0 — этажи 9–12",
-  "start": "2026-09-16",
-  "end": "2026-10-16",
+  "cycle": "Версия 7.1 — этажи 9–12",
+  "start": "2026-10-16",
+  "end": "2026-11-16",
   "tags": [
-    "Рассеивание",
-    "Лунный заряд"
+    "Звёздное сияние",
+    "Крио"
   ],
   "buffs": [
-    "Благословение Бездны: Рассеивание и Звёздное рассеивание вызывают ударную волну с истинным уроном (раз в 4 с.)"
+    "Благословение Бездны: Сверхпроводник, Звёздный проводник, Крио-рассеивание, Звёздное рассеивание, Заморозка и Раскол вызывают ударную волну с истинным уроном (раз в 2 с.)"
   ],
   "floors": [
     {
@@ -273,7 +273,7 @@
       "levels": "88–92",
       "disorder": [
         "1-я половина: бонус Анемо урона +60%",
-        "2-я половина: бонус Электро урона +60%"
+        "2-я половина: бонус Крио урона +60%"
       ],
       "chambers": [
         {
@@ -283,32 +283,40 @@
             {
               "enemies": [
                 {
-                  "id": "Volkodlak Sharpshooter",
-                  "n": 20
+                  "id": "Oprichniki Grenadier",
+                  "n": 4
                 },
                 {
-                  "id": "Volkodlak Lobber",
-                  "n": 10
+                  "id": "Oprichniki Line Trooper",
+                  "n": 8
+                },
+                {
+                  "id": "Close Combat Storm Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Force Recon Scout Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Close Combat Scout Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Force Recon Ground Effect Landcruiser",
+                  "n": 6
                 }
               ],
-              "note": "защита монолита, 10 волн"
+              "note": "защита монолита, 8 волн по 3 врага"
             },
             {
               "enemies": [
                 {
-                  "id": "Cutting Edge All-Purpose Scout Landcruiser",
-                  "n": 8
-                },
-                {
-                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser",
-                  "n": 8
-                },
-                {
-                  "id": "Force Recon Ground Effect Landcruiser",
-                  "n": 8
+                  "id": "Large Hydro Slime",
+                  "n": 24
                 }
               ],
-              "note": "защита монолита"
+              "note": "защита монолита: нужен сбор врагов или провокация и частое Крио"
             }
           ]
         },
@@ -319,34 +327,25 @@
             {
               "enemies": [
                 {
-                  "id": "Eremite Stone Enchanter"
-                },
-                {
-                  "id": "Glacial Warden"
-                },
-                {
-                  "id": "Glaciomancer",
+                  "id": "Hydro Hilichurl Rogue",
                   "n": 2
                 },
                 {
-                  "id": "Rugged Elder Leshy"
-                },
-                {
-                  "id": "Juvenile Tree Segment",
-                  "n": 2
+                  "id": "Radiant Bladehorn"
                 }
-              ]
+              ],
+              "note": "кокон Лучезарного мечерога снимается лечением"
             },
             {
               "enemies": [
                 {
-                  "id": "Tainted Water-Splitting Phantasm"
+                  "id": "Rockfond Rifthound"
                 },
                 {
-                  "id": "Tainted Water-Spouting Phantasm"
+                  "id": "Thundercraven Rifthound"
                 }
               ],
-              "note": "появляются по очереди"
+              "note": "4 врага, 2 волны; нужен хилер против разъедания"
             }
           ]
         },
@@ -357,23 +356,23 @@
             {
               "enemies": [
                 {
-                  "id": "Construction Specialist Mek"
+                  "id": "Oprichniki Thunderblitz Gvardiya"
                 },
                 {
-                  "id": "Ruin Drake: Earthguard"
+                  "id": "Oprichniki Fireblade Shock Trooper"
+                },
+                {
+                  "id": "Radiant Antelope"
                 }
               ]
             },
             {
               "enemies": [
                 {
-                  "id": "Wilderness Hunter"
-                },
-                {
-                  "id": "Wilderness Exile",
-                  "n": 2
+                  "id": "Millennial Pearl Seahorse"
                 }
-              ]
+              ],
+              "note": "жемчужину снимают Крио-атаки или Звёздный проводник"
             }
           ]
         }
@@ -382,39 +381,40 @@
         {
           "name": "1-я половина: Звёздное рассеивание",
           "members": [
+            "vesna",
+            "faruzan",
+            "traveler-cryo",
+            "qiqi"
+          ],
+          "note": "Бонус Анемо урона этажа и благословение"
+        },
+        {
+          "name": "1-я половина: Мидзуки",
+          "members": [
             "yumemizuki-mizuki",
             "odette",
             "sucrose",
             "alyosha"
           ],
-          "note": "Алёша отвлекает врагов от монолита, Сахароза собирает их"
+          "note": "Сахароза собирает врагов у монолита"
         },
         {
-          "name": "1-я половина: Звёздный проводник",
+          "name": "2-я половина: Крио Скирк",
+          "members": [
+            "skirk",
+            "escoffier",
+            "furina",
+            "vodyanitsa"
+          ],
+          "note": "Бонус Крио урона этажа ровно под неё"
+        },
+        {
+          "name": "2-я половина: Звёздный проводник",
           "members": [
             "sandrone",
             "odette",
-            "qiqi",
-            "yae-miko"
-          ]
-        },
-        {
-          "name": "2-я половина: Лунный заряд",
-          "members": [
-            "flins",
-            "columbina",
-            "ineffa",
-            "sucrose"
-          ],
-          "note": "Бонус Электро урона этажа ровно под него"
-        },
-        {
-          "name": "2-я половина: Перегрузка",
-          "members": [
-            "arlecchino",
-            "fischl",
-            "chevreuse",
-            "bennett"
+            "yae-miko",
+            "qiqi"
           ]
         }
       ]
@@ -423,8 +423,8 @@
       "floor": 12,
       "levels": "95–100",
       "disorder": [
-        "1-я половина: урон Рассеивания +200%, Звёздного рассеивания +75%, бонус Анемо урона +60%",
-        "2-я половина: урон Заряда +200%, Лунного заряда +75%, бонус Электро урона +60%"
+        "1-я половина: урон реакций Звёздного сияния +75%",
+        "2-я половина: бонус Крио урона +75%"
       ],
       "chambers": [
         {
@@ -434,23 +434,24 @@
             {
               "enemies": [
                 {
-                  "id": "Chimeric Burrowbeast",
-                  "note": "закалённая"
+                  "id": "Furiosa"
                 }
               ],
-              "note": "один босс"
+              "note": "один босс; бейте корни, как только появляются"
             },
             {
               "enemies": [
                 {
-                  "id": "Wilderness Exile",
-                  "n": 9
+                  "id": "Iniquitous Baptist"
                 },
                 {
-                  "id": "Oprichniki Fireblade Shock Trooper",
-                  "note": "«Раскольников»"
+                  "id": "Shadowy Husk: Standard Bearer"
+                },
+                {
+                  "id": "Shadowy Husk: Defender"
                 }
-              ]
+              ],
+              "note": "Креститель меняет щиты Электро → Гидро → Пиро; их снимают Заморозка и Звёздный проводник"
             }
           ]
         },
@@ -461,21 +462,18 @@
             {
               "enemies": [
                 {
-                  "id": "Immortal Construct"
+                  "id": "Radiant Moonfly"
                 }
               ],
-              "note": "один босс"
+              "note": "один босс; кокон снимается лечением"
             },
             {
               "enemies": [
                 {
-                  "id": "Fisher of Hidden Depths",
-                  "n": 4
-                },
-                {
-                  "id": "Lord of the Hidden Depths: Whisperer of Nightmares"
+                  "id": "Hiljetta"
                 }
-              ]
+              ],
+              "note": "один босс; посреди боя надевает доспех — его ломают Заморозка или Перегрузка"
             }
           ]
         },
@@ -486,20 +484,18 @@
             {
               "enemies": [
                 {
-                  "id": "Churin",
-                  "note": "закалённый"
+                  "id": "Chimeric Winged Lion"
                 }
               ],
-              "note": "один босс"
+              "note": "один босс; сначала снимите Электро-щит"
             },
             {
               "enemies": [
                 {
-                  "id": "Sigurd",
-                  "note": "закалённый"
+                  "id": "Secret Source Automaton: Overseer Device"
                 }
               ],
-              "note": "большинство врагов под щитами — ломаются Зарядом / Лунным зарядом"
+              "note": "один босс; заряд сбивает частота Крио-ударов, а не урон"
             }
           ]
         }
@@ -510,72 +506,70 @@
     {
       "name": "1-я половина: Звёздное рассеивание",
       "members": [
-        "yumemizuki-mizuki",
+        "vesna",
         "odette",
-        "sucrose",
-        "alyosha"
+        "faruzan",
+        "vodyanitsa"
       ],
-      "note": "Прямое попадание в бафф этажа и благословение"
+      "note": "Бафф этажа на Звёздное сияние и благословение"
     },
     {
       "name": "1-я половина: Звёздный проводник",
       "members": [
         "sandrone",
         "odette",
-        "qiqi",
-        "yae-miko"
-      ]
-    },
-    {
-      "name": "1-я половина: Ризли",
-      "members": [
-        "wriothesley",
-        "nicole",
-        "odette",
-        "yae-miko"
-      ]
-    },
-    {
-      "name": "2-я половина: Лунный заряд",
-      "members": [
-        "flins",
-        "columbina",
-        "ineffa",
-        "ororon"
+        "yae-miko",
+        "alyosha"
       ],
-      "note": "Главный выбор: бафф этажа ровно под него"
+      "note": "Быстро снимает Электро-щит химеры-льва"
     },
     {
-      "name": "2-я половина: Лунная бутонизация",
+      "name": "1-я половина: Мидзуки",
       "members": [
-        "nefer",
-        "lauma",
-        "columbina",
-        "kuki-shinobu"
+        "yumemizuki-mizuki",
+        "odette",
+        "sucrose",
+        "alyosha"
       ]
     },
     {
-      "name": "2-я половина: Лунный кристалл",
+      "name": "2-я половина: Крио Скирк",
       "members": [
-        "zibai",
-        "linnea",
-        "illuga",
-        "columbina"
+        "skirk",
+        "escoffier",
+        "furina",
+        "vodyanitsa"
+      ],
+      "note": "Главный выбор: бонус Крио урона этажа и частые Крио-удары против Надсмотрщика"
+    },
+    {
+      "name": "2-я половина: Заморозка Аяки",
+      "members": [
+        "kamisato-ayaka",
+        "furina",
+        "escoffier",
+        "vodyanitsa"
+      ],
+      "note": "Заморозка ломает доспех Хильетты и щиты Крестителя"
+    },
+    {
+      "name": "2-я половина: Звёздный проводник",
+      "members": [
+        "sandrone",
+        "odette",
+        "yae-miko",
+        "qiqi"
       ]
     }
   ],
   "sources": [
     {
-      "title": "Game8",
+      "title": "Game8 — этаж 12",
       "url": "https://game8.co/games/Genshin-Impact/archives/326326"
     },
     {
-      "title": "timesaver.gg",
-      "url": "https://timesaver.gg/blog/genshin-spiral-abyss-floor-12-guide"
-    },
-    {
-      "title": "allthings.how",
-      "url": "https://allthings.how/genshin-impact-7-0-spiral-abyss-floor-12-guide-reset/"
+      "title": "Game8 — этаж 11",
+      "url": "https://game8.co/games/Genshin-Impact/archives/326290"
     },
     {
       "title": "Game8 — этаж 9",
@@ -584,45 +578,32 @@
     {
       "title": "Game8 — этаж 10",
       "url": "https://game8.co/games/Genshin-Impact/archives/324621"
-    },
-    {
-      "title": "Game8 — этаж 11",
-      "url": "https://game8.co/games/Genshin-Impact/archives/326290"
-    },
-    {
-      "title": "timesaver.gg — этаж 11",
-      "url": "https://timesaver.gg/blog/genshin-spiral-abyss-floor-11-7-0"
     }
   ],
   "halves": [
     {
       "half": 1,
-      "label": "1-я половина: Рассеивание и Звёздное рассеивание",
+      "label": "1-я половина: Звёздное сияние",
       "need": [
         [
-          "anemo"
+          "cryo"
         ],
         [
-          "hydro",
-          "pyro",
-          "electro",
-          "cryo"
+          "anemo",
+          "electro"
         ]
       ],
-      "tip": "Нужен Анемо-персонаж и стихия, которую он рассеивает: этаж усиливает урон Рассеивания на 200%, благословение добавляет истинный урон за каждое Рассеивание. Все враги — одиночные боссы."
+      "tip": "Нужны Крио и Анемо или Электро: этаж усиливает реакции Звёздного сияния на 75%, а благословение срабатывает от Звёздного рассеивания и Звёздного проводника. Все враги — одиночные боссы, химера-лев закрывается Электро-щитом."
     },
     {
       "half": 2,
-      "label": "2-я половина: Заряд и Лунный заряд",
+      "label": "2-я половина: Крио",
       "need": [
         [
-          "electro"
-        ],
-        [
-          "hydro"
+          "cryo"
         ]
       ],
-      "tip": "Нужны Электро и Гидро: этаж усиливает Заряд на 200% и Лунный заряд на 75%, а большинство врагов прячутся за щитами, которые эффективно снимает именно эта реакция."
+      "tip": "Нужен Крио-отряд: этаж даёт +75% бонуса Крио урона, благословение срабатывает от Заморозки и Раскола, а Надсмотрщик и доспех Хильетты слабеют именно от частых Крио-ударов."
     }
   ]
 }
