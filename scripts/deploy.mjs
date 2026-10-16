@@ -68,7 +68,9 @@ try {
   // Публикация новостей из Sanity в Discord — отдельная задача.
   if (!test && !process.argv.includes('--no-discord')) {
     try {
-      await step('Публикую новости в Discord', 'node --import tsx scripts/discord-news.mjs');
+      const discord = await step('Публикую новости в Discord', 'node --import tsx scripts/discord-news.mjs');
+      for (const line of discord.split(/\r?\n/).filter((line) => line.startsWith('Discord:')))
+        console.log(`   ${line}`);
     } catch {
       console.warn('⚠️ Новости в Discord не опубликованы');
     }
