@@ -6070,5 +6070,9 @@
  "один босс; заряд сбивает частота Крио-ударов, а не урон": {
   "en": "single boss; its momentum drops with frequent Cryo hits, not with damage",
   "es": "un solo jefe; su impulso baja con golpes Cryo frecuentes, no con el daño"
+ },
+ "Скрытый профиль": {
+  "en": "Hidden profile",
+  "es": "Perfil oculto"
  }
 }

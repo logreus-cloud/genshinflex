@@ -9,8 +9,8 @@ export type Guild = {
   members: number;
   created_at: string;
 };
-export type GuildDetails = Guild & { owner: Author; is_member: boolean; my_guild: string | null };
-export type GuildMember = { author: Author; joined_at: string; is_owner: boolean };
+export type GuildDetails = Guild & { owner: Author | { hidden: true }; is_member: boolean; my_guild: string | null };
+export type GuildMember = { author: Author | { hidden: true }; joined_at: string; is_owner: boolean };
 
 async function rpc<T>(name: string, args: Record<string, unknown> = {}): Promise<T> {
   const { getSupabase } = await import('../auth');

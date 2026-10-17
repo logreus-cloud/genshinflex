@@ -140,7 +140,13 @@ export async function initGuildPage(root: HTMLElement, slug: string, signal: Abo
         const since = document.createElement('span');
         since.className = 'small muted';
         since.textContent = `${row.is_owner ? `${t('Владелец')} · ` : ''}${t('с {date}', { date: date(row.joined_at) })}`;
-        item.append(renderAuthor(row.author, BASE), since);
+        if (row.author && 'hidden' in row.author) {
+          const hidden = document.createElement('span');
+          hidden.textContent = t('Скрытый профиль');
+          item.append(hidden, since);
+        } else {
+          item.append(renderAuthor(row.author, BASE), since);
+        }
         members.append(item);
       }
       offset += Math.min(rows.length, 50);
