@@ -15,15 +15,28 @@ function cleanMetadata(value: unknown): unknown {
   ).map(([key, item]) => [key, cleanMetadata(item)]));
 }
 
+function nextFilter(columns: string[], last: Record<string, unknown>): string {
+  const value = (column: string) => JSON.stringify(String(last[column]));
+  return columns.map((column, index) => index
+    ? `and(${columns.slice(0, index).map((part) => `${part}.eq.${value(part)}`).join(',')},${column}.gt.${value(column)})`
+    : `${column}.gt.${value(column)}`).join(',');
+}
+
 async function exportRows(client: AdminClient, table: string, key: string, id: string, columns: string[], selection = '*') {
   const rows: unknown[] = [];
-  for (let offset = 0; ; offset += 1000) {
+  let last: Record<string, unknown> | null = null;
+  for (;;) {
     const query = client.from(table).select(selection).eq(key, id);
     for (const column of columns) query.order(column);
-    const { data, error } = await query.range(offset, offset + 999);
+    if (last) {
+      if (columns.length === 1) query.gt(columns[0], last[columns[0]]);
+      else query.or(nextFilter(columns, last));
+    }
+    const { data, error } = await query.range(0, 999);
     if (error || !data) throw new Error('Account export failed');
     rows.push(...data);
     if (data.length < 1000) break;
+    last = data[data.length - 1] as Record<string, unknown>;
   }
   return rows;
 }
@@ -31,28 +44,29 @@ async function exportRows(client: AdminClient, table: string, key: string, id: s
 async function exportRelatedRows(client: AdminClient, table: string, key: string, ids: number[], columns: string[]) {
   const rows: unknown[] = [];
   for (let batch = 0; batch < ids.length; batch += 100) {
-    for (let offset = 0; ; offset += 1000) {
+    let last: Record<string, unknown> | null = null;
+    for (;;) {
       const query = client.from(table).select('*').in(key, ids.slice(batch, batch + 100));
       for (const column of columns) query.order(column);
-      const { data, error } = await query.range(offset, offset + 999);
+      if (last) {
+        if (columns.length === 1) query.gt(columns[0], last[columns[0]]);
+        else query.or(nextFilter(columns, last));
+      }
+      const { data, error } = await query.range(0, 999);
       if (error || !data) throw new Error('Account export failed');
       rows.push(...data);
       if (data.length < 1000) break;
+      last = data[data.length - 1] as Record<string, unknown>;
     }
   }
   return rows;
 }
 
 export async function exportAccount(client: AdminClient, id: string) {
-  const wishes: unknown[] = [];
-  for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await client.from('wishes').select('*').eq('user_id', id)
-      .order('game_uid').order('id').range(offset, offset + 999);
-    if (error || !data) throw new Error('Account export failed');
-    wishes.push(...data);
-    if (data.length < 1000) break;
-  }
-  const [threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers, guildMembership, ownedGuilds, threadViews] = await Promise.all([
+  const [wishes, titles, rewards, threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers, guildMembership, ownedGuilds, threadViews] = await Promise.all([
+    exportRows(client, 'wishes', 'user_id', id, ['game_uid', 'id']),
+    exportRows(client, 'user_titles', 'user_id', id, ['title_id']),
+    exportRows(client, 'user_rewards', 'user_id', id, ['reward_id']),
     exportRows(client, 'forum_threads', 'author_id', id, ['id']),
     exportRows(client, 'forum_posts', 'author_id', id, ['id']),
     exportRows(client, 'forum_reactions', 'user_id', id, ['post_id', 'kind']),
@@ -114,6 +128,8 @@ export async function exportAccount(client: AdminClient, id: string) {
     user_data: userData.data,
     wishes,
     roles: roles.data,
+    titles,
+    rewards,
     telegram: telegram.data,
     discord_linked_roles: discordRoles.data,
     discord_tickets: discordTickets,
@@ -162,14 +178,19 @@ export async function deleteAccount(client: AdminClient, id: string, confirm: un
 }
 
 export async function purgeAccount(client: AdminClient, id: string) {
-  for (const name of ['avatars', 'profile-media']) {
-    const bucket = client.storage.from(name);
-    const paths = await mediaPaths(client, name, id);
-    for (let offset = 0; offset < paths.length; offset += 100) {
-      const { error } = await bucket.remove(paths.slice(offset, offset + 100));
-      if (error) throw new Error('Media removal failed');
-    }
-  }
+  const media = await Promise.all(['avatars', 'profile-media'].map(async (name) => ({
+    name, paths: await mediaPaths(client, name, id),
+  })));
   const { error } = await client.auth.admin.deleteUser(id, false);
   if (error) throw new Error('Account removal failed');
+  for (const { name, paths } of media) {
+    for (let offset = 0; offset < paths.length; offset += 100) {
+      try {
+        const { error } = await client.storage.from(name).remove(paths.slice(offset, offset + 100));
+        if (error) console.error('Media removal failed', id, name, error);
+      } catch (failure) {
+        console.error('Media removal failed', id, name, failure);
+      }
+    }
+  }
 }

@@ -40,17 +40,17 @@ test('выданный титул становится активным, есл�
   assert.deepEqual(updates, [{ value: { active_title: 'tester' }, filters: [`id=${userId}`, 'active_title is null'] }]);
 });
 
-test('при отзыве активного титула активным становится последний оставшийся', async () => {
-  const active = fakeClient({ active: 'moderator', rest: 'tester' });
-  await revokeTitle(active.client, userId, 'moderator');
-  assert.deepEqual(active.updates.map((item) => item.value), [{ active_title: 'tester' }]);
-  assert.ok(active.updates[0].filters.includes('active_title is null'));
+test('отзыв титула — одна транзакционная RPC, «не выдан» — 404', async () => {
+  const calls: unknown[] = [];
+  const client = {
+    rpc: async (name: string, args: unknown) => {
+      calls.push([name, args]);
+      return { data: 'tester', error: null };
+    },
+  } as any;
+  await revokeTitle(client, userId, 'moderator');
+  assert.deepEqual(calls, [['title_revoke', { p_user: userId, p_title: 'moderator' }]]);
 
-  const other = fakeClient({ active: null, rest: 'tester' });
-  await revokeTitle(other.client, userId, 'moderator');
-  assert.equal(other.updates.length, 0);
-
-  const last = fakeClient({ active: 'moderator', rest: null });
-  await revokeTitle(last.client, userId, 'moderator');
-  assert.equal(last.updates.length, 0);
+  const missing = { rpc: async () => ({ data: null, error: { message: 'title:not_granted' } }) } as any;
+  await assert.rejects(revokeTitle(missing, userId, 'moderator'), { message: 'Титул не выдан' });
 });

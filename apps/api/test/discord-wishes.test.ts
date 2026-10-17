@@ -44,6 +44,26 @@ test('/баннеры показывает текущую фазу и следу
   assert.equal(reply.data.components[0].components[0].url, `${site}/banners/`);
 });
 
+test('/баннеры укладывает большую историю в общий лимит Discord', () => {
+  const banners = Array.from({ length: 7 }, (_, index) => ({
+    ...data.banners[0],
+    phase: index + 1,
+    featured: [{ s: `banner-${index}`, n: 'Персонаж'.repeat(700) }],
+    fourStars: ['Герой'.repeat(300)],
+    weapons: ['Оружие'.repeat(300)],
+  }));
+  const reply = bannersReply({ ...data, banners }, site, {}, Date.UTC(2026, 9, 1)) as any;
+  const embeds = reply.data.embeds;
+  assert.ok(embeds.length > 0);
+  assert.ok(embeds.length <= 5);
+  const size = embeds.reduce((total: number, embed: any) => total
+    + [...embed.title].length + [...embed.description].length + [...embed.footer.text].length
+    + (embed.fields || []).reduce((sum: number, field: any) =>
+      sum + [...field.name].length + [...field.value].length, 0), 0);
+  assert.ok(size <= 6000);
+  assert.match(embeds.at(-1).description, /\n…и ещё \d+$/);
+});
+
 test('/баннеры без текущих фаз и без данных', async () => {
   const between = { ...data, banners: [data.banners[1]] };
   const waiting = bannersReply(between, site, {}, Date.UTC(2026, 9, 1)) as any;

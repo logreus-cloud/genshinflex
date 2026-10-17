@@ -63,7 +63,7 @@ export function bannersReply(data: DiscordBannersData, site: string, colors: Rec
     const content = nextLine ? `Сейчас баннеры не идут. Дальше: ${nextLine}` : 'Данных о баннерах пока нет';
     return { type: 4, data: { content: clip(content, 2000), components } };
   }
-  const embeds = current.slice(0, 5).map((banner, index) => {
+  const candidates = current.slice(0, 5).map((banner, index) => {
     const end = unix(serverMoment(banner.end));
     const lines = [
       banner.featured.length ? `★5: ${featuredLine(banner)}` : '',
@@ -77,13 +77,34 @@ export function bannersReply(data: DiscordBannersData, site: string, colors: Rec
     return {
       title: clip(`Молитвы ${banner.version}, фаза ${banner.phase}`, 256),
       url: `${site}/banners/`,
-      description: clip(lines.join('\n'), 4096),
+      description: lines.join('\n'),
       color,
       ...(first?.i ? { thumbnail: { url: first.i } } : {}),
       ...(last && nextLine ? { fields: [{ name: 'Дальше', value: clip(nextLine, 1024), inline: false }] } : {}),
       footer: { text: 'Время сервера Европы (UTC+1)' },
     };
   });
+  const embeds: typeof candidates = [];
+  let used = 0;
+  let truncated = false;
+  for (const embed of candidates) {
+    const fixed = length(embed.title) + length(embed.footer.text)
+      + (embed.fields || []).reduce((total, field) => total + length(field.name) + length(field.value), 0);
+    const available = Math.min(4096, 5980 - used - fixed);
+    if (available < 1) break;
+    const description = clip(embed.description, available);
+    truncated = length(description) < length(embed.description);
+    embeds.push({ ...embed, description });
+    used += fixed + length(description);
+    if (truncated) break;
+  }
+  const omitted = current.length - embeds.length + (truncated ? 1 : 0);
+  if (omitted && embeds.length) {
+    const last = embeds[embeds.length - 1];
+    const marker = `…и ещё ${omitted}`;
+    const limit = Math.min(4096 - length(marker) - 1, 6000 - used + length(last.description) - length(marker) - 1);
+    last.description = `${clip(last.description, Math.max(1, limit))}\n${marker}`;
+  }
   return { type: 4, data: { embeds, components } };
 }
 

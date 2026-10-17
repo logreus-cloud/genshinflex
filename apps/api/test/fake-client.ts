@@ -8,6 +8,8 @@ type Result = { data: unknown; error: null };
 type Query = {
   select: (columns: string) => Query;
   eq: (column: string, value: unknown) => Query;
+  gt: (column: string, value: unknown) => Query;
+  or: (filter: string) => Query;
   order: (column: string) => Query;
   range: (start: number, end: number) => Promise<Result>;
   maybeSingle: () => Promise<Result>;
@@ -34,6 +36,8 @@ export function fakeClient() {
         if (column === 'user_id') selectedUser = value;
         return query;
       },
+      gt: () => query,
+      or: () => query,
       order: () => query,
       range: async () => ({ data: [], error: null }),
       maybeSingle: async () => ({

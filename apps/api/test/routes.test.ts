@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { createApp } from '../src/index.ts';
 import type { TokenClaims } from '../src/lib/auth.ts';
 import type { Env } from '../src/lib/env.ts';
+import { grantTitle, revokeTitle } from '../src/lib/titles.ts';
 import { adminId, fakeClient, userId } from './fake-client.ts';
 
 const botToken = '123456:local-test';
@@ -77,6 +78,28 @@ test('отдаёт профиль с титулами и ролями', async ()
   assert.ok(Array.isArray(me.roles));
 });
 
+test('забаненный пользователь читает профиль, но не меняет его', async () => {
+  const { client } = fakeClient();
+  let checks = 0;
+  const bannedClient = {
+    ...client,
+    auth: { ...client.auth, admin: {
+      ...client.auth.admin,
+      getUserById: async () => {
+        checks++;
+        return { data: { user: { banned_until: new Date(Date.now() + 60_000).toISOString() } }, error: null };
+      },
+    } },
+  } as typeof client;
+  const app = createApp({ adminClient: () => bannedClient, claims });
+  assert.equal((await send(app, { method: 'GET', path: '/me' }, 'user')).status, 200);
+  assert.equal(checks, 0);
+  const response = await send(app, { method: 'POST', path: '/me/title', body: { title: null } }, 'user');
+  assert.equal(response.status, 403);
+  assert.deepEqual(await response.json(), { error: 'Аккаунт заблокирован' });
+  assert.equal(checks, 1);
+});
+
 test('выгружает данные через подставленный клиент', async () => {
   const { client } = fakeClient();
   const exportClient = {
@@ -105,6 +128,8 @@ test('выгружает данные через подставленный кл
     user_data: { user_id: userId, favorites: [] },
     wishes: [],
     roles: [],
+    titles: [],
+    rewards: [],
     telegram: null,
     discord_linked_roles: [],
     discord_tickets: [],
@@ -146,4 +171,50 @@ test('проверяет подпись Telegram перед входом', async
   const valid = await send(app, { method: 'POST', path: '/auth/telegram', body: { auth } });
   assert.equal(valid.status, 200);
   assert.deepEqual(await valid.json(), { ok: true, token_hash: 'fake-token-hash' });
+});
+
+test('повторная выдача с активацией завершает прерванную выдачу', async () => {
+  let inserts = 0;
+  let updates = 0;
+  let activeTitle: string | null = null;
+  const client = {
+    from: (table: string) => table === 'user_titles'
+      ? { insert: async () => ({ error: ++inserts === 1 ? null : { code: '23505' } }) }
+      : { update: (value: { active_title: string }) => {
+        const query = {
+          eq: () => query,
+          is: () => query,
+          then: (resolve: (result: { error: Error | null }) => unknown) => {
+            const error = ++updates === 1 ? new Error('profile') : null;
+            if (!error) activeTitle = value.active_title;
+            return Promise.resolve(resolve({ error }));
+          },
+        };
+        return query;
+      } },
+  } as unknown as Parameters<typeof grantTitle>[0];
+  await assert.rejects(grantTitle(client, userId, { title: 'traveler' }, adminId), /profile/);
+  assert.deepEqual(await grantTitle(client, userId, { title: 'traveler', activate: true }, adminId), { ok: true });
+  await assert.rejects(grantTitle(client, userId, { title: 'traveler' }, adminId), { status: 409 });
+  assert.equal(updates, 2);
+  assert.equal(activeTitle, 'traveler');
+});
+
+test('отзыв титула выполняется через транзакционную функцию', async () => {
+  const calls: { name: string; args: unknown }[] = [];
+  const client = {
+    rpc: async (name: string, args: unknown) => {
+      calls.push({ name, args });
+      return { data: 'other', error: null };
+    },
+  } as unknown as Parameters<typeof revokeTitle>[0];
+  assert.deepEqual(await revokeTitle(client, userId, 'old'), { ok: true });
+  assert.deepEqual(calls, [{ name: 'title_revoke', args: { p_user: userId, p_title: 'old' } }]);
+});
+
+test('отзыв невыданного титула возвращает 404', async () => {
+  const client = {
+    rpc: async () => ({ data: null, error: { message: 'title:not_granted' } }),
+  } as unknown as Parameters<typeof revokeTitle>[0];
+  await assert.rejects(revokeTitle(client, userId, 'old'), { status: 404 });
 });

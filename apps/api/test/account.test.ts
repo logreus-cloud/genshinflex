@@ -12,7 +12,7 @@ const claims = (age: number): TokenClaims => ({
   amr: [{ method: 'password', timestamp: Math.floor(now / 1000) - age }],
 });
 
-function deletionClient() {
+function deletionClient(deleteError = false, removeError = false) {
   const calls: { method: string; args: unknown[] }[] = [];
   const list = async (bucket: string, ...args: unknown[]) => {
     calls.push({ method: 'list', args: [bucket, ...args] });
@@ -20,11 +20,11 @@ function deletionClient() {
   };
   const remove = async (bucket: string, ...args: unknown[]) => {
     calls.push({ method: 'remove', args: [bucket, ...args] });
-    return { error: null };
+    return { error: removeError ? new Error('storage') : null };
   };
   const deleteUser = async (...args: unknown[]) => {
     calls.push({ method: 'deleteUser', args });
-    return { error: null };
+    return { error: deleteError ? new Error('auth') : null };
   };
   const client = {
     storage: { from: (bucket: string) => ({ list: (...args: unknown[]) => list(bucket, ...args), remove: (...args: unknown[]) => remove(bucket, ...args) }) },
@@ -33,15 +33,38 @@ function deletionClient() {
   return { client, calls };
 }
 
-test('removes avatars and profile media before deleting a user after a fresh sign-in', async () => {
+test('lists both buckets, deletes the user, then removes media after a fresh sign-in', async () => {
   const { client, calls } = deletionClient();
   assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
   assert.deepEqual(calls, [
     { method: 'list', args: ['avatars', id, { limit: 100, offset: 0 }] },
-    { method: 'remove', args: ['avatars', [`${id}/one.png`, `${id}/two.webp`]] },
     { method: 'list', args: ['profile-media', id, { limit: 100, offset: 0 }] },
-    { method: 'remove', args: ['profile-media', [`${id}/one.png`, `${id}/two.webp`]] },
     { method: 'deleteUser', args: [id, false] },
+    { method: 'remove', args: ['avatars', [`${id}/one.png`, `${id}/two.webp`]] },
+    { method: 'remove', args: ['profile-media', [`${id}/one.png`, `${id}/two.webp`]] },
+  ]);
+});
+
+test('keeps media when deleting the user fails', async () => {
+  const { client, calls } = deletionClient(true);
+  await assert.rejects(deleteAccount(client, id, 'DELETE', claims(60), now), /Account removal failed/);
+  assert.deepEqual(calls.map((call) => call.method), ['list', 'list', 'deleteUser']);
+});
+
+test('reports successful deletion when media removal fails', async () => {
+  const { client, calls } = deletionClient(false, true);
+  const errors: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => { errors.push(args); };
+  try {
+    assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
+  } finally {
+    console.error = original;
+  }
+  assert.deepEqual(calls.map((call) => call.method), ['list', 'list', 'deleteUser', 'remove', 'remove']);
+  assert.deepEqual(errors.map((args) => args.slice(0, 3)), [
+    ['Media removal failed', id, 'avatars'],
+    ['Media removal failed', id, 'profile-media'],
   ]);
 });
 
@@ -58,8 +81,11 @@ test('requires the exact confirmation', async () => {
 });
 
 test('includes every export section without provider tokens', async () => {
-    const wishes = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, game_uid: '700000000', id: String(index + 1) }));
-    const posts = Array.from({ length: 1001 }, (_, index) => ({ author_id: id, id: index + 1, deleted_at: index === 0 ? '2026-09-27' : null }));
+    const wishes = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, game_uid: '700000000', id: String(index + 1).padStart(4, '0') }));
+    const posts = [
+      { author_id: id, id: 0, deleted_at: null },
+      ...Array.from({ length: 1001 }, (_, index) => ({ author_id: id, id: index + 1, deleted_at: index === 0 ? '2026-09-27' : null })),
+    ];
     const threads = Array.from({ length: 1001 }, (_, index) => ({ author_id: id, id: index + 1 }));
     const reactions = Array.from({ length: 1001 }, (_, index) => ({ user_id: id, post_id: index + 1, kind: 'heart' }));
     const reports = Array.from({ length: 1001 }, (_, index) => ({ reporter_id: id, id: index + 1 }));
@@ -121,32 +147,56 @@ test('includes every export section without provider tokens', async () => {
       guild_members: [{ user_id: id, guild_id: 7 }, { user_id: outboundNotification.recipient_id, guild_id: 7 }],
       guilds: [{ id: 7, slug: 'mine', owner_id: id }, { id: 8, slug: 'other', owner_id: outboundNotification.recipient_id }],
       forum_thread_views: [{ thread_id: 1, user_id: id, day: '2026-10-10' }, { thread_id: 1, user_id: outboundNotification.recipient_id, day: '2026-10-10' }],
+      user_titles: [{ user_id: id, title_id: 'traveler' }],
+      user_rewards: [{ user_id: id, reward_id: 'anniversary' }],
     };
     const client = {
       from: (table: string) => table in collections ? (() => {
-        let matches = (_item: Record<string, unknown>) => true;
+        const predicates: ((item: Record<string, unknown>) => boolean)[] = [];
+        const orderedColumns: string[] = [];
+        const compare = (item: Record<string, unknown>, column: string, value: unknown) =>
+          typeof item[column] === 'number' ? (item[column] as number) - Number(value) : String(item[column]).localeCompare(String(value));
         const query = {
             select: () => query,
             eq: (key: string, value: unknown) => {
               filters.push({ table, key, value });
-              matches = (item: Record<string, unknown>) => item[key] === value;
+              predicates.push((item) => item[key] === value);
               return query;
             },
             in: (key: string, values: unknown[]) => {
               inFilters.push({ table, key, values });
-              matches = (item: Record<string, unknown>) => values.includes(item[key]);
+              predicates.push((item) => values.includes(item[key]));
+              return query;
+            },
+            gt: (key: string, value: unknown) => {
+              predicates.push((item) => compare(item, key, value) > 0);
+              return query;
+            },
+            or: (filter: string) => {
+              const cursor = [...filter.matchAll(/(\w+)\.gt\.("(?:\\.|[^"\\])*")/g)]
+                .map((match) => ({ column: match[1], value: JSON.parse(match[2]) }));
+              predicates.push((item) => cursor.some(({ column, value }, index) =>
+                cursor.slice(0, index).every((part) => compare(item, part.column, part.value) === 0)
+                  && compare(item, column, value) > 0));
               return query;
             },
             order: (column: string) => {
               orders.push({ table, column });
+              orderedColumns.push(column);
               return query;
             },
             range: async (start: number, end: number) => {
               ranges.push({ table, start, end });
-              return {
-                data: collections[table]!.filter((item) => matches(item as Record<string, unknown>)).slice(start, end + 1),
-                error: null,
-              };
+              const data = collections[table]!.filter((item) =>
+                predicates.every((predicate) => predicate(item as Record<string, unknown>)))
+                .sort((a, b) => {
+                  for (const column of orderedColumns) {
+                    const result = compare(a as Record<string, unknown>, column, (b as Record<string, unknown>)[column]);
+                    if (result) return result;
+                  }
+                  return 0;
+                }).slice(start, end + 1);
+              return { data, error: null };
             },
         };
         return query;
@@ -183,12 +233,12 @@ test('includes every export section without provider tokens', async () => {
     for (const table of ['wishes', 'forum_threads', 'forum_posts', 'forum_reactions', 'forum_reports']) {
       assert.deepEqual(ranges.filter((entry) => entry.table === table), [
         { table, start: 0, end: 999 },
-        { table, start: 1000, end: 1999 },
+        { table, start: 0, end: 999 },
       ]);
     }
     assert.deepEqual(ranges.filter((entry) => entry.table === 'dm_messages'), [
       { table: 'dm_messages', start: 0, end: 999 },
-      { table: 'dm_messages', start: 1000, end: 1999 },
+      { table: 'dm_messages', start: 0, end: 999 },
     ]);
     const columns: Record<string, string[]> = {
       wishes: ['game_uid', 'id'],
@@ -223,6 +273,8 @@ test('includes every export section without provider tokens', async () => {
       { table: 'dm_messages', key: 'conversation_id', values: [1, 2] },
     ]);
     assert.deepEqual(data.roles, rows.roles);
+    assert.deepEqual(data.titles, collections.user_titles);
+    assert.deepEqual(data.rewards, collections.user_rewards);
     assert.deepEqual(data.telegram, rows.telegram_accounts);
     assert.deepEqual(data.forum, {
       threads, posts, reactions,

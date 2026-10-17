@@ -34,7 +34,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.20.0';
+const version = '0.21.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -82,7 +82,21 @@ export async function requireUser(
   const token = /^Bearer (.+)$/i.exec(c.req.header('Authorization') || '')?.[1];
   if (!token) return c.json({ error: 'Требуется авторизация' }, 401);
   const claims = await resolve(token, c.env);
-  return claims || c.json({ error: 'Требуется авторизация' }, 401);
+  if (!claims) return c.json({ error: 'Требуется авторизация' }, 401);
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(c.req.method || 'GET')) {
+    const client = serviceClient(c);
+    if (client instanceof Response) return client;
+    try {
+      const { data, error } = await client.auth.admin.getUserById(claims.sub);
+      if (error || !data.user) return c.json({ error: 'Сервис недоступен' }, 503);
+      if (data.user.banned_until && Date.parse(data.user.banned_until) > Date.now()) {
+        return c.json({ error: 'Аккаунт заблокирован' }, 403);
+      }
+    } catch {
+      return c.json({ error: 'Сервис недоступен' }, 503);
+    }
+  }
+  return claims;
 }
 
 export async function requireAdmin(
