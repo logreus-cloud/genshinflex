@@ -26,6 +26,10 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
   let oldestId: number | null = null;
   let newestId = 0;
   let syncedId = 0;
+  let syncing = 0;
+  let syncReady = false;
+  let subscribed = false;
+  let retryTimer: ReturnType<typeof setTimeout> | null = null;
   let hasMore = false;
   let busyOlder = false;
   let sending = false;
@@ -45,6 +49,9 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
   const clearSubscription = () => {
     const previous = channel;
     const supabase = client;
+    if (retryTimer) clearTimeout(retryTimer);
+    retryTimer = null;
+    subscribed = false;
     channel = null;
     client = null;
     if (previous && supabase) void supabase.removeChannel(previous);
@@ -61,6 +68,8 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     oldestId = null;
     newestId = 0;
     syncedId = 0;
+    syncing = 0;
+    syncReady = false;
     hasMore = false;
     busyOlder = false;
     sending = false;
@@ -226,7 +235,7 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     return true;
   };
   const readIfVisible = () => {
-    if (owner && loaded && document.visibilityState === 'visible') void dmMarkRead(conversationId).then(() => {
+    if (owner && loaded && !syncing && syncReady && newestId && document.visibilityState === 'visible') void dmMarkRead(conversationId, newestId).then(() => {
       document.dispatchEvent(new Event('gf:dm-read'));
     }).catch(() => {});
   };
@@ -249,6 +258,11 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     }
   };
   const refreshLatest = async (turn: number, source: RealtimeChannel) => {
+    if (!current(turn) || channel !== source || syncing) return;
+    if (retryTimer) clearTimeout(retryTimer);
+    retryTimer = null;
+    syncing++;
+    syncReady = false;
     const last = syncedId;
     let before: number | null = null;
     let latest = syncedId;
@@ -265,14 +279,24 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
       }
       syncedId = Math.max(syncedId, latest);
       const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
-      let incoming = false;
-      missing.reverse().forEach((message) => {
-        if (addMessage(message, turn) && message.sender_id !== owner) incoming = true;
-      });
+      missing.reverse().forEach((message) => addMessage(message, turn));
       if (nearBottom) list.scrollTop = list.scrollHeight;
-      if (incoming && current(turn) && channel === source) readIfVisible();
+      syncReady = true;
     } catch {
-      if (current(turn) && channel === source) status.textContent = t('Не удалось загрузить');
+      if (current(turn) && channel === source) {
+        syncReady = false;
+        status.textContent = t('Не удалось загрузить');
+        retryTimer = setTimeout(() => {
+          if (!current(turn) || channel !== source) return;
+          retryTimer = null;
+          void refreshLatest(turn, source);
+        }, 5000);
+      }
+    } finally {
+      if (current(turn) && channel === source) {
+        syncing--;
+        if (!syncing && syncReady) readIfVisible();
+      }
     }
   };
   const initialize = async () => {
@@ -310,6 +334,8 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
       syncOlder();
       loaded = true;
       list.scrollTop = list.scrollHeight;
+      // Первая загрузка сама получила последние сообщения — отмечаем их, не дожидаясь Realtime
+      syncReady = true;
       readIfVisible();
       const nextChannel = supabase.channel(`messages-thread:${conversationId}:${crypto.randomUUID()}`)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
@@ -334,7 +360,10 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
         });
       channel = nextChannel;
       nextChannel.subscribe((state) => {
-        if (state === 'SUBSCRIBED' && current(turn) && channel === nextChannel) void refreshLatest(turn, nextChannel);
+        if (state === 'SUBSCRIBED' && current(turn) && channel === nextChannel) {
+          subscribed = true;
+          void refreshLatest(turn, nextChannel);
+        }
       });
     } catch (error) {
       if (current(turn)) {
@@ -350,7 +379,11 @@ export async function initThread(root: HTMLElement, conversationId: number, sign
     confirmations.clear();
   }, { once: true });
   older.addEventListener('click', () => { void loadOlder(generation); }, { signal });
-  document.addEventListener('visibilitychange', readIfVisible, { signal });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    if (subscribed && !syncReady && channel) void refreshLatest(generation, channel);
+    else readIfVisible();
+  }, { signal });
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const turn = generation;

@@ -61,7 +61,7 @@ export const dmSend = (conversation: number, body: string) =>
   rpc<{ id: number; created_at: string }[]>('dm_send', { p_conversation: conversation, p_body: body });
 export const dmMessages = (conversation: number, beforeId: number | null = null, limit = 20) =>
   rpc<Message[]>('dm_messages', { p_conversation: conversation, p_before_id: beforeId, p_limit: limit });
-export const dmMarkRead = (conversation: number) => rpc<number>('dm_mark_read', { p_conversation: conversation });
+export const dmMarkRead = (conversation: number, upTo?: number) => rpc<number>('dm_mark_read', { p_conversation: conversation, p_up_to: upTo ?? null });
 export const dmDeleteMessage = (message: number) => rpc<boolean>('dm_delete_message', { p_message: message });
 export const dmReport = (message: number, reason: DmReportReason, comment: string | null = null) =>
   rpc<void>('dm_report', { p_message: message, p_reason: reason, p_comment: comment });
