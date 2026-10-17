@@ -8,13 +8,22 @@ interface Ctx { request: Request; env: Env; next: () => Promise<Response>; data:
 type Jwk = JsonWebKey & { kid: string };
 
 let certs: { keys: Jwk[]; at: number } | null = null;
-async function keys(team: string) {
-  // Ключи Access меняются редко — держим их час
-  if (!certs || Date.now() - certs.at > 3_600_000) {
-    const r = await fetch(`https://${team}.cloudflareaccess.com/cdn-cgi/access/certs`);
-    certs = { keys: ((await r.json()) as { keys: Jwk[] }).keys, at: Date.now() };
+let loading: Promise<void> | null = null;
+let lastAttempt = 0;
+async function keys(team: string, force = false) {
+  // Ключи Access меняются редко — держим их час. Неизвестный kid (смена ключа) перечитывает их сразу,
+  // но не чаще раза в минуту; параллельные запросы ждут одну загрузку, ошибка не стирает прежний кэш
+  const stale = !certs || Date.now() - certs.at > 3_600_000;
+  if (!loading && (stale || force) && Date.now() - lastAttempt >= 60_000) {
+    lastAttempt = Date.now();
+    loading = (async () => {
+      const r = await fetch(`https://${team}.cloudflareaccess.com/cdn-cgi/access/certs`);
+      if (!r.ok) throw new Error(`Не удалось получить ключи Access: ${r.status}`);
+      certs = { keys: ((await r.json()) as { keys: Jwk[] }).keys, at: Date.now() };
+    })().finally(() => { loading = null; });
   }
-  return certs.keys;
+  if (loading) await loading.catch(() => {});
+  return certs?.keys ?? [];
 }
 
 const b64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '=')), (c) => c.charCodeAt(0));
@@ -24,7 +33,8 @@ async function verify(token: string, env: Env): Promise<string | null> {
   const [h, p, sig] = token.split('.');
   if (!h || !p || !sig) return null;
   const header = part(h), payload = part(p);
-  const jwk = (await keys(env.ACCESS_TEAM!)).find((k) => k.kid === header.kid);
+  let jwk = (await keys(env.ACCESS_TEAM!)).find((k) => k.kid === header.kid);
+  if (!jwk) jwk = (await keys(env.ACCESS_TEAM!, true)).find((k) => k.kid === header.kid);
   if (!jwk) return null;
   const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
   const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(sig), new TextEncoder().encode(`${h}.${p}`));

@@ -4,7 +4,7 @@ import { guideMessages, sendAll, type DiscordEnv } from '../lib/discord';
 
 interface Env extends DiscordEnv { DB: D1Database }
 interface Ctx { request: Request; env: Env; waitUntil: (p: Promise<unknown>) => void }
-type D1Database = { prepare: (q: string) => { bind: (...v: unknown[]) => { first: <T>() => Promise<T | null>; run: () => Promise<{ meta?: { last_row_id?: number } }> } } };
+type D1Database = { prepare: (q: string) => { bind: (...v: unknown[]) => { run: () => Promise<{ meta?: { changes?: number; last_row_id?: number } }> } } };
 
 const LIMIT_PER_HOUR = 3;
 const MAX_PAYLOAD = 60_000;
@@ -58,15 +58,14 @@ export async function onRequestPost({ request, env, waitUntil }: Ctx) {
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`genshinflex:${ip}`));
   const ipHash = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
-  const recent = await env.DB.prepare(
-    "SELECT COUNT(*) AS n FROM guide_submissions WHERE ip_hash = ? AND created_at > datetime('now', '-1 hour')",
-  ).bind(ipHash).first<{ n: number }>();
-  if ((recent?.n ?? 0) >= LIMIT_PER_HOUR) return json({ error: 'Слишком много гайдов подряд — попробуйте через час' }, 429);
 
   const mode = body.mode === 'edit' ? 'edit' : 'new';
   const comment = str(body.comment, 1000) || null;
-  const result = await env.DB.prepare('INSERT INTO guide_submissions (character, mode, author, contact, comment, payload, ip_hash) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(character, mode, author, str(body.contact, 120) || null, comment, JSON.stringify(guide), ipHash).run();
+  const result = await env.DB.prepare(
+    'INSERT INTO guide_submissions (character, mode, author, contact, comment, payload, ip_hash) SELECT ?, ?, ?, ?, ?, ?, ? ' +
+    "WHERE (SELECT COUNT(*) FROM guide_submissions WHERE ip_hash = ? AND created_at > datetime('now', '-1 hour')) < ?",
+  ).bind(character, mode, author, str(body.contact, 120) || null, comment, JSON.stringify(guide), ipHash, ipHash, LIMIT_PER_HOUR).run();
+  if (result.meta?.changes === 0) return json({ error: 'Слишком много гайдов подряд — попробуйте через час' }, 429);
   waitUntil(sendAll(guideMessages(env, { id: result.meta?.last_row_id, kind, target, mode, author, comment, site: 'https://genshinflex.com' })));
   return json({ ok: true }, 201);
 }
