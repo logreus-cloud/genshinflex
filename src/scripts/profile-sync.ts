@@ -145,11 +145,9 @@ async function customPart(client: Client, id: string, stamp: Stamp, remote: unkn
     return 'pulled';
   }
   const existing = await names(bucket, id);
-  const current = new Set<string>();
   for (const key of mediaKeys) {
     const path = versions[key] ? `${key}-${versions[key]}` : '';
     if (!path) continue;
-    current.add(path);
     if (existing.some((item) => item.name === path)) continue;
     const blob = await getMedia(key, versions[key]);
     if (!blob) throw new Error('Local media missing');
@@ -163,17 +161,6 @@ async function customPart(client: Client, id: string, stamp: Stamp, remote: unkn
   if (!active()) return 'skipped';
   if (error) throw error;
   if (!data?.length) { conflict(); return 'skipped'; }
-  // Перед удалением перечитываем профиль: другое устройство могло уже сослаться на старую картинку
-  const fresh = await client.from('profiles').select('custom').eq('id', id).maybeSingle();
-  if (!active()) return 'skipped';
-  if (fresh.error) throw fresh.error;
-  try { for (const [key, version] of Object.entries(mediaOf(fresh.data?.custom))) current.add(`${key}-${version}`); } catch {}
-  const stale = existing.filter((item) => !current.has(item.name) && timestamp(item.created_at) > 0 && timestamp(item.created_at) < Date.now() - 600_000).map((item) => `${id}/${item.name}`);
-  for (let offset = 0; offset < stale.length; offset += 100) {
-    if (!active()) return 'skipped';
-    const { error } = await bucket.remove(stale.slice(offset, offset + 100));
-    if (error) throw error;
-  }
   finish(id, 'custom', stamp.at, timestamp(data[0].custom_updated_at), active);
   return 'pushed';
 }

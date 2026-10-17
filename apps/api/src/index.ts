@@ -22,6 +22,7 @@ import type { TicketDeps } from './lib/discord-tickets.ts';
 import type { LinkResult } from './lib/discord-roles.ts';
 import type { DiscordBannersData, PityData } from './lib/discord-wishes.ts';
 import { dispatchSanityPublish } from './lib/github-dispatch.ts';
+import { collectProfileMedia } from './lib/profile-media-gc.ts';
 import { verifySanityWebhook } from './lib/sanity-webhook.ts';
 import { verifyTelegram } from './lib/telegram.ts';
 import { linkTelegram, telegramLogin, unlinkTelegram } from './lib/telegram-login.ts';
@@ -34,7 +35,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.21.1';
+const version = '0.22.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -723,19 +724,22 @@ export function createApp(deps: AppDeps = {}) {
   return instance;
 }
 
-function scheduled(_event: { scheduledTime?: number }, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
+function scheduled(event: { scheduledTime?: number }, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
   const client = createServiceClient(env);
   // Cron раз в минуту; очередь Linked Roles сама ограничивает частоту проверок
   const roles = env.DISCORD_APPLICATION_ID && env.DISCORD_CLIENT_SECRET;
+  const mediaGc = new Date(event.scheduledTime ?? Date.now()).getUTCMinutes() === 17;
   ctx.waitUntil(Promise.allSettled([
     deliverTelegramNotifications(client, env.TELEGRAM_BOT_TOKEN),
     deliverDiscordNotifications(client, env.DISCORD_BOT_TOKEN || ''),
     roles ? syncRoleConnections(client, { applicationId: env.DISCORD_APPLICATION_ID!, clientSecret: env.DISCORD_CLIENT_SECRET! }) : null,
-  ]).then(([telegram, discord, linkedRoles]) => {
+    mediaGc ? collectProfileMedia(client) : null,
+  ]).then(([telegram, discord, linkedRoles, media]) => {
     if (telegram.status === 'rejected') console.error('telegram notifications failed', String(telegram.reason));
     if (discord.status === 'rejected') console.error('discord notifications failed', String(discord.reason));
     if (linkedRoles.status === 'rejected') console.error('discord linked roles failed', String(linkedRoles.reason));
+    if (media.status === 'rejected') console.error('profile media gc failed', String(media.reason));
   }));
 }
 

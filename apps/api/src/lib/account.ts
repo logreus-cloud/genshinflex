@@ -36,7 +36,7 @@ async function exportRows(client: AdminClient, table: string, key: string, id: s
     if (error || !data) throw new Error('Account export failed');
     rows.push(...data);
     if (data.length < 1000) break;
-    last = data[data.length - 1] as Record<string, unknown>;
+    last = data[data.length - 1] as unknown as Record<string, unknown>;
   }
   return rows;
 }
@@ -56,7 +56,7 @@ async function exportRelatedRows(client: AdminClient, table: string, key: string
       if (error || !data) throw new Error('Account export failed');
       rows.push(...data);
       if (data.length < 1000) break;
-      last = data[data.length - 1] as Record<string, unknown>;
+      last = data[data.length - 1] as unknown as Record<string, unknown>;
     }
   }
   return rows;
