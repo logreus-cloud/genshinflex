@@ -65,9 +65,12 @@ function ownTeam(slug, cks) {
 
 // ck — список возможных ключей персонажа; в найденной записи он подменяется на тот, что в ней встретился
 async function pickTeam(cks, teams) {
-  const q = { query: { 'summary.char_names': { $in: cks }, is_db_valid: true }, limit: 100, skip: 0 };
+  // Фильтр is_db_valid база больше не принимает (400) — отбираем проверенные записи сами
+  const q = { query: { 'summary.char_names': { $in: cks } }, limit: 100, skip: 0 };
   const res = await fetch(`https://db.kqm.gg/api/db?q=${encodeURIComponent(JSON.stringify(q))}`, { signal: AbortSignal.timeout(30_000) }).then((r) => r.json());
-  const list = (res.data ?? []).filter((e) => e.summary?.target_count === 1);
+  // Ошибку базы нельзя принимать за «нет команды»: иначе молча пропадут все персонажи
+  if (res.error) throw new Error(`База gcsim: ${res.error}`);
+  const list = (res.data ?? []).filter((e) => e.is_db_valid === true && e.summary?.target_count === 1);
   const own = (e) => cks.find((k) => e.summary.char_names.includes(k));
   const cons = (e) => e.summary.team.find((m) => m.name === own(e))?.cons ?? 0;
   const overlap = (e) => Math.max(0, ...teams.map((t) => t.filter((k) => e.summary.char_names.includes(k)).length));

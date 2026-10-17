@@ -21,8 +21,8 @@
   "dps": 60112
  },
  "_meta": {
-  "gcsim": "1f9c1f2",
-  "date": "2026-10-03",
+  "gcsim": "4eda9fc",
+  "date": "2026-10-17",
   "iterations": 500
  },
  "albedo": {
@@ -2703,6 +2703,54 @@
   ],
   "weapon": 0.7,
   "dps": 58058,
+  "optimized": true
+ },
+ "zibai": {
+  "team": [
+   "zibai",
+   "illuga",
+   "gorou",
+   "aino"
+  ],
+  "source": "https://keqingmains.com/q/zibai-quickguide/",
+  "own": true,
+  "four": "flute-of-ezpitzal",
+  "refine": 5,
+  "five": "lightbearing-moonshard",
+  "cons": [
+   25.3,
+   59.5,
+   73.7,
+   87.4,
+   90.2,
+   115
+  ],
+  "weapon": 34.4,
+  "dps": 48976,
+  "optimized": true
+ },
+ "alyosha": {
+  "team": [
+   "alyosha",
+   "cyno",
+   "odette",
+   "yaemiko"
+  ],
+  "source": "https://keqingmains.com/q/alyosha-quickguide/",
+  "own": true,
+  "four": "frostbreath",
+  "refine": 5,
+  "five": "engulfing-lightning",
+  "cons": [
+   -0.3,
+   3.8,
+   4.5,
+   4.6,
+   5.5,
+   12.3
+  ],
+  "weapon": 0.6,
+  "dps": 51037,
   "optimized": true
  }
 }

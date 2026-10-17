@@ -1,0 +1,54 @@
+# Цзыбай — Иллуга — Горо — Аино. Ротация: KQM (команда 5, вариант с Аино), https://keqingmains.com/q/zibai-quickguide/
+# Aino E > Illuga EQ > Aino Q > Gorou (Q) E > Zibai combo. Команды из нашего гайда — с Линнеей, её gcsim пока не поддерживает.
+# Билды — по нашим гайдам (src/content/builds), доп. статы подбирает оптимизатор gcsim. 4★ в гайде нет — база Flute of Ezpitzal (лучшее 4★ по KQM).
+zibai char lvl=90/90 cons=0 talent=9,9,9;
+zibai add weapon="fluteofezpitzal" refine=5 lvl=90/90;
+zibai add set="nightoftheskysunveiling" count=4;
+zibai add stats hp=4780 atk=311 def%=0.583 def%=0.583 cr=0.311;
+
+illuga char lvl=90/90 cons=0 talent=9,9,9;
+illuga add weapon="favoniuslance" refine=5 lvl=90/90;
+illuga add set="silkenmoonsserenade" count=4;
+illuga add stats hp=4780 atk=311 em=187 em=187 em=187;
+
+gorou char lvl=90/90 cons=0 talent=9,9,9;
+gorou add weapon="favoniuswarbow" refine=5 lvl=90/90;
+gorou add set="theexile" count=4;
+gorou add stats hp=4780 atk=311 er=0.518 geo%=0.466 cr=0.311;
+
+aino char lvl=90/90 cons=0 talent=9,9,9;
+aino add weapon="favoniusgreatsword" refine=5 lvl=90/90;
+aino add set="noblesseoblige" count=4;
+aino add stats hp=4780 atk=311 er=0.518 em=187 em=187;
+
+options swap_delay=12 iteration=1000;
+target lvl=100 resist=0.1 radius=2 pos=0,2.4 hp=999999999;
+energy every interval=480,720 amount=1;
+
+active aino;
+for let i=0; i<5; i=i+1 {
+  aino skill;
+  illuga skill;
+  if .illuga.burst.ready {
+    illuga burst;
+  }
+  if .aino.burst.ready {
+    aino burst;
+  }
+  if .gorou.burst.ready {
+    gorou burst;
+  }
+  gorou skill;
+  zibai skill;
+  if .zibai.burst.ready {
+    zibai burst;
+  }
+  # Пока длится Лунный сдвиг фазы: Поступь скакуна при 70 очках сияния, иначе обычные атаки копят сияние
+  while .zibai.status.zibai-skill > 0 {
+    if .zibai.radiance >= 70 {
+      zibai skill;
+    } else {
+      zibai attack;
+    }
+  }
+}

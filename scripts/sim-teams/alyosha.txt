@@ -1,0 +1,49 @@
+# Алёша — Сайно — Одетта — Яэ Мико. Ротация: KQM (Звёздный проводник), https://keqingmains.com/q/alyosha-quickguide/
+# Yae Miko 3[E] > Odette 2[E] > Alyosha EQ > Cyno combo. Комбо Сайно — как в командах Сайно из базы gcsim. Сандрону gcsim пока не поддерживает.
+# Билды — по нашим гайдам (src/content/builds), доп. статы подбирает оптимизатор gcsim. Heart of the Furnace у Одетты, поэтому у Алёши Noblesse Oblige.
+alyosha char lvl=90/90 cons=0 talent=9,9,9;
+alyosha add weapon="frostbreath" refine=5 lvl=90/90;
+alyosha add set="noblesseoblige" count=4;
+alyosha add stats hp=4780 atk=311 er=0.518 atk%=0.466 atk%=0.466;
+
+cyno char lvl=90/90 cons=0 talent=9,9,9;
+cyno add weapon="balladofthefjords" refine=5 lvl=90/90;
+cyno add set="thunderingfury" count=4;
+cyno add stats hp=4780 atk=311 em=187 electro%=0.466 cr=0.311;
+
+odette char lvl=90/90 cons=0 talent=9,9,9;
+odette add weapon="finaleofthedeep" refine=5 lvl=90/90;
+odette add set="heartofthefurnace" count=4;
+odette add stats hp=4780 atk=311 atk%=0.466 atk%=0.466 cr=0.311;
+
+yaemiko char lvl=90/90 cons=0 talent=9,9,9;
+yaemiko add weapon="thewidsith" refine=5 lvl=90/90;
+yaemiko add set="disenchantmentindeepshadow" count=4;
+yaemiko add stats hp=4780 atk=311 atk%=0.466 electro%=0.466 cr=0.311;
+
+options swap_delay=12 iteration=1000;
+target lvl=100 resist=0.1 radius=2 pos=0,2.4 hp=999999999;
+energy every interval=480,720 amount=1;
+
+active yaemiko;
+for let i=0; i<5; i=i+1 {
+  yaemiko skill:3;
+  odette skill:2;
+  alyosha skill;
+  if .alyosha.burst.ready {
+    alyosha burst;
+  }
+  cyno skill, attack;
+  if .cyno.burst.ready {
+    cyno burst;
+  }
+  while .cyno.status.cyno-q > 0 {
+    if .cyno.mods.cyno-a1 && .cyno.skill.ready {
+      cyno skill;
+    } else if .cyno.normal == 4 && .stam > 20 {
+      cyno dash;
+    } else {
+      cyno attack;
+    }
+  }
+}
