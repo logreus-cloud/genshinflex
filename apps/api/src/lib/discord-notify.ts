@@ -37,6 +37,9 @@ async function logFailure(id: number, response: Response): Promise<void> {
   else console.warn('discord send failed', id, response.status, text);
 }
 
+const permanentFailure = (response: Response) =>
+  response.status >= 400 && response.status < 500 && response.status !== 429;
+
 export async function deliverDiscordNotifications(
   client: Pick<SupabaseClient, 'rpc'>,
   botToken: string,
@@ -47,6 +50,7 @@ export async function deliverDiscordNotifications(
   if (error) throw error;
   const items = (data ?? []) as DiscordNotification[];
   const channels = new Map<string, string>();
+  const ack: number[] = [];
   let sent = 0;
   for (const item of items) {
     try {
@@ -55,7 +59,11 @@ export async function deliverDiscordNotifications(
         const response = await discordRequest(fetchImpl, botToken, 'https://discord.com/api/v10/users/@me/channels', {
           recipient_id: item.discord_id,
         });
-        if (!response.ok) { await logFailure(item.id, response); continue; }
+        if (!response.ok) {
+          await logFailure(item.id, response);
+          if (permanentFailure(response)) ack.push(item.id);
+          continue;
+        }
         const channel = await response.json() as { id?: unknown };
         if (typeof channel.id !== 'string') throw new Error('Invalid Discord channel');
         channelId = channel.id;
@@ -73,12 +81,21 @@ export async function deliverDiscordNotifications(
         components: [{ type: 1, components: [{ type: 2, style: 5, label: 'Открыть на GenshinFlex', url: href }] }],
         allowed_mentions: { parse: [] },
       });
-      if (response.ok) sent++;
-      else await logFailure(item.id, response);
+      if (response.ok) {
+        sent++;
+        ack.push(item.id);
+      } else {
+        await logFailure(item.id, response);
+        if (permanentFailure(response)) ack.push(item.id);
+      }
     } catch (error) {
       if (error instanceof DiscordRateLimit) break;
       console.warn('discord send failed', item.id, String(error));
     }
+  }
+  if (ack.length) {
+    const { error: ackError } = await client.rpc('discord_notifications_ack', { p_ids: ack });
+    if (ackError) throw ackError;
   }
   if (items.length) console.log('discord notifications', { claimed: items.length, sent });
   return { claimed: items.length, sent };

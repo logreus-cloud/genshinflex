@@ -55,11 +55,16 @@ test('telegramMessage escapes user content and handles missing destinations', ()
 
 test('deliverTelegramNotifications continues after Telegram errors', async () => {
   const requests: Array<{ url: string; body: Record<string, unknown> }> = [];
+  const acks: number[][] = [];
   const client = {
-    rpc: async (name: string, args: { p_limit: number }) => {
+    rpc: async (name: string, args: { p_limit?: number; p_ids?: number[] }) => {
+      if (name === 'telegram_notifications_ack') {
+        acks.push(args.p_ids ?? []);
+        return { data: null, error: null };
+      }
       assert.equal(name, 'telegram_notifications_claim');
       assert.deepEqual(args, { p_limit: 50 });
-      return { data: [item, ...[2, 3, 4].map((id) => ({ ...item, id, telegram_id: id }))], error: null };
+      return { data: [item, ...[2, 3, 4, 5, 6].map((id) => ({ ...item, id, telegram_id: id }))], error: null };
     },
   } as unknown as Parameters<typeof deliverTelegramNotifications>[0];
   const send: typeof fetch = async (input, init) => {
@@ -67,10 +72,13 @@ test('deliverTelegramNotifications continues after Telegram errors', async () =>
     requests.push({ url: String(input), body });
     if (body.chat_id === 2) throw new Error('network');
     if (body.chat_id === 3) return new Response('', { status: 403 });
+    if (body.chat_id === 5) return new Response('', { status: 500 });
+    if (body.chat_id === 6) return new Response('', { status: 429 });
     return new Response('ok');
   };
-  assert.deepEqual(await deliverTelegramNotifications(client, 'token', send), { claimed: 4, sent: 2 });
-  assert.equal(requests.length, 4);
+  assert.deepEqual(await deliverTelegramNotifications(client, 'token', send), { claimed: 6, sent: 2 });
+  assert.equal(requests.length, 6);
+  assert.deepEqual(acks, [[1, 3, 4]]);
   assert.equal(requests[0].url, 'https://api.telegram.org/bottoken/sendMessage');
   assert.deepEqual(requests[0].body, {
     chat_id: 123,
@@ -89,4 +97,13 @@ test('deliverTelegramNotifications skips an empty token and throws on claim erro
     rpc: async () => ({ data: null, error: new Error('claim failed') }),
   } as unknown as Parameters<typeof deliverTelegramNotifications>[0];
   await assert.rejects(deliverTelegramNotifications(failed, 'token'), /claim failed/);
+});
+
+test('deliverTelegramNotifications throws on ack errors', async () => {
+  const client = {
+    rpc: async (name: string) => name === 'telegram_notifications_claim'
+      ? { data: [item], error: null }
+      : { data: null, error: new Error('ack failed') },
+  } as unknown as Parameters<typeof deliverTelegramNotifications>[0];
+  await assert.rejects(deliverTelegramNotifications(client, 'token', async () => new Response('ok')), /ack failed/);
 });

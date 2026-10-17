@@ -72,6 +72,7 @@ export async function deliverTelegramNotifications(
   const { data, error } = await client.rpc('telegram_notifications_claim', { p_limit: 50 });
   if (error) throw error;
   const items = (data ?? []) as TelegramNotification[];
+  const ack: number[] = [];
   let sent = 0;
   for (const item of items) {
     try {
@@ -86,11 +87,20 @@ export async function deliverTelegramNotifications(
           disable_web_page_preview: true,
         }),
       });
-      if (response.ok) sent++;
-      else console.warn('telegram send failed', item.id, response.status, await response.text().catch(() => ''));
+      if (response.ok) {
+        sent++;
+        ack.push(item.id);
+      } else {
+        console.warn('telegram send failed', item.id, response.status, await response.text().catch(() => ''));
+        if (response.status >= 400 && response.status < 500 && response.status !== 429) ack.push(item.id);
+      }
     } catch (error) {
       console.warn('telegram send failed', item.id, String(error));
     }
+  }
+  if (ack.length) {
+    const { error: ackError } = await client.rpc('telegram_notifications_ack', { p_ids: ack });
+    if (ackError) throw ackError;
   }
   if (items.length) console.log('telegram notifications', { claimed: items.length, sent });
   return { claimed: items.length, sent };
