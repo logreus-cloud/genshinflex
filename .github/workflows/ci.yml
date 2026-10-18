@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, platform]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+      - name: Установить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Установить зависимости
+        run: npm ci
+      - name: Запустить тесты
+        run: npm test
+
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+      - name: Установить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Установить зависимости
+        run: npm ci
+      - name: Проверить типы сайта
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run check
+      - name: Проверить типы API
+        run: npm run api:check
+
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+      - name: Установить Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Поднять базу данных
+        run: supabase db start
+      - name: Проверить SQL
+        shell: bash
+        run: |
+          # В supabase/config.toml нет секции [db] — порт по умолчанию
+          port=54322
+          status=0
+          for file in supabase/tests/*.sql; do
+            echo "::group::$file"
+            if ! psql "postgresql://postgres:postgres@127.0.0.1:${port}/postgres" -v ON_ERROR_STOP=1 -q -f "$file"; then
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "$status"

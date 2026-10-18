@@ -23,6 +23,7 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
+    "check": "astro check",
     "dev:full": "npm run build && wrangler pages dev dist",
     "deploy": "node scripts/deploy.mjs --sanity --branch=main",
     "deploy:test": "node scripts/deploy.mjs --test",
@@ -39,7 +40,7 @@
     "sim:presets": "node scripts/export-sim-presets.mjs",
     "test:forum": "node --import tsx --test scripts/test-forum-markup.mjs",
     "test:i18n": "node --test scripts/i18n/*.test.mjs",
-    "test": "npm run cms:test && npm run cms:store-test && npm run cms:model-test && npm run api:test && npm run test:user-data && npm run test:i18n && npm run test:team-check && npm run test:forum",
+    "test": "npm run cms:test && npm run cms:store-test && npm run cms:model-test && npm run api:test && npm run test:user-data && npm run test:i18n && npm run test:team-check && npm run test:forum && npm run test:sim && npm run test:discord && npm run test:reminders",
     "test:team-check": "node scripts/test-team-check.mjs",
     "test:user-data": "node --import tsx --test src/scripts/user-data/*.test.ts",
     "test:sim": "node --experimental-strip-types scripts/test-enka-gcsim.mjs",
@@ -50,7 +51,8 @@
     "import:weapon-art": "python scripts/import-weapon-art.py",
     "studio": "npm run dev -w @genshinflex/studio",
     "api:dev": "npm run dev -w @genshinflex/api",
-    "api:test": "npm run test -w @genshinflex/api"
+    "api:test": "npm run test -w @genshinflex/api",
+    "api:check": "tsc --noEmit -p apps/api"
   },
   "dependencies": {
     "@sanity/client": "^7.0.0",
@@ -61,6 +63,7 @@
     "esbuild": true
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@portabletext/block-tools": "^3.0.0",
     "@sanity/schema": "^4.0.0",
     "genshin-db": "^5.2.14",
@@ -69,6 +72,7 @@
     "marked": "^15.0.0",
     "pagefind": "^1.5.2",
     "tsx": "^4.0.0",
+    "typescript": "^5.9.3",
     "wrangler": "^4.137.0",
     "yaml": "^2.0.0"
   }

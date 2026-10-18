@@ -5,6 +5,7 @@ import YAML from 'yaml';
 import { fieldOrder } from '@genshinflex/content-model';
 import { addAuthor, buildFromSubmission, guideFromSubmission } from '../../../scripts/guides/submission.mjs';
 import { editorBuild, EXCLUDED_BUILD_FIELDS } from '../../../src/lib/editor-build';
+import { contentSchemas } from '../../../src/lib/content-schemas';
 
 const parse = (text: string) => matter(text, { engines: { yaml: (source) => YAML.parse(source) } }).data;
 const previousText = `---
@@ -72,7 +73,7 @@ test('frontmatter билда следует порядку полей модел
 
 test('редактор получает каждое поле схемы билда', () => {
   const data = parse(previousText);
-  const output = editorBuild({ ...data, updated: new Date('2026-09-01') }, 'Текст', {
+  const output = editorBuild(contentSchemas.builds.parse({ ...data, updated: new Date('2026-09-01') }), 'Текст', {
     t: (value) => value, stat: (value) => value, lang: 'ru',
   });
   for (const key of fieldOrder('builds')) {

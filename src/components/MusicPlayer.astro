@@ -134,9 +134,9 @@ const { t } = useData(Astro.currentLocale);
       muteButton.setAttribute('aria-label', label); muteButton.title = label;
     };
     const render = () => {
-      const label = button.dataset[enabled ? 'onLabel' : 'offLabel']!;
-      button.setAttribute('aria-pressed', String(enabled)); button.setAttribute('aria-label', label); button.title = label;
-      button.classList.toggle('armed', armed && !playing);
+      const label = button!.dataset[enabled ? 'onLabel' : 'offLabel']!;
+      button!.setAttribute('aria-pressed', String(enabled)); button!.setAttribute('aria-label', label); button!.title = label;
+      button!.classList.toggle('armed', armed && !playing);
       const track = tracks[index];
       title.textContent = miniTitle.textContent = track.title;
       disc.textContent = `${panel.dataset.discLabel} ${track.disc} · ${track.discTitle}`;

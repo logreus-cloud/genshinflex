@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client';
+import type { Loader } from 'astro/loaders';
 import { collections, entryId, type Collection } from '@genshinflex/content-model';
 import { bodyHash, fromSanityData } from './cms-mapping';
 import { portableTextToMarkdown } from './portable-text-md';
@@ -27,13 +28,7 @@ export function sanityLoader(collection: Collection) {
   const type = collections[collection].type;
   return {
     name: `sanity-${collection}`,
-    async load({ store, parseData, generateDigest, renderMarkdown, logger }: {
-      store: { clear(): void; set(entry: Record<string, unknown>): void };
-      parseData(input: { id: string; data: Record<string, unknown> }): Promise<Record<string, unknown>>;
-      generateDigest(data: unknown): string;
-      renderMarkdown(body: string): Promise<unknown>;
-      logger: { info(message: string): void };
-    }) {
+    async load({ store, parseData, generateDigest, renderMarkdown, logger }) {
       let documents: Document[];
       try {
         documents = await client.fetch<Document[]>(
@@ -61,7 +56,7 @@ export function sanityLoader(collection: Collection) {
         ids.add(id);
         const data = collection === 'buildsI18n'
           ? {}
-          : fromSanityData(type, document as Record<string, never>);
+          : fromSanityData(type, document as unknown as Parameters<typeof fromSanityData>[1]);
         const parsed = await parseData({ id, data });
         const converted = document.body === undefined ? undefined : portableTextToMarkdown(document.body);
         // Исходный текст нужен редактору гайдов до первого изменения блока в Studio.
@@ -75,5 +70,5 @@ export function sanityLoader(collection: Collection) {
       }
       logger.info(`Sanity: ${collection} — ${selected.length}`);
     },
-  };
+  } satisfies Loader;
 }

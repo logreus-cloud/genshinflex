@@ -154,7 +154,7 @@ async function decoded(blob: Blob) {
 }
 
 function dimensions(image: ImageBitmap | HTMLImageElement) {
-  return typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ? [image.width, image.height] : [image.naturalWidth, image.naturalHeight];
+  return 'naturalWidth' in image ? [image.naturalWidth, image.naturalHeight] : [image.width, image.height];
 }
 
 // Размеры без Image.decode(): в Chrome он может не завершиться на больших картинках

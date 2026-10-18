@@ -14,7 +14,7 @@ export const LANG = pageLang();
 export const BASE = LANG === 'ru' ? '' : `/${LANG}`;
 export const t = translate(LANG);
 let indexPromise: Promise<Index> | null = null;
-export const loadIndex = () => (indexPromise ??= fetch(`${BASE}/data/index.json`).then((r) => r.json()));
+export const loadIndex = (): Promise<Index> => (indexPromise ??= fetch(`${BASE}/data/index.json`).then((r) => r.json()));
 
 const norm = (s: string) => s.toLowerCase().replace(/ё/g, 'е');
 const score = (q: string, ...fields: string[]) => {
@@ -42,8 +42,9 @@ export async function searchNames(query: string, limit = 8): Promise<Entry[]> {
 
 // Pagefind подключается через import() в обход Vite — файлы появляются только в dist
 type PagefindResult = { data: () => Promise<{ url: string; meta: { title?: string }; excerpt: string }> };
-let pagefind: Promise<{ search: (q: string) => Promise<{ results: PagefindResult[] }> } | null> | null = null;
-const dynamicImport = new Function('u', 'return import(u)') as (u: string) => Promise<any>;
+type Pagefind = { search: (q: string) => Promise<{ results: PagefindResult[] }> };
+let pagefind: Promise<Pagefind | null> | null = null;
+const dynamicImport = new Function('u', 'return import(u)') as (u: string) => Promise<Pagefind>;
 
 export async function searchText(query: string, limit = 5) {
   pagefind ??= dynamicImport(`${BASE}/pagefind/pagefind.js`).catch(() => null);

@@ -10,7 +10,7 @@ const { lang, t } = useData(Astro.currentLocale);
 const db = enemies as Record<string, { ru: string; en: string; es: string; icon: string | null }>;
 const item = typeof e === 'string' ? undefined : db[e.id];
 const name = typeof e === 'string' ? t(e) : item?.[lang] ?? e.id;
-const extra = typeof e === 'string' ? {} : e;
+const extra: { n?: number; note?: string } = typeof e === 'string' ? {} : e;
 ---
 <li class="enemy">
   {item?.icon ? <img src={item.icon} alt="" width="36" height="36" loading="lazy" /> : <span class="ph" aria-hidden="true">?</span>}

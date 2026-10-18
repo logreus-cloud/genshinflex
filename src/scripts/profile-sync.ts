@@ -100,7 +100,7 @@ function mediaOf(custom: unknown): Partial<Record<MediaKey, string>> {
   return versions;
 }
 async function names(bucket: Bucket, id: string) {
-  const names: { name: string; created_at: string }[] = [];
+  const names: { name: string; created_at: string | null }[] = [];
   for (let offset = 0; ; offset += 100) {
     const { data, error } = await bucket.list(id, { limit: 100, offset });
     if (error || !data) throw new Error('Media listing failed');

@@ -149,7 +149,7 @@ test('throwing getter leaves favorites unchanged', () => {
   const data = createUserData({ storage });
   assert.equal(data.set('favorites', [{ href: '/a', name: 'A', kind: 'character' }]), true);
   const before = storage.getItem(userDataKey('favorites'));
-  assert.equal(data.set('favorites', [{ get href() { throw new Error('x'); }, name: 'n', kind: 'k' }]), false);
+  assert.equal(data.set('favorites', [{ get href(): string { throw new Error('x'); }, name: 'n', kind: 'k' }]), false);
   assert.equal(storage.getItem(userDataKey('favorites')), before);
 });
 
@@ -299,7 +299,7 @@ test('restore rejects a throwing property getter without changing storage', () =
   assert.equal(data.set('profileUid', '123456789'), true);
   const uid = storage.getItem(userDataKey('profileUid'));
   const marker = storage.getItem('gf:sync');
-  assert.equal(data.restore({ favorites: {}, get roster() { throw new Error('x'); }, profileUid: null }), false);
+  assert.equal(data.restore({ favorites: {}, get roster(): Record<string, unknown>[] { throw new Error('x'); }, profileUid: null }), false);
   assert.equal(storage.getItem(userDataKey('profileUid')), uid);
   assert.equal(storage.getItem(userDataKey('roster')), null);
   assert.equal(storage.getItem('gf:sync'), marker);

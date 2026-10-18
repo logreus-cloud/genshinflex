@@ -1,7 +1,7 @@
 export type SimResult = { dps: number; iterations: number; duration: number; chars: { name: string; dps: number }[] };
 
 type Reply = { id: number; result?: unknown; error?: string };
-type Pending = { resolve: (value: any) => void; reject: (reason: Error) => void };
+type Pending = { resolve: (value: unknown) => void; reject: (reason: Error) => void };
 type Client = {
   worker: Worker; pending: Map<number, Pending>;
   call: <T>(action: string, data?: Record<string, unknown>, transfer?: Transferable[]) => Promise<T>;
@@ -31,10 +31,10 @@ function makeClient(): Client {
   };
   return {
     worker, pending,
-    call<T>(action: string, data = {}, transfer = []) {
+    call<T>(action: string, data: Record<string, unknown> = {}, transfer: Transferable[] = []) {
       return new Promise<T>((resolve, reject) => {
         const id = ++nextId;
-        pending.set(id, { resolve, reject });
+        pending.set(id, { resolve: (value) => resolve(value as T), reject });
         try { worker.postMessage({ id, action, ...data }, transfer); }
         catch (error) {
           pending.delete(id);

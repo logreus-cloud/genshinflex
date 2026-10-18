@@ -48,7 +48,7 @@ const users = (await getCollection('builds'))
           <div class="eff-head">
             <h2>{w.effectName}</h2>
             <div class="refine" role="group" aria-label={t('Пробуждение')}>
-              {w.refinements.map((_, i) => <button type="button" class="btn" aria-pressed={String(i === 0)} data-r={i}>R{i + 1}</button>)}
+              {w.refinements.map((_, i) => <button type="button" class="btn" aria-pressed={i === 0 ? 'true' : 'false'} data-r={String(i)}>R{i + 1}</button>)}
             </div>
           </div>
           {w.refinements.map((text, i) => <p class="eff" hidden={i !== 0} data-r-text={i}>{text}</p>)}

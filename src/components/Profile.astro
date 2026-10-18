@@ -541,6 +541,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   onPage((signal) => {
   const root = document.querySelector<HTMLElement>('.profile-root');
   if (!root || root.dataset.mode === 'public') return;
+  const pageRoot = root;
   const pickerChars = readPickerChars($('profile-chars'));
   const pickerBySlug = new Map(pickerChars.map((char) => [char.slug, char]));
   const charsById = new Map<number, Char>();
@@ -605,7 +606,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   }
   const mediaSource = (key: MediaKey) => stagedMedia.get(key)?.url ?? committedUrls.get(key) ?? null;
   function renderPersonal() {
-    renderAppearance(root, draft, pickerBySlug, mediaSource, draft.nick || currentProfile?.player.nickname || t('Путешественник'), placeholder, effect);
+    renderAppearance(pageRoot, draft, pickerBySlug, mediaSource, draft.nick || currentProfile?.player.nickname || t('Путешественник'), placeholder, effect);
     $('preview-name').textContent = $('profile-name').textContent;
     renderCover($<HTMLImageElement>('preview-cover'), draft, pickerBySlug, mediaSource);
     renderAvatar(previewAvatar, $('preview-avatar-shell'), draft, pickerBySlug, mediaSource, placeholder);
@@ -671,7 +672,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   }
   function renderFramers() {
     const banner = $('profile-banner'), background = $('profile-bg');
-    const bannerWidth = banner.clientWidth || banner.parentElement?.clientWidth || root.clientWidth || innerWidth;
+    const bannerWidth = banner.clientWidth || banner.parentElement?.clientWidth || pageRoot.clientWidth || innerWidth;
     const bannerHeight = banner.clientHeight || (innerWidth <= 700 ? 120 : 180);
     const coverRatio = bannerWidth / bannerHeight;
     $('cover-frame-preview').style.setProperty('--banner-ratio', String(coverRatio));

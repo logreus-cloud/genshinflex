@@ -9,7 +9,7 @@ type Api = typeof globalThis & {
   // gcsim ≥ 2.48: { result: JSON полного результата, hash } или строка с ошибкой
   flush: () => { result: string; hash: string } | string;
 };
-type Request = { id: number; action: string; config?: string; count?: number; bytes?: Uint8Array[] };
+type WorkerRequest = { id: number; action: string; config?: string; count?: number; bytes?: Uint8Array[] };
 const api = globalThis as Api;
 let loading: Promise<void> | null = null;
 
@@ -28,7 +28,9 @@ function check<T>(value: T): T {
 
 function load() {
   loading ??= (async () => {
-    await import(/* @vite-ignore */ '/gcsim/wasm_exec.js');
+    // Путь из public/: через переменную, чтобы ни Vite, ни TypeScript не искали модуль при сборке
+    const wasmExec = '/gcsim/wasm_exec.js';
+    await import(/* @vite-ignore */ wasmExec);
     const response = await fetch('/gcsim/gcsim.wasm.gz');
     if (!response.ok) throw new Error(`Не удалось загрузить gcsim.wasm: HTTP ${response.status}`);
     const bytes = await response.arrayBuffer();
@@ -43,7 +45,7 @@ function load() {
   return loading;
 }
 
-self.onmessage = async (event: MessageEvent<Request>) => {
+self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   const { id, action, config, count, bytes } = event.data;
   try {
     await load();
