@@ -22,11 +22,11 @@ use webview2_com::{
         COREWEBVIEW2_WEB_ERROR_STATUS_SERVER_UNREACHABLE,
         COREWEBVIEW2_WEB_ERROR_STATUS_TIMEOUT,
         COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN,
-        ICoreWebView2,
+        ICoreWebView2, GetAvailableCoreWebView2BrowserVersionString,
     },
     NavigationCompletedEventHandler, ProcessFailedEventHandler, take_pwstr,
 };
-use windows::core::{HSTRING, Interface, PWSTR};
+use windows::core::{HSTRING, Interface, PCWSTR, PWSTR};
 
 static ALLOW_ERROR_PAGE: AtomicBool = AtomicBool::new(false);
 
@@ -182,15 +182,31 @@ fn write_log(dir: &Path, line: &str) {
     }
 }
 
+// Ошибки настройки пишем и в файл: у релизной сборки нет консоли, stderr никто не видит
+fn note(dir: Option<&Path>, text: &str) {
+    log!("{text}");
+    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).map(|time| time.as_secs()).unwrap_or(0);
+    if let Some(dir) = dir { write_log(dir, &format!("utc={timestamp} {text}
+")); }
+}
+
 pub fn watch(window: &tauri::WebviewWindow, home: String) {
     let log_dir = match window.app_handle().path().app_log_dir() {
         Ok(dir) => Some(dir),
         Err(error) => { log!("Лог WebView2: {error}"); None }
     };
+    // Строка при запуске: по ней видно, что лог пишется, и какие версии у пользователя
+    let runtime = {
+        let mut value = PWSTR::null();
+        read_string(unsafe { GetAvailableCoreWebView2BrowserVersionString(PCWSTR::null(), &mut value) }, value)
+    };
+    note(log_dir.as_deref(), &format!("start app={} webview2={runtime:?}", env!("CARGO_PKG_VERSION")));
+    let access_dir = log_dir.clone();
     if let Err(error) = window.with_webview(move |webview| {
+        let setup_dir = log_dir.clone();
         let core = match unsafe { webview.controller().CoreWebView2() } {
             Ok(core) => core,
-            Err(error) => { log!("WebView2: {error}"); return; }
+            Err(error) => { note(setup_dir.as_deref(), &format!("WebView2: {error}")); return; }
         };
         let reloads = Mutex::new(VecDeque::<Instant>::new());
         let crash_log_dir = log_dir.clone();
@@ -260,7 +276,7 @@ pub fn watch(window: &tauri::WebviewWindow, home: String) {
         }));
         let mut token = 0_i64;
         if let Err(error) = unsafe { core.add_ProcessFailed(&handler, &mut token) } {
-            log!("Подписка на сбои WebView2: {error}");
+            note(setup_dir.as_deref(), &format!("Подписка на сбои WebView2: {error}"));
         }
         let handler = NavigationCompletedEventHandler::create(Box::new(move |sender, args| {
             let Some(args) = args else { return Ok(()); };
@@ -301,9 +317,9 @@ pub fn watch(window: &tauri::WebviewWindow, home: String) {
         }));
         let mut token = 0_i64;
         if let Err(error) = unsafe { core.add_NavigationCompleted(&handler, &mut token) } {
-            log!("Подписка на навигацию WebView2: {error}");
+            note(setup_dir.as_deref(), &format!("Подписка на навигацию WebView2: {error}"));
         }
     }) {
-        log!("Доступ к WebView2: {error}");
+        note(access_dir.as_deref(), &format!("Доступ к WebView2: {error}"));
     }
 }
