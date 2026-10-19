@@ -257,6 +257,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         }}
     "#, origin = origin, version = env!("CARGO_PKG_VERSION"));
     let base = settings.base.clone();
+    let home = base.join("overlay/")?.to_string();
     let handle = app.handle().clone();
     let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(base.join("overlay/")?))
         .title("GenshinFlex Overlay").inner_size(420.0, 800.0).min_inner_size(360.0, 480.0)
@@ -272,6 +273,10 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
                 return false;
             }
             // blob:/data: и прочие схемы не пускаем, даже если origin совпадает
+            #[cfg(windows)]
+            if matches!(url.scheme(), "about" | "data") && webview_crash::take_error_page_navigation() {
+                return true;
+            }
             if !matches!(url.scheme(), "http" | "https") { return false; }
             // В панели — только компактные страницы и вход по почте; остальной сайт открываем в браузере,
             // иначе полная страница (оружие, персонаж) втискивается в узкое окно
@@ -290,7 +295,7 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     }
     let window = builder.build()?;
     #[cfg(windows)]
-    webview_crash::watch(&window);
+    webview_crash::watch(&window, home);
     let close_window = window.clone();
     let (fit_tx, fit_rx) = mpsc::channel();
     let fit_window = window.clone();
