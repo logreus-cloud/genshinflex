@@ -16,6 +16,16 @@ python apps/overlay/research/map-match/match.py --ref .cache/map-ref/ref_z11.png
 
 Итоги — в `.cache/map-match-out/report.md`. Отпечатки кадров — в `footprints.jpg`, наложения для проверки глазами — в `debug/`; там же рядом с отчётом лежит `report.json`.
 
+## Склейка (stitch.py)
+
+```sh
+python apps/overlay/research/map-match/stitch.py --ref .cache/map-ref/ref_z11.png --shots "<папка 1080>" "<папка 1600>::160,39,1600,993" --only "ли юэ|liyue|карт|map " --tiles
+```
+
+В `.cache/map-stitch/` появятся мозаика с альфой, карта покрытия, сравнение и `stitch.json`.
+Флаг `--tiles` добавляет тайлы уровней `zoom`–`zoom-3` с глобальными индексами.
+Эталон служит для привязки и локального сравнения; пиксели мозаики берутся из скриншотов.
+
 ## Результаты (19.10.2026)
 
 Прогон: эталон `tiles_twt672` z11 (7680×6656), скриншоты тестера — 37 шт. в 1080p (ru, полный экран) и 29 шт. в окне 1600 px (en), плюс 50 синтетических кадров. ПК на 12 ядер, замеры в один поток.
