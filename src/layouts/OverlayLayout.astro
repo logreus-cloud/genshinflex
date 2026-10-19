@@ -29,7 +29,9 @@ const { title, active, guideHref } = Astro.props;
       </a>
     </header>
     <main class="ov-main"><slot /></main>
-    <div class="ov-update" role="status" transition:persist hidden>
+    <!-- Без transition:persist: правка перенесённого элемента во время смены страницы роняет рендер WebView2
+         (STATUS_ACCESS_VIOLATION); полоска и тост сами перерисовываются после astro:after-swap -->
+    <div class="ov-update" role="status" hidden>
       <span data-update-message></span>
       <button type="button" data-update-install>{t('Обновить')}</button>
       <button type="button" class="ov-update-dismiss" data-update-dismiss aria-label={t('Скрыть до перезапуска')} title={t('Скрыть до перезапуска')}>×</button>
@@ -39,7 +41,7 @@ const { title, active, guideHref } = Astro.props;
       <a class="ov-tab" data-guide-tab href={guideHref} aria-disabled={!guideHref ? 'true' : undefined} aria-current={active === 'guide' ? 'page' : undefined}>{t('Гайд')}</a>
       <a class="ov-tab" href={`${base}/overlay/banners/`} aria-current={active === 'banners' ? 'page' : undefined}>{t('Баннеры')}</a>
     </nav>
-    <div class="ov-toast" role="status" transition:persist hidden></div>
+    <div class="ov-toast" role="status" hidden></div>
     <script>
       import { onPage } from '../scripts/router';
       onPage(() => {
@@ -186,14 +188,21 @@ const { title, active, guideHref } = Astro.props;
           const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(link));
           return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
         };
-        const toast = (message: string, hide = false) => {
-          clearTimeout(timer);
+        // Тост не переносится между страницами: после смены страницы показываем текущее сообщение заново
+        let shown: string | undefined;
+        const paint = () => {
           const el = document.querySelector<HTMLElement>('.ov-toast');
           if (!el) return;
-          el.textContent = message;
-          el.hidden = false;
-          if (hide) timer = setTimeout(() => { const current = document.querySelector<HTMLElement>('.ov-toast'); if (current) current.hidden = true; }, 4000);
+          el.textContent = shown ?? '';
+          el.hidden = shown === undefined;
         };
+        const toast = (message: string, hide = false) => {
+          clearTimeout(timer);
+          shown = message;
+          paint();
+          if (hide) timer = setTimeout(() => { shown = undefined; paint(); }, 4000);
+        };
+        document.addEventListener('astro:after-swap', paint);
         const drain = async () => {
           running = true;
           while (pending !== undefined) {
