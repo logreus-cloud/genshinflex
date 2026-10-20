@@ -1,0 +1,217 @@
+{
+  "mode": "abyss",
+  "version": "5.8",
+  "cycle": "Версия 5.8",
+  "start": "2025-08-16",
+  "end": "2025-09-16",
+  "buffs": [
+    "Благословение «Колеблющаяся луна»: Когда персонаж активирует Гидро реакцию (включая Лунный заряд), на месте противника возникает ударная волна, которая наносит истинный урон противникам поблизости. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Заряда и Лунного заряда персонажей увеличен на 75%.",
+        "2-я половина: урон Ночного духа, который персонажи наносят противникам, увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Floral Ring-Dancer",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Stone Enchanter",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Desert Clearwater",
+                  "n": 4
+                },
+                {
+                  "id": "Eremite Sunfrost",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Daythunder",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fluid Avatar of Lava"
+                },
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Scout",
+                  "n": 3
+                },
+                {
+                  "id": "Ruin Cruiser",
+                  "n": 4
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Burning-Aflame Wayob Manifestation"
+                },
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Battle-Hardened Pipilpan Idol"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Configuration Device"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Электро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Treasure Hoarders: Crusher",
+                  "n": 14
+                },
+                {
+                  "id": "Treasure Hoarders: Pugilist",
+                  "n": 14
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Recon Log Mek",
+                  "n": 8
+                },
+                {
+                  "id": "Suppression Specialist Mek",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fluid Avatar of Lava"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 9
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder",
+                  "n": 2
+                },
+                {
+                  "id": "Kairagi: Fiery Might",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Guard",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-08-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-08-16"
+    }
+  ]
+}

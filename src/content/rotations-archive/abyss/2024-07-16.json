@@ -1,0 +1,255 @@
+{
+  "mode": "abyss",
+  "version": "4.7",
+  "cycle": "Версия 4.7",
+  "start": "2024-07-16",
+  "end": "2024-08-16",
+  "buffs": [
+    "Благословение «Исцеляющая луна»: Когда персонаж получает лечение, урон его элементального навыка повышается на 20%. Эффект длится 8 сек. и может складываться до 3 раз. Отсчёт времени каждого уровня эффекта происходит отдельно."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Primal Construct: Repulsor"
+                },
+                {
+                  "id": "Primal Construct: Reshaper"
+                },
+                {
+                  "id": "Primal Construct: Prospector"
+                },
+                {
+                  "id": "Ruin Guard"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                },
+                {
+                  "id": "Eremite Galehunter"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Dendro Samachurl"
+                },
+                {
+                  "id": "Pyro Abyss Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Black Serpent Knight: Windcutter",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Maguu Kenki"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Suppression Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Rockfond Rifthound",
+                  "n": 2
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Assault Specialist Mek"
+                },
+                {
+                  "id": "Arithmetic Enhancer Mek"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Algorithm of Semi-Intransient Matrix of Overseer Network"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Pyro Agent"
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "n": 2
+                },
+                {
+                  "id": "Consecrated Red Vulture"
+                },
+                {
+                  "id": "Bubbler Seahorse",
+                  "n": 2
+                },
+                {
+                  "id": "Consecrated Scorpion"
+                },
+                {
+                  "id": "Sternshield Crab",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Pyro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Large Electro Slime",
+                  "n": 4
+                },
+                {
+                  "id": "Electro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Mutant Electro Slime",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Hydro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Large Cryo Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Cryo Slime",
+                  "n": 6
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Geovishap",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "n": 2
+                },
+                {
+                  "id": "Fatui Skirmisher - Anemoboxer Vanguard"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-06-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-07-16"
+    }
+  ]
+}

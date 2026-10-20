@@ -1,0 +1,197 @@
+{
+  "mode": "abyss",
+  "version": "5.1",
+  "cycle": "Версия 5.1",
+  "start": "2024-11-16",
+  "end": "2024-12-16",
+  "buffs": [
+    "Благословение «Неистовая луна»: После того как заряженная атака активного персонажа попадает по врагу, сила атаки этого персонажа увеличивается на 20%. Эффект длится 8 сек. и может складываться до 4 раз. Отсчёт каждого суммирования происходит отдельно."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Consecrated Horned Crocodile"
+                },
+                {
+                  "id": "Eroding Avatar of Lava",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tepetlisaurus",
+                  "n": 2
+                },
+                {
+                  "id": "Experimental Field Generator"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Consecrated Fanged Beast"
+                },
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Aeonblight Drake"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fluid Avatar of Lava",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Tulpa"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Гео урона.",
+        "Все члены отряда получают 60% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Koholasaurus Warrior: Waveshuttler"
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Whirling Leaves"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Shard Striker"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Rockbreaker Blade"
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Flowing Skyfire"
+                },
+                {
+                  "id": "Koholasaurus Warrior: Reefsplitter"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Frostarm Lawachurl"
+                },
+                {
+                  "id": "Ruin Drake: Skywatch"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Xuanwen Beast",
+                  "n": 2
+                },
+                {
+                  "id": "Yumkasaurus"
+                },
+                {
+                  "id": "Koholasaurus"
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Rock-Cavernous Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primo Geovishap"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-11-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-11-16"
+    }
+  ]
+}

@@ -1,0 +1,240 @@
+{
+  "mode": "abyss",
+  "version": "5.2",
+  "cycle": "Версия 5.2",
+  "start": "2024-12-16",
+  "end": "2025-01-16",
+  "buffs": [
+    "Благословение «Благоприятная луна»: Прочность щита всех членов отряда увеличивается на 20%. Активный персонаж, защищённый щитом, при нанесении урона противнику на его месте вызывает ударную волну, которая наносит истинный урон. Этот эффект может возникнуть один раз в 5 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fluid Avatar of Lava",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                },
+                {
+                  "id": "Consecrated Red Vulture"
+                },
+                {
+                  "id": "Consecrated Horned Crocodile"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Geovishap",
+                  "n": 2
+                },
+                {
+                  "id": "Primo Geovishap"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Goldflame Qucusaur Tyrant"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Papilla: Type I"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Golden Wolflord"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Aeonblight Drake"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Урон заряженных атак персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Forged Sand Interrogator",
+                  "n": 2
+                },
+                {
+                  "id": "Winged Warrior: Skysoarer",
+                  "n": 2
+                },
+                {
+                  "id": "Winged Warrior: Feathershedder",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Seeker",
+                  "n": 2
+                },
+                {
+                  "id": "Spiritspeaker Warrior: Determinator",
+                  "n": 2
+                },
+                {
+                  "id": "Spiritspeaker Warrior: Contemplator",
+                  "n": 2
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Flowing Skyfire"
+                },
+                {
+                  "id": "Qucusaurus Warrior: Blazing Sky"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Shard Striker"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Yumkasaurus"
+                },
+                {
+                  "id": "Tepetlisaurus"
+                },
+                {
+                  "id": "Iktomisaurus"
+                },
+                {
+                  "id": "Koholasaurus"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Pyro Agent",
+                  "n": 3
+                },
+                {
+                  "id": "Qucusaurus"
+                },
+                {
+                  "id": "Yumkasaurus"
+                },
+                {
+                  "id": "Iktomisaurus"
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Scout"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eroding Avatar of Lava"
+                },
+                {
+                  "id": "Ruin Drake: Skywatch",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Sunfrost"
+                },
+                {
+                  "id": "Eremite Daythunder"
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-12-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-12-16"
+    }
+  ]
+}

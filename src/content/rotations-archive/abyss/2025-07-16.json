@@ -1,0 +1,225 @@
+{
+  "mode": "abyss",
+  "version": "5.7",
+  "cycle": "Версия 5.7",
+  "start": "2025-07-16",
+  "end": "2025-08-16",
+  "buffs": [
+    "Благословение «Луна жгучего холода»: Когда персонаж активирует Крио реакцию, на месте противника возникает ударная волна, которая наносит истинный урон противникам поблизости. Эффект может возникнуть один раз в 2,5 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: Крио урон всех членов отряда увеличен на 75%.",
+        "2-я половина: урон Ночного духа всех членов отряда увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Overseer Device"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Iktomisaurus",
+                  "n": 3
+                },
+                {
+                  "id": "Wayward Hermetic Spiritspeaker"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Biting-Cold Wayob Manifestation"
+                },
+                {
+                  "id": "Eroding Avatar of Lava",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Rock-Cavernous Wayob Manifestation"
+                },
+                {
+                  "id": "Thundering Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Yumkasaurus",
+                  "n": 3
+                },
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Qucusaurus Warrior: Heartstar Hammer"
+                },
+                {
+                  "id": "Qucusaurus Warrior: Blazing Sky"
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Whirling Leaves"
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Flowing Skyfire"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Shard Striker"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Rockbreaker Blade"
+                },
+                {
+                  "id": "Tatankasaurus Warrior: Skybreaker"
+                },
+                {
+                  "id": "Tatankasaurus Warrior: Spiritlight Chaser"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Grounded Hydroshroom"
+                },
+                {
+                  "id": "Grounded Geoshroom"
+                },
+                {
+                  "id": "Sternshield Crab"
+                },
+                {
+                  "id": "Bubbler Seahorse"
+                },
+                {
+                  "id": "Stonehide Lawachurl"
+                },
+                {
+                  "id": "Thunderhelm Lawachurl"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Frostarm Lawachurl"
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Maguu Kenki"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Mirror Maiden"
+                },
+                {
+                  "id": "Consecrated Horned Crocodile"
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-07-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-07-16"
+    }
+  ]
+}

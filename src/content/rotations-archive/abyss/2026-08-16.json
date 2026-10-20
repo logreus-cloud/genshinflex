@@ -1,0 +1,204 @@
+{
+  "mode": "abyss",
+  "version": "7.0",
+  "cycle": "Версия 7.0",
+  "start": "2026-08-16",
+  "end": "2026-09-16",
+  "buffs": [
+    "Благословение «Луна пронзающего сияния»: Пока активный персонаж находится в Поле Полярной звезды, его атаки по противникам вызывают на их месте ударную волну, которая наносит истинный урон. Эффект может возникнуть один раз в 4 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Сверхпроводника персонажей увеличен на 200%, урон Звёздного проводника — на 75%.",
+        "2-я половина: Пиро урон обычных атак персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Cruiser",
+                  "n": 4
+                },
+                {
+                  "id": "Ruin Scout",
+                  "n": 8
+                },
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Chimeric Horned Bear"
+                },
+                {
+                  "id": "Chimeric Winged Lion"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Iniquitous Baptist"
+                },
+                {
+                  "id": "Cryo Abyss Mage"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Battle-Hardened Chimeric Volkodlak Archer"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker"
+                },
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Chimeric Armored Beast",
+                  "n": 2
+                },
+                {
+                  "id": "Chimeric Burrowbeast",
+                  "n": 2
+                },
+                {
+                  "id": "Mirror Maiden",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Voywolf Hunter",
+                  "n": 2
+                },
+                {
+                  "id": "Fanged Zealot",
+                  "n": 2
+                },
+                {
+                  "id": "Suppression Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Frostarm Lawachurl"
+                },
+                {
+                  "id": "Thunderhelm Lawachurl"
+                },
+                {
+                  "id": "Stonehide Lawachurl"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Chimeric Horned Bear"
+                },
+                {
+                  "id": "Thundering Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Biting-Cold Wayob Manifestation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-08-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-08-16"
+    }
+  ]
+}

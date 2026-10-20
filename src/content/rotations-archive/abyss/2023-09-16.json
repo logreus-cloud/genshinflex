@@ -1,0 +1,236 @@
+{
+  "mode": "abyss",
+  "version": "4.0",
+  "cycle": "Версия 4.0",
+  "start": "2023-09-16",
+  "end": "2023-10-01",
+  "buffs": [
+    "Благословение «Вращающаяся луна»: Когда персонаж восстанавливает или теряет HP, он получает 40% бонус всего элементального и физ. урона на 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Maguu Kenki"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "n": 2
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "n": 2
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Suppression Specialist Mek"
+                },
+                {
+                  "id": "Fatui Cryo Cicin Mage"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Emperor of Fire and Iron"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Scorching Loremaster"
+                },
+                {
+                  "id": "Eremite Daythunder",
+                  "n": 2
+                },
+                {
+                  "id": "Large Shatterstone Breacher Primus"
+                },
+                {
+                  "id": "Large Overgrown Breacher Primus"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "n": 2
+                },
+                {
+                  "id": "Suppression Specialist Mek"
+                },
+                {
+                  "id": "Annihilation Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Пиро урона.",
+        "Все члены отряда получают 60% бонус Гидро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Pyro Specter",
+                  "n": 6
+                },
+                {
+                  "id": "Pyro Whopperflower",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Cryo Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Cryo Specter",
+                  "n": 6
+                },
+                {
+                  "id": "Cryo Whopperflower",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Sternshield Crab",
+                  "n": 2
+                },
+                {
+                  "id": "Bubbler Seahorse"
+                },
+                {
+                  "id": "Thunderhelm Lawachurl",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cherubic Sea Hare",
+                  "n": 3
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Rimebiter Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Bolteater Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Frostarm Lawachurl",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban"
+                },
+                {
+                  "id": "Nobushi: Hitsukeban"
+                },
+                {
+                  "id": "Nobushi: Kikouban"
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primo Geovishap"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2023-09-01"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2023-09-16"
+    }
+  ]
+}

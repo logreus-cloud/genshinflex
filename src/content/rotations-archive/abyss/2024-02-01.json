@@ -1,0 +1,224 @@
+{
+  "mode": "abyss",
+  "version": "4.4",
+  "cycle": "Версия 4.4",
+  "start": "2024-02-01",
+  "end": "2024-02-16",
+  "buffs": [
+    "Благословение «Восходящая луна»: Когда персонаж получает лечение, оно автоматически подсчитывается. Когда подсчёт достигает 16, на месте персонажа возникает ударная волна, которая наносит истинный урон противникам поблизости и обнуляет подсчёт. Ударная волна может возникнуть один раз в 8 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Large Overgrown Breacher Primus",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Serpent"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Eremite Galehunter"
+                },
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Setekh Wenut"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Assault Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Suppression Specialist Mek",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Aeonblight Drake"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Анемо урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Blazing Axe Mitachurl",
+                  "n": 4
+                },
+                {
+                  "id": "Hilichurl Fighter",
+                  "n": 4
+                },
+                {
+                  "id": "Hilichurl Berserker",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Pyro Slime",
+                  "n": 7
+                },
+                {
+                  "id": "Hydro Slime",
+                  "n": 4
+                },
+                {
+                  "id": "Cryo Slime",
+                  "n": 4
+                },
+                {
+                  "id": "Electro Slime",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Geovishap",
+                  "n": 2
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Pyro Abyss Mage"
+                },
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 3
+                },
+                {
+                  "id": "Cryo Abyss Mage"
+                },
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Skywatch",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Mirror Maiden",
+                  "n": 3
+                },
+                {
+                  "id": "Treasure Hoarders: Pyro Potioneer",
+                  "n": 3
+                },
+                {
+                  "id": "Treasure Hoarders: Hydro Potioneer",
+                  "n": 3
+                },
+                {
+                  "id": "Treasure Hoarders: Electro Potioneer",
+                  "n": 3
+                },
+                {
+                  "id": "Treasure Hoarders: Cryo Potioneer",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-02-01"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-02-01"
+    }
+  ]
+}

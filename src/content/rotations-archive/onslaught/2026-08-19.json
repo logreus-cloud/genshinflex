@@ -1,0 +1,30 @@
+{
+  "mode": "onslaught",
+  "version": "7.0",
+  "cycle": "Версия 7.0",
+  "start": "2026-08-19",
+  "end": "2026-09-22",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Chimeric Winged Lion"
+        },
+        {
+          "id": "Wind Operative",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Knuckle Duckle"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2026-08-19"
+    }
+  ]
+}

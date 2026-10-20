@@ -1,0 +1,29 @@
+{
+  "mode": "onslaught",
+  "version": "5.8",
+  "cycle": "Версия 5.8",
+  "start": "2025-08-06",
+  "end": "2025-09-09",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Tenebrous Papilla"
+        },
+        {
+          "id": "Battle-Hardened Tent Tortoise"
+        },
+        {
+          "id": "Battle-Hardened Pipilpan Idol"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2025-08-06"
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "mode": "abyss",
+  "version": "4.8",
+  "cycle": "Версия 4.8",
+  "start": "2024-08-16",
+  "end": "2024-09-16",
+  "buffs": [
+    "Благословение «Жгучая луна»: Попадания по противникам в статусе Горение повышают шанс крит. попадания на 15% и крит. урон на 30%."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Spouting Phantasm"
+                },
+                {
+                  "id": "Hydro Tulpa"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader",
+                  "n": 2
+                },
+                {
+                  "id": "Thundercraven Rifthound",
+                  "n": 2
+                },
+                {
+                  "id": "Construction Specialist Mek",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Arithmetic Enhancer Mek",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Hitsukeban"
+                },
+                {
+                  "id": "Nobushi: Kikouban"
+                },
+                {
+                  "id": "Suppression Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Arithmetic Enhancer Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Assault Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Legatus Golem"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Дендро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Scout"
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Defender"
+                },
+                {
+                  "id": "Ruin Cruiser",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 3
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap Hatchling",
+                  "n": 3
+                },
+                {
+                  "id": "Blazing Axe Mitachurl",
+                  "n": 3
+                },
+                {
+                  "id": "Crackling Axe Mitachurl",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 3
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Pyro Agent",
+                  "n": 3
+                },
+                {
+                  "id": "Eremite Desert Clearwater"
+                },
+                {
+                  "id": "Eremite Daythunder"
+                },
+                {
+                  "id": "Eremite Sunfrost"
+                },
+                {
+                  "id": "Stonehide Lawachurl",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Rimebiter Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Bolteater Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Mirror Maiden",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 3
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-08-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-08-16"
+    }
+  ]
+}

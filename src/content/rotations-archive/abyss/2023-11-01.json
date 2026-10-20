@@ -1,0 +1,241 @@
+{
+  "mode": "abyss",
+  "version": "4.1",
+  "cycle": "Версия 4.1",
+  "start": "2023-11-01",
+  "end": "2023-11-16",
+  "buffs": [
+    "Благословение «Синергическая луна»: Когда активный персонаж наносит урон противнику с помощью обычной или заряженной атаки, шанс критического попадания обычной или заряженной атаки увеличивается на 6% в течение 5 сек. Может возникнуть один раз в 0,1 сек., складывается до 5 раз. Продолжительность каждой атаки вычисляется отдельно. Эффект снимается, когда персонаж покидает поле."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Millennial Pearl Seahorse"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Rockfond Rifthound Whelp",
+                  "n": 5
+                },
+                {
+                  "id": "Thundercraven Rifthound Whelp",
+                  "n": 5
+                },
+                {
+                  "id": "Rockfond Rifthound"
+                },
+                {
+                  "id": "Thundercraven Rifthound"
+                },
+                {
+                  "id": "Pyro Abyss Mage",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap Hatchling",
+                  "n": 2
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Suppression Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Mirror Maiden"
+                },
+                {
+                  "id": "Wind Operative",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Experimental Field Generator"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Гидро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Crossbow",
+                  "n": 4
+                },
+                {
+                  "id": "Eremite Ravenbeak Halberdier"
+                },
+                {
+                  "id": "Eremite Linebreaker",
+                  "n": 4
+                },
+                {
+                  "id": "Eremite Sword-Dancer"
+                },
+                {
+                  "id": "Eremite Desert Clearwater",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Stonehide Lawachurl"
+                },
+                {
+                  "id": "Thunderhelm Lawachurl"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Cryo Specter",
+                  "n": 6
+                },
+                {
+                  "id": "Electro Specter",
+                  "n": 6
+                },
+                {
+                  "id": "Pyro Specter",
+                  "n": 4
+                },
+                {
+                  "id": "Dendro Specter",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Guard"
+                },
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 2
+                },
+                {
+                  "id": "Large Electro Slime",
+                  "n": 2
+                },
+                {
+                  "id": "Mutant Electro Slime",
+                  "n": 2
+                },
+                {
+                  "id": "Sternshield Crab",
+                  "n": 2
+                },
+                {
+                  "id": "Bubbler Seahorse"
+                },
+                {
+                  "id": "Pyro Abyss Mage"
+                },
+                {
+                  "id": "Overgrown Breacher Primus",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2023-10-01"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2023-11-01"
+    }
+  ]
+}

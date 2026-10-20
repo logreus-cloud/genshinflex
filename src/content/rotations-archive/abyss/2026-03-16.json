@@ -1,0 +1,186 @@
+{
+  "mode": "abyss",
+  "version": "6.4",
+  "cycle": "Версия 6.4",
+  "start": "2026-03-16",
+  "end": "2026-04-16",
+  "buffs": [
+    "Благословение «Луна хлёсткого ветра»: Когда персонаж вызывает Рассеивание на противнике, он получает 1 уровень Хлёсткого ветра (не чаще раза в 0,1 сек.). При 4 уровнях на месте противника возникает ударная волна, которая наносит истинный урон, а все уровни расходуются. Волна может возникнуть один раз в 6 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: Анемо урон активного персонажа увеличен на 75%.",
+        "2-я половина: Крио урон обычных атак персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Assault Specialist Mek"
+                },
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wind Operative"
+                },
+                {
+                  "id": "Radiant Moonfly"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya"
+                },
+                {
+                  "id": "Battle-Hardened Elite Treasure Hoarder"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Radiant Glacial Wolf",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Overseer Device"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Анемо урона.",
+        "Все члены отряда получают 60% бонус Крио урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ice Shieldwall Mitachurl",
+                  "n": 8
+                },
+                {
+                  "id": "Ice Shield Hilichurl Guard",
+                  "n": 16
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 24
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Cryo Cicin Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper"
+                },
+                {
+                  "id": "Fatui Skirmisher - Cryogunner Legionnaire"
+                },
+                {
+                  "id": "Eroding Avatar of Lava"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Violet Lightning"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Stonehide Lawachurl"
+                },
+                {
+                  "id": "Frostarm Lawachurl"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Radiant Antelope"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-03-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-03-16"
+    }
+  ]
+}

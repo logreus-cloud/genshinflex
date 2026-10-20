@@ -1,0 +1,247 @@
+{
+  "mode": "abyss",
+  "version": "6.0",
+  "cycle": "Версия 6.0",
+  "start": "2025-09-16",
+  "end": "2025-10-16",
+  "buffs": [
+    "Благословение «Вздымающаяся луна»: Когда персонаж активирует Гидро реакцию, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 2 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Заряда персонажей увеличен на 200%, урон Лунного заряда — на 75%.",
+        "2-я половина: урон Цветения персонажей увеличен на 200%, урон Лунной бутонизации — на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Mirror Maiden"
+                },
+                {
+                  "id": "Battle-Hardened Pipilpan Idol"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "n": 2
+                },
+                {
+                  "id": "Hydro Tulpa"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 2
+                },
+                {
+                  "id": "Radiant Moonfly"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Thundercraven Rifthound",
+                  "n": 2
+                },
+                {
+                  "id": "Assault Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya"
+                },
+                {
+                  "id": "Knuckle Duckle"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Shadowy Husk: Standard Bearer"
+                },
+                {
+                  "id": "Shadowy Husk: Line Breaker"
+                },
+                {
+                  "id": "Shadowy Husk: Defender"
+                },
+                {
+                  "id": "Maguu Kenki: Mask of Terror"
+                },
+                {
+                  "id": "Maguu Kenki: Lone Gale"
+                },
+                {
+                  "id": "Maguu Kenki: Galloping Frost"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Электро урона.",
+        "Все члены отряда получают 60% бонус Дендро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 2
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Assault Specialist Mek",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Grounded Hydroshroom",
+                  "n": 2
+                },
+                {
+                  "id": "Grounded Geoshroom"
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Consecrated Horned Crocodile"
+                },
+                {
+                  "id": "Consecrated Fanged Beast"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primal Construct: Prospector"
+                },
+                {
+                  "id": "Primal Construct: Reshaper"
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Scout Landcruiser"
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                },
+                {
+                  "id": "Ruin Grader",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Scout Landcruiser"
+                },
+                {
+                  "id": "Oprichniki Support Trooper"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Cruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Defender"
+                },
+                {
+                  "id": "Ruin Guard",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-09-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-09-16"
+    }
+  ]
+}

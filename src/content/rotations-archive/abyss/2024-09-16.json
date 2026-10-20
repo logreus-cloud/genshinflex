@@ -1,0 +1,257 @@
+{
+  "mode": "abyss",
+  "version": "5.0",
+  "cycle": "Версия 5.0",
+  "start": "2024-09-16",
+  "end": "2024-10-16",
+  "buffs": [
+    "Благословение «Противостоящая луна»: Когда активный персонаж использует элементальный навык, урон обычных атак и элементального навыка увеличивается на 40% в течение 12 сек. Когда персонаж находится под действием Благословения Ночного духа, этот эффект усиливается: урон обычных атак и элементального навыка увеличивается на 80%."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 2
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Fatui Skirmisher - Cryogunner Legionnaire",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Skywatch"
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Cryoshroom"
+                },
+                {
+                  "id": "Winged Dendroshroom"
+                },
+                {
+                  "id": "Grounded Geoshroom"
+                },
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Black Serpent Knight: Windcutter"
+                },
+                {
+                  "id": "Maguu Kenki"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Дендро урона.",
+        "Все члены отряда получают 60% бонус Гидро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Koholasaurus Warrior: Waveshuttler"
+                },
+                {
+                  "id": "Flowing Blade Harpoon-Thrower",
+                  "n": 2
+                },
+                {
+                  "id": "Flowing Blade Skirmisher"
+                },
+                {
+                  "id": "Flowing Blade Grease-Saw"
+                },
+                {
+                  "id": "Forged Sand Interrogator",
+                  "n": 2
+                },
+                {
+                  "id": "Forged Sand Shieldbreaker",
+                  "n": 2
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Shard Striker"
+                },
+                {
+                  "id": "Forged Sand Javelineer",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Armed Courier"
+                },
+                {
+                  "id": "Swiftstep Storm Scout",
+                  "n": 2
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Flowing Skyfire"
+                },
+                {
+                  "id": "Swiftstep Seeker",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Guard",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Electro Specter",
+                  "n": 3
+                },
+                {
+                  "id": "Anemo Specter",
+                  "n": 3
+                },
+                {
+                  "id": "Geo Specter",
+                  "n": 3
+                },
+                {
+                  "id": "Grounded Geoshroom"
+                },
+                {
+                  "id": "Winged Dendroshroom"
+                },
+                {
+                  "id": "Winged Cryoshroom"
+                },
+                {
+                  "id": "Yumkasaurus",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Mirror Maiden"
+                },
+                {
+                  "id": "Consecrated Horned Crocodile"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Tepetlisaurus Warrior: Rockbreaker Blade"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Shard Striker"
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Flowing Skyfire"
+                },
+                {
+                  "id": "Fluid Avatar of Lava",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Koholasaurus Warrior: Waveshuttler",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-09-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-09-16"
+    }
+  ]
+}

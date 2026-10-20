@@ -1,0 +1,182 @@
+{
+  "mode": "abyss",
+  "version": "6.1",
+  "cycle": "Версия 6.1",
+  "start": "2025-11-16",
+  "end": "2025-12-16",
+  "buffs": [
+    "Благословение «Луна клятвы»: Когда значение Уз жизни активного персонажа увеличивается или уменьшается, возникает ударная волна, которая наносит истинный урон противникам поблизости."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Цветения персонажей увеличен на 200%, урон Лунной бутонизации — на 75%.",
+        "2-я половина: Пиро урон обычных атак персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Sternshield Crab"
+                },
+                {
+                  "id": "Battle-Scarred Rock Crab"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Suppression Specialist Mek"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Frostnight Herra"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile"
+                },
+                {
+                  "id": "Wilderness Hunter"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker"
+                },
+                {
+                  "id": "Primo Geovishap"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Мастерство стихий всех членов отряда увеличено на 200."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eroding Avatar of Lava"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Flow-Inverted Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Earthguard"
+                },
+                {
+                  "id": "Biting-Cold Wayob Manifestation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Frostarm Lawachurl"
+                },
+                {
+                  "id": "Stonehide Lawachurl"
+                },
+                {
+                  "id": "Assault Specialist Mek"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-11-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-11-16"
+    }
+  ]
+}

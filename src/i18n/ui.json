@@ -7,9 +7,17 @@
   "en": "History: {mode}",
   "es": "Historial: {mode}"
  },
- "Все циклы с версии 4.0. Данные пополняются.": {
-  "en": "All cycles since version 4.0. More data is being added.",
-  "es": "Todos los ciclos desde la versión 4.0. Se siguen añadiendo datos."
+ "Все циклы с версии 4.0: этажи 11–12 и благословение каждого сброса.": {
+  "en": "Every cycle since version 4.0: floors 11–12 and the blessing of each reset.",
+  "es": "Todos los ciclos desde la versión 4.0: pisos 11–12 y la bendición de cada reinicio."
+ },
+ "Все сезоны с первого, июль 2024 (версия 4.7).": {
+  "en": "Every season since the first one, July 2024 (version 4.7).",
+  "es": "Todas las temporadas desde la primera, julio de 2024 (versión 4.7)."
+ },
+ "Все события с первого, июнь 2025 (версия 5.7).": {
+  "en": "Every event since the first one, June 2025 (version 5.7).",
+  "es": "Todos los eventos desde el primero, junio de 2025 (versión 5.7)."
  },
  "Текущий сезон": {
   "en": "Current season",

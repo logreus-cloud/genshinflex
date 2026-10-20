@@ -1,0 +1,224 @@
+{
+  "mode": "abyss",
+  "version": "5.4",
+  "cycle": "Версия 5.4",
+  "start": "2025-02-16",
+  "end": "2025-03-16",
+  "buffs": [
+    "Благословение «Будоражащая луна»: Когда персонаж получает лечение, на его месте возникает ударная волна, которая наносит истинный урон врагам поблизости. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Рассеивания активного персонажа увеличен на 600%.",
+        "2-я половина: Крио урон заряженных атак персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Daythunder",
+                  "n": 3
+                },
+                {
+                  "id": "Eremite Desert Clearwater",
+                  "n": 3
+                },
+                {
+                  "id": "Eremite Sunfrost",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Guard",
+                  "n": 3
+                },
+                {
+                  "id": "Ruin Grader",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Blazing Axe Mitachurl",
+                  "n": 3
+                },
+                {
+                  "id": "Crackling Axe Mitachurl",
+                  "n": 3
+                },
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 4
+                },
+                {
+                  "id": "Hilichurl Berserker",
+                  "n": 12
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Experimental Field Generator"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Solitary Suanni"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Мастерство стихий всех членов отряда увеличено на 200."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Large Cryo Slime",
+                  "n": 6
+                },
+                {
+                  "id": "Hilichurl Fighter",
+                  "n": 18
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Suppression Specialist Mek"
+                },
+                {
+                  "id": "Assault Specialist Mek"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Grounded Hydroshroom",
+                  "n": 4
+                },
+                {
+                  "id": "Grounded Geoshroom",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker"
+                },
+                {
+                  "id": "Fatui Skirmisher - Electrohammer Vanguard",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Cherubic Sea Hare",
+                  "n": 5
+                },
+                {
+                  "id": "Bubbler Seahorse",
+                  "n": 3
+                },
+                {
+                  "id": "Sternshield Crab",
+                  "n": 7
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Thunderhelm Lawachurl"
+                },
+                {
+                  "id": "Consecrated Horned Crocodile"
+                },
+                {
+                  "id": "Consecrated Scorpion"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-02-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-02-16"
+    }
+  ]
+}

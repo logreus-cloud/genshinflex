@@ -1,0 +1,226 @@
+{
+  "mode": "abyss",
+  "version": "4.3",
+  "cycle": "Версия 4.3",
+  "start": "2024-01-16",
+  "end": "2024-02-01",
+  "buffs": [
+    "Благословение «Взрывающаяся луна»: Когда персонаж накопит 3 элементальных осколка, созданных реакцией Кристалл, на месте персонажа будет выпущена ударная волна, наносящая истинный урон противникам поблизости, после чего счётчик накопленных осколков будет сброшен. Такую волну можно вызвать один раз в 6 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Thunder Manifestation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Ruin Guard"
+                },
+                {
+                  "id": "Ruin Grader",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Geo Slime",
+                  "n": 3
+                },
+                {
+                  "id": "Geo Specter",
+                  "n": 2
+                },
+                {
+                  "id": "Geovishap",
+                  "n": 2
+                },
+                {
+                  "id": "Stonehide Lawachurl",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Tulpa"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Thunderhelm Lawachurl",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Scorching Loremaster"
+                },
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Гео урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Cryo Slime",
+                  "n": 2
+                },
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 3
+                },
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 3
+                },
+                {
+                  "id": "Large Electro Slime",
+                  "n": 2
+                },
+                {
+                  "id": "Mutant Electro Slime",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Mimic Mallard"
+                },
+                {
+                  "id": "Dendro Specter",
+                  "n": 2
+                },
+                {
+                  "id": "Hydro Mimic Crane"
+                },
+                {
+                  "id": "Anemo Specter",
+                  "n": 2
+                },
+                {
+                  "id": "Hydro Mimic Boar",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Sternshield Crab"
+                },
+                {
+                  "id": "Cherubic Sea Hare"
+                },
+                {
+                  "id": "Bubbler Seahorse"
+                },
+                {
+                  "id": "Ruin Grader",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Annihilation Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-01-01"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-01-16"
+    }
+  ]
+}

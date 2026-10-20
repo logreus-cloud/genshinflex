@@ -1,0 +1,193 @@
+{
+  "mode": "abyss",
+  "version": "6.7",
+  "cycle": "Версия 6.7",
+  "start": "2026-07-16",
+  "end": "2026-08-16",
+  "buffs": [
+    "Благословение «Луна ледяной волны»: Когда активный персонаж наносит противникам Крио урон заряженными атаками, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Сверхпроводника персонажей увеличен на 200%, урон Звёздного проводника — на 75%.",
+        "2-я половина: урон Заряда персонажей увеличен на 200%, урон Лунного заряда — на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Thundering Wayob Manifestation",
+                  "n": 4
+                },
+                {
+                  "id": "Gleaming Charge: Frostnight Scion"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Maguu Kenki"
+                },
+                {
+                  "id": "Wilderness Hunter"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Earthguard"
+                },
+                {
+                  "id": "Aeonblight Drake"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Jadeplume Terrorshroom"
+                },
+                {
+                  "id": "Grounded Geoshroom",
+                  "n": 3
+                },
+                {
+                  "id": "Grounded Hydroshroom",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Precursor's Secret Source Matrix of Overseer Network",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Iktomisaurus Warrior: Icy Tidebearer"
+                },
+                {
+                  "id": "Battle-Hardened Pipilpan Idol"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hilichurl Fighter",
+                  "n": 6
+                },
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Grenadier",
+                  "n": 6
+                },
+                {
+                  "id": "Oprichniki Line Trooper",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Skywatch",
+                  "n": 6
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 6
+                },
+                {
+                  "id": "Black Serpent Knight: Windcutter"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Precursor's Secret Source Matrix of Overseer Network",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-07-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-07-16"
+    }
+  ]
+}

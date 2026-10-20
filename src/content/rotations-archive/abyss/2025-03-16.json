@@ -1,0 +1,225 @@
+{
+  "mode": "abyss",
+  "version": "5.4",
+  "cycle": "Версия 5.4",
+  "start": "2025-03-16",
+  "end": "2025-04-16",
+  "buffs": [
+    "Благословение «Ниспадающая луна»: Когда атака в падении персонажа попадает по врагам, на его месте возникает ударная волна, которая наносит истинный урон врагам поблизости. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: Гидро урон элементальных навыков персонажей увеличен на 75%.",
+        "2-я половина: урон атак в падении персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Shatterstone Breacher Primus"
+                },
+                {
+                  "id": "Abyss Lector: Violet Lightning"
+                },
+                {
+                  "id": "Abyss Lector: Fathomless Flames"
+                },
+                {
+                  "id": "Burning-Aflame Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Scout"
+                },
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Algorithm of Semi-Intransient Matrix of Overseer Network"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Desert Clearwater"
+                },
+                {
+                  "id": "Eremite Sunfrost"
+                },
+                {
+                  "id": "Fluid Avatar of Lava"
+                },
+                {
+                  "id": "Emperor of Fire and Iron"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Configuration Device"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Электро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Stonehide Lawachurl"
+                },
+                {
+                  "id": "Thunderhelm Lawachurl"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban"
+                },
+                {
+                  "id": "Nobushi: Hitsukeban"
+                },
+                {
+                  "id": "Nobushi: Kikouban"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Eremite Daythunder"
+                },
+                {
+                  "id": "Eremite Sunfrost"
+                },
+                {
+                  "id": "Mirror Maiden"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Geovishap"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Yumkasaurus Warrior: Whirling Leaves"
+                },
+                {
+                  "id": "Qucusaurus Warrior: Heartstar Hammer"
+                },
+                {
+                  "id": "Tepetlisaurus Warrior: Rockbreaker Blade"
+                },
+                {
+                  "id": "Frost Operative",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Wind Operative",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Arithmetic Enhancer Mek",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-03-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-03-16"
+    }
+  ]
+}

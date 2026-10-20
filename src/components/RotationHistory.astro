@@ -10,6 +10,12 @@ type Mode = 'abyss' | 'theater' | 'onslaught';
 type EnemyValue = string | { id: string; n?: number; note?: string };
 interface Props { mode: Mode }
 const { mode } = Astro.props;
+// С какого цикла собрана история режима
+const SINCE: Record<Mode, string> = {
+  abyss: 'Все циклы с версии 4.0: этажи 11–12 и благословение каждого сброса.',
+  theater: 'Все сезоны с первого, июль 2024 (версия 4.7).',
+  onslaught: 'Все события с первого, июнь 2025 (версия 5.7).',
+};
 const { MODES, ELEMENTS, base, lang, t, fmtDate, getCharacter } = useData(Astro.currentLocale);
 const ruElements = useData('ru').ELEMENTS;
 const enemyDb = enemies as Record<string, { ru: string; en: string; es: string; icon: string | null }>;
@@ -89,14 +95,14 @@ for (const { data } of entries) {
 const frequency = [...counts.values()].sort((a, b) => b.count - a.count).slice(0, 10);
 const modes: Mode[] = ['abyss', 'theater', 'onslaught'];
 ---
-<Layout title={t('История: {mode}', { mode: MODES[mode].title })} description={t('Все циклы с версии 4.0. Данные пополняются.')} wide>
+<Layout title={t('История: {mode}', { mode: MODES[mode].title })} description={t(SINCE[mode])} wide>
   <nav class="crumbs small muted">
     <a href={`${base}/rotation/`}>{t('Эндгейм')}</a> /
     <a href={`${base}/${mode}/`}>{MODES[mode].title}</a> /
     {t('История')}
   </nav>
   <h1>{t('История: {mode}', { mode: MODES[mode].title })}</h1>
-  <p class="muted">{t('Все циклы с версии 4.0. Данные пополняются.')}</p>
+  <p class="muted">{t(SINCE[mode])}</p>
   <nav class="modes" aria-label={t('Режимы эндгейма')}>
     {modes.map((m) => <a href={`${base}/${m}/history/`} aria-current={m === mode ? 'page' : undefined}>{MODES[m].short}</a>)}
   </nav>

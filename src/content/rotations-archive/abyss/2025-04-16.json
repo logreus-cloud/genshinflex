@@ -1,0 +1,265 @@
+{
+  "mode": "abyss",
+  "version": "5.5",
+  "cycle": "Версия 5.5",
+  "start": "2025-04-16",
+  "end": "2025-05-16",
+  "buffs": [
+    "Благословение «Луна лютого мороза»: Когда персонаж активирует Крио реакцию, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 4 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: Гео урон элементальных навыков персонажей увеличен на 75%.",
+        "2-я половина: Крио урон элементальных навыков персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Tulpa"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Violet Lightning"
+                },
+                {
+                  "id": "Millennial Pearl Seahorse"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Configuration Device"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Suppression Specialist Mek"
+                },
+                {
+                  "id": "Fluid Avatar of Lava"
+                },
+                {
+                  "id": "Thundering Wayob Manifestation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Mimic Boar",
+                  "n": 2
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Xuanwen Beast",
+                  "n": 2
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap"
+                },
+                {
+                  "id": "Consecrated Horned Crocodile"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Крио урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ferocious Warrior: Human Ram",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Seeker",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Storm Scout",
+                  "n": 2
+                },
+                {
+                  "id": "Ferocious Warrior: Wrestler",
+                  "n": 2
+                },
+                {
+                  "id": "Winged Warrior: Skysoarer",
+                  "n": 2
+                },
+                {
+                  "id": "Winged Warrior: Skymaster",
+                  "n": 2
+                },
+                {
+                  "id": "Winged Warrior: Feathershedder",
+                  "n": 2
+                },
+                {
+                  "id": "Spiritspeaker Warrior: Psychokinetic",
+                  "n": 2
+                },
+                {
+                  "id": "Spiritspeaker Warrior: Contemplator",
+                  "n": 2
+                },
+                {
+                  "id": "Ferocious Warrior: Grappler",
+                  "n": 2
+                },
+                {
+                  "id": "Forged Sand Interrogator",
+                  "n": 2
+                },
+                {
+                  "id": "Forged Sand Shieldbreaker",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Thunderhelm Lawachurl"
+                },
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Ruin Guard"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 16
+                },
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 16
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Consecrated Red Vulture"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Linebreaker",
+                  "n": 12
+                },
+                {
+                  "id": "Eremite Crossbow",
+                  "n": 12
+                },
+                {
+                  "id": "Eremite Axe Vanguard",
+                  "n": 12
+                },
+                {
+                  "id": "Eremite Ravenbeak Halberdier",
+                  "n": 12
+                },
+                {
+                  "id": "Eremite Sword-Dancer",
+                  "n": 12
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wind Operative"
+                },
+                {
+                  "id": "Fatui Skirmisher - Electrohammer Vanguard",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-04-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-04-16"
+    }
+  ]
+}

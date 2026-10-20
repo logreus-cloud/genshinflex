@@ -1,0 +1,219 @@
+{
+  "mode": "abyss",
+  "version": "5.6",
+  "cycle": "Версия 5.6",
+  "start": "2025-06-16",
+  "end": "2025-07-16",
+  "buffs": [
+    "Благословение «Ледяная луна»: Когда персонаж наносит Крио урон противнику, ведётся автоматический подсчёт ударов. Когда количество ударов достигнет 4, на месте противника выпустится ударная волна, которая наносит истинный урон и сбрасывает счётчик. Этот эффект может возникнуть один раз в 4 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: когда у персонажа 0 энергии, его урон увеличен на 75%.",
+        "2-я половина: Крио урон обычных атак персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Cryo Cicin Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Wayward Hermetic Spiritspeaker"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Scout"
+                },
+                {
+                  "id": "Ruin Defender"
+                },
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Yumkasaurus",
+                  "n": 3
+                },
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Violet Lightning"
+                },
+                {
+                  "id": "Millennial Pearl Seahorse"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nimble Harvester Mek",
+                  "n": 3
+                },
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Overseer Device"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Grounded Geoshroom"
+                },
+                {
+                  "id": "Grounded Hydroshroom"
+                },
+                {
+                  "id": "Winged Cryoshroom"
+                },
+                {
+                  "id": "Winged Dendroshroom"
+                },
+                {
+                  "id": "Bubbler Seahorse"
+                },
+                {
+                  "id": "Sternshield Crab"
+                },
+                {
+                  "id": "Thunderhelm Lawachurl"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "n": 2
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Shadowy Husk: Line Breaker"
+                },
+                {
+                  "id": "Shadowy Husk: Defender"
+                },
+                {
+                  "id": "Shadowy Husk: Standard Bearer"
+                },
+                {
+                  "id": "Black Serpent Knight: Windcutter",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Skirmisher - Cryogunner Legionnaire",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Fatui Skirmisher - Electrohammer Vanguard",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Biting-Cold Wayob Manifestation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Violet Lightning"
+                },
+                {
+                  "id": "Burning-Aflame Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Battle-Hardened Tent Tortoise"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-06-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-06-16"
+    }
+  ]
+}

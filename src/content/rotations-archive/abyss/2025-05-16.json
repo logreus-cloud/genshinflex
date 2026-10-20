@@ -1,0 +1,201 @@
+{
+  "mode": "abyss",
+  "version": "5.6",
+  "cycle": "Версия 5.6",
+  "start": "2025-05-16",
+  "end": "2025-06-16",
+  "buffs": [
+    "Благословение «Переплетённая луна»: Каждое попадание элементальным навыком персонажа по противнику автоматически засчитывается, но не более 1 раза за каждые 0,9 сек. Когда подсчёт достигает 3, на месте противника выпускается ударная волна, которая наносит истинный урон и обнуляет подсчёт."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: Крио урон элементальных навыков персонажей увеличен на 75%.",
+        "2-я половина: Дендро урон элементальных навыков персонажей увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Wind Operative",
+                  "note": "усиленная версия",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Lava Dragon Statue"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Recon Log Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Geological Survey Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Mimesis - Anemo Hilichurl Rogue"
+                },
+                {
+                  "id": "Tenebrous Mimesis - Ruin Guard"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader"
+                },
+                {
+                  "id": "Thundering Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Papilla: Type II"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Дендро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 8
+                },
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 8
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Mimesis - Crackling Axe Mitachurl"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Arithmetic Enhancer Mek"
+                },
+                {
+                  "id": "Geological Survey Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Suppression Specialist Mek"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Flow-Inverted Wayob Manifestation"
+                },
+                {
+                  "id": "Maguu Kenki"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-05-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-05-16"
+    }
+  ]
+}

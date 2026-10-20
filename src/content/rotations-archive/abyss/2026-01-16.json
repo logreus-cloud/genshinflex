@@ -1,0 +1,175 @@
+{
+  "mode": "abyss",
+  "version": "6.3",
+  "cycle": "Версия 6.3",
+  "start": "2026-01-16",
+  "end": "2026-02-16",
+  "buffs": [
+    "Благословение «Луна лунного всплеска»: Когда персонаж вызывает на противнике лунную реакцию (Лунную бутонизацию, Лунный заряд или Лунный кристалл), на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон заряженных атак активного персонажа увеличен на 75%.",
+        "2-я половина: урон лунных реакций увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Perpetual Mechanical Array"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile",
+                  "n": 2
+                },
+                {
+                  "id": "Battle-Hardened Lightkeeper"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Burning-Aflame Wayob Manifestation",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Battle-Hardened Pipilpan Idol"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Radiant Antelope"
+                },
+                {
+                  "id": "Radiant Glacial Wolf"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Knuckle Duckle"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Гидро урона.",
+        "Все члены отряда получают 60% бонус Электро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Scout Landcruiser",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile",
+                  "n": 6
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Grader",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-01-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-01-16"
+    }
+  ]
+}

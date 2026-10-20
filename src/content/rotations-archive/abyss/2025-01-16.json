@@ -1,0 +1,229 @@
+{
+  "mode": "abyss",
+  "version": "5.3",
+  "cycle": "Версия 5.3",
+  "start": "2025-01-16",
+  "end": "2025-02-16",
+  "buffs": [
+    "Благословение «Пылающая луна»: Когда член отряда активирует Пиро реакции, на его месте возникает ударная волна, которая наносит истинный урон врагам поблизости. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: Пиро урон обычных атак всех членов отряда увеличен на 75%.",
+        "2-я половина: урон Ночного духа всех членов отряда увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Yumkasaurus",
+                  "n": 3
+                },
+                {
+                  "id": "Gluttonous Yumkasaur Mountain King"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Iktomisaurus",
+                  "n": 3
+                },
+                {
+                  "id": "Wayward Hermetic Spiritspeaker"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Xuanwen Beast",
+                  "n": 3
+                },
+                {
+                  "id": "Solitary Suanni"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Mimesis - Ruin Guard"
+                },
+                {
+                  "id": "Tenebrous Mimesis - Secret Source Automaton: Hunter-Seeker"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Biting-Cold Wayob Manifestation"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Papilla: Type III"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Spiritspeaker Warrior: Determinator",
+                  "n": 2
+                },
+                {
+                  "id": "Spiritspeaker Warrior: Contemplator",
+                  "n": 3
+                },
+                {
+                  "id": "Spiritspeaker Warrior: Psychokinetic",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Seeker",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Storm Scout",
+                  "n": 2
+                },
+                {
+                  "id": "Swiftstep Armed Courier",
+                  "n": 3
+                },
+                {
+                  "id": "Winged Warrior: Skysoarer",
+                  "n": 5
+                },
+                {
+                  "id": "Winged Warrior: Skymaster",
+                  "n": 2
+                },
+                {
+                  "id": "Iktomisaurus Warrior: Icy Tidebearer"
+                },
+                {
+                  "id": "Qucusaurus Warrior: Heartstar Hammer"
+                },
+                {
+                  "id": "Yumkasaurus Warrior: Flowing Skyfire"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 2
+                },
+                {
+                  "id": "Tenebrous Mimesis - Crackling Axe Mitachurl",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 3
+                },
+                {
+                  "id": "Eroding Avatar of Lava",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Cryo Abyss Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Abyss Herald: Frost Fall"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Spouting Phantasm",
+                  "note": "усиленная версия",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-01-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-01-16"
+    }
+  ]
+}

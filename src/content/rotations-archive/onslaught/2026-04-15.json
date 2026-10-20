@@ -1,0 +1,29 @@
+{
+  "mode": "onslaught",
+  "version": "6.5",
+  "cycle": "Версия 6.5",
+  "start": "2026-04-15",
+  "end": "2026-05-19",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Radiant Moongecko"
+        },
+        {
+          "id": "Tenebrous Papilla"
+        },
+        {
+          "id": "Frostnight Herra"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2026-04-15"
+    }
+  ]
+}

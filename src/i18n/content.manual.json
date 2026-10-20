@@ -2258,5 +2258,493 @@
  "усиленная версия": {
   "en": "enhanced version",
   "es": "versión reforzada"
+ },
+ "Благословение «Приближающаяся луна»: Когда активный персонаж, используя обычные атаки, заряженные атаки или атаки в падении, наносит противнику несколько раз подряд физический урон или урон одного и того же элемента, то счётчик увеличивается на 1. Счётчик увеличивается не чаще раза в 0,3 сек. Для физического урона и урона каждого элемента счётчики отдельные. Когда счётчик достигает 6, он сбрасывается, а на позиции врага вызывается ударная волна, которая наносит истинный урон. Если персонаж покидает поле боя, то все счётчики сбрасываются.": {
+  "en": "Blessing “Ingressing”: When the active character deals consecutive instances of Elemental DMG of the same Elemental Type or Physical DMG using Normal, Charged, or Plunging Attacks to an opponent, they will gain 1 count stack. 1 stack can be gained every 0.3s. The stacks for every Elemental and Physical DMG will be counted independently. After 6 stacks have been gained, a shockwave will be unleashed at the opponent's position, dealing True DMG and clearing all previously accumulated stacks for this DMG type. Should the active character leave the field, these stacks will be cleared.",
+  "es": "Bendición «Ingressing»: cuando el personaje activo inflige a un enemigo varias veces seguidas daño del mismo elemento o daño físico con Ataques Normales, Cargados o Descendentes, gana 1 acumulación (como máximo una cada 0,3 s). Cada elemento y el daño físico se cuentan por separado. Con 6 acumulaciones se libera una onda expansiva en la posición del enemigo que inflige daño verdadero y reinicia el contador de ese tipo de daño. Las acumulaciones se pierden si el personaje sale del campo."
+ },
+ "Все члены отряда получают 75% бонус физ. урона.": {
+  "en": "All party members' receive a 75% Physical DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Físico."
+ },
+ "Благословение «Вдохновляющая луна»: Когда персонаж восстанавливает HP, сила его атаки увеличивается на 10% на 10 сек. Эффект складывается до 3 раз. Отсчёт времени каждого уровня происходит отдельно. Когда персонаж теряет HP, его мастерство стихий увеличивается на 40 ед. на 10 сек. Эффект складывается до 3 раз. Отсчёт времени каждого уровня происходит отдельно. Эффекты, возникающие в результате восстановления и снижения HP персонажа, не зависят друг от друга, а отсчёт их времени происходит отдельно.": {
+  "en": "Blessing “Keen”: When a character recovers HP, that character gains 10% increased ATK for 10s. Max 3 stacks. Each stack will be counted independently. When a character loses HP, that character gains 40 Elemental Mastery for 10s. Max 3 stacks. Each stack will be counted independently. The effects from recovering and losing HP are independent from each other, and stacks are counted independently.",
+  "es": "Bendición «Keen»: cuando un personaje recupera Vida, su ATQ aumenta un 10 % durante 10 s (hasta 3 acumulaciones). Cuando pierde Vida, gana 40 de Maestría Elemental durante 10 s (hasta 3 acumulaciones). Ambos efectos y la duración de cada acumulación se cuentan por separado."
+ },
+ "Все члены отряда получают 60% бонус Пиро урона.": {
+  "en": "All party members gain a 60% Pyro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Pyro."
+ },
+ "Все члены отряда получают 60% бонус Гидро урона.": {
+  "en": "All party members gain a 60% Hydro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Hydro."
+ },
+ "Благословение «Вращающаяся луна»: Когда персонаж восстанавливает или теряет HP, он получает 40% бонус всего элементального и физ. урона на 3 сек.": {
+  "en": "Blessing “Gyrating”: When a character recovers or loses HP, that character gains 40% increased All Elemental and Physical DMG Bonus for 3s.",
+  "es": "Bendición «Gyrating»: cuando un personaje recupera o pierde Vida, obtiene un 40 % de Bonificación de Daño de todos los elementos y Físico durante 3 s."
+ },
+ "Благословение «Отделяющаяся луна»: Когда HP персонажа увеличивается или уменьшается, урон его обычных и заряженных атак увеличивается на 16% на 6 сек. Эффект может возникнуть один раз в 0,5 сек. и складывается до 3 раз.": {
+  "en": "Blessing “Cleaving”: When the character's HP increases or decreases, their Normal Attack and Charged Attack DMG will be increased by 16% for 6s. This effect can be triggered once every 0.5s. Max 3 stacks.",
+  "es": "Bendición «Cleaving»: cuando la Vida del personaje aumenta o disminuye, el daño de sus Ataques Normales y Cargados aumenta un 16 % durante 6 s. Puede activarse una vez cada 0,5 s, hasta 3 acumulaciones."
+ },
+ "Все члены отряда получают 60% бонус Крио урона.": {
+  "en": "All party members gain a 60% Cryo DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Cryo."
+ },
+ "Благословение «Сходящаяся луна»: Когда заряженная атака попадает в противника, персонаж получает усиление элементального или физического урона на 20% согласно своему элементу на 5 сек. Может возникнуть один раз в 0,5 сек, складывается до 3 раз. Бонус урона заряженной атаки от разных элементов и от физического урона считается отдельно.": {
+  "en": "Blessing “Converging”: After the character's Charged Attack hits an opponent, the character will receive a 20% Elemental or Physical DMG Bonus, corresponding to the Elemental or Physical DMG type of the Charged Attack, for 5s. This effect can be triggered once every 0.5s. Max 3 stacks. Charged Attack DMG bonuses from different Elemental types or Physical DMG are counted independently.",
+  "es": "Bendición «Converging»: cuando el Ataque Cargado del personaje golpea a un enemigo, obtiene un 20 % de Bonificación de Daño del elemento (o Físico) de ese ataque durante 5 s. Puede activarse una vez cada 0,5 s, hasta 3 acumulaciones; cada tipo de daño se cuenta por separado."
+ },
+ "Благословение «Синергическая луна»: Когда активный персонаж наносит урон противнику с помощью обычной или заряженной атаки, шанс критического попадания обычной или заряженной атаки увеличивается на 6% в течение 5 сек. Может возникнуть один раз в 0,1 сек., складывается до 5 раз. Продолжительность каждой атаки вычисляется отдельно. Эффект снимается, когда персонаж покидает поле.": {
+  "en": "Blessing “Coalescing”: After the active character's Normal or Charged Attack hits an opponent, that character's Normal and Charged Attack CRIT Rate is increased by 6% for 5s. This effect can be triggered once every 0.1s. Max 5 stacks. Each stack's duration is counted independently. This effect will be cleared if the character leaves the field.",
+  "es": "Bendición «Coalescing»: cuando el Ataque Normal o Cargado del personaje activo golpea a un enemigo, la Prob. CRIT de sus Ataques Normales y Cargados aumenta un 6 % durante 5 s. Puede activarse una vez cada 0,1 s, hasta 5 acumulaciones con duración independiente. El efecto se pierde si el personaje sale del campo."
+ },
+ "Благословение «Луна прилива»: Когда количество HP персонажа увеличивается или уменьшается, оно автоматически подсчитывается. Когда подсчёт достигает 12, на месте персонажа возникает ударная волна, которая наносит истинный урон противникам поблизости и обнуляет подсчёт. Ударная волна может возникнуть 1 раз в 4 сек.": {
+  "en": "Blessing “Tidal”: When a character's HP increases or decreases, it will be counted. When it reaches a total of 12, a shockwave will be unleashed at the character's position, dealing True DMG to nearby opponents and clearing the count. 1 such shockwave can be unleashed every 4s.",
+  "es": "Bendición «Tidal»: cada aumento o disminución de la Vida de un personaje se cuenta. Al llegar a 12, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos y reinicia el contador. Como máximo una onda cada 4 s."
+ },
+ "Все члены отряда получают 60% бонус Электро урона.": {
+  "en": "All party members gain a 60% Electro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Electro."
+ },
+ "Благословение «Причудливая луна»: Когда персонажи вне поля наносят противнику урон с помощью элементального навыка, на него накладывается жуткая метка. Когда другой активный персонаж атакует отмеченного противника атакой того же элемента, на месте противника возникает ударная волна, которая наносит истинный урон. Жуткая метка действует 5 сек., при этом метки, созданные разными атаками разными элементами, могут существовать независимо друг от друга. Ударная волна может возникнуть 1 раз в 2 сек. Когда персонаж выходит на поле боя, метки, наложенные этим персонажем на противников, снимаются.": {
+  "en": "Blessing “Uncanny”: When off-field characters deal Elemental Skill DMG to an opponent, an Uncanny Mark will be placed upon that opponent. When another active character hits a marked opponent with an attack of the same Elemental Type, a shockwave will be unleashed at that opponent's position, dealing True DMG. The Uncanny Mark lasts 5s, and Marks created through different attacks with different Elemental Types can exist independently. 1 such shockwave can be unleashed every 2s. When a character enters the field, the Uncanny Marks placed by that character on opponents will be removed.",
+  "es": "Bendición «Uncanny»: cuando un personaje fuera del campo inflige daño de Habilidad Elemental a un enemigo, le aplica una Marca Inquietante durante 5 s. Si otro personaje activo golpea al enemigo marcado con un ataque del mismo elemento, se libera una onda expansiva que inflige daño verdadero (como máximo una cada 2 s). Las marcas de distintos elementos son independientes y se eliminan cuando su autor entra en el campo."
+ },
+ "Благословение «Парящая луна»: После того как персонаж выходит на поле боя, он получает один уровень Полёта орла каждые 2,5 сек. Каждый уровень увеличивает урон этого персонажа на 8%. Складывается до 3 ур. Когда персонаж с тремя уровнями наносит урон противнику, он выпускает ударную волну на месте противника, которая наносит истинный урон. Эффект исчезает, когда персонаж покидает поле боя. Волна может возникнуть 1 раз в 1 сек.": {
+  "en": "Blessing “Soaring”: After a character takes the field, they will gain one stack of Soar every 2.5s. Each stack will increase the DMG dealt by this character by 8%. Max 3 stacks. A character with 3 stacks will unleash a shockwave at an opponent's position when they deal DMG to that opponent, dealing True DMG. This effect will be cleared when the character leaves the field. 1 such shockwave can be unleashed every 1s.",
+  "es": "Bendición «Soaring»: tras entrar en el campo, el personaje gana una acumulación de Vuelo cada 2,5 s; cada una aumenta su daño un 8 % (máximo 3). Con 3 acumulaciones, al dañar a un enemigo libera una onda expansiva que inflige daño verdadero (como máximo una por segundo). El efecto se pierde al salir del campo."
+ },
+ "Благословение «Прочная луна»: Когда персонаж получает элементальный осколок, созданный реакцией Кристалл, он приобретает состояние «Устрашение». Урон, который наносят активные персонажи в этом состоянии, увеличивается на 15%. Состояние длится 8 сек. и может складываться до 3 раз, продолжительность каждого из них будет считаться независимо от других.": {
+  "en": "Blessing “Sturdy”: After a character obtains an Elemental Shard created by the Crystallize reaction, they will gain the Redoubtable state. Active characters in this state deal 15% increased DMG. This state lasts for 8s and can stack up to 3 times, with the duration of each stack counted independently.",
+  "es": "Bendición «Sturdy»: al recoger un Fragmento Elemental de Cristalización, el personaje entra en estado Formidable y, mientras está activo, inflige un 15 % más de daño. Dura 8 s y se acumula hasta 3 veces con duración independiente."
+ },
+ "Все члены отряда получают 75% бонус Гео урона.": {
+  "en": "All party members gain a 75% Geo DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Geo."
+ },
+ "Благословение «Взрывающаяся луна»: Когда персонаж накопит 3 элементальных осколка, созданных реакцией Кристалл, на месте персонажа будет выпущена ударная волна, наносящая истинный урон противникам поблизости, после чего счётчик накопленных осколков будет сброшен. Такую волну можно вызвать один раз в 6 сек.": {
+  "en": "Blessing “Bursting”: After a character obtains an Elemental Shard created by the Crystallize reaction, it will be counted. When the count reaches 3, a shockwave will be released at the character's location, dealing True DMG to nearby opponents, and resetting the count. 1 such shockwave can be triggered every 6s.",
+  "es": "Bendición «Bursting»: cada Fragmento Elemental de Cristalización que recoge un personaje se cuenta. Al llegar a 3, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos y reinicia el contador. Como máximo una onda cada 6 s."
+ },
+ "Благословение «Восходящая луна»: Когда персонаж получает лечение, оно автоматически подсчитывается. Когда подсчёт достигает 16, на месте персонажа возникает ударная волна, которая наносит истинный урон противникам поблизости и обнуляет подсчёт. Ударная волна может возникнуть один раз в 8 сек.": {
+  "en": "Blessing “Ascendant”: When a character receives healing, it will be counted. When the count reaches a total of 16, a shockwave will be unleashed at the character's position, dealing True DMG to nearby opponents and clearing the count. 1 such shockwave can be unleashed every 8s.",
+  "es": "Bendición «Ascendant»: cada curación que recibe un personaje se cuenta. Al llegar a 16, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos y reinicia el contador. Como máximo una onda cada 8 s."
+ },
+ "Все члены отряда получают 75% бонус Анемо урона.": {
+  "en": "All party members receive a 75% Anemo DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Anemo."
+ },
+ "Благословение «Стойкая луна»: Когда активный персонаж наносит урон противнику с помощью атаки в падении, его урон атаки в падении увеличивается на 20% на 8 сек. Эффект может возникнуть один раз в 0,1 сек., складывается до 3 раз. Длительность каждого уровня рассчитывается отдельно. Эффект будет снят, если персонаж покинет поле боя.": {
+  "en": "Blessing “Resilient”: After the active character's Plunging Attacks hit opponents, the character's Plunging Attack DMG is increased by 20% for 8s. This effect can be triggered once every 0.1s. Max 3 stacks. Each stack's duration is counted independently. This effect will be cleared if the character leaves the field.",
+  "es": "Bendición «Resilient»: cuando el Ataque Descendente del personaje activo golpea a un enemigo, el daño de sus Ataques Descendentes aumenta un 20 % durante 8 s. Puede activarse una vez cada 0,1 s, hasta 3 acumulaciones con duración independiente. Se pierde al salir del campo."
+ },
+ "Благословение «Падающая луна»: При попадании атаки в падении активного персонажа по противнику, на месте персонажа возникает ударная волна, которая наносит истинный урон по противникам поблизости. Таким образом можно вызвать волну максимум один раз в 2 сек.": {
+  "en": "Blessing “Plummeting”: After the active character's Plunging Attacks hit opponents, unleash a shockwave at the character's location, dealing True DMG to nearby opponents. 1 such shockwave can be unleashed every 2s.",
+  "es": "Bendición «Plummeting»: cuando el Ataque Descendente del personaje activo golpea a un enemigo, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos. Como máximo una onda cada 2 s."
+ },
+ "Благословение «Расколотая луна»: Когда персонаж создаёт Гео конструкцию, на его месте возникает ударная волна, которая наносит истинный урон по противникам поблизости. Таким образом можно вызвать волну максимум один раз в 6 сек.": {
+  "en": "Blessing “Sundered”: When characters create Geo Constructs, unleash a shockwave at the character's location, dealing True DMG to nearby opponents. 1 such shockwave can be unleashed every 6s.",
+  "es": "Bendición «Sundered»: cuando un personaje crea una Construcción Geo, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos. Como máximo una onda cada 6 s."
+ },
+ "Благословение «Гравийная луна»: Когда персонаж наносит противнику Гео урон, у этого персонажа начинается подсчёт. Подсчёт срабатывает не чаще одного раза в 0,1 сек. Когда подсчёт достигает 3, персонаж получает Печать Гравия, которая даёт 50% бонус Гео урона на 10 сек.": {
+  "en": "Blessing “Gravel”: When a character deals Geo DMG to an opponent, this instance will be counted for the character. 1 count can be gained every 0.1s. When the count reaches 3, this character will receive a Gravel Mark, granting them 50% Geo DMG Bonus for 10s.",
+  "es": "Bendición «Gravel»: cada vez que un personaje inflige Daño Geo a un enemigo se cuenta (como máximo una vez cada 0,1 s). Al llegar a 3, obtiene una Marca de Grava que le otorga un 50 % de Bonificación de Daño Geo durante 10 s."
+ },
+ "Благословение «Луна штормовых ветров»: Когда персонаж вызывает реакцию Рассеивание, урон обычной атаки, заряженной атаки и атаки в падении у всех членов отряда увеличивается на 20%. Эффект длится 10 сек., может возникнуть один раз в 0,1 сек. и складывается до 3 раз. Длительность каждого уровня рассчитывается отдельно.": {
+  "en": "Blessing “Arrowgale”: After a character triggers a Swirl reaction, all party members' Normal, Charged, and Plunging Attack DMG is increased by 20% for 10s. This effect can be triggered once every 0.1s. Max 3 stacks. Each stack's duration is counted independently.",
+  "es": "Bendición «Arrowgale»: cuando un personaje provoca Torbellino, el daño de los Ataques Normales, Cargados y Descendentes de todo el equipo aumenta un 20 % durante 10 s. Puede activarse una vez cada 0,1 s, hasta 3 acumulaciones con duración independiente."
+ },
+ "Благословение «Огнедышащая луна»: После того как персонаж применяет по противнику реакции Пар, Перегрузка, Таяние, Горение, Цветение, Пиро Рассеивание или Пиро Кристалл, сопротивление противника всем элементам и физ. сопротивление снижаются на 30% на 4 сек.": {
+  "en": "Blessing “Flame-Fanning”: When a character triggers Vaporize, Overloaded, Melt, Burning, Burgeon, Pyro Swirl, or Pyro Crystallize reactions on an opponent, the opponent's All Elemental RES and Physical RES is reduced by 30% for 4s.",
+  "es": "Bendición «Flame-Fanning»: cuando un personaje provoca Vaporización, Sobrecarga, Derretido, Quemadura, Burgeon, Torbellino Pyro o Cristalización Pyro en un enemigo, la RES elemental y física de ese enemigo se reduce un 30 % durante 4 s."
+ },
+ "Все члены отряда получают 75% бонус Пиро урона.": {
+  "en": "All party members receive a 75% Pyro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Pyro."
+ },
+ "Благословение «Благородная луна»: Когда персонаж получает лечение, его сила атаки повышается на 50% на 3 сек.": {
+  "en": "Blessing “Valorous”: When a character receives healing, the character's ATK increases by 50% for 3s.",
+  "es": "Bendición «Valorous»: cuando un personaje recibe curación, su ATQ aumenta un 50 % durante 3 s."
+ },
+ "Благословение «Тактическая луна»: Когда текущее HP персонажа увеличивается или уменьшается, он получает 16% бонус урона всех элементов и физ. урона на 8 сек. Эффект складывается до 3 раз. Отсчёт времени каждого уровня происходит отдельно.": {
+  "en": "Blessing “Tactical”: When a character's HP value increases or decreases, that character gains a 16% increased All Elemental and Physical DMG Bonus for 8s. This effect can stack up to 3 times, and the duration of each stack is counted independently.",
+  "es": "Bendición «Tactical»: cuando la Vida de un personaje aumenta o disminuye, obtiene un 16 % de Bonificación de Daño de todos los elementos y Físico durante 8 s. Hasta 3 acumulaciones con duración independiente."
+ },
+ "Благословение «Стремительная луна»: В течение 10 сек. после того, как активный персонаж использует свой элементальный навык, урон, наносимый его обычными атаками, увеличивается на 20%. Ведётся счёт попаданий персонажа по противникам. Попадания засчитываются 1 раз в 0,1 сек., и как только счёт достигнет 3, в месте нахождения противника будет выпущена ударная волна, которая нанесёт истинный урон ближайшим противникам, и счётчик обнулится. Ударную волну можно выпускать раз в 1,5 сек. Эффект и счётчик сбрасываются, когда персонаж покидает поле боя.": {
+  "en": "Blessing “Thrusting”: For 10s after the active character uses their Elemental Skill, DMG dealt by their Normal Attacks is increased by 20%, and a tally will be kept when this character's Normal Attacks hit opponents. The tally can increase by 1 up to once every 0.1s, and once it reaches 3, a shockwave is unleashed at the opponent's location that deals True DMG to nearby opponents, and the tally will be reset. Up to 1 shockwave can be unleashed this way every 1.5s, and the effect and tally are cleared when the character leaves the field.",
+  "es": "Bendición «Thrusting»: durante 10 s tras usar su Habilidad Elemental, el daño de los Ataques Normales del personaje activo aumenta un 20 % y se cuentan sus golpes (como máximo uno cada 0,1 s). Al llegar a 3, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero a los cercanos y reinicia el contador (como máximo una cada 1,5 s). Todo se pierde al salir del campo."
+ },
+ "Благословение «Исцеляющая луна»: Когда персонаж получает лечение, урон его элементального навыка повышается на 20%. Эффект длится 8 сек. и может складываться до 3 раз. Отсчёт времени каждого уровня эффекта происходит отдельно.": {
+  "en": "Blessing “Transfusing”: After this character receives healing, their Elemental Skill DMG is increased by 20%. Lasts for 8s, up to 3 stacks. Each stack duration is calculated independently.",
+  "es": "Bendición «Transfusing»: cuando un personaje recibe curación, el daño de su Habilidad Elemental aumenta un 20 % durante 8 s. Hasta 3 acumulaciones con duración independiente."
+ },
+ "Благословение «Жгучая луна»: Попадания по противникам в статусе Горение повышают шанс крит. попадания на 15% и крит. урон на 30%.": {
+  "en": "Blessing “Searing”: When characters attack Burning opponents, their CRIT Rate is increased by 15% and their CRIT DMG is increased by 30%.",
+  "es": "Bendición «Searing»: al atacar a enemigos en estado de Quemadura, la Prob. CRIT de los personajes aumenta un 15 % y su Daño CRIT, un 30 %."
+ },
+ "Все члены отряда получают 75% бонус Дендро урона.": {
+  "en": "All party members receive a 75% Dendro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Dendro."
+ },
+ "Благословение «Противостоящая луна»: Когда активный персонаж использует элементальный навык, урон обычных атак и элементального навыка увеличивается на 40% в течение 12 сек. Когда персонаж находится под действием Благословения Ночного духа, этот эффект усиливается: урон обычных атак и элементального навыка увеличивается на 80%.": {
+  "en": "Blessing “Contending”: After the active character uses an Elemental Skill, Normal Attack and Elemental Skill DMG is increased by 40% for 12s. For characters in Nightsoul's Blessing, this effect is enhanced: Normal Attack and Elemental Skill DMG is increased by 80%.",
+  "es": "Bendición «Contending»: tras usar una Habilidad Elemental, el daño de los Ataques Normales y de la Habilidad Elemental del personaje activo aumenta un 40 % durante 12 s. Con Bendición del Alma Nocturna, el aumento es del 80 %."
+ },
+ "Все члены отряда получают 60% бонус Дендро урона.": {
+  "en": "All party members gain a 60% Dendro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Dendro."
+ },
+ "Благословение «Крепкая луна»: После того как персонаж использует элементальный навык, его защита увеличивается на 60% на 9 сек.": {
+  "en": "Blessing “Rugged”: After a character uses an Elemental Skill, said character's DEF increases by 60% for 9s.",
+  "es": "Bendición «Rugged»: tras usar una Habilidad Elemental, la DEF del personaje aumenta un 60 % durante 9 s."
+ },
+ "Благословение «Неистовая луна»: После того как заряженная атака активного персонажа попадает по врагу, сила атаки этого персонажа увеличивается на 20%. Эффект длится 8 сек. и может складываться до 4 раз. Отсчёт каждого суммирования происходит отдельно.": {
+  "en": "Blessing “Vigorous”: After the current active character's Charged Attack hits an opponent, said character's ATK increases by 20% for 8s. Max 4 stacks, each stack has an independent duration.",
+  "es": "Bendición «Vigorous»: cuando el Ataque Cargado del personaje activo golpea a un enemigo, su ATQ aumenta un 20 % durante 8 s. Hasta 4 acumulaciones con duración independiente."
+ },
+ "Все члены отряда получают 60% бонус Гео урона.": {
+  "en": "All party members gain a 60% Geo DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Geo."
+ },
+ "Благословение «Благоприятная луна»: Прочность щита всех членов отряда увеличивается на 20%. Активный персонаж, защищённый щитом, при нанесении урона противнику на его месте вызывает ударную волну, которая наносит истинный урон. Этот эффект может возникнуть один раз в 5 сек.": {
+  "en": "Blessing “Shield-Piercing”: All party members' Shield Strength is increased by 20%. While the active character is protected by a Shield, when they deal DMG to opponents, their attacks will unleash a shockwave at the opponents' position that deals True DMG. This can trigger once every 5s.",
+  "es": "Bendición «Shield-Piercing»: la Fuerza de Escudo de todo el equipo aumenta un 20 %. Mientras el personaje activo esté protegido por un escudo, sus ataques liberan una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 5 s."
+ },
+ "Урон заряженных атак персонажей увеличен на 75%.": {
+  "en": "Characters' Charged Attack DMG increased by 75%.",
+  "es": "El daño de los Ataques Cargados de los personajes aumenta un 75 %."
+ },
+ "Благословение «Пылающая луна»: Когда член отряда активирует Пиро реакции, на его месте возникает ударная волна, которая наносит истинный урон врагам поблизости. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Scorching”: After a party member triggers a Pyro-related reaction, a shockwave will be unleashed at the character's position, dealing True DMG to nearby opponents. This effect can be triggered once every 3s.",
+  "es": "Bendición «Scorching»: cuando un miembro del equipo provoca una reacción con Pyro, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: Пиро урон обычных атак всех членов отряда увеличен на 75%.": {
+  "en": "First Half: Pyro DMG dealt by all party members' Normal Attacks increased by 75%.",
+  "es": "1.ª mitad: el Daño Pyro de los Ataques Normales de todos los miembros del equipo aumenta un 75 %."
+ },
+ "2-я половина: урон Ночного духа всех членов отряда увеличен на 75%.": {
+  "en": "Second Half: All party members' Nightsoul-aligned DMG increased by 75%.",
+  "es": "2.ª mitad: el daño de Alma Nocturna de todos los miembros del equipo aumenta un 75 %."
+ },
+ "Благословение «Будоражащая луна»: Когда персонаж получает лечение, на его месте возникает ударная волна, которая наносит истинный урон врагам поблизости. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Stirring”: When a character receives healing, a shockwave will be unleashed at the character's position, dealing True DMG to nearby opponents. This effect can be triggered once every 3s.",
+  "es": "Bendición «Stirring»: cuando un personaje recibe curación, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: урон Рассеивания активного персонажа увеличен на 600%.": {
+  "en": "First Half: Swirl DMG dealt by the active character increased by 600%.",
+  "es": "1.ª mitad: el daño de Torbellino del personaje activo aumenta un 600 %."
+ },
+ "2-я половина: Крио урон заряженных атак персонажей увеличен на 75%.": {
+  "en": "Second Half: Characters' Charged Attack Cryo DMG increased by 75%.",
+  "es": "2.ª mitad: el Daño Cryo de los Ataques Cargados de los personajes aumenta un 75 %."
+ },
+ "Мастерство стихий всех членов отряда увеличено на 200.": {
+  "en": "All party members have their Elemental Mastery increased by 200.",
+  "es": "La Maestría Elemental de todos los miembros del equipo aumenta en 200."
+ },
+ "Благословение «Ниспадающая луна»: Когда атака в падении персонажа попадает по врагам, на его месте возникает ударная волна, которая наносит истинный урон врагам поблизости. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Plunging”: When a character's Plunging Attacks hit opponents, a shockwave will be unleashed at the character's position, dealing True DMG to nearby opponents. This effect can be triggered once every 3s.",
+  "es": "Bendición «Plunging»: cuando el Ataque Descendente de un personaje golpea a un enemigo, se libera una onda expansiva en su posición que inflige daño verdadero a los enemigos cercanos. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: Гидро урон элементальных навыков персонажей увеличен на 75%.": {
+  "en": "First Half: Characters' Elemental Skill Hydro DMG increased by 75%.",
+  "es": "1.ª mitad: el Daño Hydro de las Habilidades Elementales de los personajes aumenta un 75 %."
+ },
+ "2-я половина: урон атак в падении персонажей увеличен на 75%.": {
+  "en": "Second Half: Characters' Plunging Attack DMG increased by 75%.",
+  "es": "2.ª mitad: el daño de los Ataques Descendentes de los personajes aumenta un 75 %."
+ },
+ "Все члены отряда получают 75% бонус Электро урона.": {
+  "en": "All characters in the party gain a 75% Electro DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Electro."
+ },
+ "Благословение «Луна лютого мороза»: Когда персонаж активирует Крио реакцию, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 4 сек.": {
+  "en": "Blessing “Dreadfrost”: When a character triggers Cryo-related reactions, a shockwave will be released at the opponent's position, dealing True DMG. This effect can be triggered once every 4s.",
+  "es": "Bendición «Dreadfrost»: cuando un personaje provoca una reacción con Cryo, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 4 s."
+ },
+ "1-я половина: Гео урон элементальных навыков персонажей увеличен на 75%.": {
+  "en": "First Half: Characters' Elemental Skill Geo DMG increased by 75%.",
+  "es": "1.ª mitad: el Daño Geo de las Habilidades Elementales de los personajes aumenta un 75 %."
+ },
+ "2-я половина: Крио урон элементальных навыков персонажей увеличен на 75%.": {
+  "en": "Second Half: Characters' Elemental Skill Cryo DMG increased by 75%.",
+  "es": "2.ª mitad: el Daño Cryo de las Habilidades Elementales de los personajes aumenta un 75 %."
+ },
+ "Все члены отряда получают 75% бонус Крио урона.": {
+  "en": "All party members gain a 75% Cryo DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Cryo."
+ },
+ "Благословение «Переплетённая луна»: Каждое попадание элементальным навыком персонажа по противнику автоматически засчитывается, но не более 1 раза за каждые 0,9 сек. Когда подсчёт достигает 3, на месте противника выпускается ударная волна, которая наносит истинный урон и обнуляет подсчёт.": {
+  "en": "Blessing “Interwoven”: When a character's Elemental Skill hits an opponent, it will be counted (1 count can be triggered every 0.9s). When the count reaches 3, a shockwave will be unleashed at the hit opponent's location, dealing True DMG and resetting the count.",
+  "es": "Bendición «Interwoven»: cada golpe de la Habilidad Elemental de un personaje a un enemigo se cuenta (como máximo uno cada 0,9 s). Al llegar a 3, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero y reinicia el contador."
+ },
+ "1-я половина: Крио урон элементальных навыков персонажей увеличен на 75%.": {
+  "en": "First Half: Characters' Elemental Skill Cryo DMG increased by 75%.",
+  "es": "1.ª mitad: el Daño Cryo de las Habilidades Elementales de los personajes aumenta un 75 %."
+ },
+ "2-я половина: Дендро урон элементальных навыков персонажей увеличен на 75%.": {
+  "en": "Second Half: Characters' Elemental Skill Dendro DMG increased by 75%.",
+  "es": "2.ª mitad: el Daño Dendro de las Habilidades Elementales de los personajes aumenta un 75 %."
+ },
+ "Благословение «Ледяная луна»: Когда персонаж наносит Крио урон противнику, ведётся автоматический подсчёт ударов. Когда количество ударов достигнет 4, на месте противника выпустится ударная волна, которая наносит истинный урон и сбрасывает счётчик. Этот эффект может возникнуть один раз в 4 сек.": {
+  "en": "Blessing “Ice-Cloven”: When a character deals Cryo DMG to an opponent, it will be counted. When the count reaches 4, a shockwave will be unleashed at the opponent's location, dealing True DMG and resetting the count. 1 such shockwave can be triggered every 4s.",
+  "es": "Bendición «Ice-Cloven»: cada vez que un personaje inflige Daño Cryo a un enemigo se cuenta. Al llegar a 4, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero y reinicia el contador. Como máximo una onda cada 4 s."
+ },
+ "1-я половина: когда у персонажа 0 энергии, его урон увеличен на 75%.": {
+  "en": "First Half: When characters have 0 Energy, DMG +75%.",
+  "es": "1.ª mitad: cuando un personaje tiene 0 de Energía, su daño aumenta un 75 %."
+ },
+ "2-я половина: Крио урон обычных атак персонажей увеличен на 75%.": {
+  "en": "Second Half: Characters' Normal Attack Cryo DMG increased by 75%.",
+  "es": "2.ª mitad: el Daño Cryo de los Ataques Normales de los personajes aumenta un 75 %."
+ },
+ "Благословение «Луна жгучего холода»: Когда персонаж активирует Крио реакцию, на месте противника возникает ударная волна, которая наносит истинный урон противникам поблизости. Эффект может возникнуть один раз в 2,5 сек.": {
+  "en": "Blessing “Bitterfreeze”: When a character triggers Cryo-related reactions, a shockwave will be released at the opponent's position, dealing True DMG to nearby opponents. This effect can be triggered once every 2.5s.",
+  "es": "Bendición «Bitterfreeze»: cuando un personaje provoca una reacción con Cryo, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero a los enemigos cercanos. Como máximo una vez cada 2,5 s."
+ },
+ "1-я половина: Крио урон всех членов отряда увеличен на 75%.": {
+  "en": "First Half: Cryo DMG dealt by all party members increased by 75%.",
+  "es": "1.ª mitad: el Daño Cryo de todos los miembros del equipo aumenta un 75 %."
+ },
+ "Благословение «Колеблющаяся луна»: Когда персонаж активирует Гидро реакцию (включая Лунный заряд), на месте противника возникает ударная волна, которая наносит истинный урон противникам поблизости. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Wavering”: When a character triggers Hydro-related reactions (including Lunar-Charged), a shockwave will be released at the opponent's position, dealing True DMG to nearby opponents. This effect can be triggered once every 3s.",
+  "es": "Bendición «Wavering»: cuando un personaje provoca una reacción con Hydro (incluido Electrocargado Lunar), se libera una onda expansiva en la posición del enemigo que inflige daño verdadero a los enemigos cercanos. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: урон Заряда и Лунного заряда персонажей увеличен на 75%.": {
+  "en": "First Half: Characters' Electro-Charged and Lunar-Charged DMG increased by 75%.",
+  "es": "1.ª mitad: el daño de Electrocargado y Electrocargado Lunar de los personajes aumenta un 75 %."
+ },
+ "2-я половина: урон Ночного духа, который персонажи наносят противникам, увеличен на 75%.": {
+  "en": "Second Half: Characters' Nightsoul-aligned DMG dealt to opponents increased by 75%.",
+  "es": "2.ª mitad: el daño de Alma Nocturna que los personajes infligen a los enemigos aumenta un 75 %."
+ },
+ "Благословение «Вздымающаяся луна»: Когда персонаж активирует Гидро реакцию, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 2 сек.": {
+  "en": "Blessing “Surging”: When a character triggers Hydro-related reactions, a shockwave will be released at the opponent's location, dealing True DMG. This effect can be triggered once every 2s.",
+  "es": "Bendición «Surging»: cuando un personaje provoca una reacción con Hydro, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 2 s."
+ },
+ "1-я половина: урон Заряда персонажей увеличен на 200%, урон Лунного заряда — на 75%.": {
+  "en": "First Half: Characters' Electro-Charged DMG increased by 200% and Lunar-Charged DMG increased by 75%.",
+  "es": "1.ª mitad: el daño de Electrocargado de los personajes aumenta un 200 % y el de Electrocargado Lunar, un 75 %."
+ },
+ "2-я половина: урон Цветения персонажей увеличен на 200%, урон Лунной бутонизации — на 75%.": {
+  "en": "Second Half: Characters' Bloom DMG increased by 200% and Lunar-Bloom DMG increased by 75%.",
+  "es": "2.ª mitad: el daño de Florecimiento de los personajes aumenta un 200 % y el de Florecimiento Lunar, un 75 %."
+ },
+ "Благословение «Изобильная луна»: Когда персонаж активирует Дендро реакцию, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Abundant”: When a character triggers Dendro-related reactions, a shockwave will be released at the opponent's position, dealing True DMG. This effect can be triggered once every 3s.",
+  "es": "Bendición «Abundant»: cuando un personaje provoca una reacción con Dendro, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: урон Цветения персонажей увеличен на 200%, урон Лунной бутонизации — на 75%.": {
+  "en": "First Half: Characters' Bloom DMG increased by 200% and Lunar-Bloom DMG increased by 75%.",
+  "es": "1.ª mitad: el daño de Florecimiento de los personajes aumenta un 200 % y el de Florecimiento Lunar, un 75 %."
+ },
+ "2-я половина: урон Заряда персонажей увеличен на 200%, урон Лунного заряда — на 75%.": {
+  "en": "Second Half: Characters' Electro-Charged DMG increased by 200% and Lunar-Charged DMG increased by 75%.",
+  "es": "2.ª mitad: el daño de Electrocargado de los personajes aumenta un 200 % y el de Electrocargado Lunar, un 75 %."
+ },
+ "Благословение «Луна клятвы»: Когда значение Уз жизни активного персонажа увеличивается или уменьшается, возникает ударная волна, которая наносит истинный урон противникам поблизости.": {
+  "en": "Blessing “Oathbound”: When the active character's Bond of Life value increases or decreases, a shockwave will be unleashed, dealing True DMG to nearby opponents.",
+  "es": "Bendición «Oathbound»: cuando el valor de Vínculo Vital del personaje activo aumenta o disminuye, se libera una onda expansiva que inflige daño verdadero a los enemigos cercanos."
+ },
+ "2-я половина: Пиро урон обычных атак персонажей увеличен на 75%.": {
+  "en": "Second Half: Characters' Normal Attack Pyro DMG increased by 75%.",
+  "es": "2.ª mitad: el Daño Pyro de los Ataques Normales de los personajes aumenta un 75 %."
+ },
+ "Благословение «Луна вихря»: Когда активный персонаж вызывает Рассеивание на противнике, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 2 сек.": {
+  "en": "Blessing “Whirlwind”: When the active character triggers Swirl on an opponent, a shockwave will be unleashed at the opponent's position, dealing True DMG. This effect can be triggered once every 2s.",
+  "es": "Bendición «Whirlwind»: cuando el personaje activo provoca Torbellino en un enemigo, se libera una onda expansiva en su posición que inflige daño verdadero. Como máximo una vez cada 2 s."
+ },
+ "1-я половина: персонажи вне поля боя получают 75% бонус Пиро урона.": {
+  "en": "First Half: Off-field characters gain a 75% Pyro DMG Bonus.",
+  "es": "1.ª mitad: los personajes fuera del campo obtienen un 75 % de Bonificación de Daño Pyro."
+ },
+ "Благословение «Луна лунного всплеска»: Когда персонаж вызывает на противнике лунную реакцию (Лунную бутонизацию, Лунный заряд или Лунный кристалл), на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Surgestrike”: When a character triggers a Lunar reaction (Lunar-Bloom, Lunar-Charged, or Lunar-Crystallize) on an opponent, a shockwave will be unleashed at the opponent's position, dealing True DMG. This effect can be triggered once every 3s.",
+  "es": "Bendición «Surgestrike»: cuando un personaje provoca una reacción lunar (Florecimiento Lunar, Electrocargado Lunar o Cristalización Lunar) en un enemigo, se libera una onda expansiva en su posición que inflige daño verdadero. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: урон заряженных атак активного персонажа увеличен на 75%.": {
+  "en": "First Half: The active character's Charged Attack DMG is increased by 75%.",
+  "es": "1.ª mitad: el daño de los Ataques Cargados del personaje activo aumenta un 75 %."
+ },
+ "2-я половина: урон лунных реакций увеличен на 75%.": {
+  "en": "Second Half: Lunar Reaction DMG is increased by 75%.",
+  "es": "2.ª mitad: el daño de las reacciones lunares aumenta un 75 %."
+ },
+ "Благословение «Каменная луна»: Когда персонаж наносит противнику урон Лунного кристалла, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Stonehold”: When a character deals Lunar-Crystallize DMG to an opponent, a shockwave will be unleashed at the opponent's position, dealing True DMG. This effect can be triggered once every 3s.",
+  "es": "Bendición «Stonehold»: cuando un personaje inflige daño de Cristalización Lunar a un enemigo, se libera una onda expansiva en su posición que inflige daño verdadero. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: урон Лунного заряда увеличен на 75%.": {
+  "en": "First Half: Lunar-Charged DMG is increased by 75%.",
+  "es": "1.ª mitad: el daño de Electrocargado Lunar aumenta un 75 %."
+ },
+ "2-я половина: урон Лунного кристалла увеличен на 75%.": {
+  "en": "Second Half: Lunar-Crystallize DMG is increased by 75%.",
+  "es": "2.ª mitad: el daño de Cristalización Lunar aumenta un 75 %."
+ },
+ "Благословение «Луна хлёсткого ветра»: Когда персонаж вызывает Рассеивание на противнике, он получает 1 уровень Хлёсткого ветра (не чаще раза в 0,1 сек.). При 4 уровнях на месте противника возникает ударная волна, которая наносит истинный урон, а все уровни расходуются. Волна может возникнуть один раз в 6 сек.": {
+  "en": "Blessing “Windlash”: When a character triggers a Swirl reaction on an opponent, they gain 1 stack of Windlash, and when the stack count reaches 4, a shockwave is unleashed at the opponent's position, dealing True DMG and consuming all stacks of Windlash at the same time. Up to 1 stack of Windlash can be gained every 0.1s. A shockwave can be unleashed this way every 6s.",
+  "es": "Bendición «Windlash»: cuando un personaje provoca Torbellino en un enemigo, gana 1 acumulación de Latigazo de Viento (como máximo una cada 0,1 s). Con 4 acumulaciones se libera una onda expansiva en la posición del enemigo que inflige daño verdadero y las consume todas. Como máximo una onda cada 6 s."
+ },
+ "1-я половина: Анемо урон активного персонажа увеличен на 75%.": {
+  "en": "First Half: Anemo DMG dealt by the active character is increased by 75%.",
+  "es": "1.ª mitad: el Daño Anemo del personaje activo aumenta un 75 %."
+ },
+ "Все члены отряда получают 60% бонус Анемо урона.": {
+  "en": "All party members gain a 60% Anemo DMG Bonus.",
+  "es": "Todos los miembros del equipo obtienen un 60 % de Bonificación de Daño Anemo."
+ },
+ "Благословение «Грохочущая луна»: Когда срабатывает «Гармония лунного дрейфа» (Moondrift Harmony), на месте персонажа возникает ударная волна, которая наносит истинный урон противникам. Эффект может возникнуть один раз в 4 сек.": {
+  "en": "Blessing “Rumbling”: When \"Moondrift Harmony\" is triggered, a shockwave is unleashed at the character's position to deal True DMG to opponents. This effect can be triggered once every 4s.",
+  "es": "Bendición «Rumbling»: cuando se activa «Moondrift Harmony», se libera una onda expansiva en la posición del personaje que inflige daño verdadero a los enemigos. Como máximo una vez cada 4 s."
+ },
+ "1-я половина: урон Лунного кристалла увеличен на 75%.": {
+  "en": "First Half: Lunar-Crystallize DMG is increased by 75%.",
+  "es": "1.ª mitad: el daño de Cristalización Lunar aumenta un 75 %."
+ },
+ "2-я половина: урон обычных и заряженных атак активного персонажа увеличен на 75%.": {
+  "en": "Second Half: Active character's Normal and Charged Attack DMG is increased by 75%.",
+  "es": "2.ª mitad: el daño de los Ataques Normales y Cargados del personaje activo aumenta un 75 %."
+ },
+ "Благословение «Луна, крушащая щиты»: Пока активный персонаж защищён щитом, его атаки по противникам вызывают на их месте ударную волну, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Shield-Shattering”: While the active character is protected by a Shield, when they deal DMG to opponents, their attacks will unleash a shockwave at the opponent's position that deals True DMG. This can trigger once every 3s.",
+  "es": "Bendición «Shield-Shattering»: mientras el personaje activo esté protegido por un escudo, sus ataques liberan una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: все члены отряда получают 75% бонус Пиро урона.": {
+  "en": "First Half: All party members receive a 75% Pyro DMG Bonus.",
+  "es": "1.ª mitad: todos los miembros del equipo obtienen un 75 % de Bonificación de Daño Pyro."
+ },
+ "2-я половина: урон Лунной бутонизации увеличен на 75%.": {
+  "en": "Second Half: Lunar-Bloom DMG is increased by 75%.",
+  "es": "2.ª mitad: el daño de Florecimiento Lunar aumenta un 75 %."
+ },
+ "Благословение «Луна морозной волны»: Когда персонаж вне поля боя активирует Крио реакцию на противнике, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3,5 сек.": {
+  "en": "Blessing “Frost-Surging”: When an off-field character triggers Cryo-related reactions to opponents, a shockwave will be released at the opponent's position, dealing True DMG. This effect can be triggered once every 3.5s.",
+  "es": "Bendición «Frost-Surging»: cuando un personaje fuera del campo provoca una reacción con Cryo en un enemigo, se libera una onda expansiva en su posición que inflige daño verdadero. Como máximo una vez cada 3,5 s."
+ },
+ "Благословение «Луна ледяной волны»: Когда активный персонаж наносит противникам Крио урон заряженными атаками, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек.": {
+  "en": "Blessing “Ice-Surging”: When the active character deals Cryo DMG to opponents with Charged Attacks, their attacks will unleash a shockwave at the opponent's position that deals True DMG. This can trigger once every 3s.",
+  "es": "Bendición «Ice-Surging»: cuando el personaje activo inflige Daño Cryo con Ataques Cargados, se libera una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 3 s."
+ },
+ "1-я половина: урон Сверхпроводника персонажей увеличен на 200%, урон Звёздного проводника — на 75%.": {
+  "en": "First Half: Characters' Superconduct DMG increased by 200% and Stellar-Conduct DMG increased by 75%.",
+  "es": "1.ª mitad: el daño de Superconductor de los personajes aumenta un 200 % y el de Superconductor Estelar, un 75 %."
+ },
+ "Благословение «Луна пронзающего сияния»: Пока активный персонаж находится в Поле Полярной звезды, его атаки по противникам вызывают на их месте ударную волну, которая наносит истинный урон. Эффект может возникнуть один раз в 4 сек.": {
+  "en": "Blessing “Luster-Piercing”: While the active character is inside a Polestar Field, when they deal DMG to opponents, their attacks will unleash a shockwave at the opponent's position that deals True DMG. This can trigger once every 4s.",
+  "es": "Bendición «Luster-Piercing»: mientras el personaje activo esté dentro de un Campo de la Estrella Polar, sus ataques liberan una onda expansiva en la posición del enemigo que inflige daño verdadero. Como máximo una vez cada 4 s."
+ },
+ "Версия 4.0": {
+  "en": "Version 4.0",
+  "es": "Versión 4.0"
+ },
+ "Версия 4.1": {
+  "en": "Version 4.1",
+  "es": "Versión 4.1"
+ },
+ "Версия 4.2": {
+  "en": "Version 4.2",
+  "es": "Versión 4.2"
+ },
+ "Версия 4.3": {
+  "en": "Version 4.3",
+  "es": "Versión 4.3"
+ },
+ "Версия 4.4": {
+  "en": "Version 4.4",
+  "es": "Versión 4.4"
+ },
+ "Версия 4.5": {
+  "en": "Version 4.5",
+  "es": "Versión 4.5"
+ },
+ "Версия 4.6": {
+  "en": "Version 4.6",
+  "es": "Versión 4.6"
+ },
+ "Версия 4.7": {
+  "en": "Version 4.7",
+  "es": "Versión 4.7"
+ },
+ "Версия 4.8": {
+  "en": "Version 4.8",
+  "es": "Versión 4.8"
+ },
+ "Версия 5.0": {
+  "en": "Version 5.0",
+  "es": "Versión 5.0"
+ },
+ "Версия 5.1": {
+  "en": "Version 5.1",
+  "es": "Versión 5.1"
+ },
+ "Версия 5.2": {
+  "en": "Version 5.2",
+  "es": "Versión 5.2"
+ },
+ "Версия 5.3": {
+  "en": "Version 5.3",
+  "es": "Versión 5.3"
+ },
+ "Версия 5.4": {
+  "en": "Version 5.4",
+  "es": "Versión 5.4"
+ },
+ "Версия 5.5": {
+  "en": "Version 5.5",
+  "es": "Versión 5.5"
+ },
+ "Версия 5.6": {
+  "en": "Version 5.6",
+  "es": "Versión 5.6"
+ },
+ "Версия 5.7": {
+  "en": "Version 5.7",
+  "es": "Versión 5.7"
+ },
+ "Версия 5.8": {
+  "en": "Version 5.8",
+  "es": "Versión 5.8"
+ },
+ "Версия 6.0": {
+  "en": "Version 6.0",
+  "es": "Versión 6.0"
+ },
+ "Версия 6.1": {
+  "en": "Version 6.1",
+  "es": "Versión 6.1"
+ },
+ "Версия 6.2": {
+  "en": "Version 6.2",
+  "es": "Versión 6.2"
+ },
+ "Версия 6.3": {
+  "en": "Version 6.3",
+  "es": "Versión 6.3"
+ },
+ "Версия 6.4": {
+  "en": "Version 6.4",
+  "es": "Versión 6.4"
+ },
+ "Версия 6.5": {
+  "en": "Version 6.5",
+  "es": "Versión 6.5"
+ },
+ "Версия 6.6": {
+  "en": "Version 6.6",
+  "es": "Versión 6.6"
+ },
+ "Версия 6.7": {
+  "en": "Version 6.7",
+  "es": "Versión 6.7"
+ },
+ "Версия 7.0": {
+  "en": "Version 7.0",
+  "es": "Versión 7.0"
+ },
+ "Боссы": {
+  "en": "Bosses",
+  "es": "Jefes"
  }
 }

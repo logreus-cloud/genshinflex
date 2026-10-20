@@ -1,0 +1,177 @@
+{
+  "mode": "abyss",
+  "version": "6.5",
+  "cycle": "Версия 6.5",
+  "start": "2026-05-16",
+  "end": "2026-06-16",
+  "buffs": [
+    "Благословение «Луна, крушащая щиты»: Пока активный персонаж защищён щитом, его атаки по противникам вызывают на их месте ударную волну, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: все члены отряда получают 75% бонус Пиро урона.",
+        "2-я половина: урон Лунной бутонизации увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Super-Heavy Landrover: Mechanized Fortress"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Hilichurl Rogue"
+                },
+                {
+                  "id": "Lord of the Hidden Depths: Whisperer of Nightmares"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Electro Cicin Mage"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                },
+                {
+                  "id": "Primo Geovishap"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Grounded Geoshroom",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hexadecatonic Mandragora",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Guard"
+                },
+                {
+                  "id": "Battle-Scarred Rock Crab"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ice Shieldwall Mitachurl",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Frostarm Lawachurl"
+                },
+                {
+                  "id": "Consecrated Horned Crocodile"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Cryo Cicin Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Biting-Cold Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Tulpa"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-05-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-05-16"
+    }
+  ]
+}

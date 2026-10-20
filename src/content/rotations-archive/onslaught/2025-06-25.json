@@ -1,0 +1,29 @@
+{
+  "mode": "onslaught",
+  "version": "5.7",
+  "cycle": "Версия 5.7",
+  "start": "2025-06-25",
+  "end": "2025-07-29",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Hydro Tulpa"
+        },
+        {
+          "id": "Lava Dragon Statue"
+        },
+        {
+          "id": "Secret Source Automaton: Overseer Device"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2025-06-25"
+    }
+  ]
+}

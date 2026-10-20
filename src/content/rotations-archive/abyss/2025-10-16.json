@@ -1,0 +1,192 @@
+{
+  "mode": "abyss",
+  "version": "6.0",
+  "cycle": "Версия 6.0",
+  "start": "2025-10-16",
+  "end": "2025-11-16",
+  "buffs": [
+    "Благословение «Изобильная луна»: Когда персонаж активирует Дендро реакцию, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Цветения персонажей увеличен на 200%, урон Лунной бутонизации — на 75%.",
+        "2-я половина: урон Заряда персонажей увеличен на 200%, урон Лунного заряда — на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm"
+                },
+                {
+                  "id": "Assault Specialist Mek"
+                },
+                {
+                  "id": "Radiant Antelope"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Battle-Hardened Lightkeeper"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Hunter",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Battle-Scarred Rock Crab"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Электро урона.",
+        "Все члены отряда получают 60% бонус Дендро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Radiant Lunapod"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Hailstorm Cannoneer"
+                },
+                {
+                  "id": "Oprichniki Vanguard",
+                  "n": 2
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "n": 2
+                },
+                {
+                  "id": "Oprichniki Medic"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Wind Operative"
+                },
+                {
+                  "id": "Thundering Wayob Manifestation"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile",
+                  "n": 4
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile",
+                  "n": 4
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                },
+                {
+                  "id": "Close Combat Scout Landcruiser",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Foliar-Swift Wayob Manifestation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2025-10-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2025-10-16"
+    }
+  ]
+}

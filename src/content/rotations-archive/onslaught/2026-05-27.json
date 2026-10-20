@@ -1,0 +1,29 @@
+{
+  "mode": "onslaught",
+  "version": "6.6",
+  "cycle": "Версия 6.6",
+  "start": "2026-05-27",
+  "end": "2026-06-30",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Battle-Hardened Glacial Wolf"
+        },
+        {
+          "id": "Hydro Tulpa"
+        },
+        {
+          "id": "The Open-Eyed"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2026-05-27"
+    }
+  ]
+}

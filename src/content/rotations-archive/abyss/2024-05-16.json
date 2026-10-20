@@ -1,0 +1,319 @@
+{
+  "mode": "abyss",
+  "version": "4.6",
+  "cycle": "Версия 4.6",
+  "start": "2024-05-16",
+  "end": "2024-06-01",
+  "buffs": [
+    "Благословение «Благородная луна»: Когда персонаж получает лечение, его сила атаки повышается на 50% на 3 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Maguu Kenki: Mask of Terror"
+                },
+                {
+                  "id": "Maguu Kenki: Lone Gale"
+                },
+                {
+                  "id": "Maguu Kenki: Galloping Frost"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Mirror Maiden"
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "n": 2
+                },
+                {
+                  "id": "Frost Operative",
+                  "note": "усиленная версия"
+                },
+                {
+                  "id": "Wind Operative",
+                  "note": "усиленная версия"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Pyro Agent",
+                  "n": 3
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Eremite Galehunter"
+                },
+                {
+                  "id": "Abyss Lector: Violet Lightning",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Skirmisher - Cryogunner Legionnaire",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Daythunder"
+                },
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 2
+                },
+                {
+                  "id": "Assault Specialist Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Recon Log Mek",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Iniquitous Baptist"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ice Shieldwall Mitachurl",
+                  "n": 4
+                },
+                {
+                  "id": "Cryo Samachurl",
+                  "n": 4
+                },
+                {
+                  "id": "Ice Shield Hilichurl Guard",
+                  "n": 8
+                },
+                {
+                  "id": "Pyro Hilichurl Shooter",
+                  "n": 3
+                },
+                {
+                  "id": "Electro Hilichurl Shooter",
+                  "n": 3
+                },
+                {
+                  "id": "Cryo Hilichurl Shooter",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Grounded Hydroshroom"
+                },
+                {
+                  "id": "Winged Dendroshroom"
+                },
+                {
+                  "id": "Winged Cryoshroom"
+                },
+                {
+                  "id": "Grounded Geoshroom"
+                },
+                {
+                  "id": "Eremite Desert Clearwater"
+                },
+                {
+                  "id": "Eremite Sunfrost"
+                },
+                {
+                  "id": "Eremite Daythunder"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 3
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Rimebiter Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Bolteater Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Scout"
+                },
+                {
+                  "id": "Geovishap",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Pyro Slime"
+                },
+                {
+                  "id": "Large Cryo Slime"
+                },
+                {
+                  "id": "Large Electro Slime"
+                },
+                {
+                  "id": "Mutant Electro Slime"
+                },
+                {
+                  "id": "Cryo Whopperflower"
+                },
+                {
+                  "id": "Pyro Whopperflower"
+                },
+                {
+                  "id": "Electro Whopperflower"
+                },
+                {
+                  "id": "Pyro Specter"
+                },
+                {
+                  "id": "Cryo Specter"
+                },
+                {
+                  "id": "Electro Specter"
+                },
+                {
+                  "id": "Sternshield Crab"
+                },
+                {
+                  "id": "Cherubic Sea Hare"
+                },
+                {
+                  "id": "Bubbler Seahorse"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Cryo Abyss Mage"
+                },
+                {
+                  "id": "Hilichurl Grenadier",
+                  "n": 4
+                },
+                {
+                  "id": "Ice Shieldwall Mitachurl",
+                  "n": 3
+                },
+                {
+                  "id": "Frostarm Lawachurl",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Anemo Hilichurl Rogue",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Hunter"
+                },
+                {
+                  "id": "Ruin Drake: Skywatch",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2024-05-01"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2024-05-16"
+    }
+  ]
+}

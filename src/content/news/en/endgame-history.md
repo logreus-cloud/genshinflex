@@ -1,25 +1,23 @@
 ---
 lang: en
 anchor: endgame-history
-title: Endgame history — every past Theater season in one place
-summary: 'Spiral Abyss, Imaginarium Theater and Stygian Onslaught now have a cycle history. Theater is already complete: all 28 seasons since July 2024 with elements, opening characters, guests and main villains. Abyss and Onslaught are being filled in.'
+title: Endgame history — every past Abyss, Theater and Onslaught cycle
+summary: 'Spiral Abyss, Imaginarium Theater and Stygian Onslaught now have a cycle history: 48 Abyss resets since version 4.0, all 28 Theater seasons and all 12 Onslaught events. Search by enemy or character and see what comes up most often.'
 date: 2026-10-20T14:00:00+05:00
 ---
 
 ### What’s new
 
-The [Abyss](/en/abyss/), [Theater](/en/theater/) and [Onslaught](/en/onslaught/) pages now have a “Cycle history” link under the cycle name. It lists past rotations by version, with the current one marked “Now”.
+The [Abyss](/en/abyss/), [Theater](/en/theater/) and [Onslaught](/en/onslaught/) pages now have a “Cycle history” link under the cycle name. It lists every past rotation by version, with the current one marked “Now”.
 
-### Theater is complete
+- **[Spiral Abyss](/en/abyss/history/)**: 48 resets since version 4.0. Each has floors 11 and 12 with Ley Line Disorders and enemies by chamber and half, plus the Blessing of the Abyssal Moon.
+- **[Imaginarium Theater](/en/theater/history/)**: all 28 seasons since July 2024. Elements, opening characters, special guests and main villains.
+- **[Stygian Onslaught](/en/onslaught/history/)**: all 12 events since version 5.7 and their bosses.
 
-[Theater history](/en/theater/history/) has all 28 seasons, starting with the first one in July 2024. Each season shows its elements, opening characters, special guests and main villains.
+### How to use it
 
-- **Search** by character or enemy: for example, “terrorshroom” finds every season with the Jadeplume Terrorshroom.
+- **Search** by character or enemy: for example, “terrorshroom” finds every Theater season with the Jadeplume Terrorshroom.
 - **Element filter** keeps only seasons with the element you pick.
-- **Frequency** shows which elements come up most often. Hydro leads so far with 17 of 28 seasons, while Dendro and Geo are the rarest at 7 each.
+- **Frequency** shows what comes up most. On Abyss floor 12 the record holder is the Construction Specialist Mek, which appeared in 25 of 48 cycles. In the Theater, Hydro leads with 17 of 28 seasons.
 
-### What’s next
-
-Next we’ll fill in the Spiral Abyss starting from version 4.0, then Stygian Onslaught. For now their history only has the latest cycles.
-
-The data comes from public sources: dates, lineups and enemies. If you spot a mistake in any season, let us know via [feedback](/en/feedback/).
+The data comes from public sources: dates, lineups, enemies and in-game blessing descriptions. If you spot a mistake, let us know via [feedback](/en/feedback/).

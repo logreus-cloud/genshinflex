@@ -1,0 +1,30 @@
+{
+  "mode": "onslaught",
+  "version": "6.3",
+  "cycle": "Версия 6.3",
+  "start": "2026-01-21",
+  "end": "2026-02-24",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Lord of the Hidden Depths: Whisperer of Nightmares"
+        },
+        {
+          "id": "Oprichniki Fireblade Shock Trooper",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Emperor of Fire and Iron"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2026-01-21"
+    }
+  ]
+}

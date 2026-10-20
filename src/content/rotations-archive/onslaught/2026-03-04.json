@@ -1,0 +1,29 @@
+{
+  "mode": "onslaught",
+  "version": "6.4",
+  "cycle": "Версия 6.4",
+  "start": "2026-03-04",
+  "end": "2026-04-07",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Hexadecatonic Mandragora"
+        },
+        {
+          "id": "Knuckle Duckle"
+        },
+        {
+          "id": "Secret Source Automaton: Overseer Device"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2026-03-04"
+    }
+  ]
+}

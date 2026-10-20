@@ -1,0 +1,30 @@
+{
+  "mode": "onslaught",
+  "version": "6.2",
+  "cycle": "Версия 6.2",
+  "start": "2025-12-10",
+  "end": "2026-01-13",
+  "bosses": [
+    {
+      "name": "Боссы",
+      "enemies": [
+        {
+          "id": "Iniquitous Baptist"
+        },
+        {
+          "id": "Iktomisaurus",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Experimental Field Generator"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Stygian_Onslaught/2025-12-10"
+    }
+  ]
+}

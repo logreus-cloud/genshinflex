@@ -1,0 +1,225 @@
+{
+  "mode": "abyss",
+  "version": "4.2",
+  "cycle": "Версия 4.2",
+  "start": "2023-12-16",
+  "end": "2024-01-01",
+  "buffs": [
+    "Благословение «Парящая луна»: После того как персонаж выходит на поле боя, он получает один уровень Полёта орла каждые 2,5 сек. Каждый уровень увеличивает урон этого персонажа на 8%. Складывается до 3 ур. Когда персонаж с тремя уровнями наносит урон противнику, он выпускает ударную волну на месте противника, которая наносит истинный урон. Эффект исчезает, когда персонаж покидает поле боя. Волна может возникнуть 1 раз в 1 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Pyro Abyss Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Dendro Samachurl"
+                },
+                {
+                  "id": "Thundercraven Rifthound",
+                  "n": 2
+                },
+                {
+                  "id": "Abyss Lector: Fathomless Flames"
+                },
+                {
+                  "id": "Large Overgrown Breacher Primus",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Algorithm of Semi-Intransient Matrix of Overseer Network"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Recon Log Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Nimble Harvester Mek",
+                  "n": 2
+                },
+                {
+                  "id": "Annihilation Specialist Mek"
+                },
+                {
+                  "id": "Assault Specialist Mek"
+                },
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Geological Survey Mek",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                },
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "n": 2
+                },
+                {
+                  "id": "Abyss Lector: Fathomless Flames",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Icewind Suite"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Электро урона.",
+        "Все члены отряда получают 60% бонус Гидро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Sternshield Crab",
+                  "n": 4
+                },
+                {
+                  "id": "Pyro Whopperflower",
+                  "n": 4
+                },
+                {
+                  "id": "Large Pyro Slime",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Scout"
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Grader"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Fathomless Flames",
+                  "n": 2
+                },
+                {
+                  "id": "Dendro Samachurl"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primal Construct: Repulsor"
+                },
+                {
+                  "id": "Primal Construct: Reshaper"
+                },
+                {
+                  "id": "Primal Construct: Prospector"
+                },
+                {
+                  "id": "Eremite Stone Enchanter"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Frost Operative",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2023-11-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2023-12-16"
+    }
+  ]
+}

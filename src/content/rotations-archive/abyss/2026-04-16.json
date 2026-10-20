@@ -1,0 +1,169 @@
+{
+  "mode": "abyss",
+  "version": "6.5",
+  "cycle": "Версия 6.5",
+  "start": "2026-04-16",
+  "end": "2026-05-16",
+  "buffs": [
+    "Благословение «Грохочущая луна»: Когда срабатывает «Гармония лунного дрейфа» (Moondrift Harmony), на месте персонажа возникает ударная волна, которая наносит истинный урон противникам. Эффект может возникнуть один раз в 4 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "disorder": [
+        "1-я половина: урон Лунного кристалла увеличен на 75%.",
+        "2-я половина: урон обычных и заряженных атак активного персонажа увеличен на 75%."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Praetorian Golem",
+                  "n": 12
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Mimesis - Tepetlisaurus Warrior: Shard Striker"
+                },
+                {
+                  "id": "Tenebrous Mimesis - Anemo Hilichurl Rogue"
+                },
+                {
+                  "id": "Tenebrous Mimesis - Secret Source Automaton: Hunter-Seeker"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Hunter",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Maguu Kenki"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Radiant Moongecko"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tenebrous Papilla: Type II"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Мастерство стихий всех членов отряда увеличено на 200."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 8
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eroding Avatar of Lava",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Guard",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Jadeplume Terrorshroom"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-04-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-04-16"
+    }
+  ]
+}

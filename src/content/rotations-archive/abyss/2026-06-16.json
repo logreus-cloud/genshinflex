@@ -1,0 +1,184 @@
+{
+  "mode": "abyss",
+  "version": "6.6",
+  "cycle": "Версия 6.6",
+  "start": "2026-06-16",
+  "end": "2026-07-16",
+  "buffs": [
+    "Благословение «Луна морозной волны»: Когда персонаж вне поля боя активирует Крио реакцию на противнике, на месте противника возникает ударная волна, которая наносит истинный урон. Эффект может возникнуть один раз в 3,5 сек."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Hilichurl Rogue"
+                },
+                {
+                  "id": "Thundering Wayob Manifestation"
+                },
+                {
+                  "id": "Tainted Water-Splitting Phantasm",
+                  "note": "усиленная версия"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Hunter-Seeker"
+                },
+                {
+                  "id": "Secret Source Automaton: Configuration Device"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Violet Lightning"
+                },
+                {
+                  "id": "Primo Geovishap"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Mirror Maiden"
+                },
+                {
+                  "id": "Solitary Suanni"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "The Open-Eyed"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wayward Hermetic Spiritspeaker"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 60% бонус Крио урона.",
+        "Все члены отряда получают 60% бонус Пиро урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Electro Abyss Mage",
+                  "n": 3
+                },
+                {
+                  "id": "Large Electro Slime",
+                  "n": 3
+                },
+                {
+                  "id": "Mutant Electro Slime",
+                  "n": 3
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cryo Abyss Mage",
+                  "n": 2
+                },
+                {
+                  "id": "Large Cryo Slime",
+                  "n": 4
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Drake: Earthguard",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Frostarm Lawachurl",
+                  "n": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Domain Keeper",
+                  "n": 4
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2026-06-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2026-06-16"
+    }
+  ]
+}

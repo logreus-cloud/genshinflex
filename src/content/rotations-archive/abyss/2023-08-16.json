@@ -1,0 +1,276 @@
+{
+  "mode": "abyss",
+  "version": "4.0",
+  "cycle": "Версия 4.0",
+  "start": "2023-08-16",
+  "end": "2023-09-01",
+  "buffs": [
+    "Благословение «Приближающаяся луна»: Когда активный персонаж, используя обычные атаки, заряженные атаки или атаки в падении, наносит противнику несколько раз подряд физический урон или урон одного и того же элемента, то счётчик увеличивается на 1. Счётчик увеличивается не чаще раза в 0,3 сек. Для физического урона и урона каждого элемента счётчики отдельные. Когда счётчик достигает 6, он сбрасывается, а на позиции врага вызывается ударная волна, которая наносит истинный урон. Если персонаж покидает поле боя, то все счётчики сбрасываются."
+  ],
+  "floors": [
+    {
+      "floor": 12,
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Rockfond Rifthound Whelp",
+                  "n": 5
+                },
+                {
+                  "id": "Thundercraven Rifthound Whelp",
+                  "n": 5
+                },
+                {
+                  "id": "Rockfond Rifthound"
+                },
+                {
+                  "id": "Thundercraven Rifthound"
+                },
+                {
+                  "id": "Abyss Lector: Fathomless Flames"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primal Construct: Repulsor"
+                },
+                {
+                  "id": "Primal Construct: Reshaper"
+                },
+                {
+                  "id": "Primal Construct: Prospector"
+                },
+                {
+                  "id": "Rimebiter Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Bolteater Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 2
+                },
+                {
+                  "id": "Thunderhelm Lawachurl"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Fatui Skirmisher - Pyroslinger Bracer",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Desert Clearwater",
+                  "n": 2
+                },
+                {
+                  "id": "Black Serpent Knight: Rockbreaker Ax"
+                },
+                {
+                  "id": "Shadowy Husk: Standard Bearer"
+                },
+                {
+                  "id": "Shadowy Husk: Line Breaker"
+                },
+                {
+                  "id": "Shadowy Husk: Defender"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Algorithm of Semi-Intransient Matrix of Overseer Network"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Desert Clearwater"
+                },
+                {
+                  "id": "Eremite Daythunder"
+                },
+                {
+                  "id": "Mirror Maiden"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Rimebiter Bathysmal Vishap"
+                },
+                {
+                  "id": "Bolteater Bathysmal Vishap"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "disorder": [
+        "Все члены отряда получают 75% бонус физ. урона."
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Ruin Defender"
+                },
+                {
+                  "id": "Ruin Destroyer",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Cruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Ruin Scout"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Nobushi: Jintouban",
+                  "n": 3
+                },
+                {
+                  "id": "Nobushi: Hitsukeban",
+                  "n": 3
+                },
+                {
+                  "id": "Nobushi: Kikouban",
+                  "n": 3
+                },
+                {
+                  "id": "Kairagi: Dancing Thunder"
+                },
+                {
+                  "id": "Kairagi: Fiery Might"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Pyro Abyss Mage",
+                  "n": 3
+                },
+                {
+                  "id": "Dendro Samachurl"
+                },
+                {
+                  "id": "Pyro Hilichurl Shooter",
+                  "n": 2
+                },
+                {
+                  "id": "Hydro Hilichurl Rogue"
+                },
+                {
+                  "id": "Blazing Axe Mitachurl",
+                  "n": 2
+                },
+                {
+                  "id": "Cryo Abyss Mage"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Primordial Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Rimebiter Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Bolteater Bathysmal Vishap Hatchling"
+                },
+                {
+                  "id": "Primordial Bathysmal Vishap",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Abyss Lector: Fathomless Flames"
+                },
+                {
+                  "id": "Abyss Herald: Frost Fall"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Eremite Sunfrost",
+                  "n": 2
+                },
+                {
+                  "id": "Eremite Floral Ring-Dancer"
+                },
+                {
+                  "id": "Eremite Daythunder",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom): этажи",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Floors/2023-07-16"
+    },
+    {
+      "title": "Genshin Impact Wiki (Fandom): благословение",
+      "url": "https://genshin-impact.fandom.com/wiki/Spiral_Abyss/Blessing_of_the_Abyssal_Moon/2023-08-16"
+    }
+  ]
+}
