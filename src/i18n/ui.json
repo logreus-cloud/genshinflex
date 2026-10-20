@@ -3179,6 +3179,10 @@
   "en": "Flame",
   "es": "Llama"
  },
+ "По характеристике": {
+  "en": "By substat",
+  "es": "Por estadística"
+ },
  "По версиям": {
   "en": "By version",
   "es": "Por versión"

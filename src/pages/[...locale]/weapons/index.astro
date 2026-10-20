@@ -4,6 +4,7 @@ import FilterBar from '../../../components/FilterBar.astro';
 import { useData, LANGS } from '../../../lib/data';
 import { weaponSource } from '../../../lib/weapon-source';
 import weaponArt from '../../../data/generated/weapon-art.json';
+import englishWeapons from '../../../data/generated/weapons.en.json';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { weapons, fmtStat, stars, base, t, lang } = useData(Astro.currentLocale);
@@ -27,6 +28,21 @@ const groups = [5, 4, 3].map((r) => ({
 }));
 const versions = [...new Set(weapons.map((w) => w.version))].sort((a, b) => compareVersions(b, a));
 const latest = versions[0];
+const englishStats = new Map(englishWeapons.map((w) => [w.slug, w.mainStat]));
+const statKeys: Record<string, string> = {
+  'CRIT Rate': 'crit-rate',
+  'CRIT DMG': 'crit-dmg',
+  'Energy Recharge': 'er',
+  'Elemental Mastery': 'em',
+  ATK: 'atk',
+  HP: 'hp',
+  DEF: 'def',
+  'Physical DMG Bonus': 'phys'
+};
+const statKey = (w: typeof weapons[number]) => statKeys[englishStats.get(w.slug) ?? ''] ?? 'other';
+const statGroups = ['crit-rate', 'crit-dmg', 'er', 'em', 'atk', 'hp', 'def', 'phys', 'other']
+  .map((key) => ({ key, first: weapons.find((w) => statKey(w) === key) }))
+  .filter(({ first }) => first);
 ---
 <Layout title={t('Оружие')} wide>
   <h1>{t('Оружие')}</h1>
@@ -41,6 +57,7 @@ const latest = versions[0];
       <button type="button" data-sort="old" aria-pressed="false">{t('Сначала старые')}</button>
       <button type="button" data-sort="name" aria-pressed="false">{t('По имени')}</button>
       <button type="button" data-sort="version" aria-pressed="false">{t('По версиям')}</button>
+      <button type="button" data-sort="stat" aria-pressed="false">{t('По характеристике')}</button>
     </div>
   </div>
 
@@ -52,7 +69,7 @@ const latest = versions[0];
           {list.map((w) => {
             const top = w.stats.at(-1)!;
             return (
-              <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={w.name} data-version={w.version} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
+              <div data-name={`${w.name} ${w.nameEn}`.toLowerCase().replace(/ё/g, 'е')} data-sort-name={w.name} data-version={w.version} data-stat={statKey(w)} data-rarity={String(w.rarity)} data-weapon={w.weapon} data-source={weaponSource(w.slug, lang).group ?? ''}>
                 <a class:list={['wcard', `r${w.rarity}`]} href={`${base}/weapons/${w.slug}/`}>
                   <span class="wc-glow" aria-hidden="true"></span>
                   {w.version === latest && <span class="wc-badge">{t('новое')}</span>}
@@ -93,6 +110,12 @@ const latest = versions[0];
       <section data-version-group={version}>
         <h2 class="h-sec">{t('Версия {n}', { n: version })} <small>0</small></h2>
         <div class="wlist" data-version-list={version}></div>
+      </section>
+    ))}
+    {statGroups.map(({ key, first }) => (
+      <section data-stat-group={key}>
+        <h2 class="h-sec">{key === 'other' ? t('Другое') || 'Другое' : first?.mainStat} <small>0</small></h2>
+        <div class="wlist" data-stat-list={key}></div>
       </section>
     ))}
     <p class="empty muted" hidden>{t('Ничего не нашлось. Сбросьте фильтры.')}</p>
@@ -168,7 +191,9 @@ const latest = versions[0];
 
 <script>
   import { onPage, cleanup } from '../../../scripts/router';
-  type Sort = 'new' | 'old' | 'name' | 'version';
+  const sorts = ['new', 'old', 'name', 'version', 'stat'] as const;
+  type Sort = typeof sorts[number];
+  const isSort = (value: string | null): value is Sort => sorts.some((sort) => sort === value);
   const compareVersions = (a: string, b: string) => {
     const left = a.split('.').map(Number);
     const right = b.split('.').map(Number);
@@ -187,12 +212,13 @@ const latest = versions[0];
     const links = cards.map((card) => card.querySelector<HTMLAnchorElement>('.wcard')!);
     const rarityLists = [...container.querySelectorAll<HTMLElement>('[data-rarity-list]')];
     const versionLists = [...container.querySelectorAll<HTMLElement>('[data-version-list]')];
+    const statLists = [...container.querySelectorAll<HTMLElement>('[data-stat-list]')];
     const buttons = [...controls.querySelectorAll<HTMLButtonElement>('button[data-sort]')];
     const empty = container.querySelector<HTMLElement>('.empty');
     const byName = (a: HTMLElement, b: HTMLElement) => (a.dataset.sortName ?? '').localeCompare(b.dataset.sortName ?? '', container.lang);
     const byRarity = (a: HTMLElement, b: HTMLElement) => Number(b.dataset.rarity) - Number(a.dataset.rarity) || byName(a, b);
     const updateCounts = () => {
-      for (const list of [...rarityLists, ...versionLists]) {
+      for (const list of [...rarityLists, ...versionLists, ...statLists]) {
         const count = list.querySelectorAll(':scope > [data-name]:not([hidden])').length;
         list.parentElement!.querySelector('h2 small')!.textContent = String(count);
       }
@@ -210,6 +236,11 @@ const latest = versions[0];
           const version = list.dataset.versionList;
           for (const card of cards.filter((item) => item.dataset.version === version).sort(byRarity)) list.append(card);
         }
+      } else if (sort === 'stat') {
+        for (const list of statLists) {
+          const stat = list.dataset.statList;
+          for (const card of cards.filter((item) => item.dataset.stat === stat).sort(byRarity)) list.append(card);
+        }
       } else {
         for (const list of rarityLists) {
           const rarity = list.dataset.rarityList;
@@ -226,10 +257,10 @@ const latest = versions[0];
       try { localStorage.setItem('gf-weapons-sort', sort); } catch {}
     };
     let requested = new URLSearchParams(location.search).get('sort');
-    if (requested !== 'new' && requested !== 'old' && requested !== 'name' && requested !== 'version') {
+    if (!isSort(requested)) {
       try { requested = localStorage.getItem('gf-weapons-sort'); } catch {}
     }
-    render(requested === 'old' || requested === 'name' || requested === 'version' ? requested : 'new');
+    render(isSort(requested) ? requested : 'new');
     for (const button of buttons) button.addEventListener('click', () => render(button.dataset.sort as Sort), { signal });
     document.addEventListener('click', (event) => {
       if (!matchMedia('(hover: none)').matches || event.detail === 0) return;
