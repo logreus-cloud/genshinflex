@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "6.1",
+  "cycle": "Сезон 18 — стихии: Пиро, Крио, Анемо",
+  "start": "2025-12-01",
+  "end": "2026-01-01",
+  "elements": [
+    "pyro",
+    "cryo",
+    "anemo"
+  ],
+  "tags": [
+    "Пиро",
+    "Крио",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "klee",
+        "bennett",
+        "citlali",
+        "diona",
+        "chasca",
+        "sucrose"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "mualani",
+        "albedo",
+        "mona",
+        "fischl"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Primo Geovishap"
+        },
+        {
+          "id": "Aeonblight Drake"
+        },
+        {
+          "id": "Solitary Suanni"
+        },
+        {
+          "id": "Gluttonous Yumkasaur Mountain King"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-12-01"
+    }
+  ]
+}

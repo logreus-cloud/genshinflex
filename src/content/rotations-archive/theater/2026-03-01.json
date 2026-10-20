@@ -1,0 +1,66 @@
+{
+  "mode": "theater",
+  "version": "6.4",
+  "cycle": "Сезон 21 — стихии: Электро, Крио, Анемо",
+  "start": "2026-03-01",
+  "end": "2026-04-01",
+  "elements": [
+    "electro",
+    "cryo",
+    "anemo"
+  ],
+  "tags": [
+    "Электро",
+    "Крио",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "varesa",
+        "dori",
+        "eula",
+        "mika",
+        "xianyun",
+        "sayu"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "furina",
+        "columbina",
+        "durin",
+        "bennett"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Jadeplume Terrorshroom"
+        },
+        {
+          "id": "Koholasaurus Warrior: Waveshuttler",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Hexadecatonic Mandragora",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Perpetual Mechanical Array"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-03-01"
+    }
+  ]
+}

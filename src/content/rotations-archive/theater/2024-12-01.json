@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "5.2",
+  "cycle": "Сезон 6 — стихии: Гидро, Электро, Анемо",
+  "start": "2024-12-01",
+  "end": "2025-01-01",
+  "elements": [
+    "hydro",
+    "electro",
+    "anemo"
+  ],
+  "tags": [
+    "Гидро",
+    "Электро",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "sangonomiya-kokomi",
+        "xingqiu",
+        "raiden-shogun",
+        "kujou-sara",
+        "jean",
+        "lynette"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "lyney",
+        "bennett",
+        "zhongli",
+        "collei"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Emperor of Fire and Iron"
+        },
+        {
+          "id": "Goldflame Qucusaur Tyrant"
+        },
+        {
+          "id": "Setekh Wenut"
+        },
+        {
+          "id": "Experimental Field Generator"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2024-12-01"
+    }
+  ]
+}

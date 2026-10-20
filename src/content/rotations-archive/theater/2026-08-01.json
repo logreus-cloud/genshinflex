@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "6.7",
+  "cycle": "Сезон 26 — стихии: Гидро, Электро, Крио",
+  "start": "2026-08-01",
+  "end": "2026-09-01",
+  "elements": [
+    "hydro",
+    "electro",
+    "cryo"
+  ],
+  "tags": [
+    "Гидро",
+    "Электро",
+    "Крио"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "yelan",
+        "aino",
+        "flins",
+        "ororon",
+        "skirk",
+        "layla"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "arlecchino",
+        "chevreuse",
+        "kaedehara-kazuha",
+        "tighnari"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Knuckle Duckle"
+        },
+        {
+          "id": "Battle-Hardened Elite Treasure Hoarder"
+        },
+        {
+          "id": "Precursor's Secret Source Matrix of Overseer Network",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Perpetual Mechanical Array"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-08-01"
+    }
+  ]
+}

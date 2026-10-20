@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "5.2",
+  "cycle": "Сезон 7 — стихии: Пиро, Крио, Гео",
+  "start": "2025-01-01",
+  "end": "2025-02-01",
+  "elements": [
+    "pyro",
+    "cryo",
+    "geo"
+  ],
+  "tags": [
+    "Пиро",
+    "Крио",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "diluc",
+        "bennett",
+        "ganyu",
+        "kaeya",
+        "navia",
+        "noelle"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "kamisato-ayato",
+        "fischl",
+        "xianyun",
+        "sayu"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Primo Geovishap"
+        },
+        {
+          "id": "Electro Regisvine"
+        },
+        {
+          "id": "Solitary Suanni"
+        },
+        {
+          "id": "Gluttonous Yumkasaur Mountain King"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-01-01"
+    }
+  ]
+}

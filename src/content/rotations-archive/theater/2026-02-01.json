@@ -1,0 +1,69 @@
+{
+  "mode": "theater",
+  "version": "6.3",
+  "cycle": "Сезон 20 — стихии: Пиро, Гидро, Гео",
+  "start": "2026-02-01",
+  "end": "2026-03-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "geo"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "yoimiya",
+        "gaming",
+        "yelan",
+        "barbara",
+        "chiori",
+        "yun-jin"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "ineffa",
+        "flins",
+        "nefer",
+        "lauma"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Perpetual Mechanical Array"
+        },
+        {
+          "id": "Wind Operative",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Frost Operative",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Goldflame Qucusaur Tyrant"
+        },
+        {
+          "id": "Legatus Golem"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-02-01"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "5.0",
+  "cycle": "Сезон 4 — стихии: Пиро, Электро, Гео",
+  "start": "2024-10-01",
+  "end": "2024-11-01",
+  "elements": [
+    "pyro",
+    "electro",
+    "geo"
+  ],
+  "tags": [
+    "Пиро",
+    "Электро",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "dehya",
+        "chevreuse",
+        "keqing",
+        "fischl",
+        "chiori",
+        "ningguang"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "kinich",
+        "yelan",
+        "venti",
+        "sucrose"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Hydro Tulpa"
+        },
+        {
+          "id": "Legatus Golem"
+        },
+        {
+          "id": "Arithmetic Enhancer Mek",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Algorithm of Semi-Intransient Matrix of Overseer Network"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2024-10-01"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "5.8",
+  "cycle": "Сезон 14 — стихии: Электро, Крио, Анемо",
+  "start": "2025-08-01",
+  "end": "2025-09-01",
+  "elements": [
+    "electro",
+    "cryo",
+    "anemo"
+  ],
+  "tags": [
+    "Электро",
+    "Крио",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "yae-miko",
+        "kuki-shinobu",
+        "ganyu",
+        "layla",
+        "yumemizuki-mizuki",
+        "sucrose"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "neuvillette",
+        "nahida",
+        "xingqiu",
+        "gaming"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Jadeplume Terrorshroom"
+        },
+        {
+          "id": "Perpetual Mechanical Array"
+        },
+        {
+          "id": "Maguu Kenki"
+        },
+        {
+          "id": "Solitary Suanni"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-08-01"
+    }
+  ]
+}

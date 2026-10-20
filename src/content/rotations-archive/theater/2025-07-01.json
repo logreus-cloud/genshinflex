@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "5.7",
+  "cycle": "Сезон 13 — стихии: Пиро, Гидро, Крио",
+  "start": "2025-07-01",
+  "end": "2025-08-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "cryo"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Крио"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "lyney",
+        "xiangling",
+        "tartaglia",
+        "dahlia",
+        "wriothesley",
+        "rosaria"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "emilie",
+        "kinich",
+        "lan-yan",
+        "noelle"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Icewind Suite",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Solitary Suanni"
+        },
+        {
+          "id": "Goldflame Qucusaur Tyrant"
+        },
+        {
+          "id": "Secret Source Automaton: Overseer Device"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-07-01"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "6.2",
+  "cycle": "Сезон 19 — стихии: Пиро, Гидро, Электро",
+  "start": "2026-01-01",
+  "end": "2026-02-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "electro"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Электро"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "mavuika",
+        "yanfei",
+        "sigewinne",
+        "dahlia",
+        "clorinde",
+        "iansan"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "xilonen",
+        "xianyun",
+        "venti",
+        "collei"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Perpetual Mechanical Array"
+        },
+        {
+          "id": "Emperor of Fire and Iron"
+        },
+        {
+          "id": "Knuckle Duckle"
+        },
+        {
+          "id": "Maguu Kenki"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-01-01"
+    }
+  ]
+}

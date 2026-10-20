@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "6.1",
+  "cycle": "Сезон 17 — стихии: Гидро, Электро, Дендро",
+  "start": "2025-11-01",
+  "end": "2025-12-01",
+  "elements": [
+    "hydro",
+    "electro",
+    "dendro"
+  ],
+  "tags": [
+    "Гидро",
+    "Электро",
+    "Дендро"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "furina",
+        "barbara",
+        "cyno",
+        "ororon",
+        "alhaitham",
+        "yaoyao"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "arlecchino",
+        "zhongli",
+        "diona",
+        "lynette"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Maguu Kenki"
+        },
+        {
+          "id": "Primordial Bathysmal Vishap",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Knuckle Duckle"
+        },
+        {
+          "id": "Emperor of Fire and Iron"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-11-01"
+    }
+  ]
+}

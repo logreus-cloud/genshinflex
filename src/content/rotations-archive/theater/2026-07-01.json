@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "6.6",
+  "cycle": "Сезон 25 — стихии: Пиро, Электро, Крио",
+  "start": "2026-07-01",
+  "end": "2026-08-01",
+  "elements": [
+    "pyro",
+    "electro",
+    "cryo"
+  ],
+  "tags": [
+    "Пиро",
+    "Электро",
+    "Крио"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "arlecchino",
+        "bennett",
+        "cyno",
+        "beidou",
+        "ganyu",
+        "diona"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "yumemizuki-mizuki",
+        "kinich",
+        "jahoda",
+        "columbina"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Jadeplume Terrorshroom"
+        },
+        {
+          "id": "Primo Geovishap"
+        },
+        {
+          "id": "Super-Heavy Landrover: Mechanized Fortress"
+        },
+        {
+          "id": "Aeonblight Drake"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-07-01"
+    }
+  ]
+}

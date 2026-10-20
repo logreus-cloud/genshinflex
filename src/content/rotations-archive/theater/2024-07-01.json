@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "4.7",
+  "cycle": "Сезон 1 — стихии: Пиро, Электро, Анемо",
+  "start": "2024-07-01",
+  "end": "2024-08-01",
+  "elements": [
+    "pyro",
+    "electro",
+    "anemo"
+  ],
+  "tags": [
+    "Пиро",
+    "Электро",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "arlecchino",
+        "thoma",
+        "clorinde",
+        "kuki-shinobu",
+        "wanderer",
+        "faruzan"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "wriothesley",
+        "baizhu",
+        "alhaitham",
+        "sigewinne"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Jadeplume Terrorshroom"
+        },
+        {
+          "id": "Rimebiter Bathysmal Vishap"
+        },
+        {
+          "id": "Bolteater Bathysmal Vishap"
+        },
+        {
+          "id": "Icewind Suite",
+          "note": "усиленная версия"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2024-07-01"
+    }
+  ]
+}

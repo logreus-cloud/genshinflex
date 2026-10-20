@@ -2146,5 +2146,117 @@
  "Нужен Крио-отряд: этаж даёт +75% бонуса Крио урона, благословение срабатывает от Заморозки и Раскола, а Надсмотрщик и доспех Хильетты слабеют именно от частых Крио-ударов.": {
   "en": "You need a Cryo team: the floor grants +75% Cryo DMG Bonus, the blessing triggers on Frozen and Shatter, and both the Overseer Device and Hiljetta's armor give way to frequent Cryo hits.",
   "es": "Necesitas un equipo Cryo: el piso otorga +75% de Bonificación de Daño Cryo, la bendición se activa con Congelado y Fragmentación, y tanto el Supervisor como la armadura de Hiljetta ceden ante golpes Cryo frecuentes."
+ },
+ "Сезон 1 — стихии: Пиро, Электро, Анемо": {
+  "en": "Season 1 — elements: Pyro, Electro, Anemo",
+  "es": "Temporada 1 — elementos: Pyro, Electro, Anemo"
+ },
+ "Сезон 2 — стихии: Гидро, Крио, Анемо": {
+  "en": "Season 2 — elements: Hydro, Cryo, Anemo",
+  "es": "Temporada 2 — elementos: Hydro, Cryo, Anemo"
+ },
+ "Сезон 3 — стихии: Пиро, Гидро, Дендро": {
+  "en": "Season 3 — elements: Pyro, Hydro, Dendro",
+  "es": "Temporada 3 — elementos: Pyro, Hydro, Dendro"
+ },
+ "Сезон 4 — стихии: Пиро, Электро, Гео": {
+  "en": "Season 4 — elements: Pyro, Electro, Geo",
+  "es": "Temporada 4 — elementos: Pyro, Electro, Geo"
+ },
+ "Сезон 5 — стихии: Пиро, Электро, Дендро": {
+  "en": "Season 5 — elements: Pyro, Electro, Dendro",
+  "es": "Temporada 5 — elementos: Pyro, Electro, Dendro"
+ },
+ "Сезон 6 — стихии: Гидро, Электро, Анемо": {
+  "en": "Season 6 — elements: Hydro, Electro, Anemo",
+  "es": "Temporada 6 — elementos: Hydro, Electro, Anemo"
+ },
+ "Сезон 7 — стихии: Пиро, Крио, Гео": {
+  "en": "Season 7 — elements: Pyro, Cryo, Geo",
+  "es": "Temporada 7 — elementos: Pyro, Cryo, Geo"
+ },
+ "Сезон 8 — стихии: Пиро, Гидро, Анемо": {
+  "en": "Season 8 — elements: Pyro, Hydro, Anemo",
+  "es": "Temporada 8 — elementos: Pyro, Hydro, Anemo"
+ },
+ "Сезон 9 — стихии: Гидро, Электро, Крио": {
+  "en": "Season 9 — elements: Hydro, Electro, Cryo",
+  "es": "Temporada 9 — elementos: Hydro, Electro, Cryo"
+ },
+ "Сезон 10 — стихии: Пиро, Электро, Анемо": {
+  "en": "Season 10 — elements: Pyro, Electro, Anemo",
+  "es": "Temporada 10 — elementos: Pyro, Electro, Anemo"
+ },
+ "Сезон 11 — стихии: Гидро, Крио, Гео": {
+  "en": "Season 11 — elements: Hydro, Cryo, Geo",
+  "es": "Temporada 11 — elementos: Hydro, Cryo, Geo"
+ },
+ "Сезон 12 — стихии: Электро, Крио, Дендро": {
+  "en": "Season 12 — elements: Electro, Cryo, Dendro",
+  "es": "Temporada 12 — elementos: Electro, Cryo, Dendro"
+ },
+ "Сезон 13 — стихии: Пиро, Гидро, Крио": {
+  "en": "Season 13 — elements: Pyro, Hydro, Cryo",
+  "es": "Temporada 13 — elementos: Pyro, Hydro, Cryo"
+ },
+ "Сезон 14 — стихии: Электро, Крио, Анемо": {
+  "en": "Season 14 — elements: Electro, Cryo, Anemo",
+  "es": "Temporada 14 — elementos: Electro, Cryo, Anemo"
+ },
+ "Сезон 15 — стихии: Пиро, Гидро, Дендро": {
+  "en": "Season 15 — elements: Pyro, Hydro, Dendro",
+  "es": "Temporada 15 — elementos: Pyro, Hydro, Dendro"
+ },
+ "Сезон 16 — стихии: Гидро, Электро, Гео": {
+  "en": "Season 16 — elements: Hydro, Electro, Geo",
+  "es": "Temporada 16 — elementos: Hydro, Electro, Geo"
+ },
+ "Сезон 17 — стихии: Гидро, Электро, Дендро": {
+  "en": "Season 17 — elements: Hydro, Electro, Dendro",
+  "es": "Temporada 17 — elementos: Hydro, Electro, Dendro"
+ },
+ "Сезон 18 — стихии: Пиро, Крио, Анемо": {
+  "en": "Season 18 — elements: Pyro, Cryo, Anemo",
+  "es": "Temporada 18 — elementos: Pyro, Cryo, Anemo"
+ },
+ "Сезон 19 — стихии: Пиро, Гидро, Электро": {
+  "en": "Season 19 — elements: Pyro, Hydro, Electro",
+  "es": "Temporada 19 — elementos: Pyro, Hydro, Electro"
+ },
+ "Сезон 20 — стихии: Пиро, Гидро, Гео": {
+  "en": "Season 20 — elements: Pyro, Hydro, Geo",
+  "es": "Temporada 20 — elementos: Pyro, Hydro, Geo"
+ },
+ "Сезон 21 — стихии: Электро, Крио, Анемо": {
+  "en": "Season 21 — elements: Electro, Cryo, Anemo",
+  "es": "Temporada 21 — elementos: Electro, Cryo, Anemo"
+ },
+ "Сезон 22 — стихии: Гидро, Крио, Гео": {
+  "en": "Season 22 — elements: Hydro, Cryo, Geo",
+  "es": "Temporada 22 — elementos: Hydro, Cryo, Geo"
+ },
+ "Сезон 23 — стихии: Пиро, Гидро, Дендро": {
+  "en": "Season 23 — elements: Pyro, Hydro, Dendro",
+  "es": "Temporada 23 — elementos: Pyro, Hydro, Dendro"
+ },
+ "Сезон 24 — стихии: Пиро, Крио, Гео": {
+  "en": "Season 24 — elements: Pyro, Cryo, Geo",
+  "es": "Temporada 24 — elementos: Pyro, Cryo, Geo"
+ },
+ "Сезон 25 — стихии: Пиро, Электро, Крио": {
+  "en": "Season 25 — elements: Pyro, Electro, Cryo",
+  "es": "Temporada 25 — elementos: Pyro, Electro, Cryo"
+ },
+ "Сезон 26 — стихии: Гидро, Электро, Крио": {
+  "en": "Season 26 — elements: Hydro, Electro, Cryo",
+  "es": "Temporada 26 — elementos: Hydro, Electro, Cryo"
+ },
+ "Главные злодеи": {
+  "en": "Main villains",
+  "es": "Villanos principales"
+ },
+ "усиленная версия": {
+  "en": "enhanced version",
+  "es": "versión reforzada"
  }
 }

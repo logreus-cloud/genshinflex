@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "6.0",
+  "cycle": "Сезон 16 — стихии: Гидро, Электро, Гео",
+  "start": "2025-10-01",
+  "end": "2025-11-01",
+  "elements": [
+    "hydro",
+    "electro",
+    "geo"
+  ],
+  "tags": [
+    "Гидро",
+    "Электро",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "yelan",
+        "aino",
+        "varesa",
+        "iansan",
+        "arataki-itto",
+        "gorou"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "lauma",
+        "baizhu",
+        "charlotte",
+        "ifa"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Arithmetic Enhancer Mek",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Algorithm of Semi-Intransient Matrix of Overseer Network"
+        },
+        {
+          "id": "Legatus Golem"
+        },
+        {
+          "id": "Goldflame Qucusaur Tyrant"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-10-01"
+    }
+  ]
+}

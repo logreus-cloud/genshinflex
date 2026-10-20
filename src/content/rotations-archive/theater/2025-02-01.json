@@ -1,0 +1,69 @@
+{
+  "mode": "theater",
+  "version": "5.3",
+  "cycle": "Сезон 8 — стихии: Пиро, Гидро, Анемо",
+  "start": "2025-02-01",
+  "end": "2025-03-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "anemo"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "hu-tao",
+        "gaming",
+        "mona",
+        "xingqiu",
+        "venti",
+        "shikanoin-heizou"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "clorinde",
+        "ororon",
+        "citlali",
+        "yun-jin"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Frost Operative",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Wind Operative",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Goldflame Qucusaur Tyrant"
+        },
+        {
+          "id": "Tenebrous Papilla: Type II"
+        },
+        {
+          "id": "Perpetual Mechanical Array"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-02-01"
+    }
+  ]
+}

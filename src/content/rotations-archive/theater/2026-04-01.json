@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "6.4",
+  "cycle": "Сезон 22 — стихии: Гидро, Крио, Гео",
+  "start": "2026-04-01",
+  "end": "2026-05-01",
+  "elements": [
+    "hydro",
+    "cryo",
+    "geo"
+  ],
+  "tags": [
+    "Гидро",
+    "Крио",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "mona",
+        "xingqiu",
+        "wriothesley",
+        "rosaria",
+        "navia",
+        "kachina"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "chasca",
+        "sucrose",
+        "klee",
+        "lauma"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Emperor of Fire and Iron"
+        },
+        {
+          "id": "Radiant Moongecko"
+        },
+        {
+          "id": "Goldflame Qucusaur Tyrant"
+        },
+        {
+          "id": "Primo Geovishap"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-04-01"
+    }
+  ]
+}

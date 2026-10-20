@@ -1,0 +1,66 @@
+{
+  "mode": "theater",
+  "version": "5.5",
+  "cycle": "Сезон 11 — стихии: Гидро, Крио, Гео",
+  "start": "2025-05-01",
+  "end": "2025-06-01",
+  "elements": [
+    "hydro",
+    "cryo",
+    "geo"
+  ],
+  "tags": [
+    "Гидро",
+    "Крио",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "neuvillette",
+        "candace",
+        "kamisato-ayaka",
+        "charlotte",
+        "albedo",
+        "kachina"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "venti",
+        "hu-tao",
+        "kaveh",
+        "kuki-shinobu"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Arithmetic Enhancer Mek",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "\"Potapo's Solidarity\"",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Legatus Golem"
+        },
+        {
+          "id": "Secret Source Automaton: Configuration Device"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-05-01"
+    }
+  ]
+}

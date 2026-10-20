@@ -1,0 +1,71 @@
+{
+  "mode": "theater",
+  "version": "5.8",
+  "cycle": "Сезон 15 — стихии: Пиро, Гидро, Дендро",
+  "start": "2025-09-01",
+  "end": "2025-10-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "dendro"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Дендро"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "hu-tao",
+        "thoma",
+        "nilou",
+        "xingqiu",
+        "baizhu",
+        "collei"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "chasca",
+        "citlali",
+        "ineffa",
+        "iansan"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Maguu Kenki: Lone Gale"
+        },
+        {
+          "id": "Maguu Kenki: Galloping Frost"
+        },
+        {
+          "id": "Maguu Kenki: Mask of Terror"
+        },
+        {
+          "id": "Tenebrous Papilla: Type III"
+        },
+        {
+          "id": "\"Potapo's Solidarity\"",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Lava Dragon Statue"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2025-09-01"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "mode": "theater",
+  "version": "5.0",
+  "cycle": "Сезон 3 — стихии: Пиро, Гидро, Дендро",
+  "start": "2024-09-01",
+  "end": "2024-10-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "dendro"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Дендро"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "dehya",
+        "xiangling",
+        "mualani",
+        "candace",
+        "emilie",
+        "yaoyao"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "kaedehara-kazuha",
+        "kachina",
+        "clorinde",
+        "raiden-shogun"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Perpetual Mechanical Array"
+        },
+        {
+          "id": "Maguu Kenki: Lone Gale"
+        },
+        {
+          "id": "Maguu Kenki: Galloping Frost"
+        },
+        {
+          "id": "Maguu Kenki: Mask of Terror"
+        },
+        {
+          "id": "Primordial Bathysmal Vishap",
+          "note": "усиленная версия"
+        },
+        {
+          "id": "Iniquitous Baptist",
+          "note": "усиленная версия"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2024-09-01"
+    }
+  ]
+}

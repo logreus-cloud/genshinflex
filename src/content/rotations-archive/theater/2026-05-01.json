@@ -1,0 +1,70 @@
+{
+  "mode": "theater",
+  "version": "6.5",
+  "cycle": "Сезон 23 — стихии: Пиро, Гидро, Дендро",
+  "start": "2026-05-01",
+  "end": "2026-06-01",
+  "elements": [
+    "pyro",
+    "hydro",
+    "dendro"
+  ],
+  "tags": [
+    "Пиро",
+    "Гидро",
+    "Дендро"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "dehya",
+        "yanfei",
+        "kamisato-ayato",
+        "dahlia",
+        "kinich",
+        "kirara"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "varka",
+        "razor",
+        "albedo",
+        "zibai"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Maguu Kenki"
+        },
+        {
+          "id": "Lava Dragon Statue"
+        },
+        {
+          "id": "Lord of the Hidden Depths: Whisperer of Nightmares"
+        },
+        {
+          "id": "Maguu Kenki: Lone Gale"
+        },
+        {
+          "id": "Maguu Kenki: Galloping Frost"
+        },
+        {
+          "id": "Maguu Kenki: Mask of Terror"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-05-01"
+    }
+  ]
+}

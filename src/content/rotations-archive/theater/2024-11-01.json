@@ -1,0 +1,65 @@
+{
+  "mode": "theater",
+  "version": "5.1",
+  "cycle": "Сезон 5 — стихии: Пиро, Электро, Дендро",
+  "start": "2024-11-01",
+  "end": "2024-12-01",
+  "elements": [
+    "pyro",
+    "electro",
+    "dendro"
+  ],
+  "tags": [
+    "Пиро",
+    "Электро",
+    "Дендро"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "klee",
+        "xinyan",
+        "yae-miko",
+        "dori",
+        "tighnari",
+        "kirara"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "xilonen",
+        "chiori",
+        "xingqiu",
+        "layla"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Jadeplume Terrorshroom"
+        },
+        {
+          "id": "Thunder Manifestation"
+        },
+        {
+          "id": "Ruin Serpent"
+        },
+        {
+          "id": "Icewind Suite",
+          "note": "усиленная версия"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2024-11-01"
+    }
+  ]
+}

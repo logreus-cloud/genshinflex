@@ -1,0 +1,64 @@
+{
+  "mode": "theater",
+  "version": "6.6",
+  "cycle": "Сезон 24 — стихии: Пиро, Крио, Гео",
+  "start": "2026-06-01",
+  "end": "2026-07-01",
+  "elements": [
+    "pyro",
+    "cryo",
+    "geo"
+  ],
+  "tags": [
+    "Пиро",
+    "Крио",
+    "Гео"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "klee",
+        "xiangling",
+        "kamisato-ayaka",
+        "chongyun",
+        "albedo",
+        "noelle"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "sangonomiya-kokomi",
+        "aino",
+        "prune",
+        "fischl"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Perpetual Mechanical Array"
+        },
+        {
+          "id": "Maguu Kenki"
+        },
+        {
+          "id": "Millennial Pearl Seahorse"
+        },
+        {
+          "id": "Legatus Golem"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2026-06-01"
+    }
+  ]
+}

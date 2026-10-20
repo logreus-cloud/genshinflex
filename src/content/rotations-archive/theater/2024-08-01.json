@@ -1,0 +1,61 @@
+{
+  "mode": "theater",
+  "version": "4.8",
+  "cycle": "Сезон 2 — стихии: Гидро, Крио, Анемо",
+  "start": "2024-08-01",
+  "end": "2024-09-01",
+  "elements": [
+    "hydro",
+    "cryo",
+    "anemo"
+  ],
+  "tags": [
+    "Гидро",
+    "Крио",
+    "Анемо"
+  ],
+  "cast": [
+    {
+      "title": "Стартовые персонажи",
+      "members": [
+        "furina",
+        "barbara",
+        "kamisato-ayaka",
+        "diona",
+        "xiao",
+        "faruzan"
+      ]
+    },
+    {
+      "title": "Особые гости",
+      "members": [
+        "emilie",
+        "dehya",
+        "nahida",
+        "xiangling"
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "name": "Главные злодеи",
+      "enemies": [
+        {
+          "id": "Millennial Pearl Seahorse"
+        },
+        {
+          "id": "Emperor of Fire and Iron"
+        },
+        {
+          "id": "Aeonblight Drake"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Genshin Impact Wiki (Fandom)",
+      "url": "https://genshin-impact.fandom.com/wiki/Imaginarium_Theater/Seasons/2024-08-01"
+    }
+  ]
+}
