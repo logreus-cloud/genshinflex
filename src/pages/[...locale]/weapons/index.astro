@@ -49,7 +49,10 @@ const statGroups = ['crit-rate', 'crit-dmg', 'er', 'em', 'atk', 'hp', 'def', 'ph
   <p class="lead">{t('{n} видов оружия. Наведите курсор или выделите карточку — появятся статы на 90 уровне и эффект.', { n: weapons.length })}</p>
 
   <FilterBar target=".wlist" placeholder={t('Найти оружие')} groups={['rarity', 'weapon']} rarities={[5, 4, 3]}
-    choices={{ key: 'source', label: t('Как получить'), values: [['event-wish', t('Молитва события')], ['wish', t('Стандартная молитва')], ['forge', t('Кузница')], ['bp', t('Боевой пропуск')], ['starglitter', t('Магазин Паймон')], ['free', t('Бесплатно: ивенты, задания, сундуки')]] }} />
+    choices={[
+      { key: 'stat', label: t('Характеристика'), values: statGroups.filter(({ key }) => key !== 'other').map(({ key, first }) => [key, first!.mainStat]) },
+      { key: 'source', label: t('Как получить'), values: [['event-wish', t('Молитва события')], ['wish', t('Стандартная молитва')], ['forge', t('Кузница')], ['bp', t('Боевой пропуск')], ['starglitter', t('Магазин Паймон')], ['free', t('Бесплатно: ивенты, задания, сундуки')]] }
+    ]} />
 
   <div class="toolbar">
     <div class="sort" role="group" aria-label={t('Сортировка')}>
