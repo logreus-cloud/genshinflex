@@ -1,0 +1,629 @@
+{
+  "mode": "abyss",
+  "version": "7.0",
+  "cycle": "Версия 7.0 — этажи 9–12",
+  "start": "2026-09-16",
+  "end": "2026-10-16",
+  "tags": [
+    "Рассеивание",
+    "Лунный заряд"
+  ],
+  "buffs": [
+    "Благословение Бездны: Рассеивание и Звёздное рассеивание вызывают ударную волну с истинным уроном (раз в 4 с.)"
+  ],
+  "floors": [
+    {
+      "floor": 9,
+      "levels": "72–76",
+      "disorder": [
+        "Урон Звёздного рассеивания +50%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 9-1",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Halberd-Knight"
+                },
+                {
+                  "id": "Winged Soarer Knight"
+                }
+              ],
+              "note": "15 врагов, 3 волны"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 9-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Halberd-Knight"
+                },
+                {
+                  "id": "Volkodlak Basher"
+                }
+              ],
+              "note": "12 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser",
+                  "n": 2
+                }
+              ],
+              "note": "появляются по очереди"
+            }
+          ]
+        },
+        {
+          "name": "Зал 9-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Rugged Elder Leshy"
+                },
+                {
+                  "id": "Juvenile Tree Segment"
+                }
+              ],
+              "note": "5 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser"
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                }
+              ],
+              "note": "появляются одновременно"
+            }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздное рассеивание",
+          "members": [
+            "yumemizuki-mizuki",
+            "odette",
+            "sucrose",
+            "alyosha"
+          ],
+          "note": "Прямо под аномалию этажа"
+        },
+        {
+          "name": "1-я половина: без 5★",
+          "members": [
+            "traveler-cryo",
+            "sucrose",
+            "faruzan",
+            "diona"
+          ],
+          "note": "Бесплатный вариант Звёздного рассеивания"
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ]
+        },
+        {
+          "name": "2-я половина: Перегрузка без 5★",
+          "members": [
+            "razor",
+            "fischl",
+            "bennett",
+            "xiangling"
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 10,
+      "levels": "80–85",
+      "disorder": [
+        "Урон Звёздного проводника +50%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 10-1",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Volkodlak Lobber"
+                },
+                {
+                  "id": "Volkodlak Raider"
+                }
+              ],
+              "note": "15 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 10-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Leomastiff Guard"
+                },
+                {
+                  "id": "Channel Contact"
+                }
+              ],
+              "note": "8 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 10-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Glaciomancer"
+                },
+                {
+                  "id": "Glacial Warden"
+                }
+              ],
+              "note": "5 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya"
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper"
+                },
+                {
+                  "id": "Oprichniki Medic"
+                }
+              ],
+              "note": "5 врагов"
+            }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздный проводник",
+          "members": [
+            "sandrone",
+            "odette",
+            "qiqi",
+            "yae-miko"
+          ],
+          "note": "Прямо под аномалию этажа"
+        },
+        {
+          "name": "1-я половина: Мавуика",
+          "members": [
+            "mavuika",
+            "citlali",
+            "xilonen",
+            "bennett"
+          ],
+          "note": "Пиро быстро снимает щиты Стражника льдов в зале 10-3"
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ]
+        },
+        {
+          "name": "2-я половина: Лунная бутонизация",
+          "members": [
+            "nefer",
+            "lauma",
+            "columbina",
+            "kuki-shinobu"
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "levels": "88–92",
+      "disorder": [
+        "1-я половина: бонус Анемо урона +60%",
+        "2-я половина: бонус Электро урона +60%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "stars": "Прочность монолита выше 20 / 40 / 60%",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Volkodlak Sharpshooter",
+                  "n": 20
+                },
+                {
+                  "id": "Volkodlak Lobber",
+                  "n": 10
+                }
+              ],
+              "note": "защита монолита, 10 волн"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Scout Landcruiser",
+                  "n": 8
+                },
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser",
+                  "n": 8
+                },
+                {
+                  "id": "Force Recon Ground Effect Landcruiser",
+                  "n": 8
+                }
+              ],
+              "note": "защита монолита"
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Eremite Stone Enchanter"
+                },
+                {
+                  "id": "Glacial Warden"
+                },
+                {
+                  "id": "Glaciomancer",
+                  "n": 2
+                },
+                {
+                  "id": "Rugged Elder Leshy"
+                },
+                {
+                  "id": "Juvenile Tree Segment",
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Tainted Water-Splitting Phantasm"
+                },
+                {
+                  "id": "Tainted Water-Spouting Phantasm"
+                }
+              ],
+              "note": "появляются по очереди"
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Construction Specialist Mek"
+                },
+                {
+                  "id": "Ruin Drake: Earthguard"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Hunter"
+                },
+                {
+                  "id": "Wilderness Exile",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздное рассеивание",
+          "members": [
+            "yumemizuki-mizuki",
+            "odette",
+            "sucrose",
+            "alyosha"
+          ],
+          "note": "Алёша отвлекает врагов от монолита, Сахароза собирает их"
+        },
+        {
+          "name": "1-я половина: Звёздный проводник",
+          "members": [
+            "sandrone",
+            "odette",
+            "qiqi",
+            "yae-miko"
+          ]
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ],
+          "note": "Бонус Электро урона этажа ровно под него"
+        },
+        {
+          "name": "2-я половина: Перегрузка",
+          "members": [
+            "arlecchino",
+            "fischl",
+            "chevreuse",
+            "bennett"
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 12,
+      "levels": "95–100",
+      "disorder": [
+        "1-я половина: урон Рассеивания +200%, Звёздного рассеивания +75%, бонус Анемо урона +60%",
+        "2-я половина: урон Заряда +200%, Лунного заряда +75%, бонус Электро урона +60%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Chimeric Burrowbeast",
+                  "note": "закалённая"
+                }
+              ],
+              "note": "один босс"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Wilderness Exile",
+                  "n": 9
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "note": "«Раскольников»"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Immortal Construct"
+                }
+              ],
+              "note": "один босс"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Fisher of Hidden Depths",
+                  "n": 4
+                },
+                {
+                  "id": "Lord of the Hidden Depths: Whisperer of Nightmares"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Churin",
+                  "note": "закалённый"
+                }
+              ],
+              "note": "один босс"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Sigurd",
+                  "note": "закалённый"
+                }
+              ],
+              "note": "большинство врагов под щитами — ломаются Зарядом / Лунным зарядом"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "teams": [
+    {
+      "name": "1-я половина: Звёздное рассеивание",
+      "members": [
+        "yumemizuki-mizuki",
+        "odette",
+        "sucrose",
+        "alyosha"
+      ],
+      "note": "Прямое попадание в бафф этажа и благословение"
+    },
+    {
+      "name": "1-я половина: Звёздный проводник",
+      "members": [
+        "sandrone",
+        "odette",
+        "qiqi",
+        "yae-miko"
+      ]
+    },
+    {
+      "name": "1-я половина: Ризли",
+      "members": [
+        "wriothesley",
+        "nicole",
+        "odette",
+        "yae-miko"
+      ]
+    },
+    {
+      "name": "2-я половина: Лунный заряд",
+      "members": [
+        "flins",
+        "columbina",
+        "ineffa",
+        "ororon"
+      ],
+      "note": "Главный выбор: бафф этажа ровно под него"
+    },
+    {
+      "name": "2-я половина: Лунная бутонизация",
+      "members": [
+        "nefer",
+        "lauma",
+        "columbina",
+        "kuki-shinobu"
+      ]
+    },
+    {
+      "name": "2-я половина: Лунный кристалл",
+      "members": [
+        "zibai",
+        "linnea",
+        "illuga",
+        "columbina"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Game8",
+      "url": "https://game8.co/games/Genshin-Impact/archives/326326"
+    },
+    {
+      "title": "timesaver.gg",
+      "url": "https://timesaver.gg/blog/genshin-spiral-abyss-floor-12-guide"
+    },
+    {
+      "title": "allthings.how",
+      "url": "https://allthings.how/genshin-impact-7-0-spiral-abyss-floor-12-guide-reset/"
+    },
+    {
+      "title": "Game8 — этаж 9",
+      "url": "https://game8.co/games/Genshin-Impact/archives/324575"
+    },
+    {
+      "title": "Game8 — этаж 10",
+      "url": "https://game8.co/games/Genshin-Impact/archives/324621"
+    },
+    {
+      "title": "Game8 — этаж 11",
+      "url": "https://game8.co/games/Genshin-Impact/archives/326290"
+    },
+    {
+      "title": "timesaver.gg — этаж 11",
+      "url": "https://timesaver.gg/blog/genshin-spiral-abyss-floor-11-7-0"
+    }
+  ],
+  "halves": [
+    {
+      "half": 1,
+      "label": "1-я половина: Рассеивание и Звёздное рассеивание",
+      "need": [
+        [
+          "anemo"
+        ],
+        [
+          "hydro",
+          "pyro",
+          "electro",
+          "cryo"
+        ]
+      ],
+      "tip": "Нужен Анемо-персонаж и стихия, которую он рассеивает: этаж усиливает урон Рассеивания на 200%, благословение добавляет истинный урон за каждое Рассеивание. Все враги — одиночные боссы."
+    },
+    {
+      "half": 2,
+      "label": "2-я половина: Заряд и Лунный заряд",
+      "need": [
+        [
+          "electro"
+        ],
+        [
+          "hydro"
+        ]
+      ],
+      "tip": "Нужны Электро и Гидро: этаж усиливает Заряд на 200% и Лунный заряд на 75%, а большинство врагов прячутся за щитами, которые эффективно снимает именно эта реакция."
+    }
+  ]
+}

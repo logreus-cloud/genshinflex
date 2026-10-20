@@ -1,0 +1,7 @@
+---
+import RotationHistory from '../../../components/RotationHistory.astro';
+import { LANGS } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+---
+
+<RotationHistory mode="abyss" />

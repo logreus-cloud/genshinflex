@@ -15,6 +15,12 @@ const rotations = defineCollection({
   schema: contentSchemas.rotations,
 });
 
+// Прошлые циклы хранятся в git и не редактируются в Sanity
+const rotationsArchive = defineCollection({
+  loader: glob({ pattern: '**/*.json', base: './src/content/rotations-archive' }),
+  schema: contentSchemas.rotationsArchive,
+});
+
 const banners = defineCollection({
   loader: fromSanity ? sanityLoader('banners') : glob({ pattern: '**/*.json', base: './src/content/banners' }),
   schema: contentSchemas.banners,
@@ -40,4 +46,4 @@ const news = defineCollection({
   schema: contentSchemas.news,
 });
 
-export const collections = { builds, rotations, banners, buildsI18n, weaponGuides, endgameGuides, news };
+export const collections = { builds, rotations, rotationsArchive, banners, buildsI18n, weaponGuides, endgameGuides, news };

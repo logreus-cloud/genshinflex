@@ -86,6 +86,28 @@ const rotations = z.object({
   sources: z.array(source).default([]),
 });
 
+// Архив: buffs — благословение или эффекты, cast — стартовые персонажи и гости, bosses — злодеи актов и боссы боёв
+const rotationsArchive = rotations.extend({
+  version: z.string().regex(/^\d+\.\d+$/),
+  phase: z.number().int().min(1).max(2).optional(),
+  elements: z.array(z.enum(['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'])).default([]),
+  bosses: z.array(z.object({ name: z.string(), enemies: z.array(enemy) })).default([]),
+  floors: z.array(z.object({
+    floor: z.number().int(),
+    levels: z.string().optional(),
+    disorder: z.array(z.string()).default([]),
+    chambers: z.array(z.object({
+      name: z.string().optional(),
+      stars: z.string().optional(),
+      halves: z.array(z.object({
+        enemies: z.array(enemy),
+        note: z.string().optional(),
+      })),
+    })),
+    teams: z.array(team4).default([]),
+  })).default([]),
+});
+
 // Баннеры: время начала/конца — по времени сервера («2026-10-13T18:00»), таймеры пересчитываются под регион
 const serverTime = z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/);
 const banners = z.object({
@@ -128,8 +150,9 @@ export const contentSchemas = {
   builds,
   buildsI18n,
   rotations,
+  rotationsArchive,
   banners,
   news,
   weaponGuides,
   endgameGuides,
-} satisfies Record<Collection, z.ZodObject>;
+} satisfies Record<Collection, z.ZodObject> & { rotationsArchive: z.ZodObject };

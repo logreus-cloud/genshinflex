@@ -18,7 +18,7 @@ const now = new Date();
     {rotations.map(({ data: r }) => {
       const upcoming = r.start > now;
       return (
-        <a class="panel mode" href={`${base}/${r.mode}/`} data-mode={r.mode}>
+        <article class="panel mode" data-mode={r.mode}>
           <div class="head">
             <h2>{MODES[r.mode].title}</h2>
             <span class="chip">{fmtDate(r.start)} — {fmtDate(r.end)}</span>
@@ -35,9 +35,12 @@ const now = new Date();
           <div class="foot">
             <span><b data-until={resetAt(upcoming ? r.start : r.end)} data-prefix={upcoming ? t('откроется через') + ' ' : ''} data-done={t('обновилось')}>…</b>
               <span class="muted small"> {upcoming ? t('до нового сезона') : t('до обновления')}</span></span>
-            <span class="more">{t('Подробнее')} →</span>
+            <span class="links">
+              <a href={`${base}/${r.mode}/history/`}>{t('История циклов →')}</a>
+              <a class="more" href={`${base}/${r.mode}/`}>{t('Подробнее')} →</a>
+            </span>
           </div>
-        </a>
+        </article>
       );
     })}
   </div>
@@ -45,8 +48,7 @@ const now = new Date();
 
 <style>
   .modes { display: grid; gap: 12px; margin-top: 1rem; }
-  .mode { display: grid; gap: .6rem; text-decoration: none; color: inherit; }
-  .mode:hover { border-color: var(--accent); }
+  .mode { display: grid; gap: .6rem; }
   .head { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; }
   .head h2 { margin: 0; }
   .mode p { margin: 0; }
@@ -55,5 +57,6 @@ const now = new Date();
   .cast img { border-radius: 50%; background: color-mix(in srgb, var(--el) 35%, var(--surface-3)); }
   .foot { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: .6rem; }
   .foot b { color: var(--accent-text); font-family: var(--font-display); }
+  .links { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
   .more { color: var(--accent-text); font-weight: 600; }
 </style>

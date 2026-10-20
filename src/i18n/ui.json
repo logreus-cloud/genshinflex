@@ -1,4 +1,48 @@
 {
+ "История циклов →": {
+  "en": "Cycle history →",
+  "es": "Historial de ciclos →"
+ },
+ "История: {mode}": {
+  "en": "History: {mode}",
+  "es": "Historial: {mode}"
+ },
+ "Все циклы с версии 4.0. Данные пополняются.": {
+  "en": "All cycles since version 4.0. More data is being added.",
+  "es": "Todos los ciclos desde la versión 4.0. Se siguen añadiendo datos."
+ },
+ "Текущий сезон": {
+  "en": "Current season",
+  "es": "Temporada actual"
+ },
+ "Фаза {n}": {
+  "en": "Phase {n}",
+  "es": "Fase {n}"
+ },
+ "Благословение и баффы": {
+  "en": "Blessing and buffs",
+  "es": "Bendición y bonificaciones"
+ },
+ "Частота": {
+  "en": "Frequency",
+  "es": "Frecuencia"
+ },
+ "циклов: {n}": {
+  "en": "cycles: {n}",
+  "es": "ciclos: {n}"
+ },
+ "Архив прошлых циклов пополняется": {
+  "en": "Past cycles are being added to the archive",
+  "es": "Se están añadiendo ciclos anteriores al archivo"
+ },
+ "Поиск по циклам": {
+  "en": "Search cycles",
+  "es": "Buscar ciclos"
+ },
+ "Текущий цикл →": {
+  "en": "Current cycle →",
+  "es": "Ciclo actual →"
+ },
  "Форум": {
   "en": "Forum",
   "es": "Foro"
@@ -5978,6 +6022,26 @@
  "Переместить панель": {
   "en": "Move panel",
   "es": "Mover panel"
+ },
+ "Настройки": {
+  "en": "Settings",
+  "es": "Ajustes"
+ },
+ "Запускать при входе в игру": {
+  "en": "Launch when the game starts",
+  "es": "Iniciar al entrar al juego"
+ },
+ "Оверлей ждёт в трее с запуска Windows и открывает панель, когда стартует игра": {
+  "en": "The overlay waits in the tray after Windows starts and opens the panel when the game starts",
+  "es": "La superposición espera en la bandeja desde el inicio de Windows y abre el panel cuando empieza el juego"
+ },
+ "Распознавание экрана": {
+  "en": "Screen recognition",
+  "es": "Reconocimiento de pantalla"
+ },
+ "Сам открывает гайд персонажа, которого видно на экране": {
+  "en": "Automatically opens the guide for the character visible on screen",
+  "es": "Abre automáticamente la guía del personaje visible en pantalla"
  },
  "Багровый взгляд": {
   "en": "Crimson Gaze",

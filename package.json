@@ -18,6 +18,7 @@
     "i18n:collect": "node --import tsx scripts/i18n/collect-content.mjs",
     "cms:push": "node --import tsx scripts/cms/push.mjs",
     "build:sanity": "node scripts/cms/build-sanity.mjs",
+    "rotation:archive": "node scripts/archive-rotation.mjs",
     "import": "node scripts/import-data.mjs && node scripts/import-wiki-enemies.mjs && node scripts/import-banners.mjs && node scripts/import-levelup.mjs && node scripts/add-beta-levelup.mjs && node scripts/import-weapon-sources.mjs && python scripts/import-weapon-art.py && node scripts/import-calendar.mjs",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",

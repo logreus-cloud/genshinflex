@@ -20,6 +20,7 @@ const links = { abyss: '/abyss/', theater: '/theater/', onslaught: '/onslaught/'
   <div>
     <h1>{MODES[mode].title} {edit && <EditLink query={edit} />}</h1>
     <p class="muted">{t(cycle)}</p>
+    <a class="history-link small" href={`${base}/${mode}/history/`}>{t('История циклов →')}</a>
     {!draft && tags.length > 0 && <div class="row">{tags.map((tag) => <span class="chip gold">{t(tag)}</span>)}</div>}
   </div>
   <div class="panel when">
@@ -39,6 +40,7 @@ const links = { abyss: '/abyss/', theater: '/theater/', onslaught: '/onslaught/'
   .top { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
   .top h1 { margin-bottom: .2rem; }
   .top p { margin: 0 0 .5rem; }
+  .history-link { display: inline-block; margin-bottom: .6rem; }
   .when { display: grid; gap: .15rem; min-width: 200px; }
   .when b { font: 700 1.3rem var(--font-display); color: var(--accent-text); }
 </style>

@@ -1,0 +1,275 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Enemy from './Enemy.astro';
+import CharacterIcon from './CharacterIcon.astro';
+import enemies from '../data/generated/enemies.json';
+import { useData } from '../lib/data';
+
+type Mode = 'abyss' | 'theater' | 'onslaught';
+type EnemyValue = string | { id: string; n?: number; note?: string };
+interface Props { mode: Mode }
+const { mode } = Astro.props;
+const { MODES, ELEMENTS, base, lang, t, fmtDate, getCharacter } = useData(Astro.currentLocale);
+const ruElements = useData('ru').ELEMENTS;
+const enemyDb = enemies as Record<string, { ru: string; en: string; es: string; icon: string | null }>;
+
+const current = (await getCollection('rotations')).find((entry) => entry.data.mode === mode)!.data;
+// Цикл, заархивированный до смены текущего, не дублируем
+const archive = (await getCollection('rotationsArchive'))
+  .filter((entry) => entry.data.mode === mode && entry.data.start.getTime() !== current.start.getTime());
+const entries = [
+  {
+    data: {
+      ...current,
+      version: current.cycle.match(/Версия\s+(\d+\.\d+)/)?.[1] ?? '',
+      phase: undefined,
+      elements: [] as string[],
+      bosses: [] as { name: string; enemies: EnemyValue[] }[],
+    },
+    current: true,
+  },
+  ...archive.map(({ data }) => ({ data, current: false })),
+].sort((a, b) => b.data.start.getTime() - a.data.start.getTime());
+type Rotation = (typeof entries)[number]['data'];
+
+const elementsOf = (r: Rotation) => r.elements.length > 0 ? r.elements
+  : mode === 'theater'
+    ? r.tags.flatMap((tag) => Object.entries(ruElements).filter(([, name]) => name === tag).map(([key]) => key))
+    : [];
+const enemyName = (e: EnemyValue) => typeof e === 'string' ? t(e) : enemyDb[e.id]?.[lang] ?? e.id;
+const enemyKey = (e: EnemyValue) => typeof e === 'string' ? `text:${e}` : `id:${e.id}`;
+const stageEnemies = (r: Rotation) => [...new Map(
+  r.stages.flatMap((stage) => stage.halves.flatMap((half) => half.enemies)).map((e) => [enemyKey(e), e])
+).values()];
+const onslaughtEnemies = (r: Rotation) => r.bosses.length > 0
+  ? r.bosses.flatMap((boss) => boss.enemies)
+  : stageEnemies(r);
+const visibleEnemies = (r: Rotation) => mode === 'abyss'
+  ? r.floors.filter((floor) => floor.floor === 12 || floor.floor === 11)
+    .flatMap((floor) => floor.chambers.flatMap((chamber) => chamber.halves.flatMap((half) => half.enemies)))
+  : mode === 'onslaught' ? onslaughtEnemies(r) : r.bosses.flatMap((boss) => boss.enemies);
+const searchText = (r: Rotation) => [
+  t(r.cycle), r.version, ...visibleEnemies(r).map(enemyName),
+  ...r.cast.flatMap((group) => group.members.map((slug) => getCharacter(slug).name)),
+].join(' ').toLowerCase().replace(/ё/g, 'е');
+
+const groups = new Map<string, typeof entries>();
+for (const entry of entries) {
+  const heading = entry.data.version ? t('Версия {v}', { v: entry.data.version }) : t('Текущий сезон');
+  if (!groups.has(heading)) groups.set(heading, []);
+  groups.get(heading)!.push(entry);
+}
+
+const counts = new Map<string, { count: number; enemy?: EnemyValue; element?: string }>();
+for (const { data } of entries) {
+  if (mode === 'theater') {
+    for (const element of new Set(elementsOf(data))) {
+      const key = `element:${element}`;
+      const item = counts.get(key) ?? { count: 0, element };
+      item.count++;
+      counts.set(key, item);
+    }
+  } else {
+    const seen = new Set<string>();
+    const cycleEnemies = mode === 'abyss'
+      ? data.floors.filter((floor) => floor.floor === 12)
+        .flatMap((floor) => floor.chambers.flatMap((chamber) => chamber.halves.flatMap((half) => half.enemies)))
+      : onslaughtEnemies(data);
+    for (const enemy of cycleEnemies) {
+      const key = enemyKey(enemy);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const item = counts.get(key) ?? { count: 0, enemy };
+      item.count++;
+      counts.set(key, item);
+    }
+  }
+}
+const frequency = [...counts.values()].sort((a, b) => b.count - a.count).slice(0, 10);
+const modes: Mode[] = ['abyss', 'theater', 'onslaught'];
+---
+<Layout title={t('История: {mode}', { mode: MODES[mode].title })} description={t('Все циклы с версии 4.0. Данные пополняются.')} wide>
+  <nav class="crumbs small muted">
+    <a href={`${base}/rotation/`}>{t('Эндгейм')}</a> /
+    <a href={`${base}/${mode}/`}>{MODES[mode].title}</a> /
+    {t('История')}
+  </nav>
+  <h1>{t('История: {mode}', { mode: MODES[mode].title })}</h1>
+  <p class="muted">{t('Все циклы с версии 4.0. Данные пополняются.')}</p>
+  <nav class="modes" aria-label={t('Режимы эндгейма')}>
+    {modes.map((m) => <a href={`${base}/${m}/history/`} aria-current={m === mode ? 'page' : undefined}>{MODES[m].short}</a>)}
+  </nav>
+
+  <div class="layout" data-history>
+    <aside class="panel frequency">
+      <h2 class="h-sec">{t('Частота')}</h2>
+      {frequency.map((item) => (
+        <div class="freq-row">
+          {item.element
+            ? <span class="chip" data-el={item.element}>{ELEMENTS[item.element]}</span>
+            : <ul class="enemy-list"><Enemy e={item.enemy!} /></ul>}
+          <span class="muted small">{t('циклов: {n}', { n: item.count })}</span>
+        </div>
+      ))}
+    </aside>
+
+    <div class="history">
+      <form class="filters" role="search" data-history-filter>
+        <input class="input" type="search" aria-label={t('Поиск по циклам')} placeholder={t('Поиск по циклам')} />
+        <div class="elements" role="group" aria-label={t('Стихия')}>
+          {Object.entries(ELEMENTS).map(([key, name]) => (
+            <button type="button" data-element={key} data-el={key} aria-pressed="false" title={name}>
+              <span class="el-dot"></span><span class="sr-only">{name}</span>
+            </button>
+          ))}
+        </div>
+      </form>
+
+      {Array.from(groups, ([heading, cycles]) => (
+        <section class="version" data-version-group>
+          <h2 class="h-sec">{heading}</h2>
+          {cycles.map(({ data: r, current: isCurrent }) => (
+            <>
+              <article class="panel cycle" id={`c-${r.start.toISOString().slice(0, 10)}`}
+                data-history-item data-name={searchText(r)} data-elements={elementsOf(r).join(' ')}>
+                <header>
+                  <h3>{t(r.cycle)}</h3>
+                  {isCurrent && <span class="chip gold">{t('Сейчас')}</span>}
+                </header>
+                <p class="muted small">{fmtDate(r.start)} — {fmtDate(r.end)}
+                  {r.phase && <> · {t('Фаза {n}', { n: r.phase })}</>}
+                </p>
+                {elementsOf(r).length > 0 && <div class="row">
+                  {elementsOf(r).map((element) => <span class="chip" data-el={element}>{ELEMENTS[element]}</span>)}
+                </div>}
+                {r.tags.length > 0 && <div class="row">{r.tags.map((tag) => <span class="chip gold">{t(tag)}</span>)}</div>}
+
+                {mode === 'abyss' && r.floors.filter((floor) => floor.floor === 12 || floor.floor === 11)
+                  .sort((a, b) => b.floor - a.floor).map((floor) => (
+                    <section class="floor">
+                      <h4>{t('Этаж {n}', { n: floor.floor })}</h4>
+                      {floor.disorder.length > 0 && <p class="muted small">{floor.disorder.map((d) => t(d)).join(' · ')}</p>}
+                      {floor.chambers.map((chamber, i) => (
+                        <div class="chamber">
+                          <b>{t('Зал {n}', { n: chamber.name?.replace(/^Зал\s*/, '') || i + 1 })}:</b>
+                          <div class="halves">{chamber.halves.map((half, j) => (
+                            <div class="half">
+                              <span class="muted small">{t('{n}-я половина', { n: j + 1 })}</span>
+                              <ul class="enemy-list">{half.enemies.map((e) => <Enemy e={e} />)}</ul>
+                            </div>
+                          ))}</div>
+                        </div>
+                      ))}
+                    </section>
+                  ))}
+
+                {mode === 'theater' && r.cast.map((group) => (
+                  <div class="cast-group">
+                    <h4>{t(group.title)}</h4>
+                    <div class="cast">{group.members.map((slug) => <CharacterIcon slug={slug} size={40} label={false} />)}</div>
+                  </div>
+                ))}
+                {(mode === 'theater' || mode === 'onslaught') && r.bosses.map((boss) => (
+                  <div class="boss">
+                    <h4>{t(boss.name)}</h4>
+                    <ul class="enemy-list">{boss.enemies.map((e) => <Enemy e={e} />)}</ul>
+                  </div>
+                ))}
+                {mode === 'onslaught' && r.bosses.length === 0 && onslaughtEnemies(r).length > 0 &&
+                  <ul class="enemy-list boss">{onslaughtEnemies(r).map((e) => <Enemy e={e} />)}</ul>}
+
+                {r.buffs.length > 0 && <details>
+                  <summary>{t('Благословение и баффы')}</summary>
+                  <ul>{r.buffs.map((buff) => <li>{t(buff)}</li>)}</ul>
+                </details>}
+                {isCurrent && <a class="current-link" href={`${base}/${mode}/`}>{t('Текущий цикл →')}</a>}
+              </article>
+              {isCurrent && archive.length === 0 && <p class="panel muted notice">{t('Архив прошлых циклов пополняется')}</p>}
+            </>
+          ))}
+        </section>
+      ))}
+      <p class="muted empty" data-history-empty hidden>{t('Ничего не найдено')}</p>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../scripts/router';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-history]');
+    if (!root) return;
+    const form = root.querySelector<HTMLFormElement>('[data-history-filter]')!;
+    const input = form.querySelector<HTMLInputElement>('input')!;
+    const buttons = [...form.querySelectorAll<HTMLButtonElement>('[data-element]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-history-item]')];
+    const groups = [...root.querySelectorAll<HTMLElement>('[data-version-group]')];
+    const empty = root.querySelector<HTMLElement>('[data-history-empty]')!;
+    const apply = () => {
+      const query = input.value.trim().toLowerCase().replace(/ё/g, 'е');
+      const selected = buttons.filter((button) => button.getAttribute('aria-pressed') === 'true').map((button) => button.dataset.element!);
+      for (const card of cards) {
+        const elements = card.dataset.elements?.split(' ') ?? [];
+        card.hidden = (!!query && !card.dataset.name?.includes(query))
+          || (selected.length > 0 && !selected.some((element) => elements.includes(element)));
+      }
+      for (const group of groups) group.hidden = !group.querySelector('[data-history-item]:not([hidden])');
+      empty.hidden = cards.some((card) => !card.hidden);
+    };
+    form.addEventListener('submit', (event) => event.preventDefault(), { signal });
+    input.addEventListener('input', apply, { signal });
+    for (const button of buttons) button.addEventListener('click', () => {
+      button.setAttribute('aria-pressed', String(button.getAttribute('aria-pressed') !== 'true'));
+      apply();
+    }, { signal });
+  });
+</script>
+
+<style>
+  .crumbs { margin-bottom: .6rem; }
+  .crumbs a { color: var(--muted); }
+  .modes { display: flex; flex-wrap: wrap; gap: 4px; margin: 1rem 0; border-bottom: 1px solid var(--border); }
+  .modes a { padding: .6rem 1rem; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; }
+  .modes a[aria-current] { color: var(--accent-text); border-bottom-color: var(--accent); }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 1.2rem; align-items: start; }
+  .history { grid-column: 1; grid-row: 1; min-width: 0; }
+  .frequency { grid-column: 2; grid-row: 1; min-width: 0; }
+  .frequency h2 { margin-top: 0; }
+  .freq-row { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .4rem 0; border-top: 1px solid var(--border); }
+  .freq-row .enemy-list { min-width: 0; }
+  .freq-row > span:last-child { flex: none; }
+  .filters { display: grid; gap: .6rem; margin-bottom: 1.2rem; }
+  .elements { display: flex; flex-wrap: wrap; gap: 3px; }
+  .elements button { border: 1px solid var(--border); border-radius: 7px; background: var(--surface); padding: .35rem .5rem; cursor: pointer; }
+  .elements button[aria-pressed="true"] { background: color-mix(in srgb, var(--el) 25%, var(--surface)); border-color: var(--el); }
+  .elements .el-dot { width: 22px; height: 22px; }
+  .version { margin-bottom: 1.5rem; }
+  .cycle { display: grid; gap: .65rem; margin-bottom: .8rem; min-width: 0; scroll-margin-top: calc(var(--top-h) + 1rem); }
+  .cycle header { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .cycle h3, .cycle h4, .cycle p { margin: 0; }
+  .cycle h4 { margin-bottom: .35rem; }
+  .row, .cast, .enemy-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .enemy-list { list-style: none; margin: 0; padding: 0; min-width: 0; }
+  .enemy-list :global(.enemy) { max-width: 100%; overflow-wrap: anywhere; }
+  .floor, .cast-group, .boss { border-top: 1px solid var(--border); padding-top: .65rem; }
+  .chamber { display: flex; flex-wrap: wrap; gap: .5rem; padding: .4rem 0; }
+  .chamber > b { flex: none; }
+  .halves { display: flex; flex-wrap: wrap; gap: .6rem; min-width: 0; }
+  .half { min-width: 0; }
+  .half + .half { border-left: 1px solid var(--border); padding-left: .6rem; }
+  .cast { gap: .3rem; }
+  details { border-top: 1px solid var(--border); padding-top: .65rem; }
+  summary { cursor: pointer; color: var(--accent-text); }
+  details ul { margin-bottom: 0; padding-left: 1.2rem; }
+  details li + li { margin-top: .4rem; }
+  .current-link { justify-self: start; }
+  .notice { margin: .6rem 0; }
+  [hidden] { display: none !important; }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .history, .frequency { grid-column: 1; grid-row: auto; }
+    .frequency { grid-row: 1; }
+  }
+</style>
