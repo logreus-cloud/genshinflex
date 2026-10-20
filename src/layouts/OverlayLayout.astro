@@ -27,7 +27,19 @@ const { title, active, guideHref } = Astro.props;
       <a data-ov-profile href={`${base}/profile/`} target="_blank" rel="noopener" hidden>
         <img data-ov-avatar alt="" width="24" height="24" hidden /><span data-ov-name></span> · {t('Профиль')}
       </a>
+      <button type="button" class="ov-settings-toggle" data-ov-settings-toggle aria-label={t('Настройки')} title={t('Настройки')} aria-controls="ov-settings" aria-expanded="false">⚙</button>
     </header>
+    <section id="ov-settings" class="ov-settings" data-ov-settings hidden>
+      <h2>{t('Настройки')}</h2>
+      <label class="ov-settings-row">
+        <input type="checkbox" data-ov-launch disabled />
+        <span>{t('Запускать при входе в игру')}<small>{t('Оверлей ждёт в трее с запуска Windows и открывает панель, когда стартует игра')}</small></span>
+      </label>
+      <label class="ov-settings-row">
+        <input type="checkbox" data-ov-screen disabled />
+        <span>{t('Распознавание экрана')}<small>{t('Сам открывает гайд персонажа, которого видно на экране')}</small></span>
+      </label>
+    </section>
     <main class="ov-main"><slot /></main>
     <!-- Без transition:persist: правка перенесённого элемента во время смены страницы роняет рендер WebView2
          (STATUS_ACCESS_VIOLATION); полоска и тост сами перерисовываются после astro:after-swap -->
@@ -92,6 +104,55 @@ const { title, active, guideHref } = Astro.props;
         void refresh();
         onSessionChange(() => void refresh(), { signal });
       });
+    </script>
+    <script>
+      if (window.__GF_OVERLAY_APP__) {
+        type OverlaySettings = { launchWithGame: boolean; screenDetection: boolean };
+        let settings: OverlaySettings | undefined;
+        let pending: keyof OverlaySettings | undefined;
+        let expanded = false;
+        const render = () => {
+          const panel = document.querySelector<HTMLElement>('[data-ov-settings]');
+          const toggle = document.querySelector<HTMLButtonElement>('[data-ov-settings-toggle]');
+          if (!panel || !toggle) return;
+          panel.hidden = !expanded;
+          toggle.setAttribute('aria-expanded', String(expanded));
+          const launch = panel.querySelector<HTMLInputElement>('[data-ov-launch]')!;
+          const screen = panel.querySelector<HTMLInputElement>('[data-ov-screen]')!;
+          launch.checked = settings?.launchWithGame ?? false;
+          screen.checked = settings?.screenDetection ?? false;
+          launch.disabled = !settings || !!pending;
+          screen.disabled = !settings || !!pending;
+        };
+        window.addEventListener('gf:settings', (event) => {
+          const detail = (event as CustomEvent<unknown>).detail;
+          if (!detail || typeof detail !== 'object' || !('launchWithGame' in detail) || !('screenDetection' in detail)
+            || typeof detail.launchWithGame !== 'boolean' || typeof detail.screenDetection !== 'boolean') return;
+          settings = detail as OverlaySettings;
+          pending = undefined;
+          render();
+        });
+        document.addEventListener('click', (event) => {
+          if (!(event.target instanceof Element) || !event.target.closest('[data-ov-settings-toggle]')) return;
+          expanded = !expanded;
+          render();
+        });
+        document.addEventListener('change', (event) => {
+          const input = event.target;
+          if (!(input instanceof HTMLInputElement) || !settings || pending) return;
+          const checked = input.checked;
+          if (input.matches('[data-ov-launch]')) {
+            pending = 'launchWithGame';
+            render();
+            location.href = `gf-overlay://settings?launch_with_game=${checked ? 1 : 0}`;
+          } else if (input.matches('[data-ov-screen]')) {
+            pending = 'screenDetection';
+            render();
+            location.href = `gf-overlay://settings?screen_detection=${checked ? 1 : 0}`;
+          }
+        });
+        document.addEventListener('astro:after-swap', render);
+      }
     </script>
     <script>
       import { t } from '../scripts/search';
@@ -282,6 +343,16 @@ const { title, active, guideHref } = Astro.props;
   .ov-account a { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-text); }
   .ov-account img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
   .ov-account [hidden] { display: none !important; }
+  .ov-settings-toggle { display: none; width: 30px; height: 30px; margin-left: 10px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 1.25rem; cursor: pointer; }
+  .ov-app .ov-settings-toggle { display: grid; place-items: center; }
+  .ov-settings-toggle:hover, .ov-settings-toggle[aria-expanded="true"] { background: var(--surface-2); color: var(--accent); }
+  .ov-settings { position: relative; z-index: 21; margin: 4px 14px 0; padding: .75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .ov-settings[hidden], html:not(.ov-app) .ov-settings { display: none; }
+  .ov-settings h2 { margin: 0 0 .6rem; font-size: .9rem; }
+  .ov-settings-row { display: flex; align-items: flex-start; gap: .6rem; padding: .35rem 0; font-size: .82rem; cursor: pointer; }
+  .ov-settings-row input { flex: none; margin: .15rem 0 0; accent-color: var(--accent); }
+  .ov-settings-row input:disabled { cursor: default; }
+  .ov-settings-row small { display: block; margin-top: .15rem; color: var(--muted); font-size: .72rem; line-height: 1.35; }
   html.ov-root.ov-app, html.ov-root.ov-app .ov-body { background: transparent; }
   /* В прозрачном окне приложения backdrop-filter не размывает рабочий стол — фон почти непрозрачный, иначе текст под окном мешает читать */
   .ov-app .ov-backdrop { inset: 6px; border: 1px solid var(--border); border-radius: 16px; background: rgb(9 12 22); }

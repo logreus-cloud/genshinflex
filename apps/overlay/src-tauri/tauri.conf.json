@@ -27,7 +27,8 @@
         "headerImage": "installer/header.bmp",
         "sidebarImage": "installer/sidebar.bmp",
         "languages": ["English", "Russian", "Spanish"],
-        "displayLanguageSelector": false
+        "displayLanguageSelector": false,
+        "installerHooks": "installer/hooks.nsh"
       }
     }
   },

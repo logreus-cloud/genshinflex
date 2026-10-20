@@ -13,7 +13,7 @@ use tauri::{
     WebviewUrl, WebviewWindowBuilder,
     window::Color,
     webview::PageLoadEvent,
-    AppHandle, Manager, Url, WindowEvent,
+    AppHandle, Manager, Url, WindowEvent, Wry,
 };
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_deep_link::DeepLinkExt;
@@ -35,6 +35,11 @@ struct Settings {
     base: Url,
     shortcut: String,
     screen_detection: bool,
+}
+
+struct TrayChecks {
+    launch: CheckMenuItem<Wry>,
+    screen: CheckMenuItem<Wry>,
 }
 
 fn valid_base(value: &str) -> Option<Url> {
@@ -89,6 +94,42 @@ fn save_screen_detection(app: &AppHandle, enabled: bool) {
         Ok(data) => if let Err(error) = fs::write(path, data) { eprintln!("Настройки: {error}"); },
         Err(error) => eprintln!("Настройки: {error}"),
     }
+}
+
+fn launch_enabled(app: &AppHandle) -> bool {
+    match app.autolaunch().is_enabled() {
+        Ok(enabled) => enabled,
+        Err(error) => { eprintln!("Автозапуск: {error}"); false }
+    }
+}
+
+fn send_settings(window: &tauri::WebviewWindow) {
+    let json = serde_json::json!({
+        "launchWithGame": launch_enabled(window.app_handle()),
+        "screenDetection": window.state::<Arc<AtomicBool>>().load(Ordering::SeqCst),
+    });
+    if let Err(error) = window.eval(format!("window.dispatchEvent(new CustomEvent('gf:settings', {{ detail: {json} }}))")) {
+        eprintln!("Настройки: {error}");
+    }
+}
+
+fn publish_settings(app: &AppHandle) {
+    let checks = app.state::<TrayChecks>();
+    if let Err(error) = checks.launch.set_checked(launch_enabled(app)) { eprintln!("Трей: {error}"); }
+    if let Err(error) = checks.screen.set_checked(app.state::<Arc<AtomicBool>>().load(Ordering::SeqCst)) { eprintln!("Трей: {error}"); }
+    if let Some(window) = app.get_webview_window("main") { send_settings(&window); }
+}
+
+fn set_launch_with_game(app: &AppHandle, enabled: bool) {
+    let result = if enabled { app.autolaunch().enable() } else { app.autolaunch().disable() };
+    if let Err(error) = result { eprintln!("Автозапуск: {error}"); }
+    publish_settings(app);
+}
+
+fn set_screen_detection(app: &AppHandle, enabled: bool) {
+    app.state::<Arc<AtomicBool>>().store(enabled, Ordering::SeqCst);
+    save_screen_detection(app, enabled);
+    publish_settings(app);
 }
 
 fn in_panel(path: &str) -> bool {
@@ -146,6 +187,13 @@ fn show(app: &AppHandle) {
     }
 }
 
+fn show_passive(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        if window.is_visible().unwrap_or(false) { return; }
+        if let Err(error) = window.show().and_then(|_| fit_to_work_area(&window)) { eprintln!("Окно: {error}"); }
+    }
+}
+
 fn handle_link(app: &AppHandle, link: &Url) {
     if link.scheme() != "genshinflex" || link.host_str() != Some("auth")
         || !matches!(link.path(), "" | "/") || link.port().is_some()
@@ -169,34 +217,22 @@ fn handle_link(app: &AppHandle, link: &Url) {
 
 fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
     let show_item = MenuItem::with_id(app, "toggle", "Показать/скрыть", true, None::<&str>)?;
-    let autostart = CheckMenuItem::with_id(app, "autostart", "Автозапуск", true,
-        app.autolaunch().is_enabled().unwrap_or(false), None::<&str>)?;
+    let autostart = CheckMenuItem::with_id(app, "autostart", "Запускать при входе в игру", true,
+        launch_enabled(app.handle()), None::<&str>)?;
     let screen_item = CheckMenuItem::with_id(app, "screen", "Распознавание экрана", true, settings.screen_detection, None::<&str>)?;
     let update_item = MenuItem::with_id(app, "update", "Обновлений нет", false, None::<&str>)?;
     let site = MenuItem::with_id(app, "site", "Открыть сайт", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Выход", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&show_item, &autostart, &screen_item, &update_item, &site, &quit])?;
+    app.manage(TrayChecks { launch: autostart, screen: screen_item });
     updates::set_menu_item(app.handle(), update_item);
     let base = settings.base.to_string();
-    let check = autostart.clone();
-    let screen_check = screen_item.clone();
     let mut builder = TrayIconBuilder::new().menu(&menu).show_menu_on_left_click(false)
         .tooltip(format!("GenshinFlex — {}", settings.shortcut))
         .on_menu_event(move |app, event| match event.id().as_ref() {
             "toggle" => toggle(app),
-            "autostart" => {
-                let enabled = app.autolaunch().is_enabled().unwrap_or(false);
-                let result = if enabled { app.autolaunch().disable() } else { app.autolaunch().enable() };
-                if let Err(error) = result { eprintln!("Автозапуск: {error}"); }
-                let _ = check.set_checked(app.autolaunch().is_enabled().unwrap_or(enabled));
-            }
-            "screen" => {
-                let state = app.state::<Arc<AtomicBool>>();
-                let enabled = !state.load(Ordering::SeqCst);
-                state.store(enabled, Ordering::SeqCst);
-                let _ = screen_check.set_checked(enabled);
-                save_screen_detection(app, enabled);
-            }
+            "autostart" => set_launch_with_game(app, !launch_enabled(app)),
+            "screen" => set_screen_detection(app, !app.state::<Arc<AtomicBool>>().load(Ordering::SeqCst)),
             "update" => updates::install(app),
             "site" => { if let Err(error) = app.opener().open_url(base.clone(), None::<&str>) { eprintln!("Браузер: {error}"); } }
             "quit" => app.exit(0),
@@ -214,12 +250,20 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
     let shortcut = settings.shortcut.clone();
     thread::spawn(move || {
         let mut system = System::new();
+        let mut previous = None;
         loop {
             system.refresh_processes(ProcessesToUpdate::All, true);
             let running = system.processes().values().any(|p| {
                 let name = p.name().to_string_lossy();
                 name.eq_ignore_ascii_case("GenshinImpact.exe") || name.eq_ignore_ascii_case("YuanShen.exe")
             });
+            if previous == Some(false) && running && launch_enabled(&tooltip_handle) {
+                let handle = tooltip_handle.clone();
+                if let Err(error) = tooltip_handle.run_on_main_thread(move || show_passive(&handle)) {
+                    eprintln!("Окно: {error}");
+                }
+            }
+            previous = Some(running);
             let mut tip = if running { format!("GenshinFlex — {shortcut}") }
                 else { format!("GenshinFlex — {shortcut} · игра не запущена") };
             if updates::available(&tooltip_handle) { tip.push_str(" · доступно обновление"); }
@@ -266,6 +310,21 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .initialization_script(script)
         .on_navigation(move |url| {
             if url.scheme() == "gf-overlay" && url.host_str() == Some("update") { updates::install(&handle); return false; }
+            if url.scheme() == "gf-overlay" && url.host_str() == Some("settings") {
+                for (key, value) in url.query_pairs() {
+                    let enabled = match value.as_ref() {
+                        "1" => true,
+                        "0" => false,
+                        _ => continue,
+                    };
+                    match key.as_ref() {
+                        "launch_with_game" => set_launch_with_game(&handle, enabled),
+                        "screen_detection" => set_screen_detection(&handle, enabled),
+                        _ => {}
+                    }
+                }
+                return false;
+            }
             if url.scheme() == "gf-overlay" && url.host_str() == Some("drag") {
                 if let Some(window) = handle.get_webview_window("main") {
                     if let Err(error) = window.start_dragging() { eprintln!("Перетаскивание: {error}"); }
@@ -374,6 +433,7 @@ pub fn run() -> tauri::Result<()> {
                 if let Some(window) = webview.app_handle().get_webview_window("main") {
                     wish_cache::resend(&window);
                     updates::resend(&window);
+                    send_settings(&window);
                 }
             }
         })
