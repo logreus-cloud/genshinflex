@@ -11,10 +11,13 @@ type Block = {
 
 const escapeText = (text: string) => text.replace(/([\\`*_[\]<>])/g, '\\$1');
 
+// Порядок в span.marks не задаёт вложенность: код внутри, затем ссылка, жирный и курсив снаружи («**[текст](url)**»)
+const markOrder = (mark: string) => (mark === 'code' ? 0 : mark === 'strong' || mark === 'em' ? 2 : 1);
+
 function spanToMarkdown(span: Span, defs: Mark[]): string {
   // Перенос внутри абзаца — «\n» в тексте блока; оставляем как есть: renderGuide на сайте сам делает из него <br>
   let text = escapeText(span.text ?? '');
-  for (const mark of span.marks ?? []) {
+  for (const mark of [...(span.marks ?? [])].sort((a, b) => markOrder(a) - markOrder(b))) {
     if (mark === 'strong') text = `**${text}**`;
     else if (mark === 'em') text = `*${text}*`;
     else if (mark === 'code') text = `\`${(span.text ?? '').replace(/`/g, '\\`')}\``;
