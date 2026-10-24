@@ -14,7 +14,7 @@ type Row = {
   id: number; discord_id: string; thread_id: string | null; interaction_id: string | null;
   status: string; created_at: string; updated_at: string; closed_at: string | null; close_token?: string | null;
 };
-type Options = { archived?: boolean; attach?: boolean; patchFails?: boolean; messageFails?: boolean };
+type Options = { archived?: boolean; deleted?: boolean; attach?: boolean; patchFails?: boolean; messageFails?: boolean };
 
 function fixture(initial: Row[] = [], options: Options = {}) {
   const rows = [...initial];
@@ -98,6 +98,7 @@ function fixture(initial: Row[] = [], options: Options = {}) {
     const body = init.body ? JSON.parse(String(init.body)) : null;
     calls.push({ url, method, body, auth: new Headers(init.headers).get('Authorization') || '',
       signal: init.signal || undefined });
+    if (method === 'GET' && options.deleted) return new Response('{}', { status: 404 });
     if (method === 'GET') return new Response(JSON.stringify({ thread_metadata: { archived: options.archived } }));
     if (method === 'POST' && url.endsWith('/threads')) return new Response(JSON.stringify({ id: thread }));
     if (method === 'POST' && url.endsWith(`/channels/${thread}/messages`) && options.messageFails) {
@@ -191,7 +192,33 @@ test('архивированная ветка освобождает место 
   await data.flush();
   assert.equal(data.rows[0].status, 'closed');
   assert.equal(data.rows[1].thread_id, thread);
+  assert.ok(data.calls.some((call) => call.method === 'PATCH'
+    && call.url.endsWith(`/channels/${thread}`)
+    && call.body.archived && call.body.locked));
   assert.equal(reply(data.calls), `Тикет создан: <#${thread}>`);
+});
+
+test('удалённая ветка закрывается без PATCH', async () => {
+  const data = fixture([row({ id: 7 })], { deleted: true, patchFails: true });
+  await handleInteraction(modal(), data.interactionDeps);
+  await data.flush();
+  assert.equal(data.rows[0].status, 'closed');
+  assert.equal(data.rows[1].thread_id, thread);
+  assert.equal(reply(data.calls), `Тикет создан: <#${thread}>`);
+});
+
+test('ошибка блокировки архивированной ветки оставляет тикет открытым', async () => {
+  const data = fixture([row({ id: 7 })], { archived: true, patchFails: true });
+  await handleInteraction(modal(), data.interactionDeps);
+  await data.flush();
+  assert.equal(data.rows.length, 1);
+  assert.equal(data.rows[0].status, 'open');
+  assert.equal(data.calls.filter((call) => call.url.endsWith('/threads')).length, 0);
+  assert.equal(data.rpcCalls.some((call) => call.name === 'discord_ticket_close_finish'
+    && call.params.p_ok === true), false);
+  assert.ok(data.rpcCalls.some((call) => call.name === 'discord_ticket_close_finish'
+    && call.params.p_ok === false));
+  assert.equal(reply(data.calls), 'Не удалось создать тикет, попробуйте позже');
 });
 
 test('повтор взаимодействия ничего не делает', async () => {
@@ -300,6 +327,36 @@ test('старый подписанный запрос отклоняется', 
   }, env);
   assert.equal(response.status, 401);
   assert.deepEqual(await response.json(), { error: 'Неверная подпись' });
+});
+
+test('ограничивает тела до проверки подписей Discord и Sanity', async () => {
+  const app = createApp();
+  const discordEnv = { SITE_ORIGINS: '', DISCORD_PUBLIC_KEY: 'key' } as Env;
+  const declared = await app.request('/discord/interactions', {
+    method: 'POST', body: '{}', headers: { 'Content-Length': String(64 * 1024 + 1) },
+  }, discordEnv);
+  assert.equal(declared.status, 413);
+  const streamed = await app.request('/discord/interactions', {
+    method: 'POST', body: 'я'.repeat(32 * 1024 + 1),
+  }, discordEnv);
+  assert.equal(streamed.status, 413);
+  assert.deepEqual(await streamed.json(), { error: 'Слишком большое тело запроса' });
+  const sanity = await app.request('/hooks/sanity', {
+    method: 'POST', body: '{}', headers: { 'Content-Length': String(256 * 1024 + 1) },
+  }, {
+    SITE_ORIGINS: '', SANITY_WEBHOOK_SECRET: 'secret',
+    GITHUB_REPO: 'owner/repo', GITHUB_DISPATCH_TOKEN: 'token',
+  } as Env);
+  assert.equal(sanity.status, 413);
+});
+
+test('ограничивает тело входа Telegram по числу байт', async () => {
+  const app = createApp({ adminClient: () => ({}) as never });
+  const response = await app.request('/auth/telegram', {
+    method: 'POST', body: 'я'.repeat(4097),
+  }, { SITE_ORIGINS: '', TELEGRAM_BOT_TOKEN: 'token' } as Env);
+  assert.equal(response.status, 413);
+  assert.deepEqual(await response.json(), { error: 'Слишком большое тело запроса' });
 });
 
 test('без настроек тикеты недоступны', async () => {

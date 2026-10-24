@@ -18,6 +18,7 @@ export async function initForumModeration(root: HTMLElement, signal: AbortSignal
   const select = root.querySelector<HTMLSelectElement>('[data-filter]')!;
   const dialog = root.querySelector<HTMLDialogElement>('dialog')!;
   let selected: string | null = null;
+  let request = 0;
   const openBan = (id: string) => {
     selected = id;
     dialog.showModal();
@@ -40,9 +41,11 @@ export async function initForumModeration(root: HTMLElement, signal: AbortSignal
   }
 
   const load = async () => {
+    const turn = ++request;
     try {
       const rows = await forumReportsQueue(select.value);
-      if (signal.aborted) return;
+      if (signal.aborted || turn !== request) return;
+      status.textContent = '';
       list.replaceChildren();
       for (const row of rows) {
         const card = document.createElement('article');
@@ -93,7 +96,7 @@ export async function initForumModeration(root: HTMLElement, signal: AbortSignal
       }
       if (!rows.length) list.textContent = t('Пока пусто');
     } catch (error) {
-      if (!signal.aborted) status.textContent = forumErrorText(error);
+      if (!signal.aborted && turn === request) status.textContent = forumErrorText(error);
     }
   };
   select.addEventListener('change', () => void load(), { signal });

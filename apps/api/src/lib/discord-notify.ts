@@ -61,6 +61,7 @@ export async function deliverDiscordNotifications(
         });
         if (!response.ok) {
           await logFailure(item.id, response);
+          if (response.status === 401) break;
           if (permanentFailure(response)) ack.push(item.id);
           continue;
         }
@@ -86,6 +87,7 @@ export async function deliverDiscordNotifications(
         ack.push(item.id);
       } else {
         await logFailure(item.id, response);
+        if (response.status === 401) break;
         if (permanentFailure(response)) ack.push(item.id);
       }
     } catch (error) {

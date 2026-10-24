@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { createApp } from '../src/index.ts';
 import { adminDeleteAccount, banAccount, listAccounts, unbanAccount, validateBan } from '../src/lib/accounts.ts';
 import type { Account, AccountClient } from '../src/lib/accounts.ts';
 
@@ -74,6 +75,41 @@ test('не принимает неизвестный фильтр и счита�
   assert.deepEqual(calls.at(-1)!.args[1], { p_query: 'trav', p_filter: 'banned', p_limit: 50, p_offset: 100 });
   assert.equal((await listAccounts(client, { page: '-1' })).page, 0);
   await assert.rejects(listAccounts(client, { page: '42949673' }), { status: 400 });
+});
+
+test('сохраняет total на пустой странице после первой', async () => {
+  const calls: Record<string, unknown>[] = [];
+  const client = {
+    rpc: async (_name: string, args: Record<string, unknown>) => {
+      calls.push(args);
+      return { data: args.p_offset === 0 ? [{ ...account(userId), total: 73 }] : [], error: null };
+    },
+  } as unknown as AccountClient;
+  const result = await listAccounts(client, { q: ' trav ', filter: 'banned', page: '3' });
+  assert.deepEqual(result, { items: [], total: 73, page: 3, pageSize: 50 });
+  assert.deepEqual(calls, [
+    { p_query: 'trav', p_filter: 'banned', p_limit: 50, p_offset: 150 },
+    { p_query: 'trav', p_filter: 'banned', p_limit: 1, p_offset: 0 },
+  ]);
+});
+
+test('забаненный администратор получает 403 на GET-маршруте', async () => {
+  const app = createApp({
+    adminClient: () => ({
+      auth: { admin: { getUserById: async () => ({
+        data: { user: { banned_until: new Date(Date.now() + 60_000).toISOString() } }, error: null,
+      }) } },
+      from: () => ({ select: () => ({ eq: () => ({ eq: () => ({
+        maybeSingle: async () => ({ data: { role: 'admin' }, error: null }),
+      }) }) }) }),
+    }) as never,
+    claims: async () => ({ sub: adminId, iat: 0, amr: [] }),
+  });
+  const response = await app.request('/admin/accounts', {
+    headers: { Authorization: 'Bearer admin' },
+  }, { SITE_ORIGINS: '' } as never);
+  assert.equal(response.status, 403);
+  assert.deepEqual(await response.json(), { error: 'Аккаунт заблокирован' });
 });
 
 test('банит на сайте на срок и навсегда, снимает бан', async () => {

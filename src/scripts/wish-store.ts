@@ -40,15 +40,22 @@ async function withWishUidsLock<T>(fn: () => Promise<T> | T, signal?: AbortSigna
   return signal ? navigator.locks.request('gf:wish-uids', { signal }, fn) : navigator.locks.request('gf:wish-uids', fn);
 }
 
-function localUids() {
-  const saved = read<unknown>('gf:wish-uids', []);
+// Гостевая история — gf:wishes:<uid>; офлайн-копия вошедшего пользователя — отдельно, gf:wishes@<user>:<uid>,
+// чтобы при входе другого человека в том же браузере она не переехала в чужой аккаунт
+type Keys = { prefix: string; uids: string };
+const guestKeys: Keys = { prefix: 'gf:wishes:', uids: 'gf:wish-uids' };
+const ownerKeys = (owner: string): Keys => ({ prefix: `gf:wishes@${owner}:`, uids: `gf:wish-uids@${owner}` });
+export const wishStorageKey = (uid: string, owner?: string) => `${(owner ? ownerKeys(owner) : guestKeys).prefix}${uid}`;
+
+function localUids(k: Keys) {
+  const saved = read<unknown>(k.uids, []);
   const uids = Array.isArray(saved) ? saved.filter((uid): uid is string => typeof uid === 'string') : [];
-  try { for (const key of Object.keys(localStorage)) if (key.startsWith('gf:wishes:')) uids.push(key.slice('gf:wishes:'.length)); } catch {}
+  try { for (const key of Object.keys(localStorage)) if (key.startsWith(k.prefix)) uids.push(key.slice(k.prefix.length)); } catch {}
   return [...new Set(uids.filter(uidOk))];
 }
 
-function localList(uid: string) {
-  const saved = read<unknown>(`gf:wishes:${uid}`, []);
+function localList(k: Keys, uid: string) {
+  const saved = read<unknown>(`${k.prefix}${uid}`, []);
   return Array.isArray(saved) ? saved.map((wish) => validWish(wish, uid)).filter((wish): wish is Wish => !!wish).sort(cmpId) : [];
 }
 
@@ -72,13 +79,13 @@ function memory() {
   };
 }
 
-function localStore(offline = false): WishStore {
+function localStore(offline = false, k: Keys = guestKeys): WishStore {
   const state = memory();
-  for (const uid of localUids()) state.add(uid, localList(uid));
+  for (const uid of localUids(k)) state.add(uid, localList(k, uid));
   // Другая вкладка могла изменить историю: перед записью перечитываем актуальную версию
   const sync = (uid: string) => {
     state.lists.delete(uid);
-    state.add(uid, localList(uid));
+    state.add(uid, localList(k, uid));
   };
   return {
     mode: 'local', offline,
@@ -94,13 +101,13 @@ function localStore(offline = false): WishStore {
         if (!fresh.length) return 0;
         const next = [...state.list(uid), ...fresh].sort(cmpId);
         // Записи, не прошедшие проверку (например, оставшиеся после переноса в аккаунт), не выбрасываем
-        const raw = read<unknown>(`gf:wishes:${uid}`, []);
+        const raw = read<unknown>(`${k.prefix}${uid}`, []);
         const rejected = Array.isArray(raw) ? raw.filter((value) => !validWish(value, uid)) : [];
-        localStorage.setItem(`gf:wishes:${uid}`, JSON.stringify([...next, ...rejected]));
+        localStorage.setItem(`${k.prefix}${uid}`, JSON.stringify([...next, ...rejected]));
         // Память обновляем сразу: без Web Locks параллельный wipe() не должен застать её устаревшей
         const added = state.add(uid, fresh);
         await withWishUidsLock(() => {
-          localStorage.setItem('gf:wish-uids', JSON.stringify([...new Set([...localUids(), uid])]));
+          localStorage.setItem(k.uids, JSON.stringify([...new Set([...localUids(k), uid])]));
         });
         return added;
       });
@@ -108,10 +115,10 @@ function localStore(offline = false): WishStore {
     async wipe(uid) {
       await withWishLock(uid, async () => {
         sync(uid);
-        localStorage.removeItem(`gf:wishes:${uid}`);
+        localStorage.removeItem(`${k.prefix}${uid}`);
         state.lists.delete(uid);
         await withWishUidsLock(() => {
-          localStorage.setItem('gf:wish-uids', JSON.stringify(localUids().filter((saved) => saved !== uid)));
+          localStorage.setItem(k.uids, JSON.stringify(localUids(k).filter((saved) => saved !== uid)));
         });
       });
     },
@@ -121,6 +128,7 @@ function localStore(offline = false): WishStore {
 export async function openWishStore(signal?: AbortSignal): Promise<WishStore> {
   if (!hasSession()) return localStore();
 
+  let owner: string | undefined;
   try {
     const { getSupabase } = await import('./auth');
     const supabase = getSupabase();
@@ -128,6 +136,7 @@ export async function openWishStore(signal?: AbortSignal): Promise<WishStore> {
     if (sessionError) throw sessionError;
     const user = sessionData.session?.user;
     if (!user) return localStore();
+    owner = user.id;
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
     const state = memory();
@@ -204,56 +213,59 @@ export async function openWishStore(signal?: AbortSignal): Promise<WishStore> {
 
     // Перенос истории из браузера: удаляем только то, что точно попало в аккаунт.
     // Записи, не прошедшие проверку, остаются в браузере; если другая вкладка дописала историю во время переноса — переносим и её.
-    const cleared = new Set<string>();
-    for (const uid of localUids()) {
-      const key = `gf:wishes:${uid}`;
-      await withWishLock(uid, async () => {
-        for (let attempt = 0; attempt <= 3; attempt++) {
-          aborted();
-          const raw = localStorage.getItem(key);
-          if (raw === null) {
-            // Пока ждали замок, историю перенесла другая вкладка — догружаем её из аккаунта
-            if (attempt === 0) for (let offset = 0; ; offset += 1000) {
-              const { data, error } = await supabase.from('wishes').select(columns)
-                .eq('user_id', user.id).eq('game_uid', uid).order('id').range(offset, offset + 999);
-              if (error || !data) break;
-              aborted();
-              state.add(uid, data);
-              if (data.length < 1000) break;
+    // В аккаунт переносим только гостевую историю и офлайн-копию этого же пользователя
+    for (const k of [guestKeys, ownerKeys(user.id)]) {
+      const cleared = new Set<string>();
+      for (const uid of localUids(k)) {
+        const key = `${k.prefix}${uid}`;
+        await withWishLock(uid, async () => {
+          for (let attempt = 0; attempt <= 3; attempt++) {
+            aborted();
+            const raw = localStorage.getItem(key);
+            if (raw === null) {
+              // Пока ждали замок, историю перенесла другая вкладка — догружаем её из аккаунта
+              if (attempt === 0) for (let offset = 0; ; offset += 1000) {
+                const { data, error } = await supabase.from('wishes').select(columns)
+                  .eq('user_id', user.id).eq('game_uid', uid).order('id').range(offset, offset + 999);
+                if (error || !data) break;
+                aborted();
+                state.add(uid, data);
+                if (data.length < 1000) break;
+              }
+              cleared.add(uid);
+              break;
             }
-            cleared.add(uid);
+            let saved: unknown;
+            try { saved = JSON.parse(raw); } catch { break; }
+            if (!Array.isArray(saved)) break;
+            const valid: Wish[] = [], rejected: unknown[] = [];
+            for (const value of saved) {
+              const wish = validWish(value, uid);
+              if (wish) valid.push(wish); else rejected.push(value);
+            }
+            await cloud.merge(uid, valid);
+            aborted();
+            if (localStorage.getItem(key) !== raw) continue;
+            if (rejected.length) localStorage.setItem(key, JSON.stringify(rejected));
+            else { localStorage.removeItem(key); cleared.add(uid); }
             break;
           }
-          let saved: unknown;
-          try { saved = JSON.parse(raw); } catch { break; }
-          if (!Array.isArray(saved)) break;
-          const valid: Wish[] = [], rejected: unknown[] = [];
-          for (const value of saved) {
-            const wish = validWish(value, uid);
-            if (wish) valid.push(wish); else rejected.push(value);
-          }
-          await cloud.merge(uid, valid);
+        }, signal);
+      }
+      if (cleared.size) {
+        await withWishUidsLock(() => {
           aborted();
-          if (localStorage.getItem(key) !== raw) continue;
-          if (rejected.length) localStorage.setItem(key, JSON.stringify(rejected));
-          else { localStorage.removeItem(key); cleared.add(uid); }
-          break;
-        }
-      }, signal);
-    }
-    if (cleared.size) {
-      await withWishUidsLock(() => {
-        aborted();
-        const saved = read<unknown>('gf:wish-uids', []);
-        const remaining = Array.isArray(saved) ? saved.filter((uid) =>
-          typeof uid !== 'string' || !cleared.has(uid) || localStorage.getItem(`gf:wishes:${uid}`) !== null) : [];
-        if (remaining.length) localStorage.setItem('gf:wish-uids', JSON.stringify(remaining));
-        else localStorage.removeItem('gf:wish-uids');
-      }, signal);
+          const saved = read<unknown>(k.uids, []);
+          const remaining = Array.isArray(saved) ? saved.filter((uid) =>
+            typeof uid !== 'string' || !cleared.has(uid) || localStorage.getItem(`${k.prefix}${uid}`) !== null) : [];
+          if (remaining.length) localStorage.setItem(k.uids, JSON.stringify(remaining));
+          else localStorage.removeItem(k.uids);
+        }, signal);
+      }
     }
     return cloud;
   } catch (error) {
     if (signal?.aborted || (error instanceof Error && error.name === 'AbortError')) throw error;
-    return localStore(true);
+    return localStore(true, owner ? ownerKeys(owner) : guestKeys);
   }
 }

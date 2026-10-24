@@ -77,6 +77,50 @@ function serviceClient(c: ApiContext): ServiceClient | Response {
   return c.get('adminClient')(c);
 }
 
+async function limitedBody(c: ApiContext, limit: number): Promise<string | Response> {
+  const length = c.req.header('Content-Length');
+  if (length && /^\d+$/.test(length) && Number(length) > limit) {
+    return c.json({ error: 'Слишком большое тело запроса' }, 413);
+  }
+  const stream = c.req.raw.body;
+  if (!stream) return '';
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > limit) {
+      void reader.cancel().catch(() => undefined);
+      return c.json({ error: 'Слишком большое тело запроса' }, 413);
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+async function banFailure(c: ApiContext, user: string): Promise<Response | null> {
+  const client = serviceClient(c);
+  if (client instanceof Response) return client;
+  try {
+    const { data, error } = await client.auth.admin.getUserById(user);
+    if (error || !data.user) return c.json({ error: 'Сервис недоступен' }, 503);
+    if (data.user.banned_until && Date.parse(data.user.banned_until) > Date.now()) {
+      return c.json({ error: 'Аккаунт заблокирован' }, 403);
+    }
+  } catch {
+    return c.json({ error: 'Сервис недоступен' }, 503);
+  }
+  return null;
+}
+
 export async function requireUser(
   c: ApiContext, resolve = claimsFromToken,
 ): Promise<TokenClaims | Response> {
@@ -85,17 +129,8 @@ export async function requireUser(
   const claims = await resolve(token, c.env);
   if (!claims) return c.json({ error: 'Требуется авторизация' }, 401);
   if (!['GET', 'HEAD', 'OPTIONS'].includes(c.req.method || 'GET')) {
-    const client = serviceClient(c);
-    if (client instanceof Response) return client;
-    try {
-      const { data, error } = await client.auth.admin.getUserById(claims.sub);
-      if (error || !data.user) return c.json({ error: 'Сервис недоступен' }, 503);
-      if (data.user.banned_until && Date.parse(data.user.banned_until) > Date.now()) {
-        return c.json({ error: 'Аккаунт заблокирован' }, 403);
-      }
-    } catch {
-      return c.json({ error: 'Сервис недоступен' }, 503);
-    }
+    const failure = await banFailure(c, claims.sub);
+    if (failure) return failure;
   }
   return claims;
 }
@@ -109,6 +144,11 @@ export async function requireAdmin(
     .eq('user_id', user.sub).eq('role', 'admin').maybeSingle();
   if (error) return c.json({ error: 'Сервис недоступен' }, 503);
   if (!data) return c.json({ error: 'Нужны права администратора' }, 403);
+  // Забаненный читает свой профиль, но админку не видит ни на каком методе
+  if (['GET', 'HEAD'].includes(c.req.method || 'GET')) {
+    const failure = await banFailure(c, user.sub);
+    if (failure) return failure;
+  }
   return user;
 }
 
@@ -222,7 +262,8 @@ app.get('/health', (c) => c.json({ ok: true, version }));
 
 app.post('/discord/interactions', async (c) => {
   if (!c.env.DISCORD_PUBLIC_KEY) return c.json({ error: 'Сервис недоступен' }, 503);
-  const body = await c.req.text();
+  const body = await limitedBody(c, 64 * 1024);
+  if (body instanceof Response) return body;
   const signature = c.req.header('X-Signature-Ed25519');
   const timestamp = c.req.header('X-Signature-Timestamp');
   if (!signature || !timestamp || !await verifyDiscordRequest(c.env.DISCORD_PUBLIC_KEY, signature, timestamp, body)) {
@@ -614,9 +655,11 @@ app.post('/me/telegram', async (c) => {
   const supabase = serviceClient(c);
   if (supabase instanceof Response) return supabase;
   if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) return raw;
   let body: unknown;
   try {
-    body = await c.req.json();
+    body = JSON.parse(raw);
   } catch {
     return c.json({ error: 'Неверный JSON' }, 400);
   }
@@ -648,9 +691,11 @@ app.post('/auth/telegram', async (c) => {
   const supabase = serviceClient(c);
   if (supabase instanceof Response) return supabase;
   if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) return raw;
   let body: unknown;
   try {
-    body = await c.req.json();
+    body = JSON.parse(raw);
   } catch {
     return c.json({ error: 'Неверный JSON' }, 400);
   }
@@ -676,7 +721,8 @@ app.post('/hooks/sanity', async (c) => {
   if (!c.env.SANITY_WEBHOOK_SECRET || !c.env.GITHUB_REPO || !c.env.GITHUB_DISPATCH_TOKEN) {
     return c.json({ error: 'Сервис недоступен' }, 503);
   }
-  const body = await c.req.text();
+  const body = await limitedBody(c, 256 * 1024);
+  if (body instanceof Response) return body;
   const valid = await verifySanityWebhook(
     body, c.req.header('sanity-webhook-signature') || null, c.env.SANITY_WEBHOOK_SECRET,
   );

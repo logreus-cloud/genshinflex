@@ -22,13 +22,16 @@ const { t } = useData(Astro.currentLocale);
   const input = root.querySelector<HTMLInputElement>('input')!;
   const list = root.querySelector<HTMLUListElement>('ul')!;
   let active = -1;
+  let renderedQuery = '';
   let closeTimer: number | undefined;
 
-  const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
+  const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; renderedQuery = ''; };
   const highlight = () => [...list.children].forEach((li, i) => li.setAttribute('aria-selected', String(i === active)));
 
   input.addEventListener('input', async () => {
     const q = input.value;
+    close();
+    list.replaceChildren();
     const items = await searchNames(q);
     if (signal.aborted || q !== input.value) return;
     list.replaceChildren(...items.map((it) => {
@@ -41,12 +44,14 @@ const { t } = useData(Astro.currentLocale);
     list.hidden = !q.trim();
     input.setAttribute('aria-expanded', String(!list.hidden));
     active = -1;
+    renderedQuery = q;
   });
   input.addEventListener('keydown', (e) => {
-    const n = list.querySelectorAll('[role="option"]').length;
+    const n = list.hidden ? 0 : list.querySelectorAll('[role="option"]').length;
     if (e.key === 'ArrowDown' && n) { e.preventDefault(); active = (active + 1) % n; highlight(); }
-    else if (e.key === 'ArrowUp' && n) { e.preventDefault(); active = (active - 1 + n) % n; highlight(); }
+    else if (e.key === 'ArrowUp' && n) { e.preventDefault(); active = active < 0 ? n - 1 : (active - 1 + n) % n; highlight(); }
     else if (e.key === 'Enter') {
+      if (list.hidden || renderedQuery !== input.value) return;
       const a = list.querySelectorAll('a')[Math.max(active, 0)];
       if (a) { e.preventDefault(); navigate(a.href); }
     } else if (e.key === 'Escape') { close(); input.blur(); }

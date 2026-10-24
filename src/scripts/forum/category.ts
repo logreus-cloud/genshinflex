@@ -8,10 +8,14 @@ export async function initForumCategory(root: HTMLElement, signal: AbortSignal) 
   const category = root.dataset.category!;
   const list = root.querySelector<HTMLElement>('[data-list]')!;
   const more = root.querySelector<HTMLButtonElement>('[data-more]')!;
+  const errorBox = document.createElement('p');
+  errorBox.className = 'small muted';
+  list.after(errorBox);
   const select = root.querySelector<HTMLSelectElement>('[data-lang]')!;
   const create = root.querySelector<HTMLElement>('[data-create]')!;
   let offset = 0;
   let busy = false;
+  let generation = 0;
 
   try {
     const saved = localStorage.getItem('forum-lang');
@@ -27,16 +31,21 @@ export async function initForumCategory(root: HTMLElement, signal: AbortSignal) 
   }
 
   const load = async (reset = false) => {
+    if (reset) {
+      generation++;
+      offset = 0;
+      busy = false;
+      list.replaceChildren();
+      more.hidden = false;
+    }
     if (busy) return;
+    const turn = generation;
     busy = true;
     more.disabled = true;
-    if (reset) {
-      offset = 0;
-      list.replaceChildren();
-    }
+    errorBox.textContent = '';
     try {
       const rows = await forumThreads(category, select.value || null, PAGE_SIZE, offset);
-      if (signal.aborted) return;
+      if (signal.aborted || turn !== generation) return;
       for (const row of rows) {
         const card = document.createElement('article');
         card.className = `panel forum-thread${row.deleted ? ' muted' : ''}`;
@@ -63,10 +72,15 @@ export async function initForumCategory(root: HTMLElement, signal: AbortSignal) 
       more.hidden = rows.length < PAGE_SIZE;
       if (!offset) list.textContent = t('Пока пусто');
     } catch (error) {
-      if (!signal.aborted) list.textContent = forumErrorText(error);
+      if (!signal.aborted && turn === generation) {
+        errorBox.textContent = forumErrorText(error);
+        more.hidden = false;
+      }
     } finally {
-      busy = false;
-      if (!signal.aborted) more.disabled = false;
+      if (!signal.aborted && turn === generation) {
+        busy = false;
+        more.disabled = false;
+      }
     }
   };
 

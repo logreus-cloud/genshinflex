@@ -69,11 +69,12 @@ const standard = STANDARD_CHARACTERS.filter((slug) => ruCharacters.some((c) => c
     const hint = root.querySelector<HTMLElement>('[data-hint]')!;
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
     const standard = new Set<string>(JSON.parse(root.dataset.standard!));
-    let wishStore: WishStore;
+    let wishStore: WishStore | undefined;
     let uid = '';
     let version = 0;
     let index: Awaited<ReturnType<typeof loadWishIndex>>;
     const render = () => {
+      if (!wishStore) return;
       const uids = wishStore.uids();
       const choices = uid && !uids.includes(uid) ? [uid, ...uids] : uids;
       select.innerHTML = choices.map((value) => `<option value="${esc(value)}" ${value === uid ? 'selected' : ''}>${value === 'manual' ? esc(t('Ручной ввод')) : `UID ${esc(value)}`}</option>`).join('');
@@ -110,6 +111,7 @@ const standard = STANDARD_CHARACTERS.filter((slug) => ruCharacters.some((c) => c
         const next = await openWishStore(signal);
         if (signal.aborted || turn !== version) return;
         wishStore = next;
+        select.disabled = false;
         const saved = store.get<string>('gf:wish-uid', '');
         const uids = wishStore.uids();
         uid = uids.includes(saved) ? saved : uids[0] ?? '';
@@ -117,8 +119,16 @@ const standard = STANDARD_CHARACTERS.filter((slug) => ruCharacters.some((c) => c
         render();
       } catch (error) { if (!signal.aborted && turn === version) listEl.textContent = (error as Error).message; }
     };
-    select.addEventListener('change', () => { uid = select.value; store.set('gf:wish-uid', uid); render(); }, { signal });
-    onSessionChange(() => { void load(); }, { signal });
+    select.addEventListener('change', () => { if (!wishStore) return; uid = select.value; store.set('gf:wish-uid', uid); render(); }, { signal });
+    // Сменилась сессия: историю прежнего аккаунта убираем сразу, не дожидаясь загрузки новой
+    onSessionChange(() => {
+      wishStore = undefined;
+      uid = '';
+      select.disabled = true;
+      select.replaceChildren();
+      listEl.replaceChildren();
+      void load();
+    }, { signal });
     window.addEventListener('gf:wishes-changed', () => { void load(); }, { signal });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { paint(); tick(); void load(); } }, { signal });
     window.addEventListener('focus', () => { paint(); tick(); void load(); }, { signal });

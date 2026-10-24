@@ -89,7 +89,11 @@ export async function mountCaptcha(el: HTMLElement): Promise<Captcha> {
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error('turnstile'));
+    script.onerror = () => {
+      script.remove();
+      turnstileScript = undefined;
+      reject(new Error('turnstile'));
+    };
     document.head.append(script);
   });
   await turnstileScript;

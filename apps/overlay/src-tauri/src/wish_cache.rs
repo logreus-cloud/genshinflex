@@ -67,8 +67,8 @@ fn newest_link(bytes: &[u8]) -> Option<String> {
     let text = String::from_utf8_lossy(bytes);
     text.rsplit("1/0/").find_map(|part| {
         let raw = part.split('\0').next()?.trim();
-        (raw.contains("webview_gacha") && raw.contains("authkey=")).then_some(raw)
-    }).and_then(valid_link)
+        (raw.contains("webview_gacha") && raw.contains("authkey=")).then_some(raw).and_then(valid_link)
+    })
 }
 
 fn eval_link(window: &WebviewWindow, link: &str) -> bool {
@@ -89,11 +89,11 @@ pub fn start(app: AppHandle, window: WebviewWindow) {
         let mut previous: Option<(Option<SystemTime>, u64)> = None;
         let mut pending: Option<String> = None;
         loop {
-            if path.as_ref().map_or(true, |path| !path.exists())
-                && searched.map_or(true, |at| at.elapsed() >= Duration::from_secs(30)) {
-                path = cache_path();
+            if searched.map_or(true, |at| at.elapsed() >= Duration::from_secs(30)) {
+                let found = cache_path();
+                if found != path { previous = None; }
+                path = found;
                 searched = Some(Instant::now());
-                previous = None;
             }
             if let Some(ref file) = path {
                 if let Ok(metadata) = fs::metadata(file) {

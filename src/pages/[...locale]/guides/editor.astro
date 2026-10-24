@@ -330,6 +330,8 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       })).filter((x) => x.title || x.url),
     });
     const fill = (g: Partial<Guide>) => {
+      // Несохранённые правки прежней цели записываем до того, как форма заполнится новой
+      flushDraft();
       field('role').value = g.role ?? '';
       field('patch').value = g.patch ?? latestPatch;
       for (const k of ['sands', 'goblet', 'circlet'] as const) field(k).value = g.mainStats?.[k] ?? '';
@@ -349,13 +351,27 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     const drafts = () => store.get<Drafts>(DRAFTS, {});
     // Ключ черновика: у персонажей — просто слаг (как раньше), у остальных — «weapon:слаг» / «endgame:abyss-12»
     const dk = () => (kind === 'char' ? key : `${kind}:${key}`);
-    const saveDraft = debounce(() => {
-      if (!key) return;
+    // Ключ черновика фиксируем в момент правки: к срабатыванию таймера цель могла смениться
+    let pendingDraft = '';
+    let draftTimer = 0;
+    function flushDraft() {
+      clearTimeout(draftTimer);
+      if (!pendingDraft) return;
       const all = drafts();
-      all[dk()] = { guide: collect(), ts: Date.now() };
+      all[pendingDraft] = { guide: collect(), ts: Date.now() };
+      pendingDraft = '';
       // Храним черновики пяти последних персонажей
       store.set(DRAFTS, Object.fromEntries(Object.entries(all).sort((a, b) => b[1].ts - a[1].ts).slice(0, 5)));
-    }, 400);
+    }
+    const saveDraft = () => {
+      if (!key) return;
+      if (pendingDraft && pendingDraft !== dk()) flushDraft();
+      pendingDraft = dk();
+      clearTimeout(draftTimer);
+      draftTimer = window.setTimeout(flushDraft, 400);
+    };
+    cleanup(signal, flushDraft);
+    window.addEventListener('pagehide', flushDraft, { signal });
     const dropDraft = (slug: string) => { const all = drafts(); delete all[slug]; store.set(DRAFTS, all); };
     const when = (ts: number) => new Date(ts).toLocaleString(LOCALE, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 
@@ -408,6 +424,7 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     };
     const restart = () => {
       if (!key) return;
+      if (pendingDraft === dk()) { pendingDraft = ''; clearTimeout(draftTimer); }
       dropDraft(dk());
       open(kind, key);
     };
@@ -434,7 +451,9 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
     const checksEl = document.querySelector<HTMLElement>('#checks')!;
     const problems = (g: Guide) => {
       const out: string[] = [];
-      if (!key) out.push(kind === 'char' ? t('Выберите персонажа.') : t('Выберите, о чём гайд.'));
+      // Видимое поле выбора должно совпадать с целью, для которой собран гайд
+      const shown = kind === 'char' ? resolve(charInput)?.slug : kind === 'weapon' ? resolve(weapInput)?.slug : egSelect.value;
+      if (!key || shown !== key) out.push(kind === 'char' ? t('Выберите персонажа.') : t('Выберите, о чём гайд.'));
       const bad = [...form.querySelectorAll<HTMLInputElement>('.pick input[aria-invalid]')].map((i) => `«${i.value.trim()}»`);
       if (bad.length) out.push(t('Не нашли в списке: {list} — выберите вариант из подсказок.', { list: bad.join(', ') }));
       g.teams.forEach((tm, i) => {
@@ -683,6 +702,8 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
       btn.disabled = true;
       status.className = 'status small';
       status.textContent = t('Отправляем…');
+      const sentKey = dk();
+      const sentGuide = JSON.stringify(g);
       try {
         const res = await fetch('/api/guides', {
           signal,
@@ -697,7 +718,11 @@ const bubbleKinds = [['char', t('Персонаж')], ['weapon', t('Оружие
         if (signal.aborted) return;
         // Сервер отвечает по-русски — переводим сообщение здесь
         if (!res.ok) throw new Error(t(out.error ?? 'Не удалось отправить — попробуйте позже'));
-        dropDraft(dk());
+        // Удаляем только отправленный черновик и только если его не правили во время отправки
+        flushDraft();
+        const saved = drafts()[sentKey];
+        if (!saved || JSON.stringify(saved.guide) === sentGuide) dropDraft(sentKey);
+        if (dk() !== sentKey) return;
         status.className = 'status small ok';
         status.textContent = kind === 'char'
           ? t('Спасибо! Гайд отправлен на проверку. Черновик очищен — после публикации гайд появится на странице персонажа.')

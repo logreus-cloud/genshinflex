@@ -33,39 +33,56 @@ function deletionClient(deleteError = false, removeError = false) {
   return { client, calls };
 }
 
-test('lists both buckets, deletes the user, then removes media after a fresh sign-in', async () => {
+test('removes media from both buckets before deleting the user after a fresh sign-in', async () => {
   const { client, calls } = deletionClient();
   assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
   assert.deepEqual(calls, [
     { method: 'list', args: ['avatars', id, { limit: 100, offset: 0 }] },
     { method: 'list', args: ['profile-media', id, { limit: 100, offset: 0 }] },
-    { method: 'deleteUser', args: [id, false] },
     { method: 'remove', args: ['avatars', [`${id}/one.png`, `${id}/two.webp`]] },
     { method: 'remove', args: ['profile-media', [`${id}/one.png`, `${id}/two.webp`]] },
+    { method: 'deleteUser', args: [id, false] },
   ]);
 });
 
-test('keeps media when deleting the user fails', async () => {
+test('reports failure when deleting the user after media removal', async () => {
   const { client, calls } = deletionClient(true);
   await assert.rejects(deleteAccount(client, id, 'DELETE', claims(60), now), /Account removal failed/);
-  assert.deepEqual(calls.map((call) => call.method), ['list', 'list', 'deleteUser']);
+  assert.deepEqual(calls.map((call) => call.method), ['list', 'list', 'remove', 'remove', 'deleteUser']);
 });
 
-test('reports successful deletion when media removal fails', async () => {
+test('does not delete the user when media removal fails', async () => {
   const { client, calls } = deletionClient(false, true);
-  const errors: unknown[][] = [];
-  const original = console.error;
-  console.error = (...args: unknown[]) => { errors.push(args); };
-  try {
-    assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
-  } finally {
-    console.error = original;
-  }
-  assert.deepEqual(calls.map((call) => call.method), ['list', 'list', 'deleteUser', 'remove', 'remove']);
-  assert.deepEqual(errors.map((args) => args.slice(0, 3)), [
-    ['Media removal failed', id, 'avatars'],
-    ['Media removal failed', id, 'profile-media'],
+  await assert.rejects(deleteAccount(client, id, 'DELETE', claims(60), now), /Media removal failed/);
+  assert.deepEqual(calls.map((call) => call.method), ['list', 'list', 'remove']);
+});
+
+test('lists every storage page before deleting media and the user', async () => {
+  const calls: string[] = [];
+  const client = {
+    storage: { from: (bucket: string) => ({
+      list: async (_path: string, options: { offset: number }) => {
+        calls.push(`${bucket}:list:${options.offset}`);
+        return { data: options.offset ? [{ id: 'last', name: 'last.png' }]
+          : Array.from({ length: 100 }, (_, index) => ({ id: String(index), name: `${index}.png` })), error: null };
+      },
+      remove: async (paths: string[]) => {
+        calls.push(`${bucket}:remove:${paths.length}`);
+        return { error: null };
+      },
+    }) },
+    auth: { admin: { deleteUser: async () => {
+      calls.push('deleteUser');
+      return { error: null };
+    } } },
+  } as unknown as AdminClient;
+  assert.equal(await deleteAccount(client, id, 'DELETE', claims(60), now), null);
+  assert.equal(calls.filter((call) => call.endsWith(':list:100')).length, 2);
+  assert.deepEqual(calls.filter((call) => call.includes(':remove:')), [
+    'avatars:remove:100', 'avatars:remove:1',
+    'profile-media:remove:100', 'profile-media:remove:1',
   ]);
+  assert.equal(calls.at(-1), 'deleteUser');
 });
 
 test('requires a new sign-in when the last authentication is old', async () => {

@@ -34,18 +34,18 @@ export function makeLookup(
 
 const ESC: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ESC[c]);
-// Только обычные ссылки: внешние https/http и внутренние пути сайта — никаких javascript: и data:
-const safeUrl = (u: string) => (/^(https?:\/\/[^\s]+|\/(?!\/)[^\s]*)$/i.test(u) ? u : null);
+// Только внешние https-ссылки и внутренние пути сайта
+const safeUrl = (u: string) => (/^https:\/\/[^\s]+$/i.test(u) || (u.startsWith('/') && u[1] !== '/' && u[1] !== '\\' && !/[\s\\\u0000-\u001f\u007f-\u009f]/.test(u)) ? u : null);
 
 function bubble(lookup: Lookup, kind: string, arg: string): string {
   if (kind === 'gold') return `<span class="chip gold">${arg}</span>`;
   const ref = lookup(kind as Kind, arg);
   if (!ref) return `<span class="chip" title="Не найдено">${kind}:${arg}</span>`;
-  if (kind === 'el') return `<span class="chip" data-el="${ref.el}">${esc(ref.name)}</span>`;
+  const el = ref.el && /^[a-z]+$/.test(ref.el) ? ` data-el="${esc(ref.el)}"` : '';
+  if (kind === 'el') return `<span class="chip"${el}>${esc(ref.name)}</span>`;
   const img = ref.icon ? `<img src="${esc(ref.icon)}" alt="" loading="lazy" />` : '';
-  const el = ref.el ? ` data-el="${ref.el}"` : '';
   const inner = `${img}${esc(ref.name)}`;
-  return ref.href ? `<a class="chip gm-item"${el} href="${ref.href}">${inner}</a>` : `<span class="chip gm-item"${el}>${inner}</span>`;
+  return ref.href ? `<a class="chip gm-item"${el} href="${esc(ref.href)}">${inner}</a>` : `<span class="chip gm-item"${el}>${inner}</span>`;
 }
 
 function inline(text: string, lookup: Lookup): string {
@@ -68,7 +68,7 @@ function inline(text: string, lookup: Lookup): string {
   return s.replace(/\u0000(\d+)\u0000/g, (_m, i) => kept[Number(i)]);
 }
 
-export function renderGuide(src: string, lookup: Lookup, titles: Record<CalloutKind, string> = CALLOUT_TITLES): string {
+export function renderGuide(src: string, lookup: Lookup, titles: Record<CalloutKind, string> = CALLOUT_TITLES, depth = 0): string {
   const lines = src.replace(/\r\n?/g, '\n').split('\n');
   const out: string[] = [];
   let para: string[] = [];
@@ -85,12 +85,19 @@ export function renderGuide(src: string, lookup: Lookup, titles: Record<CalloutK
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     let m: RegExpMatchArray | null;
-    if ((m = line.match(/^:::(tip|warn|info)\b\s*(.*)$/))) {
+    if (depth < 8 && (m = line.match(/^:::(tip|warn|info)\b\s*(.*)$/))) {
       flush();
       const inner: string[] = [];
-      while (++i < lines.length && lines[i].trim() !== ':::') inner.push(lines[i]);
+      // Считаем вложенные выноски, чтобы «:::» внутренней не закрывал внешнюю
+      let open = 1;
+      while (++i < lines.length) {
+        const next = lines[i].trim();
+        if (/^:::(tip|warn|info)\b/.test(next)) open++;
+        else if (next === ':::' && --open === 0) break;
+        inner.push(lines[i]);
+      }
       const kind = m[1] as CalloutKind;
-      out.push(`<aside class="callout ${kind}"><b>${inline(m[2] || titles[kind], lookup)}</b>${renderGuide(inner.join('\n'), lookup, titles)}</aside>`);
+      out.push(`<aside class="callout ${kind}"><b>${inline(m[2] || titles[kind], lookup)}</b>${renderGuide(inner.join('\n'), lookup, titles, depth + 1)}</aside>`);
     } else if ((m = line.match(/^(#{1,3})\s+(.+)$/))) {
       flush();
       const tag = m[1].length === 3 ? 'h4' : 'h3';

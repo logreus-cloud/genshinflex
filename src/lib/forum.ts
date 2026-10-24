@@ -63,7 +63,7 @@ const ROTATION_PAGES = ['abyss', 'theater', 'onslaught'];
 
 export function parseSubject(value: string | null): Subject | null {
   const match = /^(character|rotation|build):([a-z0-9][a-z0-9._-]{0,79})$/i.exec(value ?? '');
-  return match ? { kind: match[1] as Subject['kind'], id: match[2] } : null;
+  return match ? { kind: match[1].toLowerCase() as Subject['kind'], id: match[2] } : null;
 }
 
 export const subjectParam = (subject: Subject) => `${subject.kind}:${subject.id}`;

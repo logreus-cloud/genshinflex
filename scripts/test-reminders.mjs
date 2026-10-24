@@ -12,16 +12,20 @@ const events = [
   event('day-start', 'banner-start', 24),
   event('day-last', 'abyss', 25 - 1 / 3600),
   event('outside', 'banner-end', 25),
+  event('previous-boundary', 'banner-start', -55 / 60),
+  event('after-previous', 'banner-start', -0.5),
   event('now-start', 'banner-start', 0),
-  event('now-abyss', 'abyss', 0.5),
+  event('now-abyss', 'abyss', 5 / 60),
+  event('future', 'banner-start', 0.5),
   event('now-event', 'event-end', 0),
   event('day-stream', 'livestream', 24),
   event('now-stream', 'livestream', 0),
 ];
-const selected = pick(events, hour);
+const selected = pick(events, hour + 5 * 60_000);
 assert.deepEqual(selected.map(({ event: item, when }) => [item.id, when]), [
   ['day-start', 'day'],
   ['day-last', 'day'],
+  ['after-previous', 'now'],
   ['now-start', 'now'],
   ['now-abyss', 'now'],
   ['day-stream', 'day'],

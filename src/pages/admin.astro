@@ -439,13 +439,15 @@ onPage(async (signal) => {
   // Куда ведёт заявка: страница персонажа, оружия или эндгейма
   const target = (g: Guide) => {
     const kind = g.payload.kind ?? 'char', t = g.payload.target ?? g.payload.character ?? '';
+    if (!/^[a-z0-9-]{1,60}$/.test(t)) return { label: t, href: '#' };
     if (kind === 'weapon') return { label: `Оружие: ${names.get(t) ?? t}`, href: `/weapons/${t}/` };
     if (kind === 'endgame') return { label: `Эндгейм: ${editor.endgame[t]?.title ?? t}`, href: t.startsWith('abyss') ? `/abyss/#floor-${t.split('-')[1]}` : `/${t}/` };
     return { label: `Персонаж: ${names.get(t) ?? t}`, href: `/characters/${t}/` };
   };
+  const sitePath = (page: string) => page.startsWith('/') && page[1] !== '/' && page[1] !== '\\' && !/[\\\u0000-\u001f\u007f-\u009f]/.test(page);
 
   const guideCard = (g: Guide) => {
-    const tg = target(g), p = g.payload;
+    const tg = target(g), p = g.payload, id = esc(String(g.id));
     const extra = [
       p.role && `Роль: ${esc(p.role)}`,
       p.weapons?.length && `Оружие: ${p.weapons.map((w) => esc(names.get(w.slug) ?? w.slug)).join(', ')}`,
@@ -453,13 +455,13 @@ onPage(async (signal) => {
       p.teams?.length && `Команд: ${p.teams.length}`,
       p.external?.length && `Ссылок: ${p.external.length}`,
     ].filter(Boolean).join(' · ');
-    return `<article class="panel card" data-id="${g.id}">
+    return `<article class="panel card" data-id="${id}">
       <header>
-        <b>#${g.id}</b> <a href="${tg.href}" target="_blank" rel="noopener">${esc(tg.label)}</a>
-        <span class="chip ${g.status === 'pending' ? 'gold' : ''}">${STATUS[g.status] ?? g.status}</span>
-        <span class="chip">${g.mode === 'edit' ? 'правка' : 'новый'}</span>
-        <span class="chip">${(p.lang ?? 'ru').toUpperCase()}</span>
-        <span class="muted small">${when(g.created_at)}</span>
+        <b>#${id}</b> <a href="${esc(tg.href)}" target="_blank" rel="noopener">${esc(tg.label)}</a>
+        <span class="chip ${g.status === 'pending' ? 'gold' : ''}">${esc(STATUS[g.status] ?? g.status)}</span>
+        <span class="chip">${esc(g.mode === 'edit' ? 'правка' : 'новый')}</span>
+        <span class="chip">${esc((p.lang ?? 'ru').toUpperCase())}</span>
+        <span class="muted small">${esc(when(g.created_at))}</span>
       </header>
       <p class="small">Автор: <b>${esc(g.author)}</b>${g.contact ? ` · ${esc(g.contact)}` : ''}</p>
       ${g.comment ? `<p class="small comment">«${esc(g.comment)}»</p>` : ''}
@@ -469,20 +471,20 @@ onPage(async (signal) => {
         <pre class="small">${esc(JSON.stringify(p, null, 2))}</pre>
       </details>
       <div class="row actions">
-        <button type="button" class="btn small copy" data-cmd="npm run guide:md -- ${g.id} --dry">Посмотреть файл: скопировать команду</button>
-        <button type="button" class="btn small primary copy" data-cmd="npm run guide:md -- ${g.id}">Опубликовать: скопировать команду</button>
+        <button type="button" class="btn small copy" data-cmd="npm run guide:md -- ${id} --dry">Посмотреть файл: скопировать команду</button>
+        <button type="button" class="btn small primary copy" data-cmd="npm run guide:md -- ${id}">Опубликовать: скопировать команду</button>
         ${g.status !== 'rejected' ? `<button type="button" class="btn small" data-set="rejected">Отклонить</button>` : ''}
         ${g.status !== 'pending' ? `<button type="button" class="btn small" data-set="pending">Вернуть в очередь</button>` : ''}
       </div>
     </article>`;
   };
 
-  const feedbackCard = (f: Feedback) => `<article class="panel card" data-id="${f.id}">
+  const feedbackCard = (f: Feedback) => `<article class="panel card" data-id="${esc(String(f.id))}">
       <header>
-        <b>#${f.id}</b> <span class="chip">${KIND[f.kind] ?? f.kind}</span>
-        <span class="chip ${f.status === 'new' ? 'gold' : ''}">${STATUS[f.status] ?? f.status}</span>
-        ${f.page ? `<a class="small" href="${esc(f.page)}" target="_blank" rel="noopener">${esc(f.page)}</a>` : ''}
-        <span class="muted small">${when(f.created_at)}</span>
+        <b>#${esc(String(f.id))}</b> <span class="chip">${esc(KIND[f.kind] ?? f.kind)}</span>
+        <span class="chip ${f.status === 'new' ? 'gold' : ''}">${esc(STATUS[f.status] ?? f.status)}</span>
+        ${f.page ? sitePath(f.page) ? `<a class="small" href="${esc(f.page)}" target="_blank" rel="noopener">${esc(f.page)}</a>` : `<span class="small">${esc(f.page)}</span>` : ''}
+        <span class="muted small">${esc(when(f.created_at))}</span>
       </header>
       <p class="msg">${esc(f.message)}</p>
       ${f.contact ? `<p class="small">Контакт: <b>${esc(f.contact)}</b></p>` : ''}
@@ -527,13 +529,22 @@ onPage(async (signal) => {
     }
     if (b.dataset.set) {
       const card = b.closest<HTMLElement>('[data-id]')!;
+      const err = $('#error');
+      err.hidden = true;
       b.disabled = true;
-      await fetch('/api/admin/inbox', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify({ type: card.closest('#guides') ? 'guide' : 'feedback', id: Number(card.dataset.id), status: b.dataset.set }),
-      }).catch(() => {});
-      if (signal.aborted) return;
-      void load();
+      try {
+        const res = await fetch('/api/admin/inbox', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
+          body: JSON.stringify({ type: card.closest('#guides') ? 'guide' : 'feedback', id: Number(card.dataset.id), status: b.dataset.set }),
+        });
+        const out = await res.json().catch(() => ({})) as { error?: string };
+        if (!res.ok) throw new Error(out.error || `Ошибка ${res.status}`);
+        if (!signal.aborted) await load();
+      } catch (cause) {
+        if (!signal.aborted) { err.textContent = cause instanceof Error ? cause.message : 'Не удалось сменить статус'; err.hidden = false; }
+      } finally {
+        b.disabled = false;
+      }
     }
     if (b.id === 'reload' && $('#titles').hidden && $('#accounts').hidden) void load();
   }, { signal });

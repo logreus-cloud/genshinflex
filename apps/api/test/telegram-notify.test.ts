@@ -71,7 +71,8 @@ test('deliverTelegramNotifications continues after Telegram errors', async () =>
     const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
     requests.push({ url: String(input), body });
     if (body.chat_id === 2) throw new Error('network');
-    if (body.chat_id === 3) return new Response('', { status: 403 });
+    if (body.chat_id === 3) return Response.json(
+      { error_code: 403, description: 'Forbidden: bot was blocked by the user' }, { status: 403 });
     if (body.chat_id === 5) return new Response('', { status: 500 });
     if (body.chat_id === 6) return new Response('', { status: 429 });
     return new Response('ok');
@@ -86,6 +87,45 @@ test('deliverTelegramNotifications continues after Telegram errors', async () =>
     parse_mode: 'HTML',
     disable_web_page_preview: true,
   });
+});
+
+test('не подтверждает 401 и прекращает пачку после ошибки токена Telegram', async () => {
+  const acks: number[][] = [];
+  let calls = 0;
+  const client = {
+    rpc: async (name: string, args: { p_ids?: number[] }) => {
+      if (name === 'telegram_notifications_ack') {
+        acks.push(args.p_ids ?? []);
+        return { data: null, error: null };
+      }
+      return { data: [item, { ...item, id: 2 }, { ...item, id: 3 }], error: null };
+    },
+  } as unknown as Parameters<typeof deliverTelegramNotifications>[0];
+  const send: typeof fetch = async () => {
+    calls++;
+    return calls === 1 ? new Response('ok')
+      : Response.json({ error_code: 401, description: 'Unauthorized' }, { status: 401 });
+  };
+  assert.deepEqual(await deliverTelegramNotifications(client, 'token', send), { claimed: 3, sent: 1 });
+  assert.equal(calls, 2);
+  assert.deepEqual(acks, [[1]]);
+});
+
+test('не подтверждает 403 с описанием невалидного токена Telegram', async () => {
+  const acks: number[][] = [];
+  const client = {
+    rpc: async (name: string, args: { p_ids?: number[] }) => name === 'telegram_notifications_ack'
+      ? (acks.push(args.p_ids ?? []), { data: null, error: null })
+      : { data: [item, { ...item, id: 2 }], error: null },
+  } as unknown as Parameters<typeof deliverTelegramNotifications>[0];
+  let calls = 0;
+  const send: typeof fetch = async () => {
+    calls++;
+    return Response.json({ error_code: 403, description: 'Forbidden: invalid bot token' }, { status: 403 });
+  };
+  assert.deepEqual(await deliverTelegramNotifications(client, 'token', send), { claimed: 2, sent: 0 });
+  assert.equal(calls, 1);
+  assert.deepEqual(acks, []);
 });
 
 test('deliverTelegramNotifications skips an empty token and throws on claim errors', async () => {

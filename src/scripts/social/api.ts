@@ -50,17 +50,13 @@ export const socialFeed = (before: { at: string; id: number } | null, limit = 20
   rpc<FeedItem[]>('social_feed', { p_before_at: before?.at ?? null, p_before_id: before?.id ?? null, p_limit: limit });
 
 export async function socialBlockedIds(): Promise<Set<string>> {
-  try {
-    const ids = new Set<string>();
-    for (let page = 0; page < 20; page++) {
-      const rows = await socialBlocked(50, page * 50);
-      for (const row of rows) ids.add(row.user_id);
-      if (rows.length < 50) break;
-    }
-    return ids;
-  } catch {
-    return new Set<string>();
+  const ids = new Set<string>();
+  for (let page = 0; page < 20; page++) {
+    const rows = await socialBlocked(50, page * 50);
+    for (const row of rows) ids.add(row.user_id);
+    if (rows.length < 50) break;
   }
+  return ids;
 }
 
 export function socialErrorText(error: unknown) {

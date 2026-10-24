@@ -40,6 +40,7 @@ export async function importFromLink(raw: string, store: WishStore, opts: Option
     aborted(opts.signal);
     let endId = '0';
     const known = new Set(foundUid ? store.list(foundUid).map((wish) => wish.id) : []);
+    const seen = new Set<string>();
     const got: Wish[] = [];
     for (let page = 1; ; page++) {
       opts.onProgress?.(type, page);
@@ -67,19 +68,26 @@ export async function importFromLink(raw: string, store: WishStore, opts: Option
         foundUid = list[0].uid;
         for (const wish of store.list(foundUid)) known.add(wish.id);
       }
-      const fresh = list.filter((wish) => !known.has(wish.id));
+      const fresh = list.filter((wish) => {
+        if (known.has(wish.id) || seen.has(wish.id)) return false;
+        seen.add(wish.id);
+        return true;
+      });
       got.push(...fresh);
-      if (fresh.length < list.length) break; // дошли до уже сохранённых
+      if (list.every((wish) => known.has(wish.id))) break; // вся страница уже сохранена
       endId = list.at(-1)!.id;
       await sleep(350);
       aborted(opts.signal);
     }
     if (foundUid && got.length) {
       opts.onSaving?.(true);
-      const added = await store.merge(foundUid, got);
-      aborted(opts.signal);
-      total += added;
-      opts.onSaving?.(false);
+      try {
+        const added = await store.merge(foundUid, got);
+        aborted(opts.signal);
+        total += added;
+      } finally {
+        opts.onSaving?.(false);
+      }
     }
   }
   if (!foundUid) throw new WishImportError('empty', 'История пуста: на этом аккаунте ещё не было молитв за последние 6 месяцев.');

@@ -28,9 +28,10 @@ export async function onRequestGet({ request, env, data }: Ctx) {
 }
 
 export async function onRequestPost({ request, env }: Ctx) {
-  const body = (await request.json().catch(() => ({}))) as { type?: string; id?: number; status?: string };
-  const id = Number(body.id);
-  if (!Number.isInteger(id)) return json({ error: 'Нет номера' }, 400);
+  const body = (await request.json().catch(() => null)) as { type?: string; id?: number; status?: string } | null;
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Не удалось прочитать запрос' }, 400);
+  const id = body.id;
+  if (typeof id !== 'number' || !Number.isSafeInteger(id) || id <= 0) return json({ error: 'Нет номера' }, 400);
   if (body.type === 'guide' && GUIDE_STATUS.has(body.status ?? '')) {
     await env.DB.prepare('UPDATE guide_submissions SET status = ? WHERE id = ?').bind(body.status, id).run();
   } else if (body.type === 'feedback' && FEEDBACK_STATUS.has(body.status ?? '')) {

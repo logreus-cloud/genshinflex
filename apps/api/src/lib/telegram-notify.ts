@@ -91,7 +91,14 @@ export async function deliverTelegramNotifications(
         sent++;
         ack.push(item.id);
       } else {
-        console.warn('telegram send failed', item.id, response.status, await response.text().catch(() => ''));
+        const body = await response.text().catch(() => '');
+        console.warn('telegram send failed', item.id, response.status, body);
+        let description = '';
+        try {
+          description = (JSON.parse(body) as { description?: string }).description || '';
+        } catch {}
+        if (response.status === 401 || (response.status === 403
+          && /unauthorized|invalid.*token|token.*invalid/i.test(description))) break;
         if (response.status >= 400 && response.status < 500 && response.status !== 429) ack.push(item.id);
       }
     } catch (error) {

@@ -6154,5 +6154,13 @@
  "Скрытый профиль": {
   "en": "Hidden profile",
   "es": "Perfil oculto"
+ },
+ "Ответ опубликован": {
+  "en": "Reply posted",
+  "es": "Respuesta publicada"
+ },
+ "Текст сохранён, заголовок не сохранён": {
+  "en": "Text saved, title not saved",
+  "es": "Texto guardado, título no guardado"
  }
 }

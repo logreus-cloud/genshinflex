@@ -156,8 +156,12 @@ fn fit_to_work_area(window: &tauri::WebviewWindow) -> tauri::Result<()> {
     let frame_height = outer.height.saturating_sub(inner.height);
     let min_width = ((360.0 * scale).ceil() as u32).saturating_add(frame_width);
     let min_height = ((480.0 * scale).ceil() as u32).saturating_add(frame_height);
-    let width = outer.width.min(area.size.width.max(min_width));
-    let height = outer.height.min(area.size.height.max(min_height));
+    let min_width = min_width.min(area.size.width);
+    let min_height = min_height.min(area.size.height);
+    window.set_min_size(Some(tauri::PhysicalSize::new(
+        min_width.saturating_sub(frame_width), min_height.saturating_sub(frame_height))))?;
+    let width = outer.width.max(min_width).min(area.size.width);
+    let height = outer.height.max(min_height).min(area.size.height);
     if width != outer.width || height != outer.height {
         window.set_size(tauri::PhysicalSize::new(width.saturating_sub(frame_width), height.saturating_sub(frame_height)))?;
     }
@@ -257,7 +261,7 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
                 let name = p.name().to_string_lossy();
                 name.eq_ignore_ascii_case("GenshinImpact.exe") || name.eq_ignore_ascii_case("YuanShen.exe")
             });
-            if previous == Some(false) && running && launch_enabled(&tooltip_handle) {
+            if previous != Some(true) && running && launch_enabled(&tooltip_handle) {
                 let handle = tooltip_handle.clone();
                 if let Err(error) = tooltip_handle.run_on_main_thread(move || show_passive(&handle)) {
                     eprintln!("Окно: {error}");

@@ -181,16 +181,12 @@ export async function purgeAccount(client: AdminClient, id: string) {
   const media = await Promise.all(['avatars', 'profile-media'].map(async (name) => ({
     name, paths: await mediaPaths(client, name, id),
   })));
-  const { error } = await client.auth.admin.deleteUser(id, false);
-  if (error) throw new Error('Account removal failed');
   for (const { name, paths } of media) {
     for (let offset = 0; offset < paths.length; offset += 100) {
-      try {
-        const { error } = await client.storage.from(name).remove(paths.slice(offset, offset + 100));
-        if (error) console.error('Media removal failed', id, name, error);
-      } catch (failure) {
-        console.error('Media removal failed', id, name, failure);
-      }
+      const { error } = await client.storage.from(name).remove(paths.slice(offset, offset + 100));
+      if (error) throw new Error('Media removal failed');
     }
   }
+  const { error } = await client.auth.admin.deleteUser(id, false);
+  if (error) throw new Error('Account removal failed');
 }

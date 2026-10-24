@@ -96,6 +96,32 @@ test('stops after a long 429', async () => {
   assert.deepEqual(acks, [[1]]);
 });
 
+test('stops without ack when Discord rejects the bot token while opening a DM', async () => {
+  const acks: number[][] = [];
+  let calls = 0;
+  const send: typeof fetch = async () => {
+    calls++;
+    return json({ message: '401: Unauthorized' }, 401);
+  };
+  assert.deepEqual(await deliverDiscordNotifications(client([item, { ...item, id: 2 }], acks), 'token', send),
+    { claimed: 2, sent: 0 });
+  assert.equal(calls, 1);
+  assert.deepEqual(acks, []);
+});
+
+test('acks earlier sends but stops without ack for a send rejected with 401', async () => {
+  const acks: number[][] = [];
+  let messages = 0;
+  const send: typeof fetch = async (input) => {
+    if (String(input).endsWith('/users/@me/channels')) return json({ id: 'channel' }, 201);
+    return ++messages === 1 ? json({ id: 'message' }) : json({ message: 'Unauthorized' }, 401);
+  };
+  assert.deepEqual(await deliverDiscordNotifications(client([item, { ...item, id: 2 }, { ...item, id: 3 }], acks), 'token', send),
+    { claimed: 3, sent: 1 });
+  assert.equal(messages, 2);
+  assert.deepEqual(acks, [[1]]);
+});
+
 test('without a token, skips the claim and HTTP requests', async () => {
   const unused = { rpc: async () => { throw new Error('RPC called'); } } as unknown as Parameters<typeof deliverDiscordNotifications>[0];
   const send: typeof fetch = async () => { throw new Error('HTTP called'); };

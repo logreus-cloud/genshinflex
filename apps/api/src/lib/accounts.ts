@@ -42,15 +42,24 @@ export async function listAccounts(client: AccountClient, input: { q?: string; f
   const parsed = Number(input.page);
   const page = Number.isInteger(parsed) && parsed >= 0 ? parsed : 0;
   if (page > 100_000) throw new AccountError('Слишком большой номер страницы', 400);
-  const { data, error } = await client.rpc('admin_accounts', {
+  const params = {
     p_query: (input.q || '').trim().slice(0, 100) || null,
     p_filter: filter,
     p_limit: pageSize,
     p_offset: page * pageSize,
-  });
+  };
+  const { data, error } = await client.rpc('admin_accounts', params);
   if (error) throw error;
   const items = (data || []) as Account[];
-  return { items, total: Number(items[0]?.total ?? 0), page, pageSize };
+  let total = Number(items[0]?.total ?? 0);
+  if (!items.length && page > 0) {
+    const first = await client.rpc('admin_accounts', {
+      ...params, p_limit: 1, p_offset: 0,
+    });
+    if (first.error) throw first.error;
+    total = Number((first.data as Account[] | null)?.[0]?.total ?? 0);
+  }
+  return { items, total, page, pageSize };
 }
 
 export async function getAccount(client: AccountClient, id: string): Promise<Account> {

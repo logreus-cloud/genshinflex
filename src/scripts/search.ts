@@ -13,8 +13,26 @@ import { pageLang, translate } from '../i18n/client';
 export const LANG = pageLang();
 export const BASE = LANG === 'ru' ? '' : `/${LANG}`;
 export const t = translate(LANG);
-let indexPromise: Promise<Index> | null = null;
-export const loadIndex = (): Promise<Index> => (indexPromise ??= fetch(`${BASE}/data/index.json`).then((r) => r.json()));
+// Клиентская навигация может сменить язык без перезагрузки модуля: язык и кеши — на каждый вызов
+const current = () => {
+  const lang = pageLang();
+  return { lang, base: lang === 'ru' ? '' : `/${lang}`, t: translate(lang) };
+};
+const indexes = new Map<string, Promise<Index>>();
+export const loadIndex = (): Promise<Index> => {
+  const { base } = current();
+  let promise = indexes.get(base);
+  if (!promise) {
+    promise = fetch(`${base}/data/index.json`).then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json() as Promise<Index>;
+    });
+    // Неудачную загрузку не кешируем, чтобы следующий поиск попробовал снова
+    promise.catch(() => { if (indexes.get(base) === promise) indexes.delete(base); });
+    indexes.set(base, promise);
+  }
+  return promise;
+};
 
 const norm = (s: string) => s.toLowerCase().replace(/ё/g, 'е');
 const score = (q: string, ...fields: string[]) => {
@@ -30,6 +48,7 @@ const score = (q: string, ...fields: string[]) => {
 export async function searchNames(query: string, limit = 8): Promise<Entry[]> {
   const q = norm(query.trim());
   if (!q) return [];
+  const { base: BASE, t } = current();
   const idx = await loadIndex();
   const found: (Entry & { score: number })[] = [
     ...idx.characters.map((c) => ({ score: score(q, c.n, c.e) + 0.3, href: `${BASE}/characters/${c.s}`, name: c.n, icon: c.i, kind: t('Персонаж') })),
@@ -43,11 +62,19 @@ export async function searchNames(query: string, limit = 8): Promise<Entry[]> {
 // Pagefind подключается через import() в обход Vite — файлы появляются только в dist
 type PagefindResult = { data: () => Promise<{ url: string; meta: { title?: string }; excerpt: string }> };
 type Pagefind = { search: (q: string) => Promise<{ results: PagefindResult[] }> };
-let pagefind: Promise<Pagefind | null> | null = null;
+const pagefinds = new Map<string, Promise<Pagefind | null>>();
 const dynamicImport = new Function('u', 'return import(u)') as (u: string) => Promise<Pagefind>;
 
 export async function searchText(query: string, limit = 5) {
-  pagefind ??= dynamicImport(`${BASE}/pagefind/pagefind.js`).catch(() => null);
+  const { base } = current();
+  let pagefind = pagefinds.get(base);
+  if (!pagefind) {
+    pagefind = dynamicImport(`${base}/pagefind/pagefind.js`).catch(() => {
+      pagefinds.delete(base);
+      return null;
+    });
+    pagefinds.set(base, pagefind);
+  }
   const pf = await pagefind;
   if (!pf || !query.trim()) return [];
   const { results } = await pf.search(query);

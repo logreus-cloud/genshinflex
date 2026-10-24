@@ -16,7 +16,8 @@ function el(tag: string, text = '', className = '') {
 export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
   const path = location.pathname.match(/\/forum\/t\/(\d+)\/?$/);
   const id = Number(path?.[1] || new URLSearchParams(location.search).get('id'));
-  const page = Math.max(1, Number(new URLSearchParams(location.search).get('page')) || 1);
+  const requested = Number(new URLSearchParams(location.search).get('page'));
+  const page = Number.isSafeInteger(requested) && requested > 1 && requested < 100_000 ? requested : 1;
   const status = root.querySelector<HTMLElement>('[data-status]')!;
   const heading = root.querySelector<HTMLElement>('[data-heading]')!;
   const postsBox = root.querySelector<HTMLElement>('[data-posts]')!;
@@ -39,7 +40,9 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       forumThread(id),
       forumPosts(id, PAGE_SIZE, (page - 1) * PAGE_SIZE),
       meRequest,
-      meRequest.then((user) => user ? socialBlockedIds() : new Set<string>()),
+      meRequest.then((user) => user
+        ? socialBlockedIds().catch(() => socialBlockedIds().catch(() => new Set<string>()))
+        : new Set<string>()),
     ]) as [ForumThread, ForumPost[], typeof me, Set<string>];
     if (signal.aborted) return;
     if (!thread) {
@@ -106,17 +109,36 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       if (!text) return;
       const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
       button.disabled = true;
+      // Пока ответ уходит, текст не меняется: иначе успех стёр бы уже новый черновик
+      body.readOnly = true;
+      const sentReplyTo = replyTo;
+      let postId: number;
       try {
-        const postId = await createPost(id, text, replyTo);
+        postId = await createPost(id, text, sentReplyTo);
+      } catch (error) {
+        if (!signal.aborted) {
+          status.textContent = forumErrorText(error, me?.banned_until);
+          button.disabled = false;
+          body.readOnly = false;
+        }
+        return;
+      }
+      if (signal.aborted) return;
+      body.readOnly = false;
+      body.value = '';
+      body.dispatchEvent(new Event('input'));
+      if (replyTo === sentReplyTo) replyTo = null;
+      status.textContent = t('Ответ опубликован');
+      try {
         const updated = await forumThread(id);
         if (!signal.aborted) {
           const lastPage = Math.max(1, Math.ceil((updated?.post_count ?? thread.post_count + 1) / PAGE_SIZE));
           location.assign(`${threadHref(BASE, id)}?page=${lastPage}#p${postId}`);
         }
-      } catch (error) {
-        if (!signal.aborted) status.textContent = forumErrorText(error, me?.banned_until);
+      } catch {
+        if (!signal.aborted) status.textContent = `${t('Ответ опубликован')}. ${t('Не удалось загрузить')}`;
       } finally {
-        button.disabled = false;
+        if (!signal.aborted) button.disabled = false;
       }
     }, { signal });
   }
@@ -132,6 +154,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
     try {
       const reason = deleteDialog.querySelector<HTMLInputElement>('input')!.value.slice(0, 200);
       await deletePost(deleteTarget, reason);
+      if (signal.aborted) return;
       deleteDialog.close();
       refresh();
     } catch (error) {
@@ -195,7 +218,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
         button.addEventListener('click', async () => {
           try {
             await setReaction(post.id, reaction.kind, !active);
-            refresh();
+            if (!signal.aborted) refresh();
           } catch (error) {
             status.textContent = forumErrorText(error);
           }
@@ -224,6 +247,7 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
     }
     if (post.mine && !post.deleted && !thread.locked) {
       action(t('Изменить'), () => {
+        if (card.querySelector('form')) return;
         const editor = el('form');
         const text = document.createElement('textarea');
         text.className = 'input';
@@ -240,14 +264,36 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
         }
         const save = el('button', t('Сохранить'), 'btn primary') as HTMLButtonElement;
         editor.append(save);
+        let bodySaved = false;
         editor.addEventListener('submit', async (event) => {
           event.preventDefault();
+          if (save.disabled) return;
+          save.disabled = true;
           try {
-            await editPost(post.id, text.value);
-            if (title && title.value.trim() !== thread.title) await editThread(thread.id, title.value);
-            refresh();
+            if (!bodySaved) {
+              text.disabled = true;
+              try {
+                await editPost(post.id, text.value);
+              } catch (error) {
+                if (!signal.aborted) text.disabled = false;
+                throw error;
+              }
+              bodySaved = true;
+            }
+            if (signal.aborted) return;
+            if (title && title.value.trim() !== thread.title) {
+              try {
+                await editThread(thread.id, title.value);
+              } catch (error) {
+                if (!signal.aborted) status.textContent = `${t('Текст сохранён, заголовок не сохранён')}. ${forumErrorText(error)}`;
+                return;
+              }
+            }
+            if (!signal.aborted) refresh();
           } catch (error) {
-            status.textContent = forumErrorText(error);
+            if (!signal.aborted) status.textContent = forumErrorText(error);
+          } finally {
+            if (!signal.aborted) save.disabled = false;
           }
         }, { signal });
         card.append(editor);
@@ -257,7 +303,9 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       action(t('Удалить'), () => {
         deleteTarget = post.id;
         if (me?.moderator) deleteDialog.showModal();
-        else void deletePost(post.id).then(refresh).catch((error) => {
+        else void deletePost(post.id).then(() => {
+          if (!signal.aborted) refresh();
+        }).catch((error) => {
           status.textContent = forumErrorText(error);
         });
       });
@@ -270,7 +318,9 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
     }
     if (me?.moderator && post.deleted) {
       action(t('Восстановить'), () => {
-        void restorePost(post.id).then(refresh).catch((error) => {
+        void restorePost(post.id).then(() => {
+          if (!signal.aborted) refresh();
+        }).catch((error) => {
           status.textContent = forumErrorText(error);
         });
       });
@@ -318,7 +368,9 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       const button = el('button', label, 'btn') as HTMLButtonElement;
       button.type = 'button';
       button.addEventListener('click', () => {
-        void moderateThread(id, change).then(refresh).catch((error) => {
+        void moderateThread(id, change).then(() => {
+          if (!signal.aborted) refresh();
+        }).catch((error) => {
           status.textContent = forumErrorText(error);
         });
       }, { signal });
@@ -338,7 +390,9 @@ export async function initForumThread(root: HTMLElement, signal: AbortSignal) {
       select.append(option);
     }
     select.addEventListener('change', () => {
-      void moderateThread(id, { p_category: select.value }).then(refresh).catch((error) => {
+      void moderateThread(id, { p_category: select.value }).then(() => {
+        if (!signal.aborted) refresh();
+      }).catch((error) => {
         status.textContent = forumErrorText(error);
       });
     }, { signal });

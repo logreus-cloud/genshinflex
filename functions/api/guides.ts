@@ -1,6 +1,7 @@
 // Приём гайдов из редактора: проверка, защита от спама, запись в очередь модерации (D1).
 // На сайт ничего не попадает само: заявки смотрим через npm run guides, одобренную превращаем в файл билда — npm run guide:md <id>
 import { guideMessages, sendAll, type DiscordEnv } from '../lib/discord';
+import { readLimited } from '../lib/body';
 
 interface Env extends DiscordEnv { DB: D1Database }
 interface Ctx { request: Request; env: Env; waitUntil: (p: Promise<unknown>) => void }
@@ -14,8 +15,9 @@ const slugs = (v: unknown, max: number) => (Array.isArray(v) ? v.filter((x): x i
 const list = (v: unknown, max: number) => (Array.isArray(v) ? v.slice(0, max).filter((x) => x && typeof x === 'object') as Record<string, unknown>[] : []);
 
 export async function onRequestPost({ request, env, waitUntil }: Ctx) {
-  const raw = await request.text();
-  if (raw.length > MAX_PAYLOAD) return json({ error: 'Гайд слишком большой — сократите текст' }, 413);
+  let raw: string | null;
+  try { raw = await readLimited(request, MAX_PAYLOAD); } catch { return json({ error: 'Не удалось прочитать гайд' }, 400); }
+  if (raw === null) return json({ error: 'Гайд слишком большой — сократите текст' }, 413);
   let body: Record<string, unknown>;
   try { body = JSON.parse(raw); } catch { return json({ error: 'Не удалось прочитать гайд' }, 400); }
   if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Не удалось прочитать гайд' }, 400);

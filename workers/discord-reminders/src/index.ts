@@ -36,13 +36,14 @@ const clip = (value: string, limit: number) => {
   return chars.length <= limit ? value : `${chars.slice(0, limit - 1).join('')}…`;
 };
 
-export function pick(events: Reminder[], hourMs: number): Picked[] {
+export function pick(events: Reminder[], scheduledTime: number): Picked[] {
+  const hour = Math.floor(scheduledTime / HOUR) * HOUR;
   const result: Picked[] = [];
   for (const event of events) {
     const at = Date.parse(event.at);
     if (!Number.isFinite(at)) continue;
-    const when = at >= hourMs + 24 * HOUR && at < hourMs + 25 * HOUR ? 'day'
-      : at >= hourMs && at < hourMs + HOUR ? 'now' : null;
+    const when = at >= hour + 24 * HOUR && at < hour + 25 * HOUR ? 'day'
+      : at > scheduledTime - HOUR && at <= scheduledTime ? 'now' : null;
     if (!when) continue;
     const text = (when === 'day' ? DAY : NOW)[event.type];
     if (text) result.push({ event, when, text });
@@ -96,16 +97,19 @@ async function upcoming(env: Env, hour: number) {
 export default {
   async scheduled(event: ScheduledController, env: Env, _ctx: ExecutionContext) {
     try {
-      const hour = Math.floor(event.scheduledTime / HOUR) * HOUR;
-      const items = await upcoming(env, hour);
+      const items = await upcoming(env, event.scheduledTime);
       if (!items.length) return;
       if (!env.DISCORD_WEBHOOK_REMINDERS) throw new Error('Не задан DISCORD_WEBHOOK_REMINDERS');
       for (let i = 0; i < items.length; i += 10) {
         // Роль пингуем только в первом сообщении
         const body = buildMessage(items.slice(i, i + 10), i === 0 ? env.DISCORD_REMINDERS_ROLE_ID : undefined);
-        await request(env.DISCORD_WEBHOOK_REMINDERS, 'Discord webhook', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
-        });
+        try {
+          await request(env.DISCORD_WEBHOOK_REMINDERS, 'Discord webhook', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+          });
+        } catch (error) {
+          console.error('Не удалось отправить напоминания в Discord:', error);
+        }
       }
     } catch (error) {
       console.error('Не удалось отправить напоминания в Discord:', error);
@@ -120,7 +124,7 @@ export default {
     if (!/^\d+$/.test(hours) || Number(hours) > 720) return new Response('hours: целое число от 0 до 720', { status: 400 });
     try {
       const hour = Math.floor((Date.now() + Number(hours) * HOUR) / HOUR) * HOUR;
-      const events = await upcoming(env, hour);
+      const events = await upcoming(env, hour + 5 * 60_000);
       return Response.json({ hour: new Date(hour).toISOString(), events, message: buildMessage(events, env.DISCORD_REMINDERS_ROLE_ID) });
     } catch (error) {
       console.error('Не удалось получить напоминания:', error);

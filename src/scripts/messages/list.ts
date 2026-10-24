@@ -146,6 +146,9 @@ export async function initConversationList(root: HTMLElement, signal: AbortSigna
       const nextChannel = supabase.channel(`messages:${owner}:${crypto.randomUUID()}`)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_messages' }, () => {
           if (channel === nextChannel && userId === owner && current(turn)) scheduleRefresh(owner, nextChannel, turn);
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'dm_messages' }, () => {
+          if (channel === nextChannel && userId === owner && current(turn)) scheduleRefresh(owner, nextChannel, turn);
         });
       channel = nextChannel;
       nextChannel.subscribe((status) => {

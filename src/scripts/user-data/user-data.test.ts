@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { clearUserData, createUserData, memoryStorage, readStrict, userDataKey, writePulled } from './index';
+import { wishStorageKey } from '../wish-store';
+
+test('wish history uses the old guest key and separate keys for users', () => {
+  assert.equal(wishStorageKey('123456789'), 'gf:wishes:123456789');
+  assert.equal(wishStorageKey('123456789', 'user-a'), 'gf:wishes@user-a:123456789');
+  assert.equal(wishStorageKey('123456789', 'user-b'), 'gf:wishes@user-b:123456789');
+});
 
 test('defaults and damaged stored values', () => {
   const storage = memoryStorage();

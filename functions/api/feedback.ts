@@ -1,5 +1,6 @@
 // Приём обратной связи: проверка, защита от спама, запись в D1. Читать сообщения: npm run feedback
 import { feedbackMessages, sendAll, type DiscordEnv } from '../lib/discord';
+import { readLimited } from '../lib/body';
 
 interface Env extends DiscordEnv { DB: D1Database }
 interface Ctx { request: Request; env: Env; waitUntil: (p: Promise<unknown>) => void }
@@ -9,17 +10,22 @@ const KINDS = new Set(['data', 'idea', 'bug', 'other']);
 const LIMIT_PER_HOUR = 5;
 
 export async function onRequestPost({ request, env, waitUntil }: Ctx) {
+  let raw: string | null;
+  try { raw = await readLimited(request, 16 * 1024); } catch { return json({ error: 'Не удалось прочитать форму' }, 400); }
+  if (raw === null) return json({ error: 'Форма слишком большая' }, 413);
   let body: Record<string, unknown>;
-  try { body = await request.json(); } catch { return json({ error: 'Не удалось прочитать форму' }, 400); }
+  try { body = JSON.parse(raw); } catch { return json({ error: 'Не удалось прочитать форму' }, 400); }
   if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Не удалось прочитать форму' }, 400);
 
   // Скрытое поле-ловушка: человек его не видит, бот заполняет. Отвечаем «успешно», чтобы бот не подбирал обход.
   if (typeof body.website === 'string' && body.website.trim()) return json({ ok: true }, 201);
 
-  const kind = String(body.kind ?? '');
-  const message = String(body.message ?? '').trim();
-  const contact = String(body.contact ?? '').trim().slice(0, 120);
-  const page = String(body.page ?? '').trim().slice(0, 200);
+  const text = (v: unknown) => (typeof v === 'string' ? v : '');
+  const kind = text(body.kind);
+  const message = text(body.message).trim();
+  const contact = text(body.contact).trim().slice(0, 120);
+  const page = typeof body.page === 'string' ? body.page : '';
+  const safePage = page.startsWith('/') && page[1] !== '/' && page[1] !== '\\' && !/[\\\u0000-\u001f\u007f-\u009f]/.test(page) ? page.slice(0, 200) : null;
   if (!KINDS.has(kind)) return json({ error: 'Выберите тип сообщения' }, 400);
   if (message.length < 10) return json({ error: 'Напишите хотя бы пару предложений — от 10 символов' }, 400);
   if (message.length > 3000) return json({ error: 'Слишком длинно: до 3000 символов' }, 400);
@@ -32,9 +38,9 @@ export async function onRequestPost({ request, env, waitUntil }: Ctx) {
   const result = await env.DB.prepare(
     'INSERT INTO feedback (kind, page, message, contact, ip_hash) SELECT ?, ?, ?, ?, ? ' +
     "WHERE (SELECT COUNT(*) FROM feedback WHERE ip_hash = ? AND created_at > datetime('now', '-1 hour')) < ?",
-  ).bind(kind, page || null, message, contact || null, ipHash, ipHash, LIMIT_PER_HOUR).run();
+  ).bind(kind, safePage, message, contact || null, ipHash, ipHash, LIMIT_PER_HOUR).run();
   if (result.meta?.changes === 0) return json({ error: 'Слишком много сообщений подряд — попробуйте через час' }, 429);
-  waitUntil(sendAll(feedbackMessages(env, { id: result.meta?.last_row_id, kind, page: page || null, message })));
+  waitUntil(sendAll(feedbackMessages(env, { id: result.meta?.last_row_id, kind, page: safePage, message })));
   return json({ ok: true }, 201);
 }
 

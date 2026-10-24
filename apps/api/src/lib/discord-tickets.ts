@@ -115,7 +115,8 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
       }
       if (opened.status !== 'exists') return;
       const response = await discordRequest(deps, `/channels/${opened.thread_id}`);
-      const archived = response.status === 404
+      const deleted = response.status === 404;
+      const archived = deleted
         || ((await response.json()) as { thread_metadata?: { archived?: boolean } }).thread_metadata?.archived === true;
       if (!archived) {
         content = `У вас уже есть открытый тикет: <#${opened.thread_id}>`;
@@ -125,10 +126,31 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
       const closing = await ticketRpc<CloseResult>(client, 'discord_ticket_close_begin', {
         p_thread_id: opened.thread_id, p_token: token,
       });
-      if (closing.status === 'claimed') {
+      if (closing.status === 'claimed' && closing.id !== opened.id) {
         await ticketRpc(client, 'discord_ticket_close_finish', {
-          p_id: closing.id, p_ok: closing.id === opened.id, p_token: token,
+          p_id: closing.id, p_ok: false, p_token: token,
         });
+      } else if (closing.status === 'claimed') {
+        try {
+          // Автоархивация не блокирует ветку: без locked пользователь откроет её снова сообщением
+          if (!deleted) {
+            await checkedRequest(deps, `/channels/${opened.thread_id}`, 'PATCH', {
+              archived: true, locked: true,
+            });
+          }
+          await ticketRpc(client, 'discord_ticket_close_finish', {
+            p_id: closing.id, p_ok: true, p_token: token,
+          });
+        } catch (error) {
+          try {
+            await ticketRpc(client, 'discord_ticket_close_finish', {
+              p_id: closing.id, p_ok: false, p_token: token,
+            });
+          } catch {
+            console.warn('discord ticket cleanup failed');
+          }
+          throw error;
+        }
       }
     }
     if (ticketId === undefined) return;

@@ -220,18 +220,23 @@ fn fetch_names(base: &tauri::Url) -> Option<Names> {
         Ok(client.GetStringAsync(&uri)?.join()?.to_string())
     })();
     match result {
+        Ok(raw) if raw.len() > 2 * 1024 * 1024 => { eprintln!("Имена персонажей: ответ слишком большой"); None }
         Ok(raw) => Names::from_json(&raw).or_else(|| { eprintln!("Некорректный список персонажей"); None }),
         Err(error) => { eprintln!("Имена персонажей: {error}"); None }
     }
 }
 
-fn load_names(base: &tauri::Url) -> Option<Names> {
+fn load_names(base: &tauri::Url, loading: &Arc<AtomicBool>) -> Option<Names> {
+    if loading.swap(true, Ordering::AcqRel) { return None; }
     let (sender, receiver) = mpsc::channel();
     let base = base.clone();
+    let in_progress = loading.clone();
     if let Err(error) = thread::Builder::new().name("overlay-names-http".into()).spawn(move || {
         let loaded = Apartment::new().and_then(|_apartment| fetch_names(&base));
+        in_progress.store(false, Ordering::Release);
         let _ = sender.send(loaded);
     }) {
+        loading.store(false, Ordering::Release);
         eprintln!("Имена персонажей: {error}");
         return None;
     }
@@ -286,8 +291,9 @@ pub fn start(app: AppHandle, window: WebviewWindow, enabled: Arc<AtomicBool>) {
         let (names_tx, names_rx) = mpsc::channel();
         if let Err(error) = thread::Builder::new().name("overlay-names".into()).spawn(move || {
             let Some(_apartment) = Apartment::new() else { return };
+            let loading = Arc::new(AtomicBool::new(false));
             loop {
-                let loaded = load_names(&base);
+                let loaded = load_names(&base, &loading);
                 let delay = if loaded.is_some() { Duration::from_secs(6 * 3600) } else { Duration::from_secs(5 * 60) };
                 if let Some(names) = loaded {
                     if names_tx.send(names).is_err() { return; }
