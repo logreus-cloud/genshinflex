@@ -7,8 +7,11 @@ import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
 import Investments from '../../../components/Investments.astro';
 import investments from '../../../data/investments.json';
+import { ROLES } from '../../../lib/rating/core';
+import { overall } from '../../../lib/rating/data';
 import { useData, LANGS, BETA_SOURCE, BETA_KIT_SOURCE, BETA_TALENT_LEVEL, type Character } from '../../../lib/data';
 import { makeLookup, renderGuide } from '../../../lib/guide-markup';
+const ratingLabels = { carry: 'Керри', subdps: 'Саб-DPS', support: 'Поддержка', sustain: 'Сустейн' } as const;
 const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
 
 export function getStaticPaths() {
@@ -17,6 +20,7 @@ export function getStaticPaths() {
 
 const { c } = Astro.props as { c: Character };
 const slug = c.slug;
+const characterRatings = ROLES.flatMap((role) => overall[role].filter((row) => row.slug === slug));
 const allBuilds = await getCollection('builds');
 const build = allBuilds.find((b) => b.data.character === c.slug);
 // На английском и испанском — переведённый текст разбора; сгенерированные разборы собираем из переведённого шаблона
@@ -137,10 +141,10 @@ const jsonLd = b && {
       <div class="two">
         <div class="panel">
           <p>{c.description}</p>
-          <div class="ratings" data-pagefind-ignore>
-            <div><span class="muted small">{t('ELO сообщества')}</span><b>{t('скоро')}</b></div>
-            <div><span class="muted small">{t('ELO по забегам')}</span><b>{t('скоро')}</b></div>
-          </div>
+          {characterRatings.length > 0 && <div class="ratings" data-pagefind-ignore>
+            <span class="muted small">{t('Рейтинг')}:</span>
+            {characterRatings.map((row) => <a class="chip" href={`${base}/rating/#${row.role}`}>{t(ratingLabels[row.role])} · {row.score} · {row.tier}</a>)}
+          </div>}
         </div>
         <LevelStats stats={c.stats} substat={c.substat} substatPercent={c.substatPercent} />
       </div>
@@ -427,8 +431,8 @@ const jsonLd = b && {
   .tabs a[aria-current] { color: var(--accent-text); border-bottom-color: var(--accent); }
 
   .two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; }
-  .ratings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
-  .ratings div { display: grid; background: var(--surface-2); border-radius: var(--radius); padding: .6rem .8rem; }
+  .ratings { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: 1rem; }
+  .ratings a { text-decoration: none; }
 
   .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
   .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }

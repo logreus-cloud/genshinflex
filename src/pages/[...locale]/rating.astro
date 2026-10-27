@@ -1,31 +1,215 @@
 ---
+import { getCollection } from 'astro:content';
 import { useData, LANGS } from '../../lib/data';
 import Layout from '../../layouts/Layout.astro';
+import CharacterIcon from '../../components/CharacterIcon.astro';
+import Team from '../../components/Team.astro';
+import rating from '../../data/rating.json';
+import manual from '../../data/rating-manual.json';
+import { buildOverall, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, simUrl, type Element, type RatingData, type RatingManual, type Role, type TeamRow } from '../../lib/rating/core';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { base, t } = useData(Astro.currentLocale);
+const { base, t, lang, characters, fmtNumber } = useData(Astro.currentLocale);
+const data = rating as RatingData;
+const expert = manual as RatingManual;
+const overall = buildOverall(data, expert);
+const bySlug = new Map(characters.map((c) => [c.slug, c]));
+const roles: { id: Role; label: string }[] = [
+  { id: 'carry', label: 'Керри' }, { id: 'subdps', label: 'Саб-DPS' },
+  { id: 'support', label: 'Поддержка' }, { id: 'sustain', label: 'Сустейн' },
+];
+const tabs = [...roles, { id: 'abyss', label: 'Бездна' }, { id: 'theater', label: 'Театр' }, { id: 'method', label: 'Как считаем' }];
+const compact = new Intl.NumberFormat({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { notation: 'compact', maximumFractionDigits: 2 });
+const teams = data.teams.filter((team) => team.m.length === 4 && team.m.every((slug) => bySlug.has(slug)));
+const members = (team: TeamRow) => team.m.map((slug) => bySlug.get(slug)!);
+const elements = (team: TeamRow): Element[] => members(team).map((c) => c.element as Element);
+const reaction = (team: TeamRow) => {
+  const label = reactionLabel(team.reaction, elements(team));
+  return label.startsWith('Моно ') ? t('Моно {element}', { element: t(label.slice(5)) }) : t(label);
+};
+const rotations = await getCollection('rotations');
+const abyss = rotations.find((r) => r.data.mode === 'abyss')?.data;
+const theater = rotations.find((r) => r.data.mode === 'theater')?.data;
+const seasonElements = theater?.tags.map(elementFromRu).filter((el): el is Element => el !== null) ?? [];
+const cast = theater?.cast.flatMap((group) => group.members) ?? [];
+const theaterTeams = seasonElements.length
+  ? rankTeams(teams, (team) => fitsTheater(members(team).map((c) => ({ slug: c.slug, element: c.element as Element })), seasonElements, cast), 15)
+  : [];
+const sustainLevels = { plenty: 'с запасом', enough: 'хватает', low: 'мало' } as const;
+const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лечение и щит' } as const;
 ---
-<Layout title={t('Рейтинг')}>
+<Layout title={t('Рейтинг')} description={t('Рейтинг персонажей Genshin Impact по ролям и лучшие команды текущей Бездны и Театра по симуляциям gcsim.')} wide>
   <h1>{t('Рейтинг')}</h1>
-  <p class="muted">{t('Вместо тир-листа — два независимых рейтинга. Оба считаются отдельно для каждого режима и цикла.')}</p>
-  <div class="grid">
-    <div class="panel">
-      <h2>{t('ELO сообщества')}</h2>
-      <p>{t('Сайт показывает двух персонажей или две команды под конкретную комнату текущего цикла, вы выбираете, кто лучше. Каждый голос — «матч» для рейтинга.')}</p>
-      <span class="chip">{t('в разработке')}</span>
+  <p class="muted intro">{t('Рейтинг по ролям и командам текущих циклов основан на открытых симуляциях gcsim из базы KQM. Роли между собой не сравниваются.')}</p>
+  <div data-rating-tabs>
+    <div class="tabs" role="tablist" aria-label={t('Разделы рейтинга')}>
+      {tabs.map(({ id, label }, i) => <button id={`tab-${id}`} type="button" role="tab" aria-controls={id} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={id}>{t(label)}</button>)}
     </div>
-    <div class="panel">
-      <h2>{t('ELO по забегам')}</h2>
-      <p>{t('Игроки отправляют команду и время прохождения. Команда, прошедшая ту же комнату быстрее, «выигрывает». Рейтинг открывается, когда набирается достаточно забегов.')}</p>
-      <span class="chip">{t('в разработке')}</span>
-    </div>
+    {roles.map(({ id, label }) => (
+      <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`}>
+        <h2 class="h-sec">{t(label)}</h2>
+        <ol class="rating-list">
+          {overall[id].filter((row) => bySlug.has(row.slug)).map((row) => {
+            const c = bySlug.get(row.slug)!;
+            const sustain = expert.sustain[row.slug];
+            const sources = row.kind === 'expert' ? expert.characters[row.slug]?.sources ?? [] : [];
+            return <li class="panel rating-row">
+              <span class="place">{row.rank}</span>
+              <CharacterIcon slug={row.slug} size={44} label={false} />
+              <div class="rating-main">
+                <div class="rating-head">
+                  <a class="name" href={`${base}/characters/${c.slug}/`}>{c.name}</a>
+                  <span class:list={['chip', 'tier', `tier-${row.tier}`]}>{row.tier}</span>
+                </div>
+                <div class="score-line">
+                  <span class="score-track"><span style={`width:${row.score}%`}></span></span>
+                  <b>{row.score}</b>
+                </div>
+                <div class="rating-meta muted small">
+                  {row.value !== null && <span>{id === 'support' ? t('DPS команды {n}', { n: compact.format(row.value) }) : t('{n} DPS', { n: compact.format(row.value) })}</span>}
+                  {row.kind === 'expert' && <span class="chip">{t('экспертная оценка')}</span>}
+                  {sustain && <><span class="chip">{t(sustainLevels[sustain.level])}</span><span>{t(sustainKinds[sustain.kind])}</span></>}
+                  {row.note && <span>{t(row.note)}</span>}
+                  {row.kind === 'sim' && row.source && <a href={row.source.url} target="_blank" rel="noopener">{t('симуляция')}</a>}
+                  {sources.map((source) => <a href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}
+                </div>
+                {row.team && <details><summary>{t('Лучшая команда')}</summary><Team members={row.team} /></details>}
+              </div>
+            </li>;
+          })}
+        </ol>
+      </section>
+    ))}
+    <section id="abyss" class="rating-section" role="tabpanel" aria-labelledby="tab-abyss">
+      <h2 class="h-sec">{t('Бездна')}</h2>
+      {abyss && <>
+        <p class="muted">{t(abyss.cycle)} · <a href={`${base}/abyss/`}>{t('Текущий цикл →')}</a></p>
+        {(abyss.halves.length ? abyss.halves : [{ label: 'Все команды', need: [] }]).map((half) => (
+          <div class="team-section">
+            <h3>{t(half.label)}</h3>
+            <ol class="rating-list">
+              {rankTeams(teams, (team) => fitsAbyssHalf(elements(team), half.need as Element[][]), 10).map((team) => (
+                <li class="panel team-row">
+                  <span class="place">{team.rank}</span>
+                  <div class="team-info">
+                    <div class="team-icons">{team.m.map((slug) => <CharacterIcon slug={slug} size={44} label={false} />)}</div>
+                    <span class="muted small">{reaction(team)}</span>
+                  </div>
+                  <div class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></div>
+                  <span class="muted small">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
+                  <a href={simUrl(team.id)} target="_blank" rel="noopener">{t('симуляция')}</a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </>}
+    </section>
+    <section id="theater" class="rating-section" role="tabpanel" aria-labelledby="tab-theater">
+      <h2 class="h-sec">{t('Театр')}</h2>
+      {theater && <p class="muted">{t(theater.cycle)} · <a href={`${base}/theater/`}>{t('Текущий цикл →')}</a></p>}
+      {seasonElements.length ? <ol class="rating-list">
+        {theaterTeams.map((team) => (
+          <li class="panel team-row">
+            <span class="place">{team.rank}</span>
+            <div class="team-info">
+              <div class="team-icons">{team.m.map((slug) => <CharacterIcon slug={slug} size={44} label={false} />)}</div>
+              <span class="muted small">{reaction(team)}</span>
+            </div>
+            <div class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></div>
+            <span class="muted small">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
+            <a href={simUrl(team.id)} target="_blank" rel="noopener">{t('симуляция')}</a>
+          </li>
+        ))}
+      </ol> : <p class="notice">{t('Данные сезона не заполнены')}</p>}
+    </section>
+    <section id="method" class="rating-section" role="tabpanel" aria-labelledby="tab-method">
+      <h2 class="h-sec">{t('Как считаем')}</h2>
+      <ul class="method">
+        <li>{t('Основа — открытые симуляции из базы KQM на движке gcsim.')}</li>
+        <li>{t('База: 5★ C0 и оружие R1, 4★ C6 и оружие R5; уровень 90, таланты 9/9/9, стандарт KQM.')}</li>
+        <li>{t('Керри и саб-DPS оцениваются по своему урону, поддержка — по урону команды. Роли не сравниваются друг с другом.')}</li>
+        <li>{t('Сустейн и персонажи без симуляций получают экспертную оценку.')}</li>
+        <li>{t('Тиры: S от 85, A от 70, B от 50, C ниже 50 баллов.')}</li>
+        <li>{t('ELO сообщества появится позже.')}</li>
+      </ul>
+      <p class="muted small">{t('Данные от {date} · симуляций по базе: {baseline} из {entries}',{ date: data._meta.date, entries: fmtNumber(data._meta.entries), baseline: fmtNumber(data._meta.baseline) })}</p>
+      <p><a href="https://db.kqm.gg/" target="_blank" rel="noopener">db.kqm.gg</a> · <a href="https://gcsim.app/" target="_blank" rel="noopener">gcsim.app</a></p>
+    </section>
   </div>
-  <p class="notice note">
-    {t('Считаем по Glicko-2: вместе с рейтингом хранится неуверенность, поэтому у персонажа с малым числом матчей видно «±», а не случайную цифру.')}
-  </p>
 </Layout>
 
+<script>
+  import { onPage } from '../../scripts/router';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-rating-tabs]');
+    if (!root) return;
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = tabs.map((tab) => document.getElementById(tab.dataset.tab!)!);
+    const select = (index: number, updateHash = false) => {
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+        panels[i].hidden = i !== index;
+      });
+      if (updateHash) history.pushState(null, '', `#${tabs[index].dataset.tab}`);
+    };
+    const fromHash = () => select(Math.max(0, tabs.findIndex((tab) => `#${tab.dataset.tab}` === location.hash)));
+    root.classList.add('ready');
+    fromHash();
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i, true), { signal });
+      tab.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const next = (i + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        select(next, true);
+        tabs[next].focus();
+      }, { signal });
+    });
+    window.addEventListener('popstate', fromHash, { signal });
+    window.addEventListener('hashchange', fromHash, { signal });
+  });
+</script>
+
 <style>
-  .panel h2 { margin-top: 0; }
-  .note { margin-top: 1.4rem; }
+  .intro { max-width: 75ch; }
+  .tabs { display: none; flex-wrap: wrap; gap: .3rem; margin: 1.4rem 0; border-bottom: 1px solid var(--border); }
+  .ready .tabs { display: flex; }
+  .tabs button { border: 0; border-bottom: 2px solid transparent; padding: .65rem .8rem; background: none; color: var(--muted); cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--accent-text); border-bottom-color: var(--accent); }
+  .rating-section { margin: 1.5rem 0; }
+  .rating-section[hidden] { display: none; }
+  .rating-list { list-style: none; display: grid; gap: .6rem; padding: 0; margin: 0; }
+  .rating-row { display: flex; align-items: start; gap: .7rem; min-width: 0; }
+  .place { flex: none; width: 1.5rem; padding-top: .7rem; color: var(--muted); text-align: center; font-weight: 600; }
+  .rating-main { flex: 1; min-width: 0; }
+  .rating-head, .score-line, .team-score { display: flex; align-items: center; gap: .5rem; }
+  .rating-head { justify-content: space-between; }
+  .name { font-weight: 600; overflow-wrap: anywhere; }
+  .score-line { margin: .35rem 0; }
+  .score-track { flex: 1; height: .45rem; overflow: hidden; border-radius: 999px; background: var(--surface-3); }
+  .score-track span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+  .score-line b { min-width: 2em; text-align: right; }
+  .rating-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem; }
+  .tier { font-weight: 700; border-color: transparent; }
+  .tier-S { background: color-mix(in srgb, #58b97b 25%, var(--surface)); color: color-mix(in srgb, #58b97b 60%, var(--text)); }
+  .tier-A { background: color-mix(in srgb, #5794db 25%, var(--surface)); color: color-mix(in srgb, #5794db 60%, var(--text)); }
+  .tier-B { background: color-mix(in srgb, #c69a44 25%, var(--surface)); color: color-mix(in srgb, #c69a44 60%, var(--text)); }
+  .tier-C { background: var(--surface-3); color: var(--text); }
+  details { margin-top: .45rem; }
+  summary { color: var(--accent-text); cursor: pointer; }
+  details :global(.team) { margin-top: .5rem; }
+  .team-section { margin-top: 1.2rem; }
+  .team-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; min-width: 0; }
+  .team-row .place { padding: 0; }
+  .team-info { flex: 1 1 240px; min-width: 0; display: grid; gap: .3rem; }
+  .team-icons { display: flex; gap: .3rem; }
+  .team-score { font-variant-numeric: tabular-nums; }
+  .method { display: grid; gap: .5rem; padding-left: 1.3rem; }
+  @media (max-width: 440px) {
+    .rating-row, .team-row { padding: .75rem; gap: .45rem; }
+    .team-info { flex-basis: 190px; }
+  }
 </style>

@@ -6162,5 +6162,209 @@
  "Текст сохранён, заголовок не сохранён": {
   "en": "Text saved, title not saved",
   "es": "Texto guardado, título no guardado"
+ },
+ "Рейтинг персонажей Genshin Impact по ролям и лучшие команды текущей Бездны и Театра по симуляциям gcsim.": {
+  "en": "Genshin Impact character ratings by role and the best teams for the current Abyss and Theater based on gcsim simulations.",
+  "es": "Clasificación de personajes de Genshin Impact por rol y mejores equipos del Abismo y Teatro actuales según simulaciones de gcsim."
+ },
+ "Рейтинг по ролям и командам текущих циклов основан на открытых симуляциях gcsim из базы KQM. Роли между собой не сравниваются.": {
+  "en": "Role and current-cycle team ratings use open gcsim simulations from the KQM database. Roles are rated separately.",
+  "es": "Las clasificaciones por rol y de equipos de los ciclos actuales usan simulaciones abiertas de gcsim de la base KQM. Los roles se valoran por separado."
+ },
+ "Разделы рейтинга": {
+  "en": "Rating sections",
+  "es": "Secciones de la clasificación"
+ },
+ "Керри": {
+  "en": "Carry",
+  "es": "Carry"
+ },
+ "Саб-DPS": {
+  "en": "Sub-DPS",
+  "es": "Sub-DPS"
+ },
+ "Сустейн": {
+  "en": "Sustain",
+  "es": "Sustento"
+ },
+ "Как считаем": {
+  "en": "How we calculate",
+  "es": "Cómo calculamos"
+ },
+ "Все команды": {
+  "en": "All teams",
+  "es": "Todos los equipos"
+ },
+ "{n} DPS": {
+  "en": "{n} DPS",
+  "es": "{n} DPS"
+ },
+ "DPS команды {n}": {
+  "en": "Team DPS {n}",
+  "es": "DPS del equipo {n}"
+ },
+ "экспертная оценка": {
+  "en": "expert rating",
+  "es": "valoración experta"
+ },
+ "симуляция": {
+  "en": "simulation",
+  "es": "simulación"
+ },
+ "Лучшая команда": {
+  "en": "Best team",
+  "es": "Mejor equipo"
+ },
+ "с запасом": {
+  "en": "comfortable",
+  "es": "con margen"
+ },
+ "хватает": {
+  "en": "enough",
+  "es": "suficiente"
+ },
+ "мало": {
+  "en": "low",
+  "es": "escaso"
+ },
+ "лечение": {
+  "en": "healing",
+  "es": "curación"
+ },
+ "щит": {
+  "en": "shield",
+  "es": "escudo"
+ },
+ "лечение и щит": {
+  "en": "healing and shield",
+  "es": "curación y escudo"
+ },
+ "Данные сезона не заполнены": {
+  "en": "Season data is incomplete",
+  "es": "Faltan datos de la temporada"
+ },
+ "Основа — открытые симуляции из базы KQM на движке gcsim.": {
+  "en": "The rating uses open simulations from the KQM database run with gcsim.",
+  "es": "La clasificación usa simulaciones abiertas de la base KQM ejecutadas con gcsim."
+ },
+ "База: 5★ C0 и оружие R1, 4★ C6 и оружие R5; уровень 90, таланты 9/9/9, стандарт KQM.": {
+  "en": "Baseline: 5★ at C0 with R1 weapons, 4★ at C6 with R5 weapons; level 90, talents 9/9/9 and KQM standards.",
+  "es": "Base: 5★ C0 con armas R1, 4★ C6 con armas R5; nivel 90, talentos 9/9/9 y estándar KQM."
+ },
+ "Керри и саб-DPS оцениваются по своему урону, поддержка — по урону команды. Роли не сравниваются друг с другом.": {
+  "en": "Carry and sub-DPS use their own damage; support uses team damage. Roles are rated separately.",
+  "es": "Carry y sub-DPS se valoran por su propio daño; apoyo, por el daño del equipo. Los roles se valoran por separado."
+ },
+ "Сустейн и персонажи без симуляций получают экспертную оценку.": {
+  "en": "Sustain and characters without simulations receive an expert rating.",
+  "es": "Sustento y los personajes sin simulaciones reciben una valoración experta."
+ },
+ "Тиры: S от 85, A от 70, B от 50, C ниже 50 баллов.": {
+  "en": "Tiers: S from 85, A from 70, B from 50 and C below 50 points.",
+  "es": "Niveles: S desde 85, A desde 70, B desde 50 y C por debajo de 50 puntos."
+ },
+ "ELO сообщества появится позже.": {
+  "en": "Community ELO will come later.",
+  "es": "La clasificación ELO de la comunidad llegará más adelante."
+ },
+ "Данные от {date} · симуляций по базе: {baseline} из {entries}": {
+  "en": "Data from {date} · simulations matching the baseline: {baseline} of {entries}",
+  "es": "Datos del {date} · simulaciones con la base: {baseline} de {entries}"
+ },
+ "Рейтинг команд этого цикла →": {
+  "en": "Team ratings for this cycle →",
+  "es": "Clasificación de equipos de este ciclo →"
+ },
+ "Персонажи по ролям и лучшие команды текущих циклов.": {
+  "en": "Characters by role and the best teams for current cycles.",
+  "es": "Personajes por rol y mejores equipos de los ciclos actuales."
+ },
+ "Моно {element}": {
+  "en": "Mono {element}",
+  "es": "Mono {element}"
+ },
+ "Испарение": {
+  "en": "Vaporize",
+  "es": "Vaporizado"
+ },
+ "Таяние": {
+  "en": "Melt",
+  "es": "Derretido"
+ },
+ "Цветение": {
+  "en": "Bloom",
+  "es": "Florecimiento"
+ },
+ "Вегетация": {
+  "en": "Hyperbloom",
+  "es": "Sobreflorecimiento"
+ },
+ "Возгорание": {
+  "en": "Burgeon",
+  "es": "Crepitar"
+ },
+ "Обострение": {
+  "en": "Aggravate",
+  "es": "Intensificación"
+ },
+ "Разрастание": {
+  "en": "Spread",
+  "es": "Propagación"
+ },
+ "Бодрость": {
+  "en": "Quicken",
+  "es": "Aceleración"
+ },
+ "Перегрузка": {
+  "en": "Overloaded",
+  "es": "Sobrecarga"
+ },
+ "Сверхпроводник": {
+  "en": "Superconduct",
+  "es": "Superconductor"
+ },
+ "Заряжен": {
+  "en": "Electro-Charged",
+  "es": "Electrocargado"
+ },
+ "Лунный заряд": {
+  "en": "Lunar-Charged",
+  "es": "Carga Lunar"
+ },
+ "Лунное цветение": {
+  "en": "Lunar-Bloom",
+  "es": "Florecimiento Lunar"
+ },
+ "Рассеивание": {
+  "en": "Swirl",
+  "es": "Torbellino"
+ },
+ "Кристаллизация": {
+  "en": "Crystallize",
+  "es": "Cristalización"
+ },
+ "Заморозка": {
+  "en": "Freeze",
+  "es": "Congelado"
+ },
+ "Раскол": {
+  "en": "Shatter",
+  "es": "Ruptura"
+ },
+ "Горение": {
+  "en": "Burning",
+  "es": "Quemadura"
+ },
+ "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60": {
+  "en": "Not in gcsim yet; scored from tier lists: SS — 92, S — 82, A — 72, B — 60",
+  "es": "Aún no está en gcsim; puntuación según tier lists: SS — 92, S — 82, A — 72, B — 60"
+ },
+ "Game8: тир-лист 7.1": {
+  "en": "Game8: 7.1 tier list",
+  "es": "Game8: tier list 7.1"
+ },
+ "Pocket Gamer: тир-лист 7.1": {
+  "en": "Pocket Gamer: 7.1 tier list",
+  "es": "Pocket Gamer: tier list 7.1"
  }
 }

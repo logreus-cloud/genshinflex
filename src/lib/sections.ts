@@ -44,7 +44,7 @@ export const SECTIONS: Section[] = [
   { id: 'rotation-builder', href: '/tools/rotation-builder', label: 'Конструктор ротаций', icon: 'tool', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 4 },
   { id: 'calculator', href: '/tools/calculator', label: 'Калькулятор прокачки', icon: 'calc', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 5 },
   { id: 'app', href: '/app', label: 'Оверлей для ПК', icon: 'tool', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 6 },
-  { id: 'rating', href: '/rating', label: 'Рейтинг', icon: 'chart', navGroup: 'В разработке', footerColumn: 'Эндгейм', footerOrder: 7, soon: true },
+  { id: 'rating', href: '/rating', label: 'Рейтинг', icon: 'chart', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 7 },
   { id: 'banner-history', href: '/banners/#history', label: 'История баннеров', icon: 'moon', footerColumn: 'Эндгейм', footerOrder: 6, footerOnly: true },
   { id: 'map', href: (lang: Lang) => `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`, label: 'Карта Тейвата', icon: 'home', footerColumn: 'Инструменты', footerOrder: 7, footerOnly: true, external: true },
   { id: 'telegram', href: (_lang: Lang, social: Social) => social.telegram, label: 'Telegram-канал', icon: 'book', footerColumn: 'Сайт', footerOrder: 3, footerOnly: true, external: true },

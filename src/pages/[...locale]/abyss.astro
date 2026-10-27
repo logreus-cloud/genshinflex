@@ -61,6 +61,7 @@ const guides = new Map(await Promise.all(floors.map(async (f) => [f.floor, await
         <>
           <h3 class="sub">{t('Команды для {n} этажа', { n: f.floor })}</h3>
           <div class="grid">{(f.floor === top ? r.teams : f.teams).map((tm) => <Team {...tm} />)}</div>
+          {f.floor === top && <p><a href={`${base}/rating/#abyss`}>{t('Рейтинг команд этого цикла →')}</a></p>}
         </>
       )}
 

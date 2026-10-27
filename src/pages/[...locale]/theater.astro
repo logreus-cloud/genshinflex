@@ -10,7 +10,7 @@ import { endgameGuide } from '../../lib/community-guides';
 import { useData, LANGS } from '../../lib/data';
 // Страница режима эндгейма: текущий цикл, баффы, состав и команды
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { t, MODES, lang } = useData(Astro.currentLocale);
+const { t, base, MODES, lang } = useData(Astro.currentLocale);
 
 const r = (await getCollection('rotations')).find((x) => x.data.mode === 'theater')!.data;
 const guide = await endgameGuide('theater', lang, r.start);
@@ -24,6 +24,7 @@ const guide = await endgameGuide('theater', lang, r.start);
     <>
       <EndgameGuide part="difficulties" difficulties={r.difficulties} />
       <ModeExtras buffs={r.buffs} cast={r.cast} teams={r.teams} teamsTitle={t('Универсальные команды')} sources={[]} />
+      <p><a href={`${base}/rating/#theater`}>{t('Рейтинг команд этого цикла →')}</a></p>
       <EndgameGuide part="stages" stages={r.stages} />
       <EndgameGuide part="media" videos={r.videos} external={r.external} />
     </>
