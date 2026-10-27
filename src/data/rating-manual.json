@@ -1,0 +1,405 @@
+{
+ "_note": "Экспертные оценки для персонажей без симуляций gcsim и для сустейна. Методика — docs/adr/0003.",
+ "characters": {
+  "vesna": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "carry",
+     "score": 92,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "sandrone": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "carry",
+     "score": 92,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "traveler-cryo": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "carry",
+     "score": 87,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "zibai": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "carry",
+     "score": 87,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "nefer": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "carry",
+     "score": 87,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "lohen": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "carry",
+     "score": 82,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "odette": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "subdps",
+     "score": 92,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    },
+    {
+     "role": "support",
+     "score": 92,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "linnea": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "subdps",
+     "score": 90,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    },
+    {
+     "role": "support",
+     "score": 90,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "iansan": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "support",
+     "score": 90,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "vodyanitsa": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "support",
+     "score": 85,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "alyosha": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "support",
+     "score": 80,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "illuga": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "support",
+     "score": 72,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  },
+  "kachina": {
+   "patch": "7.1",
+   "sources": [
+    {
+     "title": "Game8: тир-лист 7.1",
+     "url": "https://game8.co/games/Genshin-Impact/archives/297465"
+    },
+    {
+     "title": "Pocket Gamer: тир-лист 7.1",
+     "url": "https://www.pocketgamer.com/genshin-impact/tier-list"
+    }
+   ],
+   "roles": [
+    {
+     "role": "subdps",
+     "score": 60,
+     "note": "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60"
+    }
+   ]
+  }
+ },
+ "sustain": {
+  "bennett": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "sangonomiya-kokomi": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "baizhu": {
+   "level": "plenty",
+   "kind": "both"
+  },
+  "charlotte": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "sigewinne": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "yaoyao": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "jean": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "barbara": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "qiqi": {
+   "level": "plenty",
+   "kind": "heal"
+  },
+  "zhongli": {
+   "level": "plenty",
+   "kind": "shield"
+  },
+  "furina": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "xianyun": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "kuki-shinobu": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "diona": {
+   "level": "enough",
+   "kind": "both"
+  },
+  "layla": {
+   "level": "enough",
+   "kind": "shield"
+  },
+  "noelle": {
+   "level": "enough",
+   "kind": "both"
+  },
+  "thoma": {
+   "level": "enough",
+   "kind": "shield"
+  },
+  "kirara": {
+   "level": "enough",
+   "kind": "shield"
+  },
+  "lan-yan": {
+   "level": "enough",
+   "kind": "shield"
+  },
+  "xilonen": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "citlali": {
+   "level": "enough",
+   "kind": "shield"
+  },
+  "escoffier": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "dori": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "mika": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "ifa": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "dahlia": {
+   "level": "enough",
+   "kind": "shield"
+  },
+  "vodyanitsa": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "jahoda": {
+   "level": "enough",
+   "kind": "heal"
+  },
+  "beidou": {
+   "level": "low",
+   "kind": "shield"
+  },
+  "xinyan": {
+   "level": "low",
+   "kind": "shield"
+  },
+  "chevreuse": {
+   "level": "low",
+   "kind": "heal"
+  },
+  "sayu": {
+   "level": "low",
+   "kind": "heal"
+  }
+ }
+}
