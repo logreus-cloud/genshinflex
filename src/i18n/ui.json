@@ -6167,10 +6167,6 @@
   "en": "Genshin Impact character ratings by role and the best teams for the current Abyss and Theater based on gcsim simulations.",
   "es": "Clasificación de personajes de Genshin Impact por rol y mejores equipos del Abismo y Teatro actuales según simulaciones de gcsim."
  },
- "Рейтинг по ролям и командам текущих циклов основан на открытых симуляциях gcsim из базы KQM. Роли между собой не сравниваются.": {
-  "en": "Role and current-cycle team ratings use open gcsim simulations from the KQM database. Roles are rated separately.",
-  "es": "Las clasificaciones por rol y de equipos de los ciclos actuales usan simulaciones abiertas de gcsim de la base KQM. Los roles se valoran por separado."
- },
  "Разделы рейтинга": {
   "en": "Rating sections",
   "es": "Secciones de la clasificación"
@@ -6250,10 +6246,6 @@
  "База: 5★ C0 и оружие R1, 4★ C6 и оружие R5; уровень 90, таланты 9/9/9, стандарт KQM.": {
   "en": "Baseline: 5★ at C0 with R1 weapons, 4★ at C6 with R5 weapons; level 90, talents 9/9/9 and KQM standards.",
   "es": "Base: 5★ C0 con armas R1, 4★ C6 con armas R5; nivel 90, talentos 9/9/9 y estándar KQM."
- },
- "Керри и саб-DPS оцениваются по своему урону, поддержка — по урону команды. Роли не сравниваются друг с другом.": {
-  "en": "Carry and sub-DPS use their own damage; support uses team damage. Roles are rated separately.",
-  "es": "Carry y sub-DPS se valoran por su propio daño; apoyo, por el daño del equipo. Los roles se valoran por separado."
  },
  "Сустейн и персонажи без симуляций получают экспертную оценку.": {
   "en": "Sustain and characters without simulations receive an expert rating.",
@@ -6355,10 +6347,6 @@
   "en": "Burning",
   "es": "Quemadura"
  },
- "Нет в gcsim; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60": {
-  "en": "Not in gcsim yet; scored from tier lists: SS — 92, S — 82, A — 72, B — 60",
-  "es": "Aún no está en gcsim; puntuación según tier lists: SS — 92, S — 82, A — 72, B — 60"
- },
  "Game8: тир-лист 7.1": {
   "en": "Game8: 7.1 tier list",
   "es": "Game8: tier list 7.1"
@@ -6366,5 +6354,41 @@
  "Pocket Gamer: тир-лист 7.1": {
   "en": "Pocket Gamer: 7.1 tier list",
   "es": "Pocket Gamer: tier list 7.1"
+ },
+ "Рейтинг по ролям и командам текущих циклов основан на открытых симуляциях gcsim из базы KQM и наших прогонах. Роли между собой не сравниваются.": {
+  "en": "Role and current-cycle team ratings use open gcsim simulations from the KQM database and our own runs. Roles are rated separately.",
+  "es": "Las clasificaciones por rol y de equipos de los ciclos actuales usan simulaciones abiertas de gcsim de la base KQM y nuestras propias ejecuciones. Los roles se valoran por separado."
+ },
+ "{pct}% к урону команды": {
+  "en": "{pct}% to team damage",
+  "es": "{pct}% al daño del equipo"
+ },
+ "по {n} заменам": {
+  "en": "across {n} swaps",
+  "es": "en {n} sustituciones"
+ },
+ "Насколько урон команды выше, чем со средней поддержкой на том же месте": {
+  "en": "How much higher the team's damage is than with an average support in the same slot",
+  "es": "Cuánto mayor es el daño del equipo que con un apoyo promedio en el mismo puesto"
+ },
+ "конфиг": {
+  "en": "config",
+  "es": "configuración"
+ },
+ "Керри и саб-DPS оцениваются по своему урону. Роли не сравниваются друг с другом.": {
+  "en": "Carry and sub-DPS use their own damage. Roles are rated separately.",
+  "es": "Carry y sub-DPS se valoran por su propio daño. Los roles se valoran por separado."
+ },
+ "Поддержка — по парам команд, которые отличаются только ею: насколько урон выше, чем со средней поддержкой на том же месте ({pairs} пар)": {
+  "en": "Support is rated through pairs of teams differing only in that support: how much higher the damage is than with an average support in the same slot ({pairs} pairs)",
+  "es": "El apoyo se valora con pares de equipos que solo difieren en ese personaje: cuánto mayor es el daño que con un apoyo promedio en el mismo puesto ({pairs} pares)"
+ },
+ "Команды с персонажами, которых нет в базе KQM, считаем сами тем же gcsim с подбором доп. статов по стандарту KQM ({own} команд). Эти ротации ещё не проверены сообществом, поэтому они есть только в списках команд, а оценки ролей не меняют": {
+  "en": "Teams with characters missing from the KQM database are simulated by us with the same gcsim and KQM-standard substat optimization ({own} teams). These rotations are not yet reviewed by the community, so they only appear in team lists and do not change role scores",
+  "es": "Los equipos con personajes que no están en la base de KQM los simulamos nosotros con el mismo gcsim y optimización de subestadísticas según el estándar KQM ({own} equipos). Estas rotaciones aún no las revisó la comunidad, así que solo aparecen en las listas de equipos y no cambian las puntuaciones de rol"
+ },
+ "Нет в базе KQM; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60": {
+  "en": "Not in the KQM database; scored from tier lists: SS — 92, S — 82, A — 72, B — 60",
+  "es": "No está en la base de KQM; puntuación según tier lists: SS — 92, S — 82, A — 72, B — 60"
  }
 }

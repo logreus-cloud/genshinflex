@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { aggregate, buildOverall, classifyTeam, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, tierOf, type RatingData, type RatingManual, type TeamRow } from './core.ts';
+import { aggregate, buildOverall, classifyTeam, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, tierOf, type RatingData, type RatingManual, type TeamRow } from './core.ts';
 
 test('classifyTeam распределяет роли по долям', () => {
   const members = [
@@ -21,6 +21,35 @@ test('aggregate берёт два лучших значения', () => {
   assert.equal(aggregate([2, 10, 8]), 9);
 });
 
+test('swapPairs сравнивает замены при одинаковых напарниках и числе целей', () => {
+  const teams: TeamRow[] = [
+    { id: 'a', m: ['x', 'y', 'z', 'a'], dps: 200, targets: 1 },
+    { id: 'b', m: ['b', 'z', 'x', 'y'], dps: 100, targets: 1 },
+    { id: 'two', m: ['x', 'y', 'z', 'c'], dps: 50, targets: 2 },
+    { id: 'zero', m: ['x', 'y', 'z', 'd'], dps: 0, targets: 1 },
+  ];
+  const pairs = swapPairs(teams, new Set(['a', 'b', 'c', 'd']));
+  assert.equal(pairs.length, 1);
+  assert.equal(pairs[0].a, 'a');
+  assert.equal(pairs[0].b, 'b');
+  assert.equal(pairs[0].r, Math.log(2));
+  assert.deepEqual(swapPairs(teams, new Set(['a'])), []);
+});
+
+test('supportStrength ослабляет одну пару и сохраняет транзитивность', () => {
+  const r = Math.log(2);
+  const two = supportStrength([{ a: 'a', b: 'b', r }]);
+  assert.equal(two.a.n, 1);
+  assert.equal(two.b.n, 1);
+  assert.ok(two.a.s - two.b.s > 0);
+  assert.ok(two.a.s - two.b.s < r);
+  const three = supportStrength([{ a: 'a', b: 'b', r }, { a: 'b', b: 'c', r }]);
+  assert.ok(three.a.s > three.b.s);
+  assert.ok(three.b.s > three.c.s);
+  assert.ok(three.a.s > three.c.s);
+  assert.deepEqual(supportStrength([]), {});
+});
+
 test('tierOf соблюдает границы', () => {
   assert.equal(tierOf(85), 'S');
   assert.equal(tierOf(70), 'A');
@@ -38,7 +67,7 @@ test('scoreRole пересчитывает баллы и места', () => {
 
 test('buildOverall добавляет экспертов, заменяет симуляцию и строит сустейн', () => {
   const generated: RatingData = {
-    _meta: { date: '2026-10-27', source: 'https://db.kqm.gg', entries: 2, baseline: 2, teams: 2, shares: 2 },
+    _meta: { date: '2026-10-27', source: 'https://db.kqm.gg', entries: 2, baseline: 2, teams: 2, shares: 2, pairs: 0, own: 0 },
     characters: {
       a: { carry: { value: 100, n: 2, best: { id: 'sim-a', team: ['a', 'b'] } } },
       b: { carry: { value: 50, n: 1, best: { id: 'sim-b', team: ['a', 'b'] } } },
@@ -90,4 +119,6 @@ test('reactionLabel переводит реакцию и подбирает мо
 
 test('simUrl строит ссылку на запись базы', () => {
   assert.equal(simUrl('abc'), 'https://gcsim.app/db/abc');
+  assert.equal(simUrl('own:odette'), 'https://github.com/logreus-cloud/genshinflex/blob/main/scripts/sim-teams/odette.txt');
+  assert.equal(simUrl('own:team#1'), 'https://github.com/logreus-cloud/genshinflex/blob/main/scripts/sim-teams/team%231.txt');
 });

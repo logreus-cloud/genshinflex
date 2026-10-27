@@ -1,12 +1,17 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { aggregate, classifyTeam } from '../src/lib/rating/core.ts';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { aggregate, classifyTeam, supportStrength, swapPairs } from '../src/lib/rating/core.ts';
 
 const DB = 'https://db.kqm.gg/api/db';
 const CACHE = '.cache/rating/db.json';
 const SHARES = '.cache/rating/shares';
+const SIM = '.cache/rating/sim';
+const SIM_BIN = '.cache/gcsim.exe';
 const OUT = 'src/data/rating.json';
 const AGENT = 'GenshinFlex-rating (+https://github.com/logreus-cloud/genshinflex)';
 const cached = process.argv.includes('--cached');
+const resim = process.argv.includes('--resim');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Не строка (битая запись базы) — пустой ключ: такая запись не найдётся и будет пропущена
 const key = (name) => (typeof name === 'string' ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : '');
@@ -64,6 +69,21 @@ function baseline(entry) {
   return { entry, row: { id: entry._id, m: members.map((member) => member.slug), dps: Math.round(dps), targets }, rawDps: dps };
 }
 
+function resultMembers(result) {
+  const statistics = result?.statistics;
+  const details = result?.character_details;
+  const dps = statistics?.dps?.mean;
+  if (!Number.isFinite(dps) || dps <= 0 || !Array.isArray(details) || details.length !== 4) return null;
+  const members = details.map((detail, i) => ({
+    slug: characterBy.get(key(detail?.name))?.slug,
+    dps: statistics.character_dps?.[i]?.mean,
+    fieldTime: statistics.field_time?.[i]?.mean,
+  }));
+  if (members.some((member) => !member.slug || !Number.isFinite(member.dps)
+    || !Number.isFinite(member.fieldTime))) return null;
+  return { statistics, details, dps, members };
+}
+
 const entries = await loadDb();
 const base = entries.map(baseline).filter(Boolean);
 const unique = new Map();
@@ -71,6 +91,63 @@ for (const item of base) {
   const teamKey = JSON.stringify([[...item.row.m].sort(), item.row.targets]);
   const previous = unique.get(teamKey);
   if (!previous || item.rawDps > previous.rawDps) unique.set(teamKey, item);
+}
+if (!existsSync(SIM_BIN)) console.log(`Нет ${SIM_BIN}, свои прогоны пропущены`);
+else {
+  mkdirSync(SIM, { recursive: true });
+  const files = existsSync('scripts/sim-teams') ? readdirSync('scripts/sim-teams').filter((name) => name.endsWith('.txt')).sort() : [];
+  for (const file of files) {
+    const slug = file.slice(0, -4);
+    const source = `scripts/sim-teams/${file}`;
+    let hash;
+    try { hash = createHash('sha1').update(readFileSync(source)).digest('hex'); }
+    catch (error) { console.log(`Не читается ${source}: ${error.message}`); continue; }
+    const hashFile = `${SIM}/${slug}.hash`;
+    const outFile = `${SIM}/${slug}.json`;
+    let payload;
+    if (!resim && existsSync(outFile) && existsSync(hashFile) && readFileSync(hashFile, 'utf8').trim() === hash) {
+      try { payload = JSON.parse(readFileSync(outFile, 'utf8')); }
+      catch { console.log(`Повреждён кэш ${slug}, пересчитываем`); }
+    }
+    try {
+      if (!payload) {
+        const inFile = `${SIM}/${slug}.txt`;
+        copyFileSync(source, inFile);
+        execFileSync(SIM_BIN, ['-c', inFile, '-out', outFile, '-nb', '-substatOptimFull'],
+          { stdio: 'pipe', timeout: 300_000, killSignal: 'SIGKILL' });
+        payload = JSON.parse(readFileSync(outFile, 'utf8'));
+        writeFileSync(hashFile, `${hash}\n`);
+      }
+      const result = payload.data ?? payload;
+      const parsed = resultMembers(result);
+      const targets = result?.target_details?.length;
+      if (!parsed || !Number.isFinite(targets) || targets <= 0
+        || new Set(parsed.members.map((member) => member.slug)).size !== 4) {
+        console.log(`Свой прогон ${slug}: неполный результат, пропущен`);
+        continue;
+      }
+      let valid = true;
+      for (const detail of parsed.details) {
+        const character = characterBy.get(key(detail?.name));
+        const weapon = weaponBy.get(key(detail?.weapon?.name));
+        if (!character || !weapon
+          || (character.rarity === 5 && !character.slug.startsWith('traveler-') && (detail.cons ?? 0) !== 0)
+          || (weapon.rarity === 5 && (detail.weapon.refine ?? 1) !== 1)) valid = false;
+      }
+      if (!valid) {
+        console.log(`Свой прогон ${slug}: не соответствует базе C0/R1, пропущен`);
+        continue;
+      }
+      const rawDps = parsed.dps / targets;
+      const row = { id: `own:${slug}`, m: parsed.members.map((member) => member.slug),
+        dps: Math.round(rawDps), targets };
+      const teamKey = JSON.stringify([[...row.m].sort(), row.targets]);
+      const previous = unique.get(teamKey);
+      if (!previous || rawDps > previous.rawDps) unique.set(teamKey, { row, rawDps, parsed });
+    } catch (error) {
+      console.log(`Свой прогон ${slug}: ${error.message}`);
+    }
+  }
 }
 const teams = [...unique.values()].sort((a, b) => b.rawDps - a.rawDps);
 const selected = new Map(teams.slice(0, 200).map((item) => [item.row.id, item]));
@@ -82,6 +159,7 @@ for (const character of characters) {
     if (++count === 3) break;
   }
 }
+for (const item of teams) if (item.parsed) selected.set(item.row.id, item);
 
 let lastRequest = 0;
 const shareStats = { loaded: 0, cached: 0, failed: 0, invalid: 0, processed: 0 };
@@ -132,32 +210,27 @@ function record(slug, role, value, row) {
   samples.set(slug, roles);
 }
 
+let ownCount = 0;
 for (const item of selected.values()) {
-  const payload = await loadShare(item.entry.share_key);
-  if (!payload) continue;
-  const result = payload.data ?? payload;
-  const statistics = result.statistics;
-  const details = result.character_details;
-  const dps = statistics?.dps?.mean;
-  if (!Number.isFinite(dps) || dps <= 0 || !Array.isArray(details) || details.length !== 4) {
+  let parsed = item.parsed;
+  if (!parsed) {
+    const payload = await loadShare(item.entry.share_key);
+    if (!payload) continue;
+    parsed = resultMembers(payload.data ?? payload);
+  }
+  if (!parsed || parsed.members.some((member) => !item.row.m.includes(member.slug))) {
     shareStats.invalid++;
     continue;
   }
-  const members = details.map((detail, i) => ({
-    slug: characterBy.get(key(detail?.name ?? ''))?.slug,
-    dps: statistics.character_dps?.[i]?.mean,
-    fieldTime: statistics.field_time?.[i]?.mean,
-  }));
-  if (members.some((member) => !member.slug || !Number.isFinite(member.dps)
-    || !Number.isFinite(member.fieldTime) || !item.row.m.includes(member.slug))) {
-    shareStats.invalid++;
-    continue;
-  }
-  const roles = classifyTeam(members, dps);
-  for (const member of members) record(member.slug, roles[member.slug], roles[member.slug] === 'support' ? dps : member.dps, item.row);
-  const reaction = reactionOf(statistics);
+  const roles = classifyTeam(parsed.members, parsed.dps);
+  // Свои прогоны (ротации не проверены сообществом) попадают только в списки команд, а не в оценки ролей
+  if (!item.parsed) for (const member of parsed.members) record(member.slug, roles[member.slug],
+    // Урон на цель, как у команд: иначе прогоны против нескольких врагов завышают личный урон
+    (roles[member.slug] === 'support' ? parsed.dps : member.dps) / item.row.targets, item.row);
+  const reaction = reactionOf(parsed.statistics);
   if (reaction) item.row.reaction = reaction;
-  shareStats.processed++;
+  if (item.parsed) ownCount++;
+  else shareStats.processed++;
 }
 
 // Роль засчитываем, если персонаж играет её хотя бы в 30% своих симуляций (основная роль остаётся всегда):
@@ -167,16 +240,31 @@ const mainRoles = (roles) => {
   const top = Math.max(...[...roles.values()].map((rows) => rows.length));
   return [...roles].filter(([, rows]) => rows.length === top || rows.length >= 0.3 * total);
 };
-const ratingCharacters = Object.fromEntries([...samples].map(([slug, roles]) => [slug, Object.fromEntries(mainRoles(roles).map(([role, rows]) => {
+const rolesBy = new Map([...samples].map(([slug, roles]) => [slug, mainRoles(roles)]));
+const eligible = new Set([...rolesBy].filter(([, roles]) => roles.some(([role]) => role === 'support'))
+  .map(([slug]) => slug));
+const pairs = swapPairs(teams.map(({ row }) => row).filter((row) => !row.id.startsWith('own:')), eligible);
+const strength = supportStrength(pairs);
+const sparse = [];
+const ratingCharacters = Object.fromEntries([...rolesBy].map(([slug, roles]) => [slug, Object.fromEntries(roles.flatMap(([role, rows]) => {
   const best = rows.reduce((a, b) => b.value > a.value ? b : a);
-  return [role, { value: aggregate(rows.map((row) => row.value)), n: rows.length, best: { id: best.id, team: best.team } }];
+  const n = role === 'support' ? strength[slug]?.n ?? 0 : rows.length;
+  // Меньше 10 замен — сила поддержки ещё случайна; за неё отвечает экспертная оценка
+  if (role === 'support' && n < 10) {
+    sparse.push(`${slug} (${n})`);
+    return [];
+  }
+  const value = role === 'support' ? Math.exp(strength[slug].s) : aggregate(rows.map((row) => row.value));
+  return [[role, { value, n, best: { id: best.id, team: best.team } }]];
 }))]));
 const data = {
   _meta: { date: new Date().toISOString().slice(0, 10), source: 'https://db.kqm.gg',
-    entries: entries.length, baseline: base.length, teams: teams.length, shares: shareStats.processed },
+    entries: entries.length, baseline: base.length, teams: teams.length, shares: shareStats.processed,
+    pairs: pairs.length, own: ownCount },
   characters: ratingCharacters, teams: teams.map(({ row }) => row),
 };
 writeFileSync(OUT, `${JSON.stringify(data, null, 1)}\n`);
 const roleCounts = ['carry', 'subdps', 'support']
   .map((role) => `${role}: ${Object.values(ratingCharacters).filter((roles) => roles[role]).length}`).join(', ');
-console.log(`Записей ${entries.length}, база ${base.length}, команд ${teams.length}; результаты: сеть ${shareStats.loaded}, кэш ${shareStats.cached}, ошибки ${shareStats.failed}, неполные ${shareStats.invalid}; персонажи ${roleCounts}`);
+console.log(`Записей ${entries.length}, база ${base.length}, команд ${teams.length}, свои ${ownCount}, пары ${pairs.length}; результаты: сеть ${shareStats.loaded}, кэш ${shareStats.cached}, ошибки ${shareStats.failed}, неполные ${shareStats.invalid}; персонажи ${roleCounts}`);
+console.log(`Поддержки с менее чем 10 заменами: ${sparse.length ? sparse.join(', ') : 'нет'}`);

@@ -6,7 +6,7 @@ export type Element = 'pyro' | 'hydro' | 'anemo' | 'electro' | 'dendro' | 'cryo'
 export type TeamRow = { id: string; m: string[]; dps: number; targets: number; reaction?: string };
 export type RoleStat = { value: number; n: number; best: { id: string; team: string[] } };
 export type RatingData = {
-  _meta: { date: string; source: string; entries: number; baseline: number; teams: number; shares: number };
+  _meta: { date: string; source: string; entries: number; baseline: number; teams: number; shares: number; pairs: number; own: number };
   characters: Record<string, Partial<Record<'carry' | 'subdps' | 'support', RoleStat>>>;
   teams: TeamRow[];
 };
@@ -50,6 +50,54 @@ export function aggregate(values: number[]): number | null {
   return best.length === 1 ? best[0] : (best[0] + best[1]) / 2;
 }
 
+export function swapPairs(teams: TeamRow[], eligible: Set<string>): { a: string; b: string; r: number }[] {
+  const groups = new Map<string, { slug: string; dps: number }[]>();
+  for (const team of teams) {
+    if (team.m.length !== 4 || !Number.isFinite(team.dps) || team.dps <= 0) continue;
+    team.m.forEach((slug, i) => {
+      if (!eligible.has(slug)) return;
+      const other = team.m.filter((_, j) => i !== j).sort();
+      const groupKey = JSON.stringify([other, team.targets]);
+      const group = groups.get(groupKey) ?? [];
+      group.push({ slug, dps: team.dps });
+      groups.set(groupKey, group);
+    });
+  }
+  const pairs = [];
+  for (const group of groups.values()) {
+    for (let i = 0; i < group.length; i++) {
+      for (let j = i + 1; j < group.length; j++) {
+        if (group[i].slug === group[j].slug) continue;
+        pairs.push({ a: group[i].slug, b: group[j].slug, r: Math.log(group[i].dps / group[j].dps) });
+      }
+    }
+  }
+  return pairs;
+}
+
+export function supportStrength(
+  pairs: { a: string; b: string; r: number }[], lambda = 2, iterations = 500,
+): Record<string, { s: number; n: number }> {
+  const nodes = new Map<string, { s: number; edges: { other: string; r: number }[] }>();
+  for (const { a, b, r } of pairs) {
+    if (!nodes.has(a)) nodes.set(a, { s: 0, edges: [] });
+    if (!nodes.has(b)) nodes.set(b, { s: 0, edges: [] });
+    nodes.get(a)!.edges.push({ other: b, r });
+    nodes.get(b)!.edges.push({ other: a, r: -r });
+  }
+  for (let i = 0; i < iterations; i++) {
+    let change = 0;
+    for (const node of nodes.values()) {
+      const next = node.edges.reduce((sum, edge) => sum + edge.r + nodes.get(edge.other)!.s, 0)
+        / (node.edges.length + lambda);
+      change = Math.max(change, Math.abs(next - node.s));
+      node.s = next;
+    }
+    if (change < 1e-9) break;
+  }
+  return Object.fromEntries([...nodes].map(([slug, node]) => [slug, { s: node.s, n: node.edges.length }]));
+}
+
 export function tierOf(score: number): Tier {
   return score >= 85 ? 'S' : score >= 70 ? 'A' : score >= 50 ? 'B' : 'C';
 }
@@ -68,6 +116,8 @@ export function scoreRole<T extends { value: number }>(rows: T[]): (T & { score:
 }
 
 export function simUrl(id: string): string {
+  if (id.startsWith('own:'))
+    return `https://github.com/logreus-cloud/genshinflex/blob/main/scripts/sim-teams/${encodeURIComponent(id.slice(4))}.txt`;
   return `https://gcsim.app/db/${id}`;
 }
 
@@ -86,7 +136,7 @@ export function buildOverall(generated: RatingData, manual: RatingManual): Recor
       tier: row.tier,
       rank: row.rank,
       kind: 'sim',
-      source: { title: 'gcsim', url: simUrl(row.best.id) },
+      source: { title: row.best.id.startsWith('own:') ? 'конфиг' : 'gcsim', url: simUrl(row.best.id) },
       team: row.best.team,
     }));
     for (const [slug, character] of Object.entries(manual.characters)) {
