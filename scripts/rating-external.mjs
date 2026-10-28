@@ -122,7 +122,8 @@ try {
   const teams = {};
   for (const slug of Object.keys(prydwenTiers).sort()) {
     const stats = rating.characters[slug];
-    if (stats?.carry || stats?.subdps || stats?.support) continue;
+    // Команда нужна, если хотя бы в одной роли из тир-листа Prydwen у персонажа нет своей симуляции
+    if (Object.keys(prydwenTiers[slug]).every((role) => stats?.[role])) continue;
     let found = null;
     try {
       found = team(await page(`https://www.prydwen.gg/genshin-impact/characters/${slug}`, `team-${slug}.html`), slug);
