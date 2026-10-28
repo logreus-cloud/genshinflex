@@ -1,4 +1,24 @@
 {
+ "Тир-лист": {
+  "en": "Tier list",
+  "es": "Lista de niveles"
+ },
+ "Строки — тиры по баллам, колонки — роли. Нажмите на персонажа, чтобы увидеть, почему он здесь.": {
+  "en": "Rows show score tiers; columns show roles. Select a character to see why they are here.",
+  "es": "Las filas muestran niveles por puntuación y las columnas, roles. Selecciona un personaje para saber por qué está aquí."
+ },
+ "Подробнее в списке": {
+  "en": "More details in the list",
+  "es": "Más detalles en la lista"
+ },
+ "эксп.": {
+  "en": "expert",
+  "es": "experto"
+ },
+ "нет C{n}": {
+  "en": "no C{n}",
+  "es": "sin C{n}"
+ },
  "Созвездия 5★": {
   "en": "5★ constellations",
   "es": "Constelaciones de 5★"

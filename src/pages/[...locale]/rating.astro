@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { useData, LANGS } from '../../lib/data';
 import Layout from '../../layouts/Layout.astro';
+import TierTable from '../../components/TierTable.astro';
 import CharacterIcon from '../../components/CharacterIcon.astro';
 import Team from '../../components/Team.astro';
 import rating from '../../data/rating.json';
@@ -46,7 +47,7 @@ const roles: { id: Role; label: string }[] = [
   { id: 'support', label: 'Поддержка' }, { id: 'sustain', label: 'Сустейн' },
 ];
 const roleCons = new Map(roles.map(({ id }) => [id, consVariants(overall[id], gainOf)] as const));
-const tabs = [...roles, { id: 'abyss', label: 'Бездна' }, { id: 'theater', label: 'Театр' }, { id: 'bosses', label: 'Боссы' }, { id: 'explore', label: 'Исследование' }, { id: 'method', label: 'Как считаем' }];
+const tabs = [{ id: 'tiers', label: 'Тир-лист' }, ...roles, { id: 'abyss', label: 'Бездна' }, { id: 'theater', label: 'Театр' }, { id: 'bosses', label: 'Боссы' }, { id: 'explore', label: 'Исследование' }, { id: 'method', label: 'Как считаем' }];
 const compact = new Intl.NumberFormat({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { notation: 'compact', maximumFractionDigits: 2 });
 const damageCompact = new Intl.NumberFormat({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { notation: 'compact', maximumFractionDigits: 1 });
 const teams = data.teams.filter((team) => team.m.length === 4 && team.m.every((slug) => bySlug.has(slug)));
@@ -72,6 +73,20 @@ const theaterTeams = seasonElements.length
 const sustainLevels = { plenty: 'с запасом', enough: 'хватает', low: 'мало' } as const;
 const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лечение и щит' } as const;
 const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100); return pct < 0 ? `−${-pct}` : `+${pct}`; };
+const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, order) => {
+  const c = bySlug.get(row.slug);
+  if (!c) return [];
+  const variants = roleCons.get(id)!.get(row.slug)!;
+  const cons = Object.fromEntries(([false, true] as const).flatMap((weapon) => ([0, 1, 2] as const).map((level) => {
+    const key = variantKey(level, weapon);
+    const { score, tier, rank, gain } = id === 'sustain' ? variants['0'] : variants[key];
+    return [key, [score, tier, rank, gain]];
+  })));
+  const noSim = id === 'sustain' || c.rarity !== 5 || row.slug.startsWith('traveler-') ? [] : ([1, 2] as const).filter((level) => typeof investmentRows[row.slug]?.cons[level - 1] !== 'number');
+  return [{ role: id, roleLabel: label, row, c, cons: JSON.stringify(cons), noSim: noSim.length ? noSim.join(',') : undefined,
+    sources: row.kind === 'expert' ? expert.characters[row.slug]?.sources ?? [] : [], sustain: expert.sustain[row.slug],
+    limit: damageLimits.limits[row.slug as keyof typeof damageLimits.limits], supportN: data.characters[row.slug]?.support?.n ?? 0, order }];
+}));
 ---
 <Layout title={t('Рейтинг')} description={t('Рейтинг персонажей Genshin Impact по ролям и лучшие команды текущей Бездны и Театра по симуляциям gcsim.')} wide>
   <h1>{t('Рейтинг')}</h1>
@@ -80,6 +95,10 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
     <div class="tabs" role="tablist" aria-label={t('Разделы рейтинга')}>
       {tabs.map(({ id, label }, i) => <button id={`tab-${id}`} type="button" role="tab" aria-controls={id} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={id}>{t(label)}</button>)}
     </div>
+    <section id="tiers" class="rating-section" role="tabpanel" aria-labelledby="tab-tiers" data-gain-template={t('{variant}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-short-template={t('нет C{n}')} data-nosim-title={t('Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия')}>
+      <h2 class="h-sec">{t('Тир-лист')}</h2>
+      <TierTable roles={roles} entries={tierEntries} compact={compact} damageCompact={damageCompact} fmtNumber={fmtNumber} fmtFullDate={fmtFullDate} supportPct={supportPct} />
+    </section>
     {roles.map(({ id, label }) => (
       <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`} data-gain-template={t('{variant}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-title={t('Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия')}>
         <h2 class="h-sec">{t(label)}</h2>
@@ -325,14 +344,15 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
       }));
       return { section, list, rows };
     });
+    const tierSection = root.querySelector<HTMLElement>('#tiers')!;
+    const tierSlots = new Map([...tierSection.querySelectorAll<HTMLElement>('.tier-slot')].map((slot): [string, HTMLElement] => [`${slot.dataset.role}-${slot.dataset.tier}`, slot]));
+    const tierChars = [...tierSection.querySelectorAll<HTMLButtonElement>('.tier-cell-char')].map((button) => ({ button, index: Number(button.dataset.order), variants: JSON.parse(button.dataset.cons!) as Record<VariantKey, Variant> }));
     const applyCons = (level: 0 | 1 | 2, weapon: boolean) => {
       const key = variantKey(level, weapon);
       const label = `C${level}${weapon ? ' + 5★' : ''}`;
+      root.querySelectorAll<HTMLButtonElement>('.cons-switch button[data-cons]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.cons === String(level))));
+      root.querySelectorAll<HTMLButtonElement>('.weapon-toggle').forEach((button) => button.setAttribute('aria-pressed', String(weapon)));
       for (const { section, list, rows } of sections) {
-        section.querySelectorAll<HTMLButtonElement>('.cons-switch button[data-cons]').forEach((button) => {
-          button.setAttribute('aria-pressed', String(button.dataset.cons === String(level)));
-        });
-        section.querySelector<HTMLButtonElement>('.weapon-toggle')!.setAttribute('aria-pressed', String(weapon));
         for (const { row, variants } of rows) {
           const [score, tierValue, rank, gain] = variants[key];
           row.querySelector<HTMLElement>('.place')!.textContent = String(rank);
@@ -355,6 +375,33 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
         }
         list.append(...rows.slice().sort((a, b) => a.variants[key][2] - b.variants[key][2] || a.index - b.index).map(({ row }) => row));
       }
+      for (const { button, variants } of tierChars) {
+        const [score, tierValue, , gain] = variants[key];
+        const card = document.getElementById(button.getAttribute('popovertarget')!)!;
+        const tier = card.querySelector<HTMLElement>('.tier')!;
+        tier.classList.remove('tier-S', 'tier-A', 'tier-B', 'tier-C');
+        tier.classList.add(`tier-${tierValue}`);
+        tier.textContent = tierValue;
+        card.querySelector<HTMLElement>('.tier-card-score')!.textContent = String(score);
+        button.querySelector<HTMLElement>('.tier-cell-score')!.textContent = String(score);
+        button.setAttribute('aria-label', `${button.dataset.name}, ${score}`);
+        const noSim = level > 0 && (button.dataset.nosim ?? '').split(',').includes(String(level));
+        const showGain = noSim || ((level !== 0 || weapon) && gain !== null);
+        const badge = button.querySelector<HTMLElement>('.tier-cell-gain')!;
+        badge.hidden = !showGain;
+        if (showGain) badge.textContent = noSim ? tierSection.dataset.nosimShortTemplate!.replace('{n}', String(level))
+          : `${gain! < 0 ? '−' : '+'}${Math.round(Math.abs(gain!))}%`;
+        const chip = card.querySelector<HTMLElement>('.tier-card-gain')!;
+        chip.hidden = !showGain;
+        chip.title = noSim ? tierSection.dataset.nosimTitle! : '';
+        if (showGain) chip.textContent = noSim ? tierSection.dataset.nosimTemplate!.replace('{n}', String(level))
+          : tierSection.dataset.gainTemplate!.replace('{variant}', label).replace('+{pct}', gain! < 0 ? `−${Math.round(Math.abs(gain!))}` : `+${Math.round(Math.abs(gain!))}`);
+        tierSlots.get(`${button.dataset.role}-${tierValue}`)!.append(button);
+      }
+      for (const slot of tierSlots.values()) {
+        slot.append(...tierChars.filter(({ button }) => button.parentElement === slot)
+          .sort((a, b) => b.variants[key][0] - a.variants[key][0] || a.index - b.index).map(({ button }) => button));
+      }
     };
     let saved = '0';
     let weapon = false;
@@ -364,19 +411,29 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
     } catch {}
     let level: 0 | 1 | 2 = saved === '1' ? 1 : saved === '2' ? 2 : 0;
     applyCons(level, weapon);
-    sections.forEach(({ section }) => {
-      section.querySelectorAll<HTMLButtonElement>('.cons-switch button[data-cons]').forEach((button) => {
-        button.addEventListener('click', () => {
-          level = Number(button.dataset.cons) as 0 | 1 | 2;
-          applyCons(level, weapon);
-          try { localStorage.setItem('rating-cons', String(level)); } catch {}
-        }, { signal });
-      });
-      section.querySelector<HTMLButtonElement>('.weapon-toggle')!.addEventListener('click', () => {
+    root.querySelectorAll<HTMLButtonElement>('.cons-switch button[data-cons]').forEach((button) => {
+      button.addEventListener('click', () => {
+        level = Number(button.dataset.cons) as 0 | 1 | 2;
+        applyCons(level, weapon);
+        try { localStorage.setItem('rating-cons', String(level)); } catch {}
+      }, { signal });
+    });
+    root.querySelectorAll<HTMLButtonElement>('.weapon-toggle').forEach((button) => {
+      button.addEventListener('click', () => {
         weapon = !weapon;
         applyCons(level, weapon);
         try { localStorage.setItem('rating-weapon', weapon ? '1' : '0'); } catch {}
       }, { signal });
+    });
+    tierSection.querySelectorAll<HTMLButtonElement>('[data-tier-role]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const role = button.dataset.tierRole;
+        tierSection.querySelectorAll<HTMLButtonElement>('[data-tier-role]').forEach((tab) => tab.setAttribute('aria-pressed', String(tab === button)));
+        tierSection.querySelectorAll<HTMLElement>('.tier-column').forEach((column) => column.dataset.mobileHidden = String(column.dataset.role !== role));
+      }, { signal });
+    });
+    tierSection.querySelectorAll<HTMLAnchorElement>('.tier-list-link').forEach((link) => {
+      link.addEventListener('click', () => link.closest<HTMLElement>('[popover]')?.hidePopover(), { signal });
     });
     root.classList.add('ready');
     fromHash();
@@ -402,10 +459,10 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
   .tabs button { border: 0; border-bottom: 2px solid transparent; padding: .65rem .8rem; background: none; color: var(--muted); cursor: pointer; }
   .tabs button[aria-selected="true"] { color: var(--accent-text); border-bottom-color: var(--accent); }
   .rating-section { margin: 1.5rem 0; }
-  .cons-switch { display: none; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0 0 1rem; }
-  .ready .cons-switch { display: flex; }
-  .cons-switch button { padding: .35rem .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
-  .cons-switch button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-text); }
+  :global(.cons-switch) { display: none; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0 0 1rem; }
+  .ready :global(.cons-switch) { display: flex; }
+  :global(.cons-switch button) { padding: .35rem .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
+  :global(.cons-switch button[aria-pressed="true"]) { border-color: var(--accent); color: var(--accent-text); }
   .rating-section[hidden] { display: none; }
   .rating-list { list-style: none; display: grid; gap: .6rem; padding: 0; margin: 0; }
   .rating-row { display: flex; align-items: start; gap: .7rem; min-width: 0; }

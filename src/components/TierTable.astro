@@ -1,0 +1,132 @@
+---
+import Team from './Team.astro';
+import { useData } from '../lib/data';
+import type { OverallRow, Role } from '../lib/rating/core';
+
+type Entry = {
+  role: Role; roleLabel: string; row: OverallRow; c: ReturnType<typeof useData>['characters'][number];
+  cons: string; noSim?: string; order: number; supportN: number;
+  sources: { title: string; url: string }[];
+  sustain?: { level: 'plenty' | 'enough' | 'low'; kind: 'heal' | 'shield' | 'both'; note?: string };
+  limit?: { video: string; team: number; asOf: string };
+};
+interface Props {
+  roles: { id: Role; label: string }[]; entries: Entry[];
+  compact: Intl.NumberFormat; damageCompact: Intl.NumberFormat;
+  fmtNumber: (value: number) => string; fmtFullDate: (date: Date) => string;
+  supportPct: (value: number) => string;
+}
+const { roles, entries, compact, damageCompact, fmtNumber, fmtFullDate, supportPct } = Astro.props;
+const { t, base } = useData(Astro.currentLocale);
+const tiers = ['S', 'A', 'B', 'C'] as const;
+const sustainLevels = { plenty: 'с запасом', enough: 'хватает', low: 'мало' } as const;
+const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лечение и щит' } as const;
+---
+<div class="cons-switch" role="group" aria-label={t('Созвездия 5★')}>
+  {([0, 1, 2] as const).map((level) => <button type="button" data-cons={level} aria-pressed={level === 0 ? 'true' : 'false'}>C{level}</button>)}
+  <button type="button" class="weapon-toggle" aria-pressed="false">{t('+ 5★ оружие')}</button>
+  <span class="muted small">{t('Созвездия 5★ и лучшее 5★ оружие из гайда (R1): прирост урона команды по нашим симуляциям gcsim')}</span>
+</div>
+<p class="muted small tier-legend">{t('Строки — тиры по баллам, колонки — роли. Нажмите на персонажа, чтобы увидеть, почему он здесь.')}</p>
+<div class="tier-roles" aria-label={t('Роль')}>
+  {roles.map(({ id, label }, i) => <button type="button" data-tier-role={id} aria-pressed={i === 0 ? 'true' : 'false'}>{t(label)}</button>)}
+</div>
+<div class="tier-table">
+  <div class="tier-head">
+    <span aria-hidden="true"></span>
+    {roles.map(({ id, label }) => <strong class="tier-column" data-role={id} data-mobile-hidden={id !== 'carry' ? 'true' : 'false'}>{t(label)}</strong>)}
+  </div>
+  {tiers.map((tier) => (
+    <div class="tier-row">
+      <div class:list={['tier-label', `tier-${tier}`]}>{tier}</div>
+      {roles.map(({ id }) => <div class="tier-column tier-slot" data-role={id} data-tier={tier} data-mobile-hidden={id !== 'carry' ? 'true' : 'false'}>
+        {entries.filter((entry) => entry.role === id && entry.row.tier === tier).sort((a, b) => b.row.score - a.row.score || a.order - b.order).map((entry) => (
+          <button type="button" class="tier-cell-char" popovertarget={`tp-${id}-${entry.row.slug}`} data-role={id} data-name={entry.c.name} data-order={entry.order} data-cons={entry.cons} data-nosim={entry.noSim} data-el={entry.c.element} aria-label={`${entry.c.name}, ${entry.row.score}`}>
+            <span class:list={['tier-frame', `r${entry.c.rarity}`, { emblem: entry.c.emblem }]}>
+              {entry.c.icon && <img src={entry.c.icon} alt="" width="56" height="56" loading="lazy" />}
+              {entry.c.emblem && <img class="skill" src={entry.c.emblem} alt="" width="28" height="28" loading="lazy" />}
+              <i class="dot" aria-hidden="true"></i>
+              {entry.c.beta && <b class="beta">BETA</b>}
+            </span>
+            <span class="tier-cell-caption"><b class="tier-cell-score">{entry.row.score}</b><small class="tier-cell-expert" hidden={entry.row.kind !== 'expert'}>{t('эксп.')}</small><small class="tier-cell-gain" hidden></small></span>
+          </button>
+        ))}
+      </div>)}
+    </div>
+  ))}
+</div>
+{entries.map((entry) => (
+  <div popover id={`tp-${entry.role}-${entry.row.slug}`} class="tier-card">
+    <div class="tier-card-head">
+      <h3><a href={`${base}/characters/${entry.c.slug}/`}>{entry.c.name}</a></h3>
+      <button type="button" popovertarget={`tp-${entry.role}-${entry.row.slug}`} popovertargetaction="hide" aria-label={t('Закрыть')}>×</button>
+    </div>
+    <p class="tier-card-scoreline"><span class:list={['chip', 'tier', `tier-${entry.row.tier}`]}>{entry.row.tier}</span> <b class="tier-card-score">{entry.row.score}</b> · {t(entry.roleLabel)}</p>
+    {entry.row.value !== null && (entry.role === 'support'
+      ? <p>{t('{pct}% к урону команды', { pct: supportPct(entry.row.value) })} <small>{t('по {n} заменам', { n: fmtNumber(entry.supportN) })}</small></p>
+      : <p>{t('{n} DPS', { n: compact.format(entry.row.value) })}</p>)}
+    {entry.row.kind === 'sim' && entry.row.source && <p><a href={entry.row.source.url} target="_blank" rel="noopener">{t(entry.row.source.title === 'конфиг' ? 'конфиг' : 'симуляция')}</a></p>}
+    {entry.row.kind === 'expert' && <p>{t('экспертная оценка')} {entry.sources.map((source) => <a class="tier-source" href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}</p>}
+    {entry.sustain && <p><span class="chip">{t(sustainLevels[entry.sustain.level])}</span> {t(sustainKinds[entry.sustain.kind])}</p>}
+    {entry.row.note && <p class="muted small">{t(entry.row.note)}</p>}
+    {entry.row.team && <div class="tier-team"><h4>{t('Лучшая команда')}</h4><Team members={entry.row.team} /></div>}
+    {entry.limit && <p><a class="chip dmg-limit" href={`https://www.youtube.com/watch?v=${entry.limit.video}`} title={t('Предел урона Miron MinMax: один удар с отрядом, на момент {date}. Справка, в баллы не входит.', { date: fmtFullDate(new Date(entry.limit.asOf)) })} target="_blank" rel="noopener noreferrer">{t('Предел')} {damageCompact.format(entry.limit.team)}</a></p>}
+    <p class="tier-card-gain chip" hidden></p>
+    <a class="tier-list-link" href={`#${entry.role}`}>{t('Подробнее в списке')}</a>
+  </div>
+))}
+
+<style>
+  .tier-legend { margin: 0 0 .8rem; }
+  .tier-roles { display: none; flex-wrap: wrap; gap: .35rem; margin-bottom: .7rem; }
+  .tier-roles button { padding: .35rem .65rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
+  .tier-roles button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-text); }
+  .tier-table { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .tier-head, .tier-row { display: grid; grid-template-columns: 72px repeat(4, minmax(0, 1fr)); }
+  .tier-head { background: var(--surface-3); border-bottom: 1px solid var(--border); }
+  .tier-head strong { padding: .65rem .5rem; text-align: center; font-size: .85rem; }
+  .tier-row + .tier-row { border-top: 1px solid var(--border); }
+  .tier-label { display: flex; align-items: center; justify-content: center; font: 700 2rem var(--font-display); }
+  .tier-label.tier-S, .tier.tier-S { background: color-mix(in srgb, #58b97b 25%, var(--surface)); color: color-mix(in srgb, #58b97b 60%, var(--text)); }
+  .tier-label.tier-A, .tier.tier-A { background: color-mix(in srgb, #5794db 25%, var(--surface)); color: color-mix(in srgb, #5794db 60%, var(--text)); }
+  .tier-label.tier-B, .tier.tier-B { background: color-mix(in srgb, #c69a44 25%, var(--surface)); color: color-mix(in srgb, #c69a44 60%, var(--text)); }
+  .tier-label.tier-C, .tier.tier-C { background: var(--surface-3); color: var(--text); }
+  .tier-slot { display: flex; flex-wrap: wrap; align-content: start; gap: .4rem; min-width: 0; min-height: 84px; padding: .55rem; border-left: 1px solid var(--border); }
+  .tier-cell-char { display: flex; flex-direction: column; align-items: center; gap: .2rem; width: 72px; padding: 0; border: 0; background: none; color: var(--text); cursor: pointer; }
+  .tier-frame { position: relative; display: block; width: 56px; height: 56px; overflow: hidden; border-radius: 12px; background: linear-gradient(160deg, #6c5a8f, #9a7ec9); }
+  .tier-frame.r5 { background: linear-gradient(160deg, #8a5a2b, #d3953e); }
+  .tier-frame.emblem { background: linear-gradient(160deg, color-mix(in srgb, var(--el) 55%, #1c2033), color-mix(in srgb, var(--el) 85%, #fff)); }
+  .tier-frame img:not(.skill) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .tier-frame .skill { position: absolute; right: 2px; bottom: 2px; width: 32%; height: auto; border-radius: 50%; padding: 2px; background: rgb(15 18 32 / .8); box-shadow: 0 0 0 1.5px var(--el); }
+  .dot { position: absolute; top: 2px; right: 2px; width: 34%; aspect-ratio: 1; border-radius: 50%; background: var(--el-icon) center / 84% no-repeat, rgb(12 14 24 / .6); }
+  .beta { position: absolute; left: 0; right: 0; bottom: 0; background: #e0457b; color: #fff; font-size: .5rem; line-height: 1.3; text-align: center; letter-spacing: .04em; }
+  .tier-cell-char:hover .tier-frame, .tier-cell-char:focus-visible .tier-frame { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tier-cell-caption { display: flex; align-items: center; justify-content: center; gap: .15rem; width: 100%; height: 1rem; white-space: nowrap; font-size: .7rem; font-variant-numeric: tabular-nums; }
+  .tier-cell-caption small { font-size: .65rem; }
+  .tier-cell-caption [hidden], .tier-card [hidden] { display: none; }
+  .tier-cell-expert { color: var(--muted); }
+  .tier-cell-gain { color: var(--accent-text); }
+  .tier-card { width: 340px; max-width: min(340px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); box-shadow: 0 12px 36px rgb(0 0 0 / .25); }
+  .tier-card::backdrop { background: rgb(0 0 0 / .25); }
+  .tier-card-head { display: flex; align-items: start; justify-content: space-between; gap: .5rem; }
+  .tier-card-head h3 { margin: 0; }
+  .tier-card-head button { border: 0; background: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+  .tier-card p { margin: .65rem 0; }
+  .tier-card-scoreline { display: flex; align-items: center; gap: .35rem; }
+  .tier { font-weight: 700; border-color: transparent; }
+  .tier-source { margin-left: .4rem; }
+  .tier-team h4 { margin: .8rem 0 .35rem; font-size: .9rem; }
+  .tier-team :global(.team) { padding: .5rem; }
+  .tier-team :global(.ci) { --s: 44px !important; }
+  .dmg-limit { font-size: .75rem; text-decoration: none; }
+  .tier-card-gain { display: inline-block; font-size: .8rem; }
+  .tier-list-link { display: inline-block; margin-top: .4rem; }
+  @media (max-width: 720px) {
+    .tier-roles { display: flex; }
+    .tier-head, .tier-row { grid-template-columns: 56px minmax(0, 1fr); }
+    .tier-column[data-mobile-hidden="true"] { display: none; }
+    .tier-slot { min-height: 76px; padding: .4rem; }
+    .tier-cell-char { width: 64px; }
+    .tier-frame { width: 48px; height: 48px; }
+  }
+</style>
