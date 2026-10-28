@@ -96,13 +96,47 @@ test('consVariants пересчитывает созвездия и сохран
     { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
     { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
   ];
-  const variants = consVariants(rows, (slug, level) => slug === 'b' && level === 1 ? 50 : null);
+  const variants = consVariants(rows, (slug, level, weapon) => slug === 'b' && level === 1 && !weapon ? 50 : null);
   assert.deepEqual(rows.map((row) => variants.get(row.slug)![0]), rows.map(({ score, tier, rank }) => ({ score, tier, rank, gain: null })));
   assert.deepEqual(variants.get('b')![1], { score: 100, tier: 'S', rank: 1, gain: 50 });
   assert.deepEqual(variants.get('a')![1], { score: 83, tier: 'A', rank: 2, gain: null });
   assert.deepEqual(variants.get('c')![1], { score: 67, tier: 'B', rank: 3, gain: null });
   assert.deepEqual(rows.map((row) => variants.get(row.slug)![2].rank), [1, 2, 2]);
   assert.deepEqual(rows.map(({ score, tier, rank }) => [score, tier, rank]), [[100, 'S', 1], [80, 'A', 2], [80, 'A', 2]]);
+});
+
+test('consVariants перемножает приросты в C2 с оружием и пересчитывает места', () => {
+  const rows: OverallRow[] = [
+    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'S', rank: 1, kind: 'sim' },
+    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+  ];
+  const variants = consVariants(rows, (slug, level, weapon) => {
+    if (slug !== 'b') return null;
+    const cons = level === 2 ? 20 : 0;
+    const weaponGain = weapon ? 30 : 0;
+    return cons || weaponGain ? ((1 + cons / 100) * (1 + weaponGain / 100) - 1) * 100 : null;
+  });
+  assert.equal(Math.round(variants.get('b')!['2w'].gain!), 56);
+  assert.deepEqual(['a', 'b', 'c'].map((slug) => [variants.get(slug)!['2w'].score, variants.get(slug)!['2w'].rank]), [
+    [80, 2], [100, 1], [64, 3],
+  ]);
+});
+
+test('consVariants на C0 с оружием учитывает только доступный прирост оружия', () => {
+  const rows: OverallRow[] = [
+    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'S', rank: 1, kind: 'sim' },
+    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+  ];
+  const variants = consVariants(rows, (slug, _level, weapon) => slug === 'b' && weapon ? 30 : null);
+  assert.deepEqual(rows.map((row) => variants.get(row.slug)![0].rank), [1, 2, 2]);
+  assert.equal(variants.get('b')!['0w'].gain, 30);
+  assert.equal(variants.get('a')!['0w'].gain, null);
+  assert.equal(variants.get('c')!['0w'].gain, null);
+  assert.deepEqual(rows.map((row) => [variants.get(row.slug)!['0w'].score, variants.get(row.slug)!['0w'].rank]), [
+    [96, 2], [100, 1], [77, 3],
+  ]);
 });
 
 test('фильтры ротации и русские стихии', () => {

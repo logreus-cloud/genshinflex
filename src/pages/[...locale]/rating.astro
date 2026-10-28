@@ -11,7 +11,7 @@ import manual from '../../data/rating-manual.json';
 import bossData from '../../data/rating-bosses.json';
 import enemies from '../../data/generated/enemies.json';
 import charactersEn from '../../data/generated/characters.en.json';
-import { buildOverall, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, simUrl, type Element, type RatingData, type RatingManual, type Role, type TeamRow } from '../../lib/rating/core';
+import { buildOverall, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, simUrl, variantKey, type Element, type RatingData, type RatingManual, type Role, type TeamRow } from '../../lib/rating/core';
 import { BOSS_TAGS, bossGroup, mechanicTags, rankBossTeams, type Boss, type BossMember, type BossTag } from '../../lib/rating/bosses';
 import { EXPLORE_CATEGORIES, EXPLORE_TAGS, explorationTags, rankExploration } from '../../lib/rating/exploration';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
@@ -21,9 +21,17 @@ const data = rating as RatingData;
 const expert = manual as RatingManual;
 const overall = buildOverall(data, expert);
 const bySlug = new Map(characters.map((c) => [c.slug, c]));
-const investmentRows = investments as unknown as Record<string, { cons: (number | null)[] } | undefined>;
-const gainOf = (slug: string, level: 1 | 2) => bySlug.get(slug)?.rarity === 5 && !slug.startsWith('traveler-')
-  ? investmentRows[slug]?.cons[level - 1] ?? null : null;
+const investmentRows = investments as unknown as Record<string, { cons: (number | null)[]; weapon?: number | null } | undefined>;
+const gainOf = (slug: string, level: 0 | 1 | 2, weapon: boolean) => {
+  const row = investmentRows[slug];
+  const traveler = slug.startsWith('traveler-');
+  const constellation = level > 0 && bySlug.get(slug)?.rarity === 5 && !traveler ? row?.cons[level - 1] ?? null : null;
+  const weaponValue = row?.weapon;
+  const weaponGain = weapon && !traveler && typeof weaponValue === 'number' ? weaponValue : null;
+  if (constellation === null) return weaponGain;
+  if (weaponGain === null) return constellation;
+  return ((1 + constellation / 100) * (1 + weaponGain / 100) - 1) * 100;
+};
 const enPassives = new Map(charactersEn.map((c) => [c.slug, c.talents?.passives ?? []]));
 const bosses = bossData.bosses as unknown as Boss[];
 const enemiesByName = enemies as Record<string, { ru: string; en: string; es: string; icon?: string }>;
@@ -73,11 +81,12 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
       {tabs.map(({ id, label }, i) => <button id={`tab-${id}`} type="button" role="tab" aria-controls={id} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={id}>{t(label)}</button>)}
     </div>
     {roles.map(({ id, label }) => (
-      <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`} data-gain-template={t('C{n}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-title={t('gcsim ещё не умеет считать этого персонажа, поэтому балл не умножается на созвездия')}>
+      <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`} data-gain-template={t('{variant}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-title={t('Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия')}>
         <h2 class="h-sec">{t(label)}</h2>
         {id !== 'sustain' && <div class="cons-switch" role="group" aria-label={t('Созвездия 5★')}>
           {([0, 1, 2] as const).map((level) => <button type="button" data-cons={level} aria-pressed={level === 0 ? 'true' : 'false'}>C{level}</button>)}
-          <span class="muted small">{t('5★ с созвездиями: прирост урона команды по нашим симуляциям gcsim')}</span>
+          <button type="button" class="weapon-toggle" aria-pressed="false">{t('+ 5★ оружие')}</button>
+          <span class="muted small">{t('Созвездия 5★ и лучшее 5★ оружие из гайда (R1): прирост урона команды по нашим симуляциям gcsim')}</span>
         </div>}
         <ol class="rating-list">
           {overall[id].filter((row) => bySlug.has(row.slug)).map((row) => {
@@ -86,12 +95,14 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
             const sources = row.kind === 'expert' ? expert.characters[row.slug]?.sources ?? [] : [];
             const variants = roleCons.get(id)!.get(row.slug)!;
             const limit = damageLimits.limits[row.slug as keyof typeof damageLimits.limits];
-            const cons = Object.fromEntries(([0, 1, 2] as const).map((level) => {
-              const { score, tier, rank, gain } = variants[level];
-              return [level, [score, tier, rank, gain]];
-            }));
-            const noSim = bySlug.get(row.slug)?.rarity === 5 && !row.slug.startsWith('traveler-') && !(row.slug in investmentRows);
-            return <li class="panel rating-row" data-slug={row.slug} data-cons={JSON.stringify(cons)} data-nosim={noSim ? '' : undefined}>
+            const cons = Object.fromEntries(([false, true] as const).flatMap((weapon) => ([0, 1, 2] as const).map((level) => {
+              const key = variantKey(level, weapon);
+              const { score, tier, rank, gain } = variants[key];
+              return [key, [score, tier, rank, gain]];
+            })));
+            const consSimulated = bySlug.get(row.slug)?.rarity !== 5 || row.slug.startsWith('traveler-');
+            const noSim = consSimulated ? [] : ([1, 2] as const).filter((level) => typeof investmentRows[row.slug]?.cons[level - 1] !== 'number');
+            return <li class="panel rating-row" data-slug={row.slug} data-cons={JSON.stringify(cons)} data-nosim={noSim.length ? noSim.join(',') : undefined}>
               <span class="place">{row.rank}</span>
               <CharacterIcon slug={row.slug} size={44} label={false} />
               <div class="rating-main">
@@ -274,7 +285,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
         <li>{t('Поддержка — по парам команд, которые отличаются только ею: насколько урон выше, чем со средней поддержкой на том же месте ({pairs} пар)', { pairs: fmtNumber(data._meta.pairs) })}</li>
         <li>{t('Команды с персонажами, которых нет в базе KQM, считаем сами тем же gcsim с подбором доп. статов по стандарту KQM ({own} команд). Эти ротации ещё не проверены сообществом, поэтому они есть только в списках команд, а оценки ролей не меняют', { own: fmtNumber(data._meta.own) })}</li>
         <li>{t('Сустейн и персонажи без симуляций получают экспертную оценку.')}</li>
-        <li>{t('Переключатель C0/C1/C2 умножает балл 5★ персонажа на прирост урона команды от созвездий из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывает места. 4★ и персонажи без симуляции созвездий множитель не получают, но баллы всех пересчитываются от нового лидера.')}</li>
+        <li>{t('Переключатели C0/C1/C2 и «+ 5★ оружие» умножают балл персонажа на прирост урона команды из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывают места. Созвездия учитываются только у 5★, оружие — у всех, для кого есть симуляция; созвездия и оружие считались отдельно, вместе их приросты перемножаются (приближение). Баллы всех пересчитываются от нового лидера.')}</li>
         <li>{t('Боссы — команды из той же базы, отобранные под механику босса: стихию щита, иммунитет, число целей, дальний бой, лечение.')}</li>
         <li>{t('Исследование — чек-лист пассивок и навыков вне боя, без симуляций.')}</li>
         <li>{t('«Предел» у строки — рекорд одного удара из серии «Предел урона» канала Miron MinMax (C6, лучшие артефакты, отряд по правилам автора). Это справка, в баллы не входит; автор сам считает старые цифры устаревшими.')}</li>
@@ -289,6 +300,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
 
 <script>
   import { onPage } from '../../scripts/router';
+  import { variantKey, type VariantKey } from '../../lib/rating/core';
 
   onPage((signal) => {
     const root = document.querySelector<HTMLElement>('[data-rating-tabs]');
@@ -309,17 +321,20 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
       const section = root.querySelector<HTMLElement>(`#${id}`)!;
       const list = section.querySelector<HTMLOListElement>('.rating-list')!;
       const rows = [...list.querySelectorAll<HTMLLIElement>('.rating-row')].map((row, index) => ({
-        row, index, variants: JSON.parse(row.dataset.cons!) as Record<0 | 1 | 2, Variant>,
+        row, index, variants: JSON.parse(row.dataset.cons!) as Record<VariantKey, Variant>,
       }));
       return { section, list, rows };
     });
-    const applyCons = (level: 0 | 1 | 2) => {
+    const applyCons = (level: 0 | 1 | 2, weapon: boolean) => {
+      const key = variantKey(level, weapon);
+      const label = `C${level}${weapon ? ' + 5★' : ''}`;
       for (const { section, list, rows } of sections) {
-        section.querySelectorAll<HTMLButtonElement>('.cons-switch button').forEach((button) => {
+        section.querySelectorAll<HTMLButtonElement>('.cons-switch button[data-cons]').forEach((button) => {
           button.setAttribute('aria-pressed', String(button.dataset.cons === String(level)));
         });
+        section.querySelector<HTMLButtonElement>('.weapon-toggle')!.setAttribute('aria-pressed', String(weapon));
         for (const { row, variants } of rows) {
-          const [score, tierValue, rank, gain] = variants[level];
+          const [score, tierValue, rank, gain] = variants[key];
           row.querySelector<HTMLElement>('.place')!.textContent = String(rank);
           const tier = row.querySelector<HTMLElement>('.tier')!;
           tier.classList.remove('tier-S', 'tier-A', 'tier-B', 'tier-C');
@@ -328,29 +343,41 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
           row.querySelector<HTMLElement>('.score-track span')!.style.width = `${score}%`;
           row.querySelector<HTMLElement>('.score-line b')!.textContent = String(score);
           const chip = row.querySelector<HTMLElement>('.cons-gain')!;
-          const noSim = row.dataset.nosim !== undefined;
-          chip.hidden = level === 0 || (gain === null && !noSim);
+          const noSim = level > 0 && (row.dataset.nosim ?? '').split(',').includes(String(level));
+          chip.hidden = !noSim && ((level === 0 && !weapon) || gain === null);
           chip.title = noSim ? section.dataset.nosimTitle! : '';
-          if (!chip.hidden && gain === null) chip.textContent = section.dataset.nosimTemplate!.replace('{n}', String(level));
+          if (noSim) chip.textContent = section.dataset.nosimTemplate!.replace('{n}', String(level));
           else if (!chip.hidden) {
             const pct = Math.round(Math.abs(gain!));
-            chip.textContent = section.dataset.gainTemplate!.replace('{n}', String(level))
+            chip.textContent = section.dataset.gainTemplate!.replace('{variant}', label)
               .replace('+{pct}', gain! < 0 ? `−${pct}` : `+${pct}`);
           }
         }
-        list.append(...rows.slice().sort((a, b) => a.variants[level][2] - b.variants[level][2] || a.index - b.index).map(({ row }) => row));
+        list.append(...rows.slice().sort((a, b) => a.variants[key][2] - b.variants[key][2] || a.index - b.index).map(({ row }) => row));
       }
     };
     let saved = '0';
-    try { saved = localStorage.getItem('rating-cons') ?? '0'; } catch {}
-    applyCons(saved === '1' ? 1 : saved === '2' ? 2 : 0);
-    sections.forEach(({ section }) => section.querySelectorAll<HTMLButtonElement>('.cons-switch button').forEach((button) => {
-      button.addEventListener('click', () => {
-        const level = Number(button.dataset.cons) as 0 | 1 | 2;
-        applyCons(level);
-        try { localStorage.setItem('rating-cons', String(level)); } catch {}
+    let weapon = false;
+    try {
+      saved = localStorage.getItem('rating-cons') ?? '0';
+      weapon = localStorage.getItem('rating-weapon') === '1';
+    } catch {}
+    let level: 0 | 1 | 2 = saved === '1' ? 1 : saved === '2' ? 2 : 0;
+    applyCons(level, weapon);
+    sections.forEach(({ section }) => {
+      section.querySelectorAll<HTMLButtonElement>('.cons-switch button[data-cons]').forEach((button) => {
+        button.addEventListener('click', () => {
+          level = Number(button.dataset.cons) as 0 | 1 | 2;
+          applyCons(level, weapon);
+          try { localStorage.setItem('rating-cons', String(level)); } catch {}
+        }, { signal });
+      });
+      section.querySelector<HTMLButtonElement>('.weapon-toggle')!.addEventListener('click', () => {
+        weapon = !weapon;
+        applyCons(level, weapon);
+        try { localStorage.setItem('rating-weapon', weapon ? '1' : '0'); } catch {}
       }, { signal });
-    }));
+    });
     root.classList.add('ready');
     fromHash();
     tabs.forEach((tab, i) => {
@@ -393,6 +420,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
   .score-line b { min-width: 2em; text-align: right; }
   .rating-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem; }
   .dmg-limit { font-size: .75rem; text-decoration: none; }
+  .cons-gain[hidden] { display: none; }
   .explore-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem; min-width: 0; }
   .explore-group .chip { white-space: normal; overflow-wrap: anywhere; }
   .boss-group { margin-top: 1.2rem; }

@@ -3,18 +3,6 @@
   "en": "5★ constellations",
   "es": "Constelaciones de 5★"
  },
- "5★ с созвездиями: прирост урона команды по нашим симуляциям gcsim": {
-  "en": "5★ constellations: team damage gain from our gcsim simulations",
-  "es": "Constelaciones de 5★: aumento del daño del equipo según nuestras simulaciones de gcsim"
- },
- "C{n}: +{pct}% к урону команды": {
-  "en": "C{n}: +{pct}% to team damage",
-  "es": "C{n}: +{pct}% al daño del equipo"
- },
- "Переключатель C0/C1/C2 умножает балл 5★ персонажа на прирост урона команды от созвездий из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывает места. 4★ и персонажи без симуляции созвездий множитель не получают, но баллы всех пересчитываются от нового лидера.": {
-  "en": "The C0/C1/C2 switch multiplies a 5★ character's score by the constellation team damage gain from our gcsim simulations (as in “Is it worth pulling”) and recalculates ranks. 4★ characters and characters without constellation simulations get no multiplier, but all scores are renormalized to the new leader.",
-  "es": "El selector C0/C1/C2 multiplica la puntuación de un personaje 5★ por el aumento del daño del equipo debido a sus constelaciones según nuestras simulaciones de gcsim (como en «¿Vale la pena tirar?») y recalcula los puestos. Los personajes 4★ y los que no tienen simulaciones de constelaciones no reciben multiplicador, pero todas las puntuaciones se recalculan respecto al nuevo líder."
- },
  "Боссы": {
   "en": "Bosses",
   "es": "Jefes"
@@ -6667,8 +6655,24 @@
   "en": "C{n}: no simulation",
   "es": "C{n}: sin simulación"
  },
- "gcsim ещё не умеет считать этого персонажа, поэтому балл не умножается на созвездия": {
-  "en": "gcsim can't simulate this character yet, so the score isn't multiplied for constellations",
-  "es": "gcsim aún no puede simular a este personaje, así que la puntuación no se multiplica por constelaciones"
+ "+ 5★ оружие": {
+  "en": "+ 5★ weapon",
+  "es": "+ arma de 5★"
+ },
+ "Созвездия 5★ и лучшее 5★ оружие из гайда (R1): прирост урона команды по нашим симуляциям gcsim": {
+  "en": "5★ constellations and the best 5★ weapon from the guide (R1): team damage gain from our gcsim simulations",
+  "es": "Constelaciones de 5★ y la mejor arma de 5★ de la guía (R1): aumento del daño del equipo según nuestras simulaciones de gcsim"
+ },
+ "{variant}: +{pct}% к урону команды": {
+  "en": "{variant}: +{pct}% to team damage",
+  "es": "{variant}: +{pct}% al daño del equipo"
+ },
+ "Переключатели C0/C1/C2 и «+ 5★ оружие» умножают балл персонажа на прирост урона команды из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывают места. Созвездия учитываются только у 5★, оружие — у всех, для кого есть симуляция; созвездия и оружие считались отдельно, вместе их приросты перемножаются (приближение). Баллы всех пересчитываются от нового лидера.": {
+  "en": "The C0/C1/C2 and “+ 5★ weapon” switches multiply character scores by team damage gains from our gcsim simulations (as in “Is it worth pulling”) and recalculate ranks. Constellations apply only to 5★ characters; weapons apply to anyone with simulation data. Constellation and weapon gains were simulated separately and are multiplied together as an approximation. All scores are recalculated relative to the new leader.",
+  "es": "Los selectores C0/C1/C2 y «+ arma de 5★» multiplican las puntuaciones por el aumento del daño del equipo según nuestras simulaciones de gcsim (como en «¿Vale la pena tirar?») y recalculan los puestos. Las constelaciones solo se aplican a personajes de 5★; las armas, a cualquiera con datos de simulación. Ambos aumentos se simularon por separado y se multiplican como aproximación. Todas las puntuaciones se recalculan respecto al nuevo líder."
+ },
+ "Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия": {
+  "en": "There's no constellation simulation for this character, so the score isn't multiplied for constellations",
+  "es": "No hay simulación de constelaciones para este personaje, así que la puntuación no se multiplica por constelaciones"
  }
 }

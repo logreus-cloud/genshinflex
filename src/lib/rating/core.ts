@@ -23,7 +23,12 @@ export type OverallRow = {
   kind: 'sim' | 'expert'; source?: { title: string; url: string }; team?: string[]; note?: string;
 };
 export type ConsLevel = 0 | 1 | 2;
+export type VariantKey = '0' | '1' | '2' | '0w' | '1w' | '2w';
 export type ConsVariant = { score: number; tier: Tier; rank: number; gain: number | null };
+
+export function variantKey(level: ConsLevel, weapon: boolean): VariantKey {
+  return `${level}${weapon ? 'w' : ''}` as VariantKey;
+}
 
 export const SUSTAIN_SCORE = { plenty: 90, enough: 75, low: 55 } as const;
 
@@ -181,27 +186,34 @@ export function buildOverall(generated: RatingData, manual: RatingManual): Recor
 
 export function consVariants(
   rows: OverallRow[],
-  gainOf: (slug: string, level: 1 | 2) => number | null,
-): Map<string, Record<ConsLevel, ConsVariant>> {
-  const result = new Map<string, Record<ConsLevel, ConsVariant>>();
+  gainOf: (slug: string, level: ConsLevel, weapon: boolean) => number | null,
+): Map<string, Record<VariantKey, ConsVariant>> {
+  const result = new Map<string, Record<VariantKey, ConsVariant>>();
   for (const row of rows) {
     const base = { score: row.score, tier: row.tier, rank: row.rank, gain: null };
-    result.set(row.slug, { 0: base, 1: { ...base }, 2: { ...base } });
+    result.set(row.slug, {
+      0: base, 1: { ...base }, 2: { ...base },
+      '0w': { ...base }, '1w': { ...base }, '2w': { ...base },
+    });
   }
-  for (const level of [1, 2] as const) {
-    const adjusted = rows.map((row, index) => {
-      const gain = gainOf(row.slug, level);
-      return { slug: row.slug, index, gain, value: row.score * (1 + (gain ?? 0) / 100) };
-    });
-    const max = Math.max(0, ...adjusted.map((entry) => entry.value));
-    const sorted = adjusted.map((entry) => ({
-      ...entry, score: max > 0 ? Math.round(entry.value / max * 100) : 0,
-    })).sort((a, b) => b.score - a.score || a.index - b.index);
-    let rank = 0;
-    sorted.forEach((entry, index) => {
-      if (index === 0 || entry.score !== sorted[index - 1].score) rank = index + 1;
-      result.get(entry.slug)![level] = { score: entry.score, tier: tierOf(entry.score), rank, gain: entry.gain };
-    });
+  for (const weapon of [false, true]) {
+    for (const level of [0, 1, 2] as const) {
+      if (level === 0 && !weapon) continue;
+      const key = variantKey(level, weapon);
+      const adjusted = rows.map((row, index) => {
+        const gain = gainOf(row.slug, level, weapon);
+        return { slug: row.slug, index, gain, value: row.score * (1 + (gain ?? 0) / 100) };
+      });
+      const max = Math.max(0, ...adjusted.map((entry) => entry.value));
+      const sorted = adjusted.map((entry) => ({
+        ...entry, score: max > 0 ? Math.round(entry.value / max * 100) : 0,
+      })).sort((a, b) => b.score - a.score || a.index - b.index);
+      let rank = 0;
+      sorted.forEach((entry, index) => {
+        if (index === 0 || entry.score !== sorted[index - 1].score) rank = index + 1;
+        result.get(entry.slug)![key] = { score: entry.score, tier: tierOf(entry.score), rank, gain: entry.gain };
+      });
+    }
   }
   return result;
 }
