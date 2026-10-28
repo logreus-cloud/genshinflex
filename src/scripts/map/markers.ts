@@ -1,5 +1,6 @@
 import * as L from 'leaflet';
 import { t } from '../search';
+import type { CollectedStore } from './collected';
 
 export const MARKER_TYPES = [
   { id: 'waypoint', label: 'Точки телепорта', color: '#4d9fe6', glyph: 'M12 2 21 12 12 22 3 12Z' },
@@ -16,6 +17,7 @@ export type MarkerTypeId = (typeof MARKER_TYPES)[number]['id'];
 export type MapMarker = { id: number; type: string; x: number; y: number; item: string | null; title: string | null; note: string | null };
 
 const FILTER_KEY = 'gf:map.filters';
+const HIDE_KEY = 'gf:map.hideCollected';
 const KNOWN_TYPES = new Set<MarkerTypeId>(MARKER_TYPES.map(type => type.id));
 const DENSE_TYPES = new Set<MarkerTypeId>(['chest', 'specialty', 'oculus']);
 
@@ -31,7 +33,7 @@ function saveFilters(selected: Set<MarkerTypeId>) {
   try { localStorage.setItem(FILTER_KEY, JSON.stringify([...selected])); } catch {}
 }
 
-export async function loadMarkers(layer: string): Promise<MapMarker[]> {
+export async function loadMarkers(layer: string): Promise<MapMarker[] | null> {
   try {
     const { getSupabase } = await import('../auth');
     const { data, error } = await getSupabase().from('map_markers')
@@ -41,21 +43,21 @@ export async function loadMarkers(layer: string): Promise<MapMarker[]> {
     return (data ?? []) as MapMarker[];
   } catch (error) {
     console.warn('Map markers could not be loaded', error);
-    return [];
+    return null;
   }
 }
 
-function markerIcon(type: (typeof MARKER_TYPES)[number], compact: boolean) {
+function markerIcon(type: (typeof MARKER_TYPES)[number], compact: boolean, collected: boolean) {
   const size = compact ? 18 : 22;
   return L.divIcon({
-    className: `gf-marker gf-marker--${type.id}${compact ? ' gf-marker--compact' : ''}`,
+    className: `gf-marker gf-marker--${type.id}${compact ? ' gf-marker--compact' : ''}${collected ? ' gf-marker--collected' : ''}`,
     html: `<span class="gf-marker__badge" style="background:${type.color}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${type.glyph}"/></svg></span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
     popupAnchor: [0, -size / 2],
   });
 }
-function markerPopup(type: (typeof MARKER_TYPES)[number], marker: MapMarker) {
+function markerPopup(type: (typeof MARKER_TYPES)[number], marker: MapMarker, collected: CollectedStore, buttons: Map<number, HTMLButtonElement>) {
   const popup = document.createElement('div');
   popup.className = 'gf-marker-popup';
   const heading = document.createElement('strong');
@@ -67,28 +69,67 @@ function markerPopup(type: (typeof MARKER_TYPES)[number], marker: MapMarker) {
     line.textContent = text;
     popup.append(line);
   }
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'gf-marker-popup__button';
+  button.textContent = t(collected.has(marker.id) ? 'Собрано — снять отметку' : 'Отметить собранным');
+  button.disabled = collected.isPending(marker.id);
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    try { await collected.toggle(marker.id); }
+    finally { button.disabled = collected.isPending(marker.id); button.textContent = t(collected.has(marker.id) ? 'Собрано — снять отметку' : 'Отметить собранным'); }
+  });
+  buttons.set(marker.id, button);
+  popup.append(button);
   return popup;
 }
 
-export function markerLayer(map: L.Map, markers: MapMarker[], options: { compact?: boolean } = {}): () => void {
+export function markerLayer(map: L.Map, markers: MapMarker[], options: { compact?: boolean; collected: CollectedStore }): () => void {
+  let hideCollected = false;
+  try { hideCollected = localStorage.getItem(HIDE_KEY) === 'true'; } catch {}
   const groups = new Map<MarkerTypeId, L.LayerGroup>();
   const counts = new Map<MarkerTypeId, number>();
-  const icons = new Map<MarkerTypeId, L.DivIcon>();
+  const icons = new Map<MarkerTypeId, { normal: L.DivIcon; collected: L.DivIcon }>();
+  const pins: { id: number; type: MarkerTypeId; pin: L.Marker }[] = [];
+  const popupButtons = new Map<number, HTMLButtonElement>();
   for (const type of MARKER_TYPES) {
     groups.set(type.id, L.layerGroup());
     counts.set(type.id, 0);
-    icons.set(type.id, markerIcon(type, !!options.compact));
+    icons.set(type.id, {
+      normal: markerIcon(type, !!options.compact, false),
+      collected: markerIcon(type, !!options.compact, true),
+    });
   }
   for (const marker of markers) {
     const type = MARKER_TYPES.find(type => type.id === marker.type);
     if (!type) continue;
-    const pin = L.marker([-marker.y, marker.x], { icon: icons.get(type.id)! });
-    pin.bindPopup(() => markerPopup(type, marker));
+    const pin = L.marker([-marker.y, marker.x], { icon: icons.get(type.id)!.normal });
+    pin.bindPopup(() => markerPopup(type, marker, options.collected, popupButtons));
     groups.get(type.id)!.addLayer(pin);
+    pins.push({ id: marker.id, type: type.id, pin });
     counts.set(type.id, counts.get(type.id)! + 1);
   }
 
   const selected = savedFilters();
+  let progress: HTMLElement | undefined;
+  const syncCollected = () => {
+    for (const { id, type, pin } of pins) {
+      const marked = options.collected.has(id);
+      const icon = icons.get(type)![marked ? 'collected' : 'normal'];
+      if (pin.options.icon !== icon) pin.setIcon(icon);
+      const group = groups.get(type)!;
+      if (hideCollected && marked && group.hasLayer(pin)) group.removeLayer(pin);
+      if ((!hideCollected || !marked) && !group.hasLayer(pin)) group.addLayer(pin);
+      const button = popupButtons.get(id);
+      if (button) {
+        button.textContent = t(marked ? 'Собрано — снять отметку' : 'Отметить собранным');
+        button.disabled = options.collected.isPending(id);
+      }
+    }
+    if (progress) progress.textContent = t('Собрано: {n} из {total}', {
+      n: markers.filter(marker => options.collected.has(marker.id)).length, total: markers.length,
+    });
+  };
   const update = () => {
     const bounds = map.getBounds();
     let visible = 0;
@@ -166,6 +207,21 @@ export function markerLayer(map: L.Map, markers: MapMarker[], options: { compact
       row.append(input, swatch, name, count);
       panel.append(row);
     }
+    const hideRow = document.createElement('label');
+    hideRow.className = 'gf-map-filters__row gf-map-filters__hide';
+    const hideInput = document.createElement('input');
+    hideInput.type = 'checkbox';
+    hideInput.checked = hideCollected;
+    hideInput.addEventListener('change', () => {
+      hideCollected = hideInput.checked;
+      try { localStorage.setItem(HIDE_KEY, String(hideCollected)); } catch {}
+      syncCollected();
+    });
+    hideRow.append(hideInput, t('Скрыть собранное'));
+    panel.append(hideRow);
+    progress = document.createElement('div');
+    progress.className = 'gf-map-filters__progress';
+    panel.append(progress);
     const actions = document.createElement('div');
     actions.className = 'gf-map-filters__actions';
     for (const [label, all] of [[t('Все'), true], [t('Ничего'), false]] as const) {
@@ -199,10 +255,13 @@ export function markerLayer(map: L.Map, markers: MapMarker[], options: { compact
 
   map.on('moveend zoomend', update);
   map.on('resize', fitPanel);
+  const unsubscribe = options.collected.onChange(syncCollected);
+  syncCollected();
   update();
   return () => {
     map.off('moveend zoomend', update);
     map.off('resize', fitPanel);
+    unsubscribe();
     control.remove();
     empty?.remove();
     for (const group of groups.values()) group.remove();

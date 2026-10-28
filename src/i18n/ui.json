@@ -7,6 +7,22 @@
   "en": "Map",
   "es": "Mapa"
  },
+ "Отметить собранным": {
+  "en": "Mark as collected",
+  "es": "Marcar como recogido"
+ },
+ "Собрано — снять отметку": {
+  "en": "Collected — remove mark",
+  "es": "Recogido — quitar marca"
+ },
+ "Скрыть собранное": {
+  "en": "Hide collected",
+  "es": "Ocultar lo recogido"
+ },
+ "Собрано: {n} из {total}": {
+  "en": "Collected: {n} of {total}",
+  "es": "Recogido: {n} de {total}"
+ },
  "Интерактивная карта Тейвата": {
   "en": "Interactive Map of Teyvat",
   "es": "Mapa interactivo de Teyvat"

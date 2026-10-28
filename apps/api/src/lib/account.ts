@@ -63,10 +63,12 @@ async function exportRelatedRows(client: AdminClient, table: string, key: string
 }
 
 export async function exportAccount(client: AdminClient, id: string) {
-  const [wishes, titles, rewards, threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers, guildMembership, ownedGuilds, threadViews] = await Promise.all([
+  const [wishes, titles, rewards, collected, mapMarkers, threads, posts, reactions, reports, following, followers, requestedFriendships, receivedFriendships, blocks, notifications, ownMembers, guildMembership, ownedGuilds, threadViews] = await Promise.all([
     exportRows(client, 'wishes', 'user_id', id, ['game_uid', 'id']),
     exportRows(client, 'user_titles', 'user_id', id, ['title_id']),
     exportRows(client, 'user_rewards', 'user_id', id, ['reward_id']),
+    exportRows(client, 'map_collected', 'user_id', id, ['marker_id']),
+    exportRows(client, 'map_markers', 'author_id', id, ['id']),
     exportRows(client, 'forum_threads', 'author_id', id, ['id']),
     exportRows(client, 'forum_posts', 'author_id', id, ['id']),
     exportRows(client, 'forum_reactions', 'user_id', id, ['post_id', 'kind']),
@@ -134,6 +136,7 @@ export async function exportAccount(client: AdminClient, id: string) {
     discord_linked_roles: discordRoles.data,
     discord_tickets: discordTickets,
     forum: { threads, posts, reactions, reports, ban: ban.data, views: threadViews },
+    map: { collected, markers: mapMarkers },
     social: { following, followers, friendships: [...requestedFriendships, ...receivedFriendships], blocks },
     notifications,
     messages: { conversations, members, messages },

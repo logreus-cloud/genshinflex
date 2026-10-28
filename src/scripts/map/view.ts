@@ -2,6 +2,7 @@ import * as L from 'leaflet';
 import tiles from '../../data/map-tiles.json';
 import { MAP_TILES_URL } from '../../lib/platform';
 import { loadMarkers, markerLayer } from './markers';
+import { createCollectedStore } from './collected';
 import 'leaflet/dist/leaflet.css';
 import './map.css';
 
@@ -71,13 +72,17 @@ export function mountMap(element: HTMLElement, options: MapOptions = {}): () => 
 
   let destroyed = false;
   let removeMarkers: (() => void) | undefined;
+  let collected: ReturnType<typeof createCollectedStore> | undefined;
   void loadMarkers('surface').then((markers) => {
-    if (!destroyed) removeMarkers = markerLayer(map, markers, options);
+    if (destroyed || !markers) return;
+    collected = createCollectedStore(markers.map(marker => marker.id));
+    removeMarkers = markerLayer(map, markers, { ...options, collected });
   });
   return () => {
     destroyed = true;
     resize.disconnect();
     removeMarkers?.();
+    collected?.dispose();
     map.remove();
   };
 }
