@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { aggregate, buildOverall, classifyTeam, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, tierOf, type RatingData, type RatingManual, type TeamRow } from './core.ts';
+import { aggregate, buildOverall, classifyTeam, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, tierOf, type OverallRow, type RatingData, type RatingManual, type TeamRow } from './core.ts';
 
 test('classifyTeam распределяет роли по долям', () => {
   const members = [
@@ -88,6 +88,21 @@ test('buildOverall добавляет экспертов, заменяет си�
   assert.equal(overall.carry[2].source?.url, simUrl('sim-b'));
   assert.equal(overall.carry[0].value, null);
   assert.deepEqual(overall.sustain.map(({ slug, score, kind }) => [slug, score, kind]), [['d', 90, 'expert']]);
+});
+
+test('consVariants пересчитывает созвездия и сохраняет исходный C0', () => {
+  const rows: OverallRow[] = [
+    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'S', rank: 1, kind: 'sim' },
+    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+  ];
+  const variants = consVariants(rows, (slug, level) => slug === 'b' && level === 1 ? 50 : null);
+  assert.deepEqual(rows.map((row) => variants.get(row.slug)![0]), rows.map(({ score, tier, rank }) => ({ score, tier, rank, gain: null })));
+  assert.deepEqual(variants.get('b')![1], { score: 100, tier: 'S', rank: 1, gain: 50 });
+  assert.deepEqual(variants.get('a')![1], { score: 83, tier: 'A', rank: 2, gain: null });
+  assert.deepEqual(variants.get('c')![1], { score: 67, tier: 'B', rank: 3, gain: null });
+  assert.deepEqual(rows.map((row) => variants.get(row.slug)![2].rank), [1, 2, 2]);
+  assert.deepEqual(rows.map(({ score, tier, rank }) => [score, tier, rank]), [[100, 'S', 1], [80, 'A', 2], [80, 'A', 2]]);
 });
 
 test('фильтры ротации и русские стихии', () => {

@@ -1,4 +1,20 @@
 {
+ "Созвездия 5★": {
+  "en": "5★ constellations",
+  "es": "Constelaciones de 5★"
+ },
+ "5★ с созвездиями: прирост урона команды по нашим симуляциям gcsim": {
+  "en": "5★ constellations: team damage gain from our gcsim simulations",
+  "es": "Constelaciones de 5★: aumento del daño del equipo según nuestras simulaciones de gcsim"
+ },
+ "C{n}: +{pct}% к урону команды": {
+  "en": "C{n}: +{pct}% to team damage",
+  "es": "C{n}: +{pct}% al daño del equipo"
+ },
+ "Переключатель C0/C1/C2 умножает балл 5★ персонажа на прирост урона команды от созвездий из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывает места. 4★ и персонажи без симуляции созвездий множитель не получают, но баллы всех пересчитываются от нового лидера.": {
+  "en": "The C0/C1/C2 switch multiplies a 5★ character's score by the constellation team damage gain from our gcsim simulations (as in “Is it worth pulling”) and recalculates ranks. 4★ characters and characters without constellation simulations get no multiplier, but all scores are renormalized to the new leader.",
+  "es": "El selector C0/C1/C2 multiplica la puntuación de un personaje 5★ por el aumento del daño del equipo debido a sus constelaciones según nuestras simulaciones de gcsim (como en «¿Vale la pena tirar?») y recalcula los puestos. Los personajes 4★ y los que no tienen simulaciones de constelaciones no reciben multiplicador, pero todas las puntuaciones se recalculan respecto al nuevo líder."
+ },
  "Боссы": {
   "en": "Bosses",
   "es": "Jefes"

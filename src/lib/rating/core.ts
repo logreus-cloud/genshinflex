@@ -22,6 +22,8 @@ export type OverallRow = {
   slug: string; role: Role; value: number | null; score: number; tier: Tier; rank: number;
   kind: 'sim' | 'expert'; source?: { title: string; url: string }; team?: string[]; note?: string;
 };
+export type ConsLevel = 0 | 1 | 2;
+export type ConsVariant = { score: number; tier: Tier; rank: number; gain: number | null };
 
 export const SUSTAIN_SCORE = { plenty: 90, enough: 75, low: 55 } as const;
 
@@ -174,6 +176,33 @@ export function buildOverall(generated: RatingData, manual: RatingManual): Recor
     if (index === 0 || row.score !== sustain[index - 1].score) rank = index + 1;
     return { ...row, rank };
   });
+  return result;
+}
+
+export function consVariants(
+  rows: OverallRow[],
+  gainOf: (slug: string, level: 1 | 2) => number | null,
+): Map<string, Record<ConsLevel, ConsVariant>> {
+  const result = new Map<string, Record<ConsLevel, ConsVariant>>();
+  for (const row of rows) {
+    const base = { score: row.score, tier: row.tier, rank: row.rank, gain: null };
+    result.set(row.slug, { 0: base, 1: { ...base }, 2: { ...base } });
+  }
+  for (const level of [1, 2] as const) {
+    const adjusted = rows.map((row, index) => {
+      const gain = gainOf(row.slug, level);
+      return { slug: row.slug, index, gain, value: row.score * (1 + (gain ?? 0) / 100) };
+    });
+    const max = Math.max(0, ...adjusted.map((entry) => entry.value));
+    const sorted = adjusted.map((entry) => ({
+      ...entry, score: max > 0 ? Math.round(entry.value / max * 100) : 0,
+    })).sort((a, b) => b.score - a.score || a.index - b.index);
+    let rank = 0;
+    sorted.forEach((entry, index) => {
+      if (index === 0 || entry.score !== sorted[index - 1].score) rank = index + 1;
+      result.get(entry.slug)![level] = { score: entry.score, tier: tierOf(entry.score), rank, gain: entry.gain };
+    });
+  }
   return result;
 }
 
