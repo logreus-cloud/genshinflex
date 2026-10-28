@@ -37,6 +37,13 @@ test('иммунитет исключает только керри нужной
   assert.equal(fitsBoss(target, [member({ element: 'electro' })], 1), true);
 });
 
+test('иммунитет к нескольким стихиям исключает керри любой из них', () => {
+  const target = boss(['immune'], { immune: ['cryo', 'anemo'] });
+  assert.equal(fitsBoss(target, [member({ element: 'anemo', carry: true })], 1), false);
+  assert.equal(fitsBoss(target, [member({ element: 'cryo', carry: true })], 1), false);
+  assert.equal(fitsBoss(target, [member({ element: 'pyro', carry: true })], 1), true);
+});
+
 test('для воздушного босса керри нужен лук или катализатор', () => {
   const target = boss(['airborne']);
   assert.equal(fitsBoss(target, [member({ carry: true })], 1), false);

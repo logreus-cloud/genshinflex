@@ -1,7 +1,7 @@
 import { fitsAbyssHalf, rankTeams, type Element, type TeamRow } from './core';
 
 export type BossTag = 'nightsoul' | 'lunar' | 'stellar' | 'arkhe' | 'counter' | 'immune' | 'adds' | 'airborne' | 'heal' | 'adaptive' | 'single';
-export type Boss = { en: string; weekly?: boolean; tags: BossTag[]; need?: Element[][]; immune?: Element; verified: boolean };
+export type Boss = { en: string; weekly?: boolean; tags: BossTag[]; need?: Element[][]; immune?: Element | Element[]; verified: boolean };
 export type BossMember = { slug: string; element: Element; weapon: string; carry: boolean; healer: boolean; mechanics: BossTag[] };
 
 export const BOSS_TAGS: Record<BossTag, { label: string; hint: string }> = {
@@ -36,7 +36,7 @@ export function fitsBoss(boss: Boss, members: BossMember[], targets: number): bo
   return boss.tags.every((tag) => {
     switch (tag) {
       case 'counter': return fitsAbyssHalf(members.map((member) => member.element), boss.need ?? []);
-      case 'immune': return !members.some((member) => member.carry && member.element === boss.immune);
+      case 'immune': return !members.some((member) => member.carry && [boss.immune ?? []].flat().includes(member.element));
       case 'airborne': return members.every((member) => !member.carry || ['bow', 'catalyst'].includes(member.weapon));
       case 'heal': return members.some((member) => member.healer);
       case 'nightsoul':

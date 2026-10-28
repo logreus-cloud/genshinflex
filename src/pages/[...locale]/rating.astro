@@ -191,7 +191,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
                         {boss.tags.map((tag) => <span class="chip">{t(BOSS_TAGS[tag].label)}</span>)}
                       </div>
                       {boss.need && <span class="muted small">{t('Нужно: {elements}', { elements: needText(boss.need) })}</span>}
-                      {boss.immune && <span class="muted small">{t('Иммунитет: {element}', { element: t(elementText[boss.immune]) })}</span>}
+                      {boss.immune && <span class="muted small">{t('Иммунитет: {element}', { element: [boss.immune].flat().map((element) => t(elementText[element])).join(', ') })}</span>}
                       {ranked.slice(0, 1).map((team) => (
                         <div class="boss-team">
                           <div class="boss-team-icons">
