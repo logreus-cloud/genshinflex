@@ -3,7 +3,7 @@ import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import { useData } from '../lib/data';
 const { lang, base, t } = useData(Astro.currentLocale);
-interface Props { title: string; active?: 'search' | 'guide' | 'banners'; guideHref?: string; }
+interface Props { title: string; active?: 'search' | 'guide' | 'banners' | 'map'; guideHref?: string; }
 const { title, active, guideHref } = Astro.props;
 ---
 <!doctype html>
@@ -48,10 +48,11 @@ const { title, active, guideHref } = Astro.props;
       <button type="button" data-update-install>{t('Обновить')}</button>
       <button type="button" class="ov-update-dismiss" data-update-dismiss aria-label={t('Скрыть до перезапуска')} title={t('Скрыть до перезапуска')}>×</button>
     </div>
-    <nav class="ov-tabs" aria-label={t('Навигация')}>
+    <nav class="ov-tabs" aria-label={t('Навигация')} style="grid-template-columns: repeat(4, 1fr)">
       <a class="ov-tab" href={`${base}/overlay/`} aria-current={active === 'search' ? 'page' : undefined}>{t('Поиск')}</a>
       <a class="ov-tab" data-guide-tab href={guideHref} aria-disabled={!guideHref ? 'true' : undefined} aria-current={active === 'guide' ? 'page' : undefined}>{t('Гайд')}</a>
       <a class="ov-tab" href={`${base}/overlay/banners/`} aria-current={active === 'banners' ? 'page' : undefined}>{t('Баннеры')}</a>
+      <a class="ov-tab" href={`${base}/overlay/map/`} aria-current={active === 'map' ? 'page' : undefined}>{t('Карта')}</a>
     </nav>
     <div class="ov-toast" role="status" hidden></div>
     <script>

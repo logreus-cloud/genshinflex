@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "tileSize": 256,
+  "minZoom": 9,
+  "maxZoom": 12,
+  "boundsZ12": [
+    -6340,
+    -4288,
+    6176,
+    7776
+  ],
+  "layers": [
+    {
+      "id": "surface",
+      "minZoom": 9,
+      "maxZoom": 12
+    }
+  ]
+}

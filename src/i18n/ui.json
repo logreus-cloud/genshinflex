@@ -3,6 +3,22 @@
   "en": "Tier list",
   "es": "Lista de niveles"
  },
+ "Карта": {
+  "en": "Map",
+  "es": "Mapa"
+ },
+ "Интерактивная карта Тейвата": {
+  "en": "Interactive Map of Teyvat",
+  "es": "Mapa interactivo de Teyvat"
+ },
+ "Карта мира Genshin Impact: все регионы, приближение до уровня городов.": {
+  "en": "Genshin Impact world map: every region, with zoom down to city level.",
+  "es": "Mapa del mundo de Genshin Impact: todas las regiones, con zoom hasta el nivel de las ciudades."
+ },
+ "Своя карта GenshinFlex, собранная из скриншотов игры. Метки и отметки «собрано» появятся в следующих обновлениях.": {
+  "en": "GenshinFlex's own map, assembled from in-game screenshots. Markers and collected-item tracking will arrive in future updates.",
+  "es": "El mapa propio de GenshinFlex, creado a partir de capturas del juego. Los marcadores y el seguimiento de objetos recogidos llegarán en próximas actualizaciones."
+ },
  "Строки — тиры по баллам, колонки — роли. Нажмите на персонажа, чтобы увидеть, почему он здесь.": {
   "en": "Rows show score tiers; columns show roles. Select a character to see why they are here.",
   "es": "Las filas muestran niveles por puntuación y las columnas, roles. Selecciona un personaje para saber por qué está aquí."

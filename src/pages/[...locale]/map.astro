@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { LANGS, useData } from '../../lib/data';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Интерактивная карта Тейвата')} description={t('Карта мира Genshin Impact: все регионы, приближение до уровня городов.')}>
+  <h1>{t('Карта Тейвата')}</h1>
+  <p class="lead">{t('Своя карта GenshinFlex, собранная из скриншотов игры. Метки и отметки «собрано» появятся в следующих обновлениях.')}</p>
+  <div class="map-canvas panel" id="map-view" aria-label={t('Карта Тейвата')}></div>
+</Layout>
+
+<script>
+  import { mountMap } from '../../scripts/map/view';
+  import { onPage, cleanup } from '../../scripts/router';
+
+  onPage((signal) => {
+    const el = document.getElementById('map-view');
+    if (!el) return;
+    cleanup(signal, mountMap(el, {}));
+  });
+</script>
+
+<style>
+  .map-canvas { isolation: isolate; height: min(75vh, 900px); padding: 0; overflow: hidden; background: #0d2a3a; }
+</style>

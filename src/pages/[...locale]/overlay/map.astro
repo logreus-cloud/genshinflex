@@ -1,0 +1,25 @@
+---
+import OverlayLayout from '../../../layouts/OverlayLayout.astro';
+import { LANGS, useData } from '../../../lib/data';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { t } = useData(Astro.currentLocale);
+---
+<OverlayLayout title={t('Карта Тейвата')} active="map">
+  <div class="ov-map" id="ov-map-view" aria-label={t('Карта Тейвата')}></div>
+</OverlayLayout>
+
+<script>
+  import { mountMap } from '../../../scripts/map/view';
+  import { onPage, cleanup } from '../../../scripts/router';
+
+  onPage((signal) => {
+    const el = document.getElementById('ov-map-view');
+    if (!el) return;
+    cleanup(signal, mountMap(el, { compact: true }));
+  });
+</script>
+
+<style>
+  :global(.ov-main) { display: flex; flex-direction: column; min-height: calc(100dvh - 42px); }
+  .ov-map { isolation: isolate; flex: 1; min-height: 320px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: #0d2a3a; }
+</style>
