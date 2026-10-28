@@ -9,10 +9,11 @@ import rating from '../../data/rating.json';
 import investments from '../../data/investments.json';
 import damageLimits from '../../data/damage-limits.json';
 import manual from '../../data/rating-manual.json';
+import externalData from '../../data/rating-external.json';
 import bossData from '../../data/rating-bosses.json';
 import enemies from '../../data/generated/enemies.json';
 import charactersEn from '../../data/generated/characters.en.json';
-import { buildOverall, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, simUrl, variantKey, type Element, type RatingData, type RatingManual, type Role, type TeamRow } from '../../lib/rating/core';
+import { buildOverall, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, simUrl, variantKey, type Element, type RatingData, type RatingExternal, type RatingManual, type Role, type TeamRow } from '../../lib/rating/core';
 import { BOSS_TAGS, bossGroup, mechanicTags, rankBossTeams, type Boss, type BossMember, type BossTag } from '../../lib/rating/bosses';
 import { EXPLORE_CATEGORIES, EXPLORE_TAGS, explorationTags, rankExploration } from '../../lib/rating/exploration';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
@@ -20,7 +21,9 @@ export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 
 const { base, t, lang, characters, fmtNumber, fmtFullDate } = useData(Astro.currentLocale);
 const data = rating as RatingData;
 const expert = manual as RatingManual;
-const overall = buildOverall(data, expert);
+const external = externalData as RatingExternal;
+const overall = buildOverall(data, expert, external);
+const manualTierSources = Object.values(expert.characters).flatMap((character) => character.sources).filter((source, index, sources) => sources.findIndex((item) => item.title === source.title) === index);
 const bySlug = new Map(characters.map((c) => [c.slug, c]));
 const investmentRows = investments as unknown as Record<string, { cons: (number | null)[]; weapon?: number | null } | undefined>;
 const gainOf = (slug: string, level: 0 | 1 | 2, weapon: boolean) => {
@@ -84,7 +87,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
   })));
   const noSim = id === 'sustain' || c.rarity !== 5 || row.slug.startsWith('traveler-') ? [] : ([1, 2] as const).filter((level) => typeof investmentRows[row.slug]?.cons[level - 1] !== 'number');
   return [{ role: id, roleLabel: label, row, c, cons: JSON.stringify(cons), noSim: noSim.length ? noSim.join(',') : undefined,
-    sources: row.kind === 'expert' ? expert.characters[row.slug]?.sources ?? [] : [], sustain: expert.sustain[row.slug],
+    sources: expert.characters[row.slug]?.sources ?? [], sustain: expert.sustain[row.slug],
     limit: damageLimits.limits[row.slug as keyof typeof damageLimits.limits], supportN: data.characters[row.slug]?.support?.n ?? 0, order }];
 }));
 ---
@@ -97,7 +100,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
     </div>
     <section id="tiers" class="rating-section" role="tabpanel" aria-labelledby="tab-tiers" data-gain-template={t('{variant}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-short-template={t('нет C{n}')} data-nosim-title={t('Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия')}>
       <h2 class="h-sec">{t('Тир-лист')}</h2>
-      <TierTable roles={roles} entries={tierEntries} compact={compact} damageCompact={damageCompact} fmtNumber={fmtNumber} fmtFullDate={fmtFullDate} supportPct={supportPct} />
+      <TierTable roles={roles} entries={tierEntries} external={external} compact={compact} damageCompact={damageCompact} fmtNumber={fmtNumber} fmtFullDate={fmtFullDate} supportPct={supportPct} />
     </section>
     {roles.map(({ id, label }) => (
       <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`} data-gain-template={t('{variant}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-title={t('Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия')}>
@@ -111,7 +114,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
           {overall[id].filter((row) => bySlug.has(row.slug)).map((row) => {
             const c = bySlug.get(row.slug)!;
             const sustain = expert.sustain[row.slug];
-            const sources = row.kind === 'expert' ? expert.characters[row.slug]?.sources ?? [] : [];
+            const sources = expert.characters[row.slug]?.sources ?? [];
             const variants = roleCons.get(id)!.get(row.slug)!;
             const limit = damageLimits.limits[row.slug as keyof typeof damageLimits.limits];
             const cons = Object.fromEntries(([false, true] as const).flatMap((weapon) => ([0, 1, 2] as const).map((level) => {
@@ -139,13 +142,23 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
                   {row.value !== null && (id === 'support'
                     ? <span><span title={t('Насколько урон команды выше, чем со средней поддержкой на том же месте')}>{t('{pct}% к урону команды', { pct: supportPct(row.value) })}</span> <small>{t('по {n} заменам', { n: fmtNumber(data.characters[row.slug]?.support?.n ?? 0) })}</small></span>
                     : <span>{t('{n} DPS', { n: compact.format(row.value) })}</span>)}
+                  {row.simScore !== undefined && <span>{t('Симуляция: {score}', { score: row.simScore })}</span>}
+                  {row.consensus && <span>
+                    {t('Тир-листы: {score}', { score: Math.round(row.consensus.score) })} (
+                    {row.consensus.parts.map((part, index) => <>
+                      {index > 0 && ' · '}
+                      {part.source === 'manual'
+                        ? <span>Game8/PG {part.label} {sources.map((source) => <a href={source.url} title={t(source.title)} target="_blank" rel="noopener">↗</a>)}</span>
+                        : <a href={external._meta.sources[part.source].url} target="_blank" rel="noopener">{part.source === 'prydwen' ? 'Prydwen' : 'WotPack'} {part.label}</a>}
+                    </>)} )
+                  </span>}
                   {row.kind === 'expert' && <span class="chip">{t('экспертная оценка')}</span>}
                   {sustain && <><span class="chip">{t(sustainLevels[sustain.level])}</span><span>{t(sustainKinds[sustain.kind])}</span></>}
                   {row.note && <span>{t(row.note)}</span>}
                   {row.kind === 'sim' && row.source && <a href={row.source.url} target="_blank" rel="noopener">{t(row.source.title === 'конфиг' ? 'конфиг' : 'симуляция')}</a>}
-                  {sources.map((source) => <a href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}
+                  {!row.consensus && sources.map((source) => <a href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}
                 </div>
-                {row.team && <details><summary>{t('Лучшая команда')}</summary><Team members={row.team} /></details>}
+                {row.team && <details><summary>{t('Лучшая команда')} {row.teamSource && <a href={row.teamSource.url} target="_blank" rel="noopener">{t('команда: Prydwen')}</a>}</summary><Team members={row.team} /></details>}
               </div>
             </li>;
           })}
@@ -303,7 +316,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
         <li>{t('Керри и саб-DPS оцениваются по своему урону. Роли не сравниваются друг с другом.')}</li>
         <li>{t('Поддержка — по парам команд, которые отличаются только ею: насколько урон выше, чем со средней поддержкой на том же месте ({pairs} пар)', { pairs: fmtNumber(data._meta.pairs) })}</li>
         <li>{t('Команды с персонажами, которых нет в базе KQM, считаем сами тем же gcsim с подбором доп. статов по стандарту KQM ({own} команд). Эти ротации ещё не проверены сообществом, поэтому они есть только в списках команд, а оценки ролей не меняют', { own: fmtNumber(data._meta.own) })}</li>
-        <li>{t('Сустейн и персонажи без симуляций получают экспертную оценку.')}</li>
+        <li>{t('Итоговый балл роли: 60% — наши симуляции gcsim, 40% — среднее внешних тир-листов (Prydwen по ролям, WotPack, Game8 и Pocket Gamer). Без симуляции — только тир-листы. Шкалы: Prydwen T0 — 100 … T5 — 40, WotPack S+ — 95 … D — 40.')}</li>
         <li>{t('Переключатели C0/C1/C2 и «+ 5★ оружие» умножают балл персонажа на прирост урона команды из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывают места. Созвездия учитываются только у 5★, оружие — у всех, для кого есть симуляция; созвездия и оружие считались отдельно, вместе их приросты перемножаются (приближение). Баллы всех пересчитываются от нового лидера.')}</li>
         <li>{t('Боссы — команды из той же базы, отобранные под механику босса: стихию щита, иммунитет, число целей, дальний бой, лечение.')}</li>
         <li>{t('Исследование — чек-лист пассивок и навыков вне боя, без симуляций.')}</li>
@@ -312,6 +325,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
         <li>{t('ELO сообщества появится позже.')}</li>
       </ul>
       <p class="muted small">{t('Данные от {date} · симуляций по базе: {baseline} из {entries}',{ date: data._meta.date, entries: fmtNumber(data._meta.entries), baseline: fmtNumber(data._meta.baseline) })}</p>
+      <p class="muted small">{t('Источники')}: {[...Object.values(external._meta.sources), ...manualTierSources].map((source, index) => <>{index > 0 && ' · '}<a href={source.url} target="_blank" rel="noopener">{t(source.title)}</a></>)}</p>
       <p><a href="https://db.kqm.gg/" target="_blank" rel="noopener">db.kqm.gg</a> · <a href="https://gcsim.app/" target="_blank" rel="noopener">gcsim.app</a></p>
     </section>
   </div>

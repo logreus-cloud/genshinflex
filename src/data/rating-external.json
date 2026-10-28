@@ -1,0 +1,540 @@
+{
+ "_meta": {
+  "date": "2026-10-28",
+  "sources": {
+   "prydwen": {
+    "title": "Prydwen: тир-лист",
+    "url": "https://www.prydwen.gg/genshin-impact/tier-list"
+   },
+   "wotpack": {
+    "title": "WotPack: тир-лист 7.1",
+    "url": "https://wotpack.ru/genshin-impact-top-20-luchshih-personazhej/"
+   }
+  }
+ },
+ "prydwen": {
+  "aino": {
+   "support": "T1.5"
+  },
+  "albedo": {
+   "subdps": "T1"
+  },
+  "alhaitham": {
+   "carry": "T3"
+  },
+  "aloy": {
+   "carry": "T5"
+  },
+  "alyosha": {
+   "support": "T1.5"
+  },
+  "amber": {
+   "support": "T4",
+   "carry": "T5"
+  },
+  "arataki-itto": {
+   "carry": "T2"
+  },
+  "arlecchino": {
+   "carry": "T1"
+  },
+  "baizhu": {
+   "support": "T3"
+  },
+  "barbara": {
+   "subdps": "T3",
+   "support": "T4"
+  },
+  "beidou": {
+   "support": "T1"
+  },
+  "bennett": {
+   "support": "T0.5"
+  },
+  "candace": {
+   "support": "T3"
+  },
+  "charlotte": {
+   "support": "T2"
+  },
+  "chasca": {
+   "carry": "T2"
+  },
+  "chevreuse": {
+   "support": "T0.5"
+  },
+  "chiori": {
+   "subdps": "T1.5"
+  },
+  "chongyun": {
+   "support": "T3"
+  },
+  "citlali": {
+   "support": "T0.5"
+  },
+  "clorinde": {
+   "carry": "T1.5"
+  },
+  "collei": {
+   "support": "T3"
+  },
+  "columbina": {
+   "subdps": "T0",
+   "carry": "T1.5"
+  },
+  "cyno": {
+   "carry": "T0.5"
+  },
+  "dahlia": {
+   "support": "T3"
+  },
+  "dehya": {
+   "support": "T3",
+   "carry": "T4"
+  },
+  "diluc": {
+   "carry": "T3"
+  },
+  "diona": {
+   "support": "T1"
+  },
+  "dori": {
+   "carry": "T4"
+  },
+  "durin": {
+   "subdps": "T0.5"
+  },
+  "emilie": {
+   "subdps": "T1"
+  },
+  "escoffier": {
+   "subdps": "T0.5"
+  },
+  "eula": {
+   "carry": "T4"
+  },
+  "faruzan": {
+   "support": "T0.5"
+  },
+  "fischl": {
+   "subdps": "T0.5"
+  },
+  "flins": {
+   "carry": "T0.5"
+  },
+  "freminet": {
+   "carry": "T4"
+  },
+  "furina": {
+   "subdps": "T1"
+  },
+  "gaming": {
+   "carry": "T1.5"
+  },
+  "ganyu": {
+   "carry": "T3"
+  },
+  "gorou": {
+   "support": "T1.5"
+  },
+  "hu-tao": {
+   "carry": "T1.5"
+  },
+  "iansan": {
+   "support": "T0"
+  },
+  "ifa": {
+   "carry": "T2"
+  },
+  "illuga": {
+   "support": "T1.5"
+  },
+  "ineffa": {
+   "subdps": "T0.5"
+  },
+  "jahoda": {
+   "support": "T1.5"
+  },
+  "jean": {
+   "support": "T2"
+  },
+  "kachina": {
+   "support": "T2"
+  },
+  "kaedehara-kazuha": {
+   "support": "T1.5"
+  },
+  "kaeya": {
+   "subdps": "T3"
+  },
+  "kamisato-ayaka": {
+   "carry": "T2"
+  },
+  "kamisato-ayato": {
+   "carry": "T4"
+  },
+  "kaveh": {
+   "carry": "T4"
+  },
+  "keqing": {
+   "carry": "T4"
+  },
+  "kinich": {
+   "carry": "T1"
+  },
+  "kirara": {
+   "support": "T3"
+  },
+  "klee": {
+   "carry": "T1"
+  },
+  "kujou-sara": {
+   "support": "T2"
+  },
+  "kuki-shinobu": {
+   "subdps": "T2",
+   "support": "T2"
+  },
+  "lan-yan": {
+   "support": "T2"
+  },
+  "lauma": {
+   "support": "T0.5"
+  },
+  "layla": {
+   "support": "T3"
+  },
+  "linnea": {
+   "subdps": "T0"
+  },
+  "lisa": {
+   "carry": "T4",
+   "support": "T4"
+  },
+  "lohen": {
+   "carry": "T1"
+  },
+  "lynette": {
+   "support": "T2"
+  },
+  "lyney": {
+   "carry": "T1.5"
+  },
+  "mavuika": {
+   "carry": "T0",
+   "subdps": "T1"
+  },
+  "mika": {
+   "support": "T4"
+  },
+  "mona": {
+   "support": "T0.5"
+  },
+  "mualani": {
+   "carry": "T1"
+  },
+  "nahida": {
+   "support": "T1.5"
+  },
+  "navia": {
+   "carry": "T1.5"
+  },
+  "nefer": {
+   "carry": "T0.5"
+  },
+  "neuvillette": {
+   "carry": "T1.5"
+  },
+  "nicole": {
+   "support": "T0"
+  },
+  "nilou": {
+   "support": "T1.5"
+  },
+  "ningguang": {
+   "carry": "T3"
+  },
+  "noelle": {
+   "carry": "T2"
+  },
+  "odette": {
+   "subdps": "T0"
+  },
+  "ororon": {
+   "subdps": "T1"
+  },
+  "prune": {
+   "support": "T1.5"
+  },
+  "qiqi": {
+   "support": "T1"
+  },
+  "raiden-shogun": {
+   "carry": "T2",
+   "subdps": "T2"
+  },
+  "razor": {
+   "carry": "T2"
+  },
+  "rosaria": {
+   "subdps": "T2"
+  },
+  "sandrone": {
+   "carry": "T0"
+  },
+  "sangonomiya-kokomi": {
+   "subdps": "T2",
+   "support": "T3"
+  },
+  "sayu": {
+   "support": "T4"
+  },
+  "sethos": {
+   "carry": "T3"
+  },
+  "shenhe": {
+   "support": "T1.5"
+  },
+  "shikanoin-heizou": {
+   "carry": "T4"
+  },
+  "sigewinne": {
+   "support": "T3"
+  },
+  "skirk": {
+   "carry": "T0.5"
+  },
+  "sucrose": {
+   "support": "T0"
+  },
+  "tartaglia": {
+   "carry": "T4"
+  },
+  "thoma": {
+   "subdps": "T3",
+   "support": "T4"
+  },
+  "tighnari": {
+   "carry": "T4"
+  },
+  "traveler-anemo": {
+   "support": "T3"
+  },
+  "traveler-cryo": {
+   "carry": "T0.5",
+   "subdps": "T0.5"
+  },
+  "traveler-dendro": {
+   "support": "T3"
+  },
+  "traveler-electro": {
+   "support": "T5"
+  },
+  "traveler-geo": {
+   "support": "T4"
+  },
+  "traveler-hydro": {
+   "carry": "T5"
+  },
+  "traveler-pyro": {
+   "support": "T1.5"
+  },
+  "varesa": {
+   "carry": "T1"
+  },
+  "varka": {
+   "carry": "T0.5"
+  },
+  "venti": {
+   "carry": "T1.5",
+   "subdps": "T1.5"
+  },
+  "vesna": {
+   "carry": "T0"
+  },
+  "vodyanitsa": {
+   "support": "T0"
+  },
+  "wanderer": {
+   "carry": "T2"
+  },
+  "wriothesley": {
+   "carry": "T0"
+  },
+  "xiangling": {
+   "subdps": "T1.5"
+  },
+  "xianyun": {
+   "support": "T2"
+  },
+  "xiao": {
+   "carry": "T2"
+  },
+  "xilonen": {
+   "support": "T1"
+  },
+  "xingqiu": {
+   "subdps": "T1.5"
+  },
+  "xinyan": {
+   "carry": "T5"
+  },
+  "yae-miko": {
+   "subdps": "T0"
+  },
+  "yanfei": {
+   "carry": "T3"
+  },
+  "yaoyao": {
+   "support": "T3"
+  },
+  "yelan": {
+   "subdps": "T1.5"
+  },
+  "yoimiya": {
+   "carry": "T3"
+  },
+  "yumemizuki-mizuki": {
+   "carry": "T0"
+  },
+  "yun-jin": {
+   "support": "T4"
+  },
+  "zhongli": {
+   "support": "T1.5"
+  },
+  "zibai": {
+   "carry": "T0"
+  }
+ },
+ "wotpack": {
+  "aino": "A",
+  "albedo": "S",
+  "alhaitham": "A",
+  "aloy": "D",
+  "alyosha": "S",
+  "amber": "D",
+  "arataki-itto": "B",
+  "arlecchino": "A",
+  "baizhu": "A",
+  "barbara": "C",
+  "beidou": "B",
+  "bennett": "S+",
+  "candace": "C",
+  "charlotte": "A",
+  "chasca": "S",
+  "chevreuse": "S+",
+  "chiori": "A",
+  "chongyun": "C",
+  "citlali": "S+",
+  "clorinde": "A",
+  "collei": "A",
+  "columbina": "S+",
+  "cyno": "S+",
+  "dahlia": "C",
+  "dehya": "C",
+  "diluc": "B",
+  "diona": "A",
+  "dori": "C",
+  "durin": "S+",
+  "emilie": "A",
+  "escoffier": "S+",
+  "eula": "C",
+  "faruzan": "S",
+  "fischl": "S",
+  "flins": "S+",
+  "freminet": "C",
+  "furina": "S",
+  "gaming": "A",
+  "ganyu": "B",
+  "gorou": "B",
+  "hu-tao": "A",
+  "iansan": "S+",
+  "ifa": "B",
+  "illuga": "S",
+  "ineffa": "S+",
+  "jahoda": "B",
+  "jean": "A",
+  "kachina": "C",
+  "kaedehara-kazuha": "A",
+  "kaeya": "C",
+  "kamisato-ayaka": "A",
+  "kamisato-ayato": "B",
+  "kaveh": "C",
+  "keqing": "B",
+  "kinich": "S",
+  "kirara": "B",
+  "klee": "S",
+  "kujou-sara": "B",
+  "kuki-shinobu": "A",
+  "lan-yan": "A",
+  "lauma": "S+",
+  "layla": "A",
+  "linnea": "S+",
+  "lisa": "C",
+  "lohen": "A",
+  "lynette": "B",
+  "lyney": "A",
+  "mavuika": "S+",
+  "mika": "B",
+  "mona": "S",
+  "mualani": "S",
+  "nahida": "A",
+  "navia": "A",
+  "nefer": "S+",
+  "neuvillette": "A",
+  "nicole": "S+",
+  "nilou": "A",
+  "ningguang": "C",
+  "noelle": "B",
+  "odette": "S+",
+  "ororon": "A",
+  "prune": "S",
+  "qiqi": "S",
+  "raiden-shogun": "A",
+  "razor": "A",
+  "rosaria": "A",
+  "sandrone": "S+",
+  "sangonomiya-kokomi": "A",
+  "sayu": "B",
+  "sethos": "B",
+  "shenhe": "A",
+  "shikanoin-heizou": "C",
+  "sigewinne": "B",
+  "skirk": "S+",
+  "sucrose": "S+",
+  "tartaglia": "B",
+  "thoma": "B",
+  "tighnari": "B",
+  "traveler-anemo": "D",
+  "traveler-cryo": "S+",
+  "traveler-dendro": "B",
+  "traveler-electro": "C",
+  "traveler-geo": "D",
+  "traveler-hydro": "D",
+  "traveler-pyro": "B",
+  "varesa": "S",
+  "varka": "S+",
+  "venti": "S",
+  "vesna": "S+",
+  "vodyanitsa": "S",
+  "wanderer": "B",
+  "wriothesley": "S+",
+  "xiangling": "A",
+  "xianyun": "A",
+  "xiao": "B",
+  "xilonen": "S",
+  "xingqiu": "A",
+  "xinyan": "D",
+  "yae-miko": "S+",
+  "yanfei": "C",
+  "yaoyao": "A",
+  "yelan": "S",
+  "yoimiya": "B",
+  "yumemizuki-mizuki": "S+",
+  "yun-jin": "A",
+  "zhongli": "A",
+  "zibai": "S+"
+ },
+ "teams": {}
+}

@@ -18,10 +18,18 @@ export type RatingManual = {
   sustain: Record<string, { level: 'plenty' | 'enough' | 'low'; kind: 'heal' | 'shield' | 'both'; note?: string }>;
   exploration?: Record<string, ExploreTag[]>;
 };
+export type RatingExternal = {
+  _meta: { date: string; sources: Record<'prydwen' | 'wotpack', { title: string; url: string }> };
+  prydwen: Record<string, Partial<Record<'carry' | 'subdps' | 'support', keyof typeof PRYDWEN_SCORE>>>;
+  wotpack: Record<string, keyof typeof WOTPACK_SCORE>;
+  teams: Record<string, { members: string[]; title: string; url: string }>;
+};
+export type Consensus = { score: number; parts: { source: 'prydwen' | 'wotpack' | 'manual'; label: string; score: number }[] };
 export type SustainLevel = keyof typeof SUSTAIN_SCORE;
 export type OverallRow = {
   slug: string; role: Role; value: number | null; score: number; tier: Tier; rank: number;
   kind: 'sim' | 'expert'; source?: { title: string; url: string }; team?: string[]; note?: string;
+  simScore?: number; consensus?: Consensus; teamSource?: { title: string; url: string };
 };
 export type ConsLevel = 0 | 1 | 2;
 export type VariantKey = '0' | '1' | '2' | '0w' | '1w' | '2w';
@@ -32,6 +40,8 @@ export function variantKey(level: ConsLevel, weapon: boolean): VariantKey {
 }
 
 export const SUSTAIN_SCORE = { plenty: 90, enough: 75, low: 55 } as const;
+export const PRYDWEN_SCORE = { T0: 100, 'T0.5': 93, T1: 86, 'T1.5': 79, T2: 70, T3: 60, T4: 50, T5: 40 } as const;
+export const WOTPACK_SCORE = { 'S+': 95, S: 85, A: 75, B: 62, C: 50, D: 40 } as const;
 
 export function classifyTeam(
   members: { slug: string; dps: number; fieldTime: number }[],
@@ -138,7 +148,24 @@ export function simUrl(id: string): string {
   return `https://gcsim.app/db/${id}`;
 }
 
-export function buildOverall(generated: RatingData, manual: RatingManual): Record<Role, OverallRow[]> {
+export function consensusScore(
+  slug: string, role: Exclude<Role, 'sustain'>, external: RatingExternal, manual: RatingManual,
+): Consensus | null {
+  const parts: Consensus['parts'] = [];
+  const prydwenTier = external.prydwen[slug]?.[role];
+  if (prydwenTier && Object.hasOwn(PRYDWEN_SCORE, prydwenTier))
+    parts.push({ source: 'prydwen', label: prydwenTier, score: PRYDWEN_SCORE[prydwenTier] });
+  const wotpackTier = external.wotpack[slug];
+  if (wotpackTier && Object.hasOwn(WOTPACK_SCORE, wotpackTier))
+    parts.push({ source: 'wotpack', label: wotpackTier, score: WOTPACK_SCORE[wotpackTier] });
+  const entry = manual.characters[slug]?.roles.find((item) => item.role === role);
+  if (entry) parts.push({ source: 'manual', label: String(entry.score), score: entry.score });
+  return parts.length ? { score: parts.reduce((sum, part) => sum + part.score, 0) / parts.length, parts } : null;
+}
+
+export function buildOverall(
+  generated: RatingData, manual: RatingManual, external?: RatingExternal,
+): Record<Role, OverallRow[]> {
   const result = {} as Record<Role, OverallRow[]>;
   for (const role of ['carry', 'subdps', 'support'] as const) {
     const sims = Object.entries(generated.characters).flatMap(([slug, stats]) => {
@@ -168,6 +195,38 @@ export function buildOverall(generated: RatingData, manual: RatingManual): Recor
         };
         if (index >= 0) rows[index] = row;
         else rows.push(row);
+      }
+    }
+    if (external) {
+      for (const row of rows) {
+        const consensus = consensusScore(row.slug, role, external, manual);
+        if (consensus) row.consensus = consensus;
+        if (row.kind === 'sim') {
+          row.simScore = row.score;
+          row.score = consensus ? 0.6 * row.score + 0.4 * consensus.score : row.score;
+        } else {
+          row.score = consensus?.score ?? row.score;
+          const team = external.teams[row.slug];
+          if (team) {
+            row.team = team.members;
+            row.teamSource = { title: 'Prydwen', url: team.url };
+          }
+        }
+      }
+      for (const [slug, roles] of Object.entries(external.prydwen)) {
+        if (!roles[role] || rows.some((row) => row.slug === slug)) continue;
+        const consensus = consensusScore(slug, role, external, manual)!;
+        const team = external.teams[slug];
+        rows.push({
+          slug, role, value: null, score: consensus.score, tier: tierOf(consensus.score),
+          rank: 0, kind: 'expert', consensus,
+          ...(team ? { team: team.members, teamSource: { title: 'Prydwen', url: team.url } } : {}),
+        });
+      }
+      const max = Math.max(0, ...rows.map((row) => row.score));
+      for (const row of rows) {
+        row.score = max > 0 ? Math.round(row.score / max * 100) : 0;
+        row.tier = tierOf(row.score);
       }
     }
     rows.sort((a, b) => b.score - a.score);

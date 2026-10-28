@@ -6527,10 +6527,6 @@
   "en": "Baseline: 5★ at C0 with R1 weapons, 4★ at C6 with R5 weapons; level 90, talents 9/9/9 and KQM standards.",
   "es": "Base: 5★ C0 con armas R1, 4★ C6 con armas R5; nivel 90, talentos 9/9/9 y estándar KQM."
  },
- "Сустейн и персонажи без симуляций получают экспертную оценку.": {
-  "en": "Sustain and characters without simulations receive an expert rating.",
-  "es": "Sustento y los personajes sin simulaciones reciben una valoración experta."
- },
  "Тиры по баллам роли: T0 от 95, T0.5 от 88, T1 от 80, T1.5 от 70, T2 от 55, T3 от 40, T4 ниже 40.": {
   "en": "Role score tiers: T0 from 95, T0.5 from 88, T1 from 80, T1.5 from 70, T2 from 55, T3 from 40, T4 below 40.",
   "es": "Niveles según la puntuación del rol: T0 desde 95, T0.5 desde 88, T1 desde 80, T1.5 desde 70, T2 desde 55, T3 desde 40 y T4 por debajo de 40."
@@ -6667,10 +6663,6 @@
   "en": "Teams with characters missing from the KQM database are simulated by us with the same gcsim and KQM-standard substat optimization ({own} teams). These rotations are not yet reviewed by the community, so they only appear in team lists and do not change role scores",
   "es": "Los equipos con personajes que no están en la base de KQM los simulamos nosotros con el mismo gcsim y optimización de subestadísticas según el estándar KQM ({own} equipos). Estas rotaciones aún no las revisó la comunidad, así que solo aparecen en las listas de equipos y no cambian las puntuaciones de rol"
  },
- "Нет в базе KQM; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60": {
-  "en": "Not in the KQM database; scored from tier lists: SS — 92, S — 82, A — 72, B — 60",
-  "es": "No está en la base de KQM; puntuación según tier lists: SS — 92, S — 82, A — 72, B — 60"
- },
  "C{n}: нет симуляции": {
   "en": "C{n}: no simulation",
   "es": "C{n}: sin simulación"
@@ -6694,5 +6686,29 @@
  "Для этого персонажа нет симуляции созвездий, поэтому балл не умножается на созвездия": {
   "en": "There's no constellation simulation for this character, so the score isn't multiplied for constellations",
   "es": "No hay simulación de constelaciones para este personaje, así que la puntuación no se multiplica por constelaciones"
+ },
+ "Тир-листы: {score}": {
+  "en": "Tier lists: {score}",
+  "es": "Tier lists: {score}"
+ },
+ "Симуляция: {score}": {
+  "en": "Simulation: {score}",
+  "es": "Simulación: {score}"
+ },
+ "команда: Prydwen": {
+  "en": "team: Prydwen",
+  "es": "equipo: Prydwen"
+ },
+ "Prydwen: тир-лист": {
+  "en": "Prydwen: tier list",
+  "es": "Prydwen: tier list"
+ },
+ "WotPack: тир-лист 7.1": {
+  "en": "WotPack: 7.1 tier list",
+  "es": "WotPack: tier list 7.1"
+ },
+ "Итоговый балл роли: 60% — наши симуляции gcsim, 40% — среднее внешних тир-листов (Prydwen по ролям, WotPack, Game8 и Pocket Gamer). Без симуляции — только тир-листы. Шкалы: Prydwen T0 — 100 … T5 — 40, WotPack S+ — 95 … D — 40.": {
+  "en": "Final role score: 60% from our gcsim simulations and 40% from the average of external tier lists (Prydwen by role, WotPack, Game8 and Pocket Gamer). Without a simulation, only tier lists count. Scales: Prydwen T0 — 100 … T5 — 40; WotPack S+ — 95 … D — 40.",
+  "es": "Puntuación final del rol: 60 % de nuestras simulaciones gcsim y 40 % del promedio de tier lists externas (Prydwen por rol, WotPack, Game8 y Pocket Gamer). Sin simulación, solo cuentan las tier lists. Escalas: Prydwen T0 — 100 … T5 — 40; WotPack S+ — 95 … D — 40."
  }
 }

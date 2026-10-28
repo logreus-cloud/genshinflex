@@ -1,7 +1,7 @@
 ---
 import Team from './Team.astro';
 import { useData } from '../lib/data';
-import { TIERS, type OverallRow, type Role } from '../lib/rating/core';
+import { TIERS, type OverallRow, type RatingExternal, type Role } from '../lib/rating/core';
 
 type Entry = {
   role: Role; roleLabel: string; row: OverallRow; c: ReturnType<typeof useData>['characters'][number];
@@ -11,12 +11,12 @@ type Entry = {
   limit?: { video: string; team: number; asOf: string };
 };
 interface Props {
-  roles: { id: Role; label: string }[]; entries: Entry[];
+  roles: { id: Role; label: string }[]; entries: Entry[]; external: RatingExternal;
   compact: Intl.NumberFormat; damageCompact: Intl.NumberFormat;
   fmtNumber: (value: number) => string; fmtFullDate: (date: Date) => string;
   supportPct: (value: number) => string;
 }
-const { roles, entries, compact, damageCompact, fmtNumber, fmtFullDate, supportPct } = Astro.props;
+const { roles, entries, external, compact, damageCompact, fmtNumber, fmtFullDate, supportPct } = Astro.props;
 const { t, base } = useData(Astro.currentLocale);
 const sustainLevels = { plenty: 'с запасом', enough: 'хватает', low: 'мало' } as const;
 const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лечение и щит' } as const;
@@ -64,11 +64,21 @@ const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лече
     {entry.row.value !== null && (entry.role === 'support'
       ? <p>{t('{pct}% к урону команды', { pct: supportPct(entry.row.value) })} <small>{t('по {n} заменам', { n: fmtNumber(entry.supportN) })}</small></p>
       : <p>{t('{n} DPS', { n: compact.format(entry.row.value) })}</p>)}
+    {entry.row.simScore !== undefined && <p>{t('Симуляция: {score}', { score: entry.row.simScore })}</p>}
+    {entry.row.consensus && <p>
+      {t('Тир-листы: {score}', { score: Math.round(entry.row.consensus.score) })} (
+      {entry.row.consensus.parts.map((part, index) => <>
+        {index > 0 && ' · '}
+        {part.source === 'manual'
+          ? <span>Game8/PG {part.label} {entry.sources.map((source) => <a class="tier-source" href={source.url} title={t(source.title)} target="_blank" rel="noopener">↗</a>)}</span>
+          : <a href={external._meta.sources[part.source].url} target="_blank" rel="noopener">{part.source === 'prydwen' ? 'Prydwen' : 'WotPack'} {part.label}</a>}
+      </>)} )
+    </p>}
     {entry.row.kind === 'sim' && entry.row.source && <p><a href={entry.row.source.url} target="_blank" rel="noopener">{t(entry.row.source.title === 'конфиг' ? 'конфиг' : 'симуляция')}</a></p>}
-    {entry.row.kind === 'expert' && <p>{t('экспертная оценка')} {entry.sources.map((source) => <a class="tier-source" href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}</p>}
+    {entry.row.kind === 'expert' && !entry.row.consensus && <p>{t('экспертная оценка')} {entry.sources.map((source) => <a class="tier-source" href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}</p>}
     {entry.sustain && <p><span class="chip">{t(sustainLevels[entry.sustain.level])}</span> {t(sustainKinds[entry.sustain.kind])}</p>}
     {entry.row.note && <p class="muted small">{t(entry.row.note)}</p>}
-    {entry.row.team && <div class="tier-team"><h4>{t('Лучшая команда')}</h4><Team members={entry.row.team} /></div>}
+    {entry.row.team && <div class="tier-team"><h4>{t('Лучшая команда')} {entry.row.teamSource && <a href={entry.row.teamSource.url} target="_blank" rel="noopener">{t('команда: Prydwen')}</a>}</h4><Team members={entry.row.team} /></div>}
     {entry.limit && <p><a class="chip dmg-limit" href={`https://www.youtube.com/watch?v=${entry.limit.video}`} title={t('Предел урона Miron MinMax: один удар с отрядом, на момент {date}. Справка, в баллы не входит.', { date: fmtFullDate(new Date(entry.limit.asOf)) })} target="_blank" rel="noopener noreferrer">{t('Предел')} {damageCompact.format(entry.limit.team)}</a></p>}
     <p class="tier-card-gain chip" hidden></p>
     <a class="tier-list-link" href={`#${entry.role}`}>{t('Подробнее в списке')}</a>

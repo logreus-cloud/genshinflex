@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { aggregate, buildOverall, classifyTeam, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, TIERS, tierOf, type OverallRow, type RatingData, type RatingManual, type TeamRow } from './core.ts';
+import { aggregate, buildOverall, classifyTeam, consensusScore, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, PRYDWEN_SCORE, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, TIERS, tierOf, WOTPACK_SCORE, type OverallRow, type RatingData, type RatingExternal, type RatingManual, type TeamRow } from './core.ts';
 
 test('classifyTeam распределяет роли по долям', () => {
   const members = [
@@ -89,6 +89,62 @@ test('buildOverall добавляет экспертов, заменяет си�
   assert.equal(overall.carry[2].source?.url, simUrl('sim-b'));
   assert.equal(overall.carry[0].value, null);
   assert.deepEqual(overall.sustain.map(({ slug, score, kind }) => [slug, score, kind]), [['d', 90, 'expert']]);
+});
+
+test('консенсус смешивается с симуляцией и баллы нормируются к новому лидеру', () => {
+  const generated: RatingData = {
+    _meta: { date: '', source: '', entries: 0, baseline: 0, teams: 0, shares: 0, pairs: 0, own: 0 },
+    characters: {
+      a: { carry: { value: 100, n: 1, best: { id: 'a', team: ['a'] } } },
+      b: { carry: { value: 80, n: 1, best: { id: 'b', team: ['b'] } } },
+    },
+    teams: [],
+  };
+  const manual: RatingManual = { characters: {}, sustain: {} };
+  const external: RatingExternal = {
+    _meta: { date: '', sources: {
+      prydwen: { title: 'Prydwen', url: 'https://example.com/prydwen' },
+      wotpack: { title: 'WotPack', url: 'https://example.com/wotpack' },
+    } },
+    prydwen: { a: { carry: 'T3' }, b: { carry: 'T0' } }, wotpack: {}, teams: {},
+  };
+  assert.equal(PRYDWEN_SCORE['T0.5'], 93);
+  assert.equal(WOTPACK_SCORE['S+'], 95);
+  const rows = buildOverall(generated, manual, external).carry;
+  assert.deepEqual(rows.map(({ slug, score, rank }) => [slug, score, rank]), [['b', 100, 1], ['a', 95, 2]]);
+  assert.equal(rows[0].simScore, 80);
+  assert.equal(rows[0].consensus?.score, 100);
+  assert.equal(rows[1].simScore, 100);
+  assert.deepEqual(buildOverall(generated, manual).carry.map(({ slug, score }) => [slug, score]), [['a', 100], ['b', 80]]);
+});
+
+test('Prydwen учитывается только в своей роли, WotPack — в любой, а новые роли добавляются', () => {
+  const generated: RatingData = {
+    _meta: { date: '', source: '', entries: 0, baseline: 0, teams: 0, shares: 0, pairs: 0, own: 0 },
+    characters: {},
+    teams: [],
+  };
+  const manual: RatingManual = {
+    characters: { a: { patch: '', sources: [], roles: [{ role: 'carry', score: 92 }] } },
+    sustain: {},
+  };
+  const external: RatingExternal = {
+    _meta: { date: '', sources: {
+      prydwen: { title: 'Prydwen', url: 'https://example.com/prydwen' },
+      wotpack: { title: 'WotPack', url: 'https://example.com/wotpack' },
+    } },
+    prydwen: { a: { support: 'T0' }, vesna: { support: 'T1' } },
+    wotpack: { a: 'S+' },
+    teams: { vesna: { members: ['vesna', 'a', 'b', 'c'], title: 'Vesna team', url: 'https://example.com/vesna' } },
+  };
+  assert.deepEqual(consensusScore('a', 'carry', external, manual)?.parts.map(({ source }) => source), ['wotpack', 'manual']);
+  assert.deepEqual(consensusScore('a', 'support', external, manual)?.parts.map(({ source }) => source), ['prydwen', 'wotpack']);
+  const rows = buildOverall(generated, manual, external);
+  assert.equal(rows.carry[0].consensus?.score, 93.5);
+  assert.equal(rows.support.find((row) => row.slug === 'vesna')?.kind, 'expert');
+  assert.deepEqual(rows.support.find((row) => row.slug === 'vesna')?.team, ['vesna', 'a', 'b', 'c']);
+  assert.equal(rows.support.find((row) => row.slug === 'vesna')?.teamSource?.url, 'https://example.com/vesna');
+  assert.deepEqual(rows.sustain, []);
 });
 
 test('consVariants пересчитывает созвездия и сохраняет исходный C0', () => {

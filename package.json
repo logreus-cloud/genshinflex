@@ -40,6 +40,7 @@
     "sim": "node --import tsx scripts/sim-investments.mjs",
     "sim:presets": "node scripts/export-sim-presets.mjs",
     "rating:data": "node --import tsx scripts/rating-data.mjs",
+    "rating:external": "node scripts/rating-external.mjs",
     "test:forum": "node --import tsx --test scripts/test-forum-markup.mjs",
     "test:i18n": "node --test scripts/i18n/*.test.mjs",
     "test:rating": "node --import tsx --test src/lib/rating/*.test.ts",
