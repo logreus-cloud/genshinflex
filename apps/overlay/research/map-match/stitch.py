@@ -53,6 +53,7 @@ def interface_mask(width, height):
     hide(0, height - 130 * scale, 130 * scale, height)
     hide(width - 520 * scale, height - 140 * scale, width, height)
     hide(width - 140 * scale, 0, width, 140 * scale)
+    hide(width - 140 * scale, 430 * scale, width, 640 * scale)
     mask[:4] = 0
     mask[-4:] = 0
     mask[:, :4] = 0
@@ -125,8 +126,9 @@ def write_coverage(path, count):
 
 def align_gain(warped, sums, weight, overlap):
     source = np.clip(np.rint(warped[overlap]), 0, 255).astype(np.uint8)
-    target = np.clip(np.rint(sums[overlap] / weight[overlap, None]), 0, 255
-                     ).astype(np.uint8)
+    target = (sums[overlap] if weight is None
+              else sums[overlap] / weight[overlap, None])
+    target = np.clip(np.rint(target), 0, 255).astype(np.uint8)
     source = cv2.cvtColor(source.reshape(-1, 1, 3),
                           cv2.COLOR_BGR2LAB).reshape(-1, 3).astype(np.float64)
     target = cv2.cvtColor(target.reshape(-1, 1, 3),
@@ -147,6 +149,63 @@ def align_gain(warped, sums, weight, overlap):
     lab[:, :, 2] = np.clip(lab[:, :, 2] + shift_b, 0, 255)
     gain = {"L": {"a": a, "b": b}, "A": shift_a, "B": shift_b}
     return cv2.cvtColor(lab.astype(np.uint8), cv2.COLOR_LAB2BGR).astype(np.float32), gain
+
+
+def local_gain(warped, base, alpha, overlap):
+    height, width = warped.shape[:2]
+    size = (max(1, round(width / 8)), max(1, round(height / 8)))
+    numerator = np.zeros((size[1], size[0], 3), np.float32)
+    mask = np.zeros((size[1], size[0]), np.float32)
+    for y in range(0, height, 512):
+        ys = slice(y, min(y + 512, height))
+        block_overlap = overlap[ys]
+        columns = np.flatnonzero(np.any(block_overlap, axis=0))
+        if not len(columns):
+            continue
+        x0, x1 = columns[0], columns[-1] + 1
+        reference = np.zeros_like(warped[ys, x0:x1])
+        np.divide(base[ys, x0:x1], alpha[ys, x0:x1, None],
+                  out=reference, where=alpha[ys, x0:x1, None] > 0)
+        reference = cv2.cvtColor(np.clip(reference / 255, 0, 1),
+                                 cv2.COLOR_BGR2LAB)
+        frame = cv2.cvtColor(np.clip(warped[ys, x0:x1] / 255, 0, 1),
+                             cv2.COLOR_BGR2LAB)
+        block_mask = block_overlap.astype(np.float32)
+        diff = np.zeros((*block_mask.shape, 3), np.float32)
+        diff[:, x0:x1] = (reference - frame) * block_mask[:, x0:x1, None]
+        small_y0 = round(y * size[1] / height)
+        small_y1 = round(ys.stop * size[1] / height)
+        # хвост в несколько строк после округления пуст — его вклад ничтожен
+        if small_y1 <= small_y0:
+            continue
+        small_size = (size[0], small_y1 - small_y0)
+        numerator[small_y0:small_y1] = cv2.resize(
+            diff, small_size, interpolation=cv2.INTER_AREA)
+        mask[small_y0:small_y1] = cv2.resize(
+            block_mask, small_size, interpolation=cv2.INTER_AREA)
+    sigma = min(height, width) / 48
+    numerator = cv2.GaussianBlur(numerator, (0, 0), sigma)
+    denominator = cv2.GaussianBlur(mask, (0, 0), sigma)
+    correction = numerator / np.maximum(denominator, 1e-6)[:, :, None]
+    correction *= np.clip(denominator / .2, 0, 1)[:, :, None]
+    correction[:, :, 0] = np.clip(correction[:, :, 0], -40, 40)
+    correction[:, :, 1:] = np.clip(correction[:, :, 1:], -15, 15)
+    mean_abs_L = float(np.mean(np.abs(correction[:, :, 0][mask > 0])))
+    sx, sy = size[0] / width, size[1] / height
+    for y in range(0, height, 512):
+        block = warped[y:y + 512]
+        matrix = np.float32([[sx, 0, (sx - 1) / 2],
+                             [0, sy, sy * (y + .5) - .5]])
+        field = cv2.warpAffine(correction, matrix,
+                               (width, block.shape[0]),
+                               flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
+                               borderMode=cv2.BORDER_REPLICATE)
+        lab = cv2.cvtColor(np.clip(block / 255, 0, 1),
+                           cv2.COLOR_BGR2LAB)
+        lab += field
+        lab[:, :, 0] = np.clip(lab[:, :, 0], 0, 100)
+        block[:] = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR) * 255
+    return warped, mean_abs_L
 
 
 GLYPHS = {
@@ -189,13 +248,13 @@ def write_compare(path, mosaic, ref, meta, left, top, factor):
     preview_height = max(1, round(height * preview_width / width))
     size = (preview_width, preview_height)
     scale = preview_width / width
-    alpha = cv2.resize(mosaic[:, :, 3], size, interpolation=cv2.INTER_AREA)
-    ours = cv2.resize(mosaic[:, :, :3], size, interpolation=cv2.INTER_AREA)
+    alpha = cv2.resize(mosaic[:, :, 3], size, interpolation=cv2.INTER_AREA).astype(np.float32) / 255
+    ours = cv2.resize(mosaic[:, :, :3], size, interpolation=cv2.INTER_AREA).astype(np.float32)
     cells = ((np.arange(preview_height)[:, None] // 16
               + np.arange(preview_width)[None, :] // 16) % 2)
     checker = np.where(cells == 0, 180, 210).astype(np.float32)
-    ours = np.clip(ours.astype(np.float32)
-                   + checker[:, :, None] * (1 - alpha[:, :, None] / 255), 0, 255
+    ours = np.clip(ours * alpha[:, :, None]
+                   + checker[:, :, None] * (1 - alpha[:, :, None]), 0, 255
                    ).astype(np.uint8)
     matrix = np.float64([[factor * scale, 0,
                           (meta["x0"] * 256 * factor - left) * scale],
@@ -220,7 +279,7 @@ def main():
     parser.add_argument("--out", type=Path, default=match.ROOT / ".cache/map-stitch")
     parser.add_argument("--tiles", action="store_true")
     parser.add_argument("--max-scale", type=float, default=.6)
-    parser.add_argument("--blend", choices=("best", "mix"), default="best")
+    parser.add_argument("--blend", choices=("layer", "best", "mix"), default="layer")
     parser.add_argument("--gain", dest="gain", action="store_true", default=True)
     parser.add_argument("--no-gain", dest="gain", action="store_false")
     args = parser.parse_args()
@@ -320,19 +379,29 @@ def main():
     width, height = int(right - left), int(bottom - top)
     if width * height > 400_000_000:
         raise ValueError("Холст больше 400 Мпикс; сузьте выбор через --only")
-    sums = np.zeros((height, width, 3), np.float32)
-    weight = np.zeros((height, width), np.float32)
+    if args.blend == "layer":
+        canvas = np.zeros((height, width, 3), np.float32)
+        alpha = np.zeros((height, width), np.float32)
+    else:
+        sums = np.zeros((height, width, 3), np.float32)
+        weight = np.zeros((height, width), np.float32)
     count = np.zeros((height, width), np.uint8)
     for path, rect, matrix, footprint, scale_z, q, row in sorted(
-            aligned, key=lambda item: item[5], reverse=True):
+            aligned, key=lambda item: item[5], reverse=args.blend != "layer"):
         image = client_view(match.read_image(path), rect)
         mask = interface_mask(image.shape[1], image.shape[0])
         distance = cv2.distanceTransform(mask, cv2.DIST_L2, 3)
-        # best: побеждает кадр, в котором пиксель ближе к середине — без обрезки, иначе кадры одного масштаба усредняются
-        feather = (distance / (min(image.shape[:2]) / 2) if args.blend == "best"
-                   else np.minimum(distance, 40) / 40)
+        if args.blend == "layer":
+            feather = np.clip(distance / (min(image.shape[:2]) * .12), 0, 1)
+            feather = feather * feather * (3 - 2 * feather)
+        else:
+            # best: побеждает кадр, в котором пиксель ближе к середине — без обрезки, иначе кадры одного масштаба усредняются
+            feather = (distance / (min(image.shape[:2]) / 2) if args.blend == "best"
+                       else np.minimum(distance, 40) / 40)
         mask = mask.astype(np.float32) / 255
         row["gain"] = {"L": {"a": 1.0, "b": 0.0}, "A": 0.0, "B": 0.0}
+        if args.blend == "layer":
+            row["gain"].update(local=False, mean_abs_L=0.0)
         x0, y0 = np.floor(footprint.min(axis=0)).astype(int) - [left, top]
         x1, y1 = np.ceil(footprint.max(axis=0)).astype(int) - [left, top]
         x0, y0 = max(0, x0), max(0, y0)
@@ -351,30 +420,59 @@ def main():
         valid = (warped_mask > .5) & (warped_feather > 0)
         warped = np.zeros_like(warped_premult)
         warped[valid] = warped_premult[valid] / warped_mask[valid, None]
-        pixel_weight = warped_feather * valid * q
-        if args.blend == "best":
-            pixel_weight **= 8
         region = np.s_[y0:y1, x0:x1]
-        if args.gain:
-            overlap = valid & (weight[region] > 0)
-            if np.count_nonzero(overlap) >= 2000:
-                warped, row["gain"] = align_gain(warped, sums[region], weight[region], overlap)
-        sums[region] += warped * pixel_weight[:, :, None]
-        weight[region] += pixel_weight
+        if args.blend == "layer":
+            alpha_region = alpha[region]
+            canvas_region = canvas[region]
+            if args.gain:
+                overlap = valid & (alpha_region > .99)
+                if np.count_nonzero(overlap) >= 2000:
+                    warped, gain = align_gain(warped, canvas_region, alpha_region, overlap)
+                    row["gain"].update(gain)
+                    warped, mean_abs_L = local_gain(warped, canvas_region, alpha_region, overlap)
+                    row["gain"].update(local=True, mean_abs_L=mean_abs_L)
+            # край растворяется только поверх основы; над пустым холстом кадр кладётся целиком
+            warped_feather = (1 - (1 - warped_feather) * alpha_region) * valid
+            canvas_region *= (1 - warped_feather)[:, :, None]
+            warped *= warped_feather[:, :, None]
+            canvas_region += warped
+            warped_feather *= 1 - alpha_region
+            alpha_region += warped_feather
+        else:
+            pixel_weight = warped_feather * valid * q
+            if args.blend == "best":
+                pixel_weight **= 8
+            if args.gain:
+                overlap = valid & (weight[region] > 0)
+                if np.count_nonzero(overlap) >= 2000:
+                    warped, row["gain"] = align_gain(warped, sums[region], weight[region], overlap)
+            sums[region] += warped * pixel_weight[:, :, None]
+            weight[region] += pixel_weight
         count[region] = np.minimum(count[region] + valid.astype(np.uint8), 3)
     mosaic = np.zeros((height, width, 4), np.uint8)
     covered = 0
     for y in range(0, height, 512):
         ys = slice(y, min(y + 512, height))
         block = mosaic[ys]
-        block_weight = weight[ys]
-        valid = block_weight > 0
+        if args.blend == "layer":
+            block_alpha = alpha[ys]
+            valid = block_alpha > 0
+            block[:, :, :3][valid] = np.clip(
+                np.rint(canvas[ys][valid] / block_alpha[valid, None]), 0, 255).astype(np.uint8)
+            block[:, :, 3] = np.rint(
+                np.where(block_alpha > .5, 255, block_alpha * 255)).astype(np.uint8)
+        else:
+            block_weight = weight[ys]
+            valid = block_weight > 0
+            block[:, :, :3][valid] = np.clip(
+                np.rint(sums[ys][valid] / block_weight[valid, None]), 0, 255
+            ).astype(np.uint8)
+            block[:, :, 3][valid] = 255
         covered += int(np.count_nonzero(valid))
-        block[:, :, :3][valid] = np.clip(
-            np.rint(sums[ys][valid] / block_weight[valid, None]), 0, 255
-        ).astype(np.uint8)
-        block[:, :, 3][valid] = 255
-    del sums, weight
+    if args.blend == "layer":
+        del canvas, alpha
+    else:
+        del sums, weight
     match.save_image(args.out / f"mosaic_z{args.zoom}.png", mosaic, ".png")
     write_coverage(args.out / f"coverage_z{args.zoom}.png", count)
     write_compare(args.out / f"compare_z{args.zoom}.jpg",
