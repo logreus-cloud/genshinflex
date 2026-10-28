@@ -6662,5 +6662,13 @@
  "Нет в базе KQM; оценка по тир-листам: SS — 92, S — 82, A — 72, B — 60": {
   "en": "Not in the KQM database; scored from tier lists: SS — 92, S — 82, A — 72, B — 60",
   "es": "No está en la base de KQM; puntuación según tier lists: SS — 92, S — 82, A — 72, B — 60"
+ },
+ "C{n}: нет симуляции": {
+  "en": "C{n}: no simulation",
+  "es": "C{n}: sin simulación"
+ },
+ "gcsim ещё не умеет считать этого персонажа, поэтому балл не умножается на созвездия": {
+  "en": "gcsim can't simulate this character yet, so the score isn't multiplied for constellations",
+  "es": "gcsim aún no puede simular a este personaje, así que la puntuación no se multiplica por constelaciones"
  }
 }

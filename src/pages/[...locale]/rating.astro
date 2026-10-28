@@ -73,7 +73,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
       {tabs.map(({ id, label }, i) => <button id={`tab-${id}`} type="button" role="tab" aria-controls={id} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={id}>{t(label)}</button>)}
     </div>
     {roles.map(({ id, label }) => (
-      <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`} data-gain-template={t('C{n}: +{pct}% к урону команды')}>
+      <section id={id} class="rating-section" role="tabpanel" aria-labelledby={`tab-${id}`} data-gain-template={t('C{n}: +{pct}% к урону команды')} data-nosim-template={t('C{n}: нет симуляции')} data-nosim-title={t('gcsim ещё не умеет считать этого персонажа, поэтому балл не умножается на созвездия')}>
         <h2 class="h-sec">{t(label)}</h2>
         {id !== 'sustain' && <div class="cons-switch" role="group" aria-label={t('Созвездия 5★')}>
           {([0, 1, 2] as const).map((level) => <button type="button" data-cons={level} aria-pressed={level === 0 ? 'true' : 'false'}>C{level}</button>)}
@@ -90,7 +90,8 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
               const { score, tier, rank, gain } = variants[level];
               return [level, [score, tier, rank, gain]];
             }));
-            return <li class="panel rating-row" data-slug={row.slug} data-cons={JSON.stringify(cons)}>
+            const noSim = bySlug.get(row.slug)?.rarity === 5 && !row.slug.startsWith('traveler-') && !(row.slug in investmentRows);
+            return <li class="panel rating-row" data-slug={row.slug} data-cons={JSON.stringify(cons)} data-nosim={noSim ? '' : undefined}>
               <span class="place">{row.rank}</span>
               <CharacterIcon slug={row.slug} size={44} label={false} />
               <div class="rating-main">
@@ -327,8 +328,11 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
           row.querySelector<HTMLElement>('.score-track span')!.style.width = `${score}%`;
           row.querySelector<HTMLElement>('.score-line b')!.textContent = String(score);
           const chip = row.querySelector<HTMLElement>('.cons-gain')!;
-          chip.hidden = level === 0 || gain === null;
-          if (!chip.hidden) {
+          const noSim = row.dataset.nosim !== undefined;
+          chip.hidden = level === 0 || (gain === null && !noSim);
+          chip.title = noSim ? section.dataset.nosimTitle! : '';
+          if (!chip.hidden && gain === null) chip.textContent = section.dataset.nosimTemplate!.replace('{n}', String(level));
+          else if (!chip.hidden) {
             const pct = Math.round(Math.abs(gain!));
             chip.textContent = section.dataset.gainTemplate!.replace('{n}', String(level))
               .replace('+{pct}', gain! < 0 ? `−${pct}` : `+${pct}`);
