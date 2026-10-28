@@ -93,11 +93,14 @@ function wotpack(html, characters) {
 function team(html, slug) {
   const start = html.indexOf('<div class="team-chart-row source-team-row');
   if (start < 0) return null;
-  const end = html.indexOf('<div class="team-chart-value team-percent-value"', start);
-  if (end < 0) return null;
+  // У части команд нет процента урона: тогда строка заканчивается там, где начинается следующая
+  const ends = [html.indexOf('team-percent-value', start), html.indexOf('source-team-row', start + 50)].filter((index) => index > 0);
+  if (!ends.length) return null;
+  const end = Math.min(...ends);
   const row = html.slice(start, end);
-  const members = [...row.matchAll(/class="team-member-card[^"]*" href="\/genshin-impact\/characters\/([^"]+)"/g)].map((match) => match[1]);
-  const title = row.match(/<div class="team-chart-meta">[\s\S]*?<strong>([^<]+)<\/strong>/)?.[1]
+  // Страницы, сохранённые из браузера, содержат абсолютные ссылки и лишние атрибуты
+  const members = [...row.matchAll(/class="team-member-card[^"]*" href="(?:https:\/\/www\.prydwen\.gg)?\/genshin-impact\/characters\/([^"]+)"/g)].map((match) => match[1]);
+  const title = row.match(/<div class="team-chart-meta"[^>]*>[\s\S]*?<strong>([^<]+)<\/strong>/)?.[1]
     ?.replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16)))
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
     .replace(/&amp;/g, '&');

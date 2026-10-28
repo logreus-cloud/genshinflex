@@ -536,5 +536,126 @@
   "zhongli": "A",
   "zibai": "S+"
  },
- "teams": {}
+ "teams": {
+  "alyosha": {
+   "members": [
+    "sandrone",
+    "yae-miko",
+    "odette",
+    "alyosha"
+   ],
+   "title": "Sandrone Premium (C6 Alyosha)",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/alyosha"
+  },
+  "iansan": {
+   "members": [
+    "mavuika",
+    "citlali",
+    "iansan",
+    "bennett"
+   ],
+   "title": "Mavuika Premium Melt (Extreme)",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/iansan"
+  },
+  "illuga": {
+   "members": [
+    "zibai",
+    "linnea",
+    "columbina",
+    "illuga"
+   ],
+   "title": "Zibai Premium",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/illuga"
+  },
+  "linnea": {
+   "members": [
+    "zibai",
+    "linnea",
+    "columbina",
+    "illuga"
+   ],
+   "title": "Zibai Premium",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/linnea"
+  },
+  "lohen": {
+   "members": [
+    "lohen",
+    "durin",
+    "citlali",
+    "nicole"
+   ],
+   "title": "Lohen Premium 1",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/lohen"
+  },
+  "nefer": {
+   "members": [
+    "nefer",
+    "lauma",
+    "columbina",
+    "sucrose"
+   ],
+   "title": "Nefer Premium",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/nefer"
+  },
+  "odette": {
+   "members": [
+    "sandrone",
+    "yae-miko",
+    "odette",
+    "alyosha"
+   ],
+   "title": "Sandrone Premium 2",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/odette"
+  },
+  "sandrone": {
+   "members": [
+    "sandrone",
+    "yae-miko",
+    "odette",
+    "escoffier"
+   ],
+   "title": "Sandrone Premium (Escoffier)",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/sandrone"
+  },
+  "traveler-cryo": {
+   "members": [
+    "traveler-cryo",
+    "yae-miko",
+    "odette",
+    "qiqi"
+   ],
+   "title": "Cryo MC Main Carry",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/traveler-cryo"
+  },
+  "vesna": {
+   "members": [
+    "vesna",
+    "faruzan",
+    "odette",
+    "traveler-cryo"
+   ],
+   "title": "Vesna Premium",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/vesna"
+  },
+  "vodyanitsa": {
+   "members": [
+    "skirk",
+    "vodyanitsa",
+    "furina",
+    "escoffier"
+   ],
+   "title": "Skirk Premium 7.1",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/vodyanitsa"
+  },
+  "zibai": {
+   "members": [
+    "zibai",
+    "linnea",
+    "columbina",
+    "illuga"
+   ],
+   "title": "Zibai Premium",
+   "url": "https://www.prydwen.gg/genshin-impact/characters/zibai"
+  }
+ }
 }
