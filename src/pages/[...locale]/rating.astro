@@ -156,37 +156,53 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
             return group.length ? <div class="boss-group">
               <h4>{t(BOSS_TAGS[tag].label)}</h4>
               <p class="muted small">{t(BOSS_TAGS[tag].hint)}</p>
-              <ol class="rating-list">
+              <ol class="boss-grid">
                 {group.map((boss) => {
                   const enemy = enemiesByName[boss.en];
                   const ranked = rankBossTeams(boss, teams, bossMembers, 3);
-                  return <li class="panel rating-row">
-                    {enemy?.icon && <img class="boss-icon" src={enemy.icon} width="44" height="44" loading="lazy" alt="" />}
-                    <div class="rating-main">
-                      <div class="rating-head"><span class="name">{enemy?.[lang as 'ru' | 'en' | 'es'] ?? boss.en}</span></div>
-                      <div class="rating-meta muted small">
+                  return <li class:list={['panel', 'boss-card', { weekly }]}>
+                    <div class="boss-art">
+                      {enemy?.icon && <img class="boss-image" src={enemy.icon} width="96" height="96" loading="lazy" alt="" />}
+                      {!boss.verified && <span class="boss-badge">{t('механика не проверена')}</span>}
+                    </div>
+                    <div class="boss-body">
+                      <span class="boss-name">{enemy?.[lang as 'ru' | 'en' | 'es'] ?? boss.en}</span>
+                      <div class="boss-tags">
                         {boss.tags.map((tag) => <span class="chip">{t(BOSS_TAGS[tag].label)}</span>)}
-                        {boss.need && <span>{t('Нужно: {elements}', { elements: needText(boss.need) })}</span>}
-                        {boss.immune && <span>{t('Иммунитет: {element}', { element: t(elementText[boss.immune]) })}</span>}
-                        {!boss.verified && <span class="chip">{t('механика не проверена')}</span>}
                       </div>
-                      <details>
+                      {boss.need && <span class="muted small">{t('Нужно: {elements}', { elements: needText(boss.need) })}</span>}
+                      {boss.immune && <span class="muted small">{t('Иммунитет: {element}', { element: t(elementText[boss.immune]) })}</span>}
+                      {ranked.slice(0, 1).map((team) => (
+                        <div class="boss-team">
+                          <div class="boss-team-icons">
+                            {team.m.map((slug) => <CharacterIcon slug={slug} size={36} label={false} />)}
+                          </div>
+                          <div class="boss-team-meta">
+                            <span class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></span>
+                            <span class="muted">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
+                            <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
+                          </div>
+                        </div>
+                      ))}
+                      {ranked.length > 1 && <details>
                         <summary>{t('Лучшие команды')}</summary>
-                        {ranked.length ? <ol class="rating-list boss-teams">
-                          {ranked.map((team) => (
-                            <li class="panel team-row">
-                              <span class="place">{team.rank}</span>
-                              <div class="team-info">
-                                <div class="team-icons">{team.m.map((slug) => <CharacterIcon slug={slug} size={44} label={false} />)}</div>
-                                <span class="muted small">{reaction(team)}</span>
+                        <ol class="boss-more">
+                          {ranked.slice(1).map((team) => (
+                            <li class="boss-team">
+                              <div class="boss-team-icons">
+                                <span class="boss-rank">{team.rank}</span>
+                                {team.m.map((slug) => <CharacterIcon slug={slug} size={36} label={false} />)}
                               </div>
-                              <div class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></div>
-                              <span class="muted small">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
-                              <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
+                              <div class="boss-team-meta">
+                                <span class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></span>
+                                <span class="muted">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
+                                <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
+                              </div>
                             </li>
                           ))}
-                        </ol> : <p class="muted">{t('Подходящих команд в базе нет')}</p>}
-                      </details>
+                        </ol>
+                      </details>}
+                      {!ranked.length && <p class="muted small">{t('Подходящих команд в базе нет')}</p>}
                     </div>
                   </li>;
                 })}
@@ -306,9 +322,24 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
   .explore-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem; min-width: 0; }
   .explore-group .chip { white-space: normal; overflow-wrap: anywhere; }
   .boss-group { margin-top: 1.2rem; }
-  .boss-icon { flex: none; }
-  .boss-teams { margin-top: .5rem; }
-  .boss-teams .team-icons { flex-wrap: wrap; }
+  .boss-grid { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; padding: 0; margin: 0; }
+  .boss-card { display: flex; flex-direction: column; min-width: 0; padding: 0; overflow: hidden; }
+  .boss-art { position: relative; display: flex; height: 120px; flex: none; align-items: center; justify-content: center; background: linear-gradient(180deg, #2a2f4a, #4b3f6e); }
+  .boss-card.weekly .boss-art { background: linear-gradient(180deg, #7a5226, #d1953f); }
+  .boss-image { width: 96px; height: 96px; object-fit: contain; }
+  .boss-badge { position: absolute; top: 6px; right: 6px; padding: .05rem .4rem; border-radius: 4px; background: rgb(15 18 32 / .75); color: #fff; font-size: .68rem; font-weight: 600; }
+  .boss-body { display: flex; min-width: 0; flex-direction: column; gap: .45rem; padding: .6rem .7rem .7rem; text-align: center; overflow-wrap: anywhere; }
+  .boss-name { font: 600 .95rem var(--font-display); }
+  .boss-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem; }
+  .boss-tags .chip { white-space: normal; }
+  .boss-team { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: .3rem; }
+  .boss-team-icons { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: center; gap: .25rem; }
+  .boss-rank { color: var(--muted); font-size: .8rem; font-weight: 600; }
+  .boss-team-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .2rem .45rem; font-size: .75rem; }
+  .boss-body details { min-width: 0; margin-top: 0; }
+  .boss-body summary { font-size: .8rem; }
+  .boss-more { list-style: none; display: grid; gap: .6rem; padding: 0; margin: .5rem 0 0; }
+  .boss-more .boss-team { padding-top: .5rem; border-top: 1px solid var(--border); }
   .tier { font-weight: 700; border-color: transparent; }
   .tier-S { background: color-mix(in srgb, #58b97b 25%, var(--surface)); color: color-mix(in srgb, #58b97b 60%, var(--text)); }
   .tier-A { background: color-mix(in srgb, #5794db 25%, var(--surface)); color: color-mix(in srgb, #5794db 60%, var(--text)); }
@@ -327,5 +358,8 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
   @media (max-width: 440px) {
     .rating-row, .team-row { padding: .75rem; gap: .45rem; }
     .team-info { flex-basis: 190px; }
+    .boss-grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); gap: 10px; }
+    .boss-art { height: 96px; }
+    .boss-image { width: 72px; height: 72px; }
   }
 </style>
