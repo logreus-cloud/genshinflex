@@ -1,7 +1,7 @@
 ---
 import Team from './Team.astro';
 import { useData } from '../lib/data';
-import type { OverallRow, Role } from '../lib/rating/core';
+import { TIERS, type OverallRow, type Role } from '../lib/rating/core';
 
 type Entry = {
   role: Role; roleLabel: string; row: OverallRow; c: ReturnType<typeof useData>['characters'][number];
@@ -18,7 +18,6 @@ interface Props {
 }
 const { roles, entries, compact, damageCompact, fmtNumber, fmtFullDate, supportPct } = Astro.props;
 const { t, base } = useData(Astro.currentLocale);
-const tiers = ['S', 'A', 'B', 'C'] as const;
 const sustainLevels = { plenty: 'с запасом', enough: 'хватает', low: 'мало' } as const;
 const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лечение и щит' } as const;
 ---
@@ -36,9 +35,9 @@ const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лече
     <span aria-hidden="true"></span>
     {roles.map(({ id, label }) => <strong class="tier-column" data-role={id} data-mobile-hidden={id !== 'carry' ? 'true' : 'false'}>{t(label)}</strong>)}
   </div>
-  {tiers.map((tier) => (
+  {TIERS.map((tier) => (
     <div class="tier-row">
-      <div class:list={['tier-label', `tier-${tier}`]}>{tier}</div>
+      <div class="tier-label" data-tier={tier}>{tier}</div>
       {roles.map(({ id }) => <div class="tier-column tier-slot" data-role={id} data-tier={tier} data-mobile-hidden={id !== 'carry' ? 'true' : 'false'}>
         {entries.filter((entry) => entry.role === id && entry.row.tier === tier).sort((a, b) => b.row.score - a.row.score || a.order - b.order).map((entry) => (
           <button type="button" class="tier-cell-char" popovertarget={`tp-${id}-${entry.row.slug}`} data-role={id} data-name={entry.c.name} data-order={entry.order} data-cons={entry.cons} data-nosim={entry.noSim} data-el={entry.c.element} aria-label={`${entry.c.name}, ${entry.row.score}`}>
@@ -61,7 +60,7 @@ const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лече
       <h3><a href={`${base}/characters/${entry.c.slug}/`}>{entry.c.name}</a></h3>
       <button type="button" popovertarget={`tp-${entry.role}-${entry.row.slug}`} popovertargetaction="hide" aria-label={t('Закрыть')}>×</button>
     </div>
-    <p class="tier-card-scoreline"><span class:list={['chip', 'tier', `tier-${entry.row.tier}`]}>{entry.row.tier}</span> <b class="tier-card-score">{entry.row.score}</b> · {t(entry.roleLabel)}</p>
+    <p class="tier-card-scoreline"><span class="chip tier" data-tier={entry.row.tier}>{entry.row.tier}</span> <b class="tier-card-score">{entry.row.score}</b> · {t(entry.roleLabel)}</p>
     {entry.row.value !== null && (entry.role === 'support'
       ? <p>{t('{pct}% к урону команды', { pct: supportPct(entry.row.value) })} <small>{t('по {n} заменам', { n: fmtNumber(entry.supportN) })}</small></p>
       : <p>{t('{n} DPS', { n: compact.format(entry.row.value) })}</p>)}
@@ -86,11 +85,18 @@ const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лече
   .tier-head { background: var(--surface-3); border-bottom: 1px solid var(--border); }
   .tier-head strong { padding: .65rem .5rem; text-align: center; font-size: .85rem; }
   .tier-row + .tier-row { border-top: 1px solid var(--border); }
-  .tier-label { display: flex; align-items: center; justify-content: center; font: 700 2rem var(--font-display); }
-  .tier-label.tier-S, .tier.tier-S { background: color-mix(in srgb, #58b97b 25%, var(--surface)); color: color-mix(in srgb, #58b97b 60%, var(--text)); }
-  .tier-label.tier-A, .tier.tier-A { background: color-mix(in srgb, #5794db 25%, var(--surface)); color: color-mix(in srgb, #5794db 60%, var(--text)); }
-  .tier-label.tier-B, .tier.tier-B { background: color-mix(in srgb, #c69a44 25%, var(--surface)); color: color-mix(in srgb, #c69a44 60%, var(--text)); }
-  .tier-label.tier-C, .tier.tier-C { background: var(--surface-3); color: var(--text); }
+  .tier-label { display: flex; align-items: center; justify-content: center; font: 700 1.25rem var(--font-display); white-space: nowrap; }
+  :global([data-tier="T0"]) { --tier-color: #e0525e; }
+  :global([data-tier="T0.5"]) { --tier-color: #e66c45; }
+  :global([data-tier="T1"]) { --tier-color: #e58d35; }
+  :global([data-tier="T1.5"]) { --tier-color: #d9a735; }
+  :global([data-tier="T2"]) { --tier-color: #a3b63e; }
+  :global([data-tier="T3"]) { --tier-color: #39aaa3; }
+  :global([data-tier="T4"]) { --tier-color: #8295aa; }
+  .tier-label[data-tier], :global(.tier[data-tier]) {
+    background: color-mix(in srgb, var(--tier-color) 28%, var(--surface));
+    color: color-mix(in srgb, var(--tier-color) 40%, var(--text));
+  }
   .tier-slot { display: flex; flex-wrap: wrap; align-content: start; gap: .4rem; min-width: 0; min-height: 84px; padding: .55rem; border-left: 1px solid var(--border); }
   .tier-cell-char { display: flex; flex-direction: column; align-items: center; gap: .2rem; width: 72px; padding: 0; border: 0; background: none; color: var(--text); cursor: pointer; }
   .tier-frame { position: relative; display: block; width: 56px; height: 56px; overflow: hidden; border-radius: 12px; background: linear-gradient(160deg, #6c5a8f, #9a7ec9); }
@@ -125,6 +131,7 @@ const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лече
     .tier-roles { display: flex; }
     .tier-head, .tier-row { grid-template-columns: 56px minmax(0, 1fr); }
     .tier-column[data-mobile-hidden="true"] { display: none; }
+    .tier-label { font-size: 1.05rem; }
     .tier-slot { min-height: 76px; padding: .4rem; }
     .tier-cell-char { width: 64px; }
     .tier-frame { width: 48px; height: 48px; }

@@ -2,7 +2,8 @@ import type { ExploreTag } from './exploration';
 
 export type Role = 'carry' | 'subdps' | 'support' | 'sustain';
 export const ROLES: Role[] = ['carry', 'subdps', 'support', 'sustain'];
-export type Tier = 'S' | 'A' | 'B' | 'C';
+export type Tier = 'T0' | 'T0.5' | 'T1' | 'T1.5' | 'T2' | 'T3' | 'T4';
+export const TIERS: Tier[] = ['T0', 'T0.5', 'T1', 'T1.5', 'T2', 'T3', 'T4'];
 export type Element = 'pyro' | 'hydro' | 'anemo' | 'electro' | 'dendro' | 'cryo' | 'geo';
 
 export type TeamRow = { id: string; m: string[]; dps: number; targets: number; reaction?: string };
@@ -109,7 +110,13 @@ export function supportStrength(
 }
 
 export function tierOf(score: number): Tier {
-  return score >= 85 ? 'S' : score >= 70 ? 'A' : score >= 50 ? 'B' : 'C';
+  return score >= 95 ? 'T0'
+    : score >= 88 ? 'T0.5'
+    : score >= 80 ? 'T1'
+    : score >= 70 ? 'T1.5'
+    : score >= 55 ? 'T2'
+    : score >= 40 ? 'T3'
+    : 'T4';
 }
 
 export function scoreRole<T extends { value: number }>(rows: T[]): (T & { score: number; tier: Tier; rank: number })[] {

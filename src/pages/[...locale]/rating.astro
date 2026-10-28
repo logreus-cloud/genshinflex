@@ -127,7 +127,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
               <div class="rating-main">
                 <div class="rating-head">
                   <a class="name" href={`${base}/characters/${c.slug}/`}>{c.name}</a>
-                  <span class:list={['chip', 'tier', `tier-${row.tier}`]}>{row.tier}</span>
+                  <span class="chip tier" data-tier={row.tier}>{row.tier}</span>
                 </div>
                 <div class="score-line">
                   <span class="score-track"><span style={`width:${row.score}%`}></span></span>
@@ -167,7 +167,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
                     <div class="team-icons">{team.m.map((slug) => <CharacterIcon slug={slug} size={44} label={false} />)}</div>
                     <span class="muted small">{reaction(team)}</span>
                   </div>
-                  <div class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></div>
+                  <div class="team-score"><b>{team.score}</b><span class="chip tier" data-tier={team.tier}>{team.tier}</span></div>
                   <span class="muted small">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
                   <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
                 </li>
@@ -188,7 +188,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
               <div class="team-icons">{team.m.map((slug) => <CharacterIcon slug={slug} size={44} label={false} />)}</div>
               <span class="muted small">{reaction(team)}</span>
             </div>
-            <div class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></div>
+            <div class="team-score"><b>{team.score}</b><span class="chip tier" data-tier={team.tier}>{team.tier}</span></div>
             <span class="muted small">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
             <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
           </li>
@@ -228,7 +228,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
                             {team.m.map((slug) => <CharacterIcon slug={slug} size={36} label={false} />)}
                           </div>
                           <div class="boss-team-meta">
-                            <span class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></span>
+                            <span class="team-score"><b>{team.score}</b><span class="chip tier" data-tier={team.tier}>{team.tier}</span></span>
                             <span class="muted">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
                             <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
                           </div>
@@ -244,7 +244,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
                                 {team.m.map((slug) => <CharacterIcon slug={slug} size={36} label={false} />)}
                               </div>
                               <div class="boss-team-meta">
-                                <span class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></span>
+                                <span class="team-score"><b>{team.score}</b><span class="chip tier" data-tier={team.tier}>{team.tier}</span></span>
                                 <span class="muted">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
                                 <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
                               </div>
@@ -274,7 +274,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
             <div class="rating-main">
               <div class="rating-head">
                 <a class="name" href={`${base}/characters/${c.slug}/`}>{c.name}</a>
-                <span class:list={['chip', 'tier', `tier-${row.tier}`]}>{row.tier}</span>
+                <span class="chip tier" data-tier={row.tier}>{row.tier}</span>
               </div>
               <div class="score-line">
                 <span class="score-track"><span style={`width:${row.score}%`}></span></span>
@@ -308,7 +308,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
         <li>{t('Боссы — команды из той же базы, отобранные под механику босса: стихию щита, иммунитет, число целей, дальний бой, лечение.')}</li>
         <li>{t('Исследование — чек-лист пассивок и навыков вне боя, без симуляций.')}</li>
         <li>{t('«Предел» у строки — рекорд одного удара из серии «Предел урона» канала Miron MinMax (C6, лучшие артефакты, отряд по правилам автора). Это справка, в баллы не входит; автор сам считает старые цифры устаревшими.')}</li>
-        <li>{t('Тиры: S от 85, A от 70, B от 50, C ниже 50 баллов.')}</li>
+        <li>{t('Тиры по баллам роли: T0 от 95, T0.5 от 88, T1 от 80, T1.5 от 70, T2 от 55, T3 от 40, T4 ниже 40.')}</li>
         <li>{t('ELO сообщества появится позже.')}</li>
       </ul>
       <p class="muted small">{t('Данные от {date} · симуляций по базе: {baseline} из {entries}',{ date: data._meta.date, entries: fmtNumber(data._meta.entries), baseline: fmtNumber(data._meta.baseline) })}</p>
@@ -357,8 +357,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
           const [score, tierValue, rank, gain] = variants[key];
           row.querySelector<HTMLElement>('.place')!.textContent = String(rank);
           const tier = row.querySelector<HTMLElement>('.tier')!;
-          tier.classList.remove('tier-S', 'tier-A', 'tier-B', 'tier-C');
-          tier.classList.add(`tier-${tierValue}`);
+          tier.dataset.tier = tierValue;
           tier.textContent = tierValue;
           row.querySelector<HTMLElement>('.score-track span')!.style.width = `${score}%`;
           row.querySelector<HTMLElement>('.score-line b')!.textContent = String(score);
@@ -379,8 +378,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
         const [score, tierValue, , gain] = variants[key];
         const card = document.getElementById(button.getAttribute('popovertarget')!)!;
         const tier = card.querySelector<HTMLElement>('.tier')!;
-        tier.classList.remove('tier-S', 'tier-A', 'tier-B', 'tier-C');
-        tier.classList.add(`tier-${tierValue}`);
+        tier.dataset.tier = tierValue;
         tier.textContent = tierValue;
         card.querySelector<HTMLElement>('.tier-card-score')!.textContent = String(score);
         button.querySelector<HTMLElement>('.tier-cell-score')!.textContent = String(score);
@@ -500,10 +498,6 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
   .boss-more { list-style: none; display: grid; gap: .6rem; padding: 0; margin: .5rem 0 0; }
   .boss-more .boss-team { padding-top: .5rem; border-top: 1px solid var(--border); }
   .tier { font-weight: 700; border-color: transparent; }
-  .tier-S { background: color-mix(in srgb, #58b97b 25%, var(--surface)); color: color-mix(in srgb, #58b97b 60%, var(--text)); }
-  .tier-A { background: color-mix(in srgb, #5794db 25%, var(--surface)); color: color-mix(in srgb, #5794db 60%, var(--text)); }
-  .tier-B { background: color-mix(in srgb, #c69a44 25%, var(--surface)); color: color-mix(in srgb, #c69a44 60%, var(--text)); }
-  .tier-C { background: var(--surface-3); color: var(--text); }
   details { margin-top: .45rem; }
   summary { color: var(--accent-text); cursor: pointer; }
   details :global(.team) { margin-top: .5rem; }

@@ -35,7 +35,7 @@ test('рейтинг пропускает пустые строки и даёт 
     { slug: 'best', tags: ['kit-sprint', 'kit-water'] },
   ]);
   assert.deepEqual(rows.map(({ slug, score, rank, tier }) => [slug, score, rank, tier]), [
-    ['best', 100, 1, 'S'], ['other', 20, 2, 'C'],
+    ['best', 100, 1, 'T0'], ['other', 20, 2, 'T4'],
   ]);
 });
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { aggregate, buildOverall, classifyTeam, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, tierOf, type OverallRow, type RatingData, type RatingManual, type TeamRow } from './core.ts';
+import { aggregate, buildOverall, classifyTeam, consVariants, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, scoreRole, simUrl, supportStrength, swapPairs, TIERS, tierOf, type OverallRow, type RatingData, type RatingManual, type TeamRow } from './core.ts';
 
 test('classifyTeam распределяет роли по долям', () => {
   const members = [
@@ -51,10 +51,11 @@ test('supportStrength ослабляет одну пару и сохраняет
 });
 
 test('tierOf соблюдает границы', () => {
-  assert.equal(tierOf(85), 'S');
-  assert.equal(tierOf(70), 'A');
-  assert.equal(tierOf(50), 'B');
-  assert.equal(tierOf(49), 'C');
+  assert.deepEqual(TIERS, ['T0', 'T0.5', 'T1', 'T1.5', 'T2', 'T3', 'T4']);
+  assert.deepEqual(
+    [95, 94, 88, 87, 80, 79, 70, 69, 55, 54, 40, 39].map(tierOf),
+    ['T0', 'T0.5', 'T0.5', 'T1', 'T1', 'T1.5', 'T1.5', 'T2', 'T2', 'T3', 'T3', 'T4'],
+  );
 });
 
 test('scoreRole пересчитывает баллы и места', () => {
@@ -92,24 +93,24 @@ test('buildOverall добавляет экспертов, заменяет си�
 
 test('consVariants пересчитывает созвездия и сохраняет исходный C0', () => {
   const rows: OverallRow[] = [
-    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'S', rank: 1, kind: 'sim' },
-    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
-    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'T0', rank: 1, kind: 'sim' },
+    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'T1', rank: 2, kind: 'sim' },
+    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'T1', rank: 2, kind: 'sim' },
   ];
   const variants = consVariants(rows, (slug, level, weapon) => slug === 'b' && level === 1 && !weapon ? 50 : null);
   assert.deepEqual(rows.map((row) => variants.get(row.slug)![0]), rows.map(({ score, tier, rank }) => ({ score, tier, rank, gain: null })));
-  assert.deepEqual(variants.get('b')![1], { score: 100, tier: 'S', rank: 1, gain: 50 });
-  assert.deepEqual(variants.get('a')![1], { score: 83, tier: 'A', rank: 2, gain: null });
-  assert.deepEqual(variants.get('c')![1], { score: 67, tier: 'B', rank: 3, gain: null });
+  assert.deepEqual(variants.get('b')![1], { score: 100, tier: 'T0', rank: 1, gain: 50 });
+  assert.deepEqual(variants.get('a')![1], { score: 83, tier: 'T1', rank: 2, gain: null });
+  assert.deepEqual(variants.get('c')![1], { score: 67, tier: 'T2', rank: 3, gain: null });
   assert.deepEqual(rows.map((row) => variants.get(row.slug)![2].rank), [1, 2, 2]);
-  assert.deepEqual(rows.map(({ score, tier, rank }) => [score, tier, rank]), [[100, 'S', 1], [80, 'A', 2], [80, 'A', 2]]);
+  assert.deepEqual(rows.map(({ score, tier, rank }) => [score, tier, rank]), [[100, 'T0', 1], [80, 'T1', 2], [80, 'T1', 2]]);
 });
 
 test('consVariants перемножает приросты в C2 с оружием и пересчитывает места', () => {
   const rows: OverallRow[] = [
-    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'S', rank: 1, kind: 'sim' },
-    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
-    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'T0', rank: 1, kind: 'sim' },
+    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'T1', rank: 2, kind: 'sim' },
+    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'T1', rank: 2, kind: 'sim' },
   ];
   const variants = consVariants(rows, (slug, level, weapon) => {
     if (slug !== 'b') return null;
@@ -125,9 +126,9 @@ test('consVariants перемножает приросты в C2 с оружие
 
 test('consVariants на C0 с оружием учитывает только доступный прирост оружия', () => {
   const rows: OverallRow[] = [
-    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'S', rank: 1, kind: 'sim' },
-    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
-    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'A', rank: 2, kind: 'sim' },
+    { slug: 'a', role: 'carry', value: 100, score: 100, tier: 'T0', rank: 1, kind: 'sim' },
+    { slug: 'b', role: 'carry', value: 80, score: 80, tier: 'T1', rank: 2, kind: 'sim' },
+    { slug: 'c', role: 'carry', value: 80, score: 80, tier: 'T1', rank: 2, kind: 'sim' },
   ];
   const variants = consVariants(rows, (slug, _level, weapon) => slug === 'b' && weapon ? 30 : null);
   assert.deepEqual(rows.map((row) => variants.get(row.slug)![0].rank), [1, 2, 2]);

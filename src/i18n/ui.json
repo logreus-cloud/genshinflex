@@ -6531,9 +6531,9 @@
   "en": "Sustain and characters without simulations receive an expert rating.",
   "es": "Sustento y los personajes sin simulaciones reciben una valoración experta."
  },
- "Тиры: S от 85, A от 70, B от 50, C ниже 50 баллов.": {
-  "en": "Tiers: S from 85, A from 70, B from 50 and C below 50 points.",
-  "es": "Niveles: S desde 85, A desde 70, B desde 50 y C por debajo de 50 puntos."
+ "Тиры по баллам роли: T0 от 95, T0.5 от 88, T1 от 80, T1.5 от 70, T2 от 55, T3 от 40, T4 ниже 40.": {
+  "en": "Role score tiers: T0 from 95, T0.5 from 88, T1 from 80, T1.5 from 70, T2 from 55, T3 from 40, T4 below 40.",
+  "es": "Niveles según la puntuación del rol: T0 desde 95, T0.5 desde 88, T1 desde 80, T1.5 desde 70, T2 desde 55, T3 desde 40 y T4 por debajo de 40."
  },
  "ELO сообщества появится позже.": {
   "en": "Community ELO will come later.",
