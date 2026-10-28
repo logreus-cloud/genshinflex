@@ -150,7 +150,7 @@ const tierEntries = roles.flatMap(({ id, label }) => overall[id].flatMap((row, o
                       {part.source === 'manual'
                         ? <span>Game8/PG {part.label} {sources.map((source) => <a href={source.url} title={t(source.title)} target="_blank" rel="noopener">↗</a>)}</span>
                         : <a href={external._meta.sources[part.source].url} target="_blank" rel="noopener">{part.source === 'prydwen' ? 'Prydwen' : 'WotPack'} {part.label}</a>}
-                    </>)} )
+                    </>)})
                   </span>}
                   {row.kind === 'expert' && <span class="chip">{t('экспертная оценка')}</span>}
                   {sustain && <><span class="chip">{t(sustainLevels[sustain.level])}</span><span>{t(sustainKinds[sustain.kind])}</span></>}

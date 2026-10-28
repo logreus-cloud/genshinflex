@@ -72,7 +72,7 @@ const sustainKinds = { heal: 'лечение', shield: 'щит', both: 'лече
         {part.source === 'manual'
           ? <span>Game8/PG {part.label} {entry.sources.map((source) => <a class="tier-source" href={source.url} title={t(source.title)} target="_blank" rel="noopener">↗</a>)}</span>
           : <a href={external._meta.sources[part.source].url} target="_blank" rel="noopener">{part.source === 'prydwen' ? 'Prydwen' : 'WotPack'} {part.label}</a>}
-      </>)} )
+      </>)})
     </p>}
     {entry.row.kind === 'sim' && entry.row.source && <p><a href={entry.row.source.url} target="_blank" rel="noopener">{t(entry.row.source.title === 'конфиг' ? 'конфиг' : 'симуляция')}</a></p>}
     {entry.row.kind === 'expert' && !entry.row.consensus && <p>{t('экспертная оценка')} {entry.sources.map((source) => <a class="tier-source" href={source.url} target="_blank" rel="noopener">{t(source.title)}</a>)}</p>}

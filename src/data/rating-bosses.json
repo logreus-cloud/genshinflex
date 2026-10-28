@@ -3,7 +3,7 @@
  "bosses": [
   { "en": "Stormterror", "weekly": true, "tags": ["airborne"], "verified": true },
   { "en": "Lupus Boreas, Dominator of Wolves", "weekly": true, "tags": ["immune"], "immune": ["cryo", "anemo"], "verified": true },
-  { "en": "Childe", "weekly": true, "tags": ["single"], "verified": false },
+  { "en": "Childe", "weekly": true, "tags": ["single"], "verified": true },
   { "en": "Azhdaha", "weekly": true, "tags": ["adaptive"], "verified": true },
   { "en": "La Signora", "weekly": true, "tags": ["counter"], "need": [["pyro"]], "verified": true },
   { "en": "Magatsu Mitake Narukami no Mikoto", "weekly": true, "tags": ["airborne"], "verified": true },
@@ -14,7 +14,7 @@
   { "en": "Lord of Eroded Primal Fire", "weekly": true, "tags": ["single"], "verified": true },
   { "en": "The Game Before the Gate", "weekly": true, "tags": ["adds"], "verified": true },
   { "en": "The Doctor", "weekly": true, "tags": ["lunar"], "verified": true },
-  { "en": "Il Dottore", "weekly": true, "tags": ["single"], "verified": false },
+  { "en": "Il Dottore", "weekly": true, "tags": ["single"], "verified": true },
   { "en": "Anemo Hypostasis", "tags": ["immune"], "immune": "anemo", "verified": true },
   { "en": "Electro Hypostasis", "tags": ["immune", "adds"], "immune": "electro", "verified": true },
   { "en": "Geo Hypostasis", "tags": ["immune"], "immune": "geo", "verified": true },
