@@ -6726,5 +6726,41 @@
  "Итоговый балл роли: 60% — наши симуляции gcsim, 40% — среднее внешних тир-листов (Prydwen по ролям, WotPack, Game8 и Pocket Gamer). Без симуляции — только тир-листы. Шкалы: Prydwen T0 — 100 … T5 — 40, WotPack S+ — 95 … D — 40.": {
   "en": "Final role score: 60% from our gcsim simulations and 40% from the average of external tier lists (Prydwen by role, WotPack, Game8 and Pocket Gamer). Without a simulation, only tier lists count. Scales: Prydwen T0 — 100 … T5 — 40; WotPack S+ — 95 … D — 40.",
   "es": "Puntuación final del rol: 60 % de nuestras simulaciones gcsim y 40 % del promedio de tier lists externas (Prydwen por rol, WotPack, Game8 y Pocket Gamer). Sin simulación, solo cuentan las tier lists. Escalas: Prydwen T0 — 100 … T5 — 40; WotPack S+ — 95 … D — 40."
+ },
+ "Точки телепорта": {
+  "en": "Teleport Waypoints",
+  "es": "Puntos de teletransporte"
+ },
+ "Статуи Семи": {
+  "en": "Statues of The Seven",
+  "es": "Estatuas de los Siete"
+ },
+ "Подземелья": {
+  "en": "Domains",
+  "es": "Dominios"
+ },
+ "Окулусы": {
+  "en": "Oculi",
+  "es": "Óculos"
+ },
+ "Местные диковинки": {
+  "en": "Local specialties",
+  "es": "Especialidades locales"
+ },
+ "Головоломки": {
+  "en": "Puzzles",
+  "es": "Acertijos"
+ },
+ "Ничего": {
+  "en": "None",
+  "es": "Ninguno"
+ },
+ "Метки на карте": {
+  "en": "Map markers",
+  "es": "Marcadores del mapa"
+ },
+ "Меток пока нет — скоро добавим": {
+  "en": "No markers yet — coming soon",
+  "es": "Aún no hay marcadores — llegarán pronto"
  }
 }

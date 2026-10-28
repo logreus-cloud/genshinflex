@@ -1,7 +1,9 @@
 import * as L from 'leaflet';
 import tiles from '../../data/map-tiles.json';
 import { MAP_TILES_URL } from '../../lib/platform';
+import { loadMarkers, markerLayer } from './markers';
 import 'leaflet/dist/leaflet.css';
+import './map.css';
 
 interface MapOptions { compact?: boolean; }
 interface SavedView { lat: number; lng: number; zoom: number; }
@@ -66,8 +68,16 @@ export function mountMap(element: HTMLElement, options: MapOptions = {}): () => 
   // высота контейнера в оверлее меняется без resize окна (полоска обновления)
   const resize = new ResizeObserver(() => map.invalidateSize());
   resize.observe(element);
+
+  let destroyed = false;
+  let removeMarkers: (() => void) | undefined;
+  void loadMarkers('surface').then((markers) => {
+    if (!destroyed) removeMarkers = markerLayer(map, markers, options);
+  });
   return () => {
+    destroyed = true;
     resize.disconnect();
+    removeMarkers?.();
     map.remove();
   };
 }
