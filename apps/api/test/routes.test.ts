@@ -138,6 +138,7 @@ test('выгружает данные через подставленный кл
     notifications: [],
     messages: { conversations: [], members: [], messages: [] },
     guilds: { membership: [], owned: [] },
+    map: { collected: [], markers: [] },
   });
 });
 

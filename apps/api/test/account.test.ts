@@ -166,6 +166,8 @@ test('includes every export section without provider tokens', async () => {
       forum_thread_views: [{ thread_id: 1, user_id: id, day: '2026-10-10' }, { thread_id: 1, user_id: outboundNotification.recipient_id, day: '2026-10-10' }],
       user_titles: [{ user_id: id, title_id: 'traveler' }],
       user_rewards: [{ user_id: id, reward_id: 'anniversary' }],
+      map_collected: [{ user_id: id, marker_id: 5 }, { user_id: outboundNotification.recipient_id, marker_id: 5 }],
+      map_markers: [{ id: 9, author_id: id, type: 'chest' }, { id: 10, author_id: outboundNotification.recipient_id, type: 'chest' }],
     };
     const client = {
       from: (table: string) => table in collections ? (() => {
@@ -301,6 +303,10 @@ test('includes every export section without provider tokens', async () => {
     assert.deepEqual(data.guilds, {
       membership: [{ user_id: id, guild_id: 7 }],
       owned: [{ id: 7, slug: 'mine', owner_id: id }],
+    });
+    assert.deepEqual(data.map, {
+      collected: [{ user_id: id, marker_id: 5 }],
+      markers: [{ id: 9, author_id: id, type: 'chest' }],
     });
     assert.deepEqual(data.social, {
       following: [following],
