@@ -6,8 +6,11 @@ import CharacterIcon from '../../components/CharacterIcon.astro';
 import Team from '../../components/Team.astro';
 import rating from '../../data/rating.json';
 import manual from '../../data/rating-manual.json';
+import bossData from '../../data/rating-bosses.json';
+import enemies from '../../data/generated/enemies.json';
 import charactersEn from '../../data/generated/characters.en.json';
 import { buildOverall, elementFromRu, fitsAbyssHalf, fitsTheater, rankTeams, reactionLabel, simUrl, type Element, type RatingData, type RatingManual, type Role, type TeamRow } from '../../lib/rating/core';
+import { BOSS_TAGS, bossGroup, mechanicTags, rankBossTeams, type Boss, type BossMember, type BossTag } from '../../lib/rating/bosses';
 import { EXPLORE_CATEGORIES, EXPLORE_TAGS, explorationTags, rankExploration } from '../../lib/rating/exploration';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
@@ -17,16 +20,27 @@ const expert = manual as RatingManual;
 const overall = buildOverall(data, expert);
 const bySlug = new Map(characters.map((c) => [c.slug, c]));
 const enPassives = new Map(charactersEn.map((c) => [c.slug, c.talents?.passives ?? []]));
+const bosses = bossData.bosses as unknown as Boss[];
+const enemiesByName = enemies as Record<string, { ru: string; en: string; es: string; icon?: string }>;
+const bossCharacters = new Map(charactersEn.map((c) => [c.slug, { weapon: c.weapon, mechanics: mechanicTags(JSON.stringify(c.talents ?? {})) }]));
+const bossTags = Object.keys(BOSS_TAGS) as BossTag[];
+const elementText: Record<Element, string> = { pyro: 'Пиро', hydro: 'Гидро', anemo: 'Анемо', electro: 'Электро', dendro: 'Дендро', cryo: 'Крио', geo: 'Гео' };
+const needText = (need: Element[][]) => need.map((group) => group.map((element) => t(elementText[element])).join(' / ')).join(' + ');
 const explore = rankExploration(characters.filter((c) => !c.slug.startsWith('traveler-'))
   .map((c) => ({ slug: c.slug, tags: explorationTags(enPassives.get(c.slug) ?? [], expert.exploration?.[c.slug] ?? []) })));
 const roles: { id: Role; label: string }[] = [
   { id: 'carry', label: 'Керри' }, { id: 'subdps', label: 'Саб-DPS' },
   { id: 'support', label: 'Поддержка' }, { id: 'sustain', label: 'Сустейн' },
 ];
-const tabs = [...roles, { id: 'abyss', label: 'Бездна' }, { id: 'theater', label: 'Театр' }, { id: 'explore', label: 'Исследование' }, { id: 'method', label: 'Как считаем' }];
+const tabs = [...roles, { id: 'abyss', label: 'Бездна' }, { id: 'theater', label: 'Театр' }, { id: 'bosses', label: 'Боссы' }, { id: 'explore', label: 'Исследование' }, { id: 'method', label: 'Как считаем' }];
 const compact = new Intl.NumberFormat({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { notation: 'compact', maximumFractionDigits: 2 });
 const teams = data.teams.filter((team) => team.m.length === 4 && team.m.every((slug) => bySlug.has(slug)));
 const members = (team: TeamRow) => team.m.map((slug) => bySlug.get(slug)!);
+const bossMembers = (team: TeamRow): BossMember[] => team.m.map((slug) => ({
+  slug, element: bySlug.get(slug)!.element as Element, weapon: bossCharacters.get(slug)?.weapon ?? '',
+  carry: !!data.characters[slug]?.carry, healer: ['heal', 'both'].includes(expert.sustain[slug]?.kind ?? ''),
+  mechanics: bossCharacters.get(slug)?.mechanics ?? [],
+}));
 const elements = (team: TeamRow): Element[] => members(team).map((c) => c.element as Element);
 const reaction = (team: TeamRow) => {
   const label = reactionLabel(team.reaction, elements(team));
@@ -131,6 +145,58 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
         ))}
       </ol> : <p class="notice">{t('Данные сезона не заполнены')}</p>}
     </section>
+    <section id="bosses" class="rating-section" role="tabpanel" aria-labelledby="tab-bosses">
+      <h2 class="h-sec">{t('Боссы')}</h2>
+      <p class="muted">{t('Боссы сгруппированы по главной механике. Для каждого — лучшие команды из базы симуляций, которые под неё подходят.')}</p>
+      {([{ label: 'Недельные боссы', weekly: true }, { label: 'Обычные боссы', weekly: false }] as const).map(({ label, weekly }) => (
+        <div class="team-section">
+          <h3>{t(label)}</h3>
+          {bossTags.map((tag) => {
+            const group = bosses.filter((boss) => !!boss.weekly === weekly && bossGroup(boss) === tag);
+            return group.length ? <div class="boss-group">
+              <h4>{t(BOSS_TAGS[tag].label)}</h4>
+              <p class="muted small">{t(BOSS_TAGS[tag].hint)}</p>
+              <ol class="rating-list">
+                {group.map((boss) => {
+                  const enemy = enemiesByName[boss.en];
+                  const ranked = rankBossTeams(boss, teams, bossMembers, 3);
+                  return <li class="panel rating-row">
+                    {enemy?.icon && <img class="boss-icon" src={enemy.icon} width="44" height="44" loading="lazy" alt="" />}
+                    <div class="rating-main">
+                      <div class="rating-head"><span class="name">{enemy?.[lang as 'ru' | 'en' | 'es'] ?? boss.en}</span></div>
+                      <div class="rating-meta muted small">
+                        {boss.tags.map((tag) => <span class="chip">{t(BOSS_TAGS[tag].label)}</span>)}
+                        {boss.need && <span>{t('Нужно: {elements}', { elements: needText(boss.need) })}</span>}
+                        {boss.immune && <span>{t('Иммунитет: {element}', { element: t(elementText[boss.immune]) })}</span>}
+                        {!boss.verified && <span class="chip">{t('механика не проверена')}</span>}
+                      </div>
+                      <details>
+                        <summary>{t('Лучшие команды')}</summary>
+                        {ranked.length ? <ol class="rating-list boss-teams">
+                          {ranked.map((team) => (
+                            <li class="panel team-row">
+                              <span class="place">{team.rank}</span>
+                              <div class="team-info">
+                                <div class="team-icons">{team.m.map((slug) => <CharacterIcon slug={slug} size={44} label={false} />)}</div>
+                                <span class="muted small">{reaction(team)}</span>
+                              </div>
+                              <div class="team-score"><b>{team.score}</b><span class:list={['chip', 'tier', `tier-${team.tier}`]}>{team.tier}</span></div>
+                              <span class="muted small">{t('DPS команды {n}', { n: compact.format(team.dps) })}</span>
+                              <a href={simUrl(team.id)} target="_blank" rel="noopener">{t(team.id.startsWith('own:') ? 'конфиг' : 'симуляция')}</a>
+                            </li>
+                          ))}
+                        </ol> : <p class="muted">{t('Подходящих команд в базе нет')}</p>}
+                      </details>
+                    </div>
+                  </li>;
+                })}
+              </ol>
+            </div> : null;
+          })}
+        </div>
+      ))}
+      <p class="muted small">{t('Механики — по подсказкам официальной вики HoYoLAB. Дальний бой — керри с луком или катализатором; хил — по экспертной оценке сустейна; Ночная душа, лунные и звёздные реакции, Пневма и Усия — по талантам персонажей.')}</p>
+    </section>
     <section id="explore" class="rating-section" role="tabpanel" aria-labelledby="tab-explore">
       <h2 class="h-sec">{t('Исследование')}</h2>
       <ol class="rating-list">
@@ -172,6 +238,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
         <li>{t('Поддержка — по парам команд, которые отличаются только ею: насколько урон выше, чем со средней поддержкой на том же месте ({pairs} пар)', { pairs: fmtNumber(data._meta.pairs) })}</li>
         <li>{t('Команды с персонажами, которых нет в базе KQM, считаем сами тем же gcsim с подбором доп. статов по стандарту KQM ({own} команд). Эти ротации ещё не проверены сообществом, поэтому они есть только в списках команд, а оценки ролей не меняют', { own: fmtNumber(data._meta.own) })}</li>
         <li>{t('Сустейн и персонажи без симуляций получают экспертную оценку.')}</li>
+        <li>{t('Боссы — команды из той же базы, отобранные под механику босса: стихию щита, иммунитет, число целей, дальний бой, лечение.')}</li>
         <li>{t('Исследование — чек-лист пассивок и навыков вне боя, без симуляций.')}</li>
         <li>{t('Тиры: S от 85, A от 70, B от 50, C ниже 50 баллов.')}</li>
         <li>{t('ELO сообщества появится позже.')}</li>
@@ -238,6 +305,10 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
   .rating-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem; }
   .explore-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem; min-width: 0; }
   .explore-group .chip { white-space: normal; overflow-wrap: anywhere; }
+  .boss-group { margin-top: 1.2rem; }
+  .boss-icon { flex: none; }
+  .boss-teams { margin-top: .5rem; }
+  .boss-teams .team-icons { flex-wrap: wrap; }
   .tier { font-weight: 700; border-color: transparent; }
   .tier-S { background: color-mix(in srgb, #58b97b 25%, var(--surface)); color: color-mix(in srgb, #58b97b 60%, var(--text)); }
   .tier-A { background: color-mix(in srgb, #5794db 25%, var(--surface)); color: color-mix(in srgb, #5794db 60%, var(--text)); }

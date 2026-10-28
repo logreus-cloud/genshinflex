@@ -1,4 +1,136 @@
 {
+ "Боссы": {
+  "en": "Bosses",
+  "es": "Jefes"
+ },
+ "Боссы сгруппированы по главной механике. Для каждого — лучшие команды из базы симуляций, которые под неё подходят.": {
+  "en": "Bosses are grouped by their main mechanic. Each shows the best suitable teams from the simulation database.",
+  "es": "Los jefes se agrupan por su mecánica principal. Cada uno muestra los mejores equipos adecuados de la base de simulaciones."
+ },
+ "Недельные боссы": {
+  "en": "Weekly bosses",
+  "es": "Jefes semanales"
+ },
+ "Обычные боссы": {
+  "en": "Normal bosses",
+  "es": "Jefes normales"
+ },
+ "Ночная душа": {
+  "en": "Nightsoul",
+  "es": "Alma nocturna"
+ },
+ "Слабое место открывают атаки в состоянии Ночной души.": {
+  "en": "Attacks during Nightsoul's Blessing expose the weak point.",
+  "es": "Los ataques en estado de Bendición noctámbula descubren el punto débil."
+ },
+ "Лунные реакции": {
+  "en": "Lunar reactions",
+  "es": "Reacciones lunares"
+ },
+ "Щиты и механики эффективнее ломают лунные реакции.": {
+  "en": "Lunar reactions break shields and mechanics more effectively.",
+  "es": "Las reacciones lunares rompen escudos y mecánicas con mayor eficacia."
+ },
+ "Звёздные реакции": {
+  "en": "Stellar reactions",
+  "es": "Reacciones estelares"
+ },
+ "Механики останавливает реакция Звёздного сияния и другие звёздные реакции.": {
+  "en": "Stellar Glimmer and other stellar reactions stop these mechanics.",
+  "es": "Destello Estelar y otras reacciones estelares detienen estas mecánicas."
+ },
+ "Пневма и Усия": {
+  "en": "Pneuma and Ousia",
+  "es": "Pneuma y Ousia"
+ },
+ "Ключевая механика ломается атаками Пневмы или Усии.": {
+  "en": "Pneuma or Ousia attacks break the key mechanic.",
+  "es": "Los ataques de Pneuma u Ousia rompen la mecánica principal."
+ },
+ "Нужна стихия": {
+  "en": "Element required",
+  "es": "Elemento necesario"
+ },
+ "Щит или ядро ломается определённой стихией.": {
+  "en": "A specific element breaks the shield or core.",
+  "es": "Un elemento concreto rompe el escudo o núcleo."
+ },
+ "Иммунитет к стихии": {
+  "en": "Elemental immunity",
+  "es": "Inmunidad elemental"
+ },
+ "К своей стихии босс неуязвим: керри этой стихии не подходит.": {
+  "en": "The boss is immune to its own element, so a carry of that element is unsuitable.",
+  "es": "El jefe es inmune a su propio elemento, así que un carry de ese elemento no sirve."
+ },
+ "Несколько целей": {
+  "en": "Multiple targets",
+  "es": "Varios objetivos"
+ },
+ "Призывает помощников или ломаемые объекты: ценится урон по площади.": {
+  "en": "Summons helpers or breakable objects, making area damage valuable.",
+  "es": "Invoca ayudantes u objetos rompibles, por lo que el daño en área es valioso."
+ },
+ "В воздухе и подвижные": {
+  "en": "Airborne and mobile",
+  "es": "Voladores y móviles"
+ },
+ "Часть боя в воздухе или на расстоянии: нужен дальний бой.": {
+  "en": "Spends part of the fight airborne or at a distance; ranged damage is needed.",
+  "es": "Pasa parte del combate en el aire o a distancia; se necesita daño a distancia."
+ },
+ "Нужен хил": {
+  "en": "Healing required",
+  "es": "Curación necesaria"
+ },
+ "Постоянный урон по отряду или кокон, из которого выбирает только лечение.": {
+  "en": "Deals constant party damage or traps a character in a cocoon that only healing can remove.",
+  "es": "Inflige daño constante al equipo o atrapa a un personaje en un capullo que solo se elimina curando."
+ },
+ "Адаптивное сопротивление": {
+  "en": "Adaptive resistance",
+  "es": "Resistencia adaptable"
+ },
+ "Подстраивает сопротивление под самую частую стихию урона.": {
+  "en": "Adapts resistance to the most frequently used damage element.",
+  "es": "Adapta su resistencia al elemento de daño más frecuente."
+ },
+ "Одиночная цель": {
+  "en": "Single target",
+  "es": "Objetivo único"
+ },
+ "Без особых требований: решает чистый урон по одной цели.": {
+  "en": "No special requirements: single-target damage decides the fight.",
+  "es": "Sin requisitos especiales: decide el daño a un solo objetivo."
+ },
+ "Нужно: {elements}": {
+  "en": "Required: {elements}",
+  "es": "Necesario: {elements}"
+ },
+ "Иммунитет: {element}": {
+  "en": "Immune: {element}",
+  "es": "Inmune a {element}"
+ },
+ "механика не проверена": {
+  "en": "mechanic unverified",
+  "es": "mecánica sin verificar"
+ },
+ "Лучшие команды": {
+  "en": "Best teams",
+  "es": "Mejores equipos"
+ },
+ "Подходящих команд в базе нет": {
+  "en": "No suitable teams in the database",
+  "es": "No hay equipos adecuados en la base de datos"
+ },
+ "Механики — по подсказкам официальной вики HoYoLAB. Дальний бой — керри с луком или катализатором; хил — по экспертной оценке сустейна; Ночная душа, лунные и звёздные реакции, Пневма и Усия — по талантам персонажей.": {
+  "en": "Mechanics follow tips on the official HoYoLAB wiki. Ranged combat means a carry with a bow or catalyst; healing uses expert sustain ratings; Nightsoul, lunar and stellar reactions, Pneuma and Ousia are identified from character talents.",
+  "es": "Las mecánicas se basan en consejos de la wiki oficial de HoYoLAB. El combate a distancia requiere un carry con arco o catalizador; la curación se basa en la valoración experta del sustento; el Alma nocturna, las reacciones lunares y estelares, Pneuma y Ousia se identifican por los talentos."
+ },
+ "Боссы — команды из той же базы, отобранные под механику босса: стихию щита, иммунитет, число целей, дальний бой, лечение.": {
+  "en": "Boss teams come from the same database, filtered for each boss's mechanics: shield element, immunity, target count, ranged combat and healing.",
+  "es": "Los equipos para jefes salen de la misma base, filtrados según sus mecánicas: elemento del escudo, inmunidad, número de objetivos, combate a distancia y curación."
+ },
  "Исследование": {
   "en": "Exploration",
   "es": "Exploración"
