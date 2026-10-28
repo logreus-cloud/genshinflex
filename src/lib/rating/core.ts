@@ -1,3 +1,5 @@
+import type { ExploreTag } from './exploration';
+
 export type Role = 'carry' | 'subdps' | 'support' | 'sustain';
 export const ROLES: Role[] = ['carry', 'subdps', 'support', 'sustain'];
 export type Tier = 'S' | 'A' | 'B' | 'C';
@@ -13,6 +15,7 @@ export type RatingData = {
 export type RatingManual = {
   characters: Record<string, { patch: string; sources: { title: string; url: string }[]; roles: { role: 'carry' | 'subdps' | 'support'; score: number; note?: string; override?: boolean }[] }>;
   sustain: Record<string, { level: 'plenty' | 'enough' | 'low'; kind: 'heal' | 'shield' | 'both'; note?: string }>;
+  exploration?: Record<string, ExploreTag[]>;
 };
 export type SustainLevel = keyof typeof SUSTAIN_SCORE;
 export type OverallRow = {

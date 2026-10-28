@@ -1,4 +1,108 @@
 {
+ "Исследование": {
+  "en": "Exploration",
+  "es": "Exploración"
+ },
+ "Передвижение": {
+  "en": "Movement",
+  "es": "Movimiento"
+ },
+ "Сбор": {
+  "en": "Gathering",
+  "es": "Recolección"
+ },
+ "Польза": {
+  "en": "Utility",
+  "es": "Utilidad"
+ },
+ "Удобство": {
+  "en": "Convenience",
+  "es": "Comodidad"
+ },
+ "Быстрое передвижение навыком": {
+  "en": "Fast movement with a skill",
+  "es": "Movimiento rápido con una habilidad"
+ },
+ "Полёт": {
+  "en": "Flight",
+  "es": "Vuelo"
+ },
+ "Подъём в воздух": {
+  "en": "Rise into the air",
+  "es": "Elevación en el aire"
+ },
+ "Передвижение по воде": {
+  "en": "Movement over water",
+  "es": "Desplazamiento sobre el agua"
+ },
+ "Бег: −20% выносливости": {
+  "en": "Sprinting: −20% stamina use",
+  "es": "Esprintar: −20 % de consumo de Aguante"
+ },
+ "Лазание: −20% выносливости": {
+  "en": "Climbing: −20% stamina use",
+  "es": "Escalar: −20 % de consumo de Aguante"
+ },
+ "Планирование: −20% выносливости": {
+  "en": "Gliding: −20% stamina use",
+  "es": "Planear: −20 % de consumo de Aguante"
+ },
+ "Планирование: +15% скорости": {
+  "en": "Gliding: +15% speed",
+  "es": "Planear: +15 % de velocidad"
+ },
+ "Плавание: меньше выносливости": {
+  "en": "Swimming: less stamina use",
+  "es": "Nadar: menor consumo de Aguante"
+ },
+ "Под водой: быстрее": {
+  "en": "Faster underwater",
+  "es": "Más velocidad bajo el agua"
+ },
+ "Скорость передвижения днём или ночью": {
+  "en": "Movement speed by day or night",
+  "es": "Velocidad de movimiento de día o de noche"
+ },
+ "Местные диковинки на мини-карте": {
+  "en": "Local specialties on the mini-map",
+  "es": "Especialidades locales en el minimapa"
+ },
+ "Руда на мини-карте": {
+  "en": "Ore on the mini-map",
+  "es": "Minerales en el minimapa"
+ },
+ "Не пугает животных": {
+  "en": "Does not startle animals",
+  "es": "No asusta a los animales"
+ },
+ "Сбор на расстоянии или с бонусом": {
+  "en": "Remote or bonus gathering",
+  "es": "Recolección a distancia o con bonificación"
+ },
+ "Особая польза вне боя": {
+  "en": "Special utility outside combat",
+  "es": "Utilidad especial fuera de combate"
+ },
+ "Экспедиции": {
+  "en": "Expeditions",
+  "es": "Expediciones"
+ },
+ "Крафт": {
+  "en": "Crafting",
+  "es": "Fabricación"
+ },
+ "Готовка": {
+  "en": "Cooking",
+  "es": "Cocina"
+ },
+ "Баллы: передвижение навыком 2–3, пассивки отряда 1–2, сбор 1–2, польза 1, удобство 0,5. Источник — пассивки персонажей из данных игры; способы передвижения из навыков отмечены вручную.": {
+  "en": "Points: skill-based movement 2–3, party passives 1–2, gathering 1–2, utility 1, convenience 0.5. Sources: character passives from game data; movement skills are tagged manually.",
+  "es": "Puntos: movimiento con habilidades 2–3, pasivas del equipo 1–2, recolección 1–2, utilidad 1 y comodidad 0,5. Fuentes: pasivas de los personajes de los datos del juego; las habilidades de movimiento se etiquetan a mano."
+ },
+ "Исследование — чек-лист пассивок и навыков вне боя, без симуляций.": {
+  "en": "Exploration is a checklist of passives and skills outside combat, with no simulations.",
+  "es": "La exploración es una lista de pasivas y habilidades fuera del combate, sin simulaciones."
+ },
  "История циклов →": {
   "en": "Cycle history →",
   "es": "Historial de ciclos →"

@@ -401,5 +401,66 @@
    "level": "low",
    "kind": "heal"
   }
+ },
+ "exploration": {
+  "kamisato-ayaka": [
+   "kit-sprint",
+   "kit-water"
+  ],
+  "mona": [
+   "kit-sprint",
+   "kit-water"
+  ],
+  "yelan": [
+   "kit-sprint"
+  ],
+  "kirara": [
+   "kit-sprint"
+  ],
+  "sayu": [
+   "kit-sprint"
+  ],
+  "mualani": [
+   "kit-sprint",
+   "kit-water"
+  ],
+  "xilonen": [
+   "kit-sprint"
+  ],
+  "mavuika": [
+   "kit-sprint"
+  ],
+  "neuvillette": [
+   "kit-water"
+  ],
+  "vodyanitsa": [
+   "kit-water"
+  ],
+  "wanderer": [
+   "kit-flight",
+   "kit-vertical"
+  ],
+  "chasca": [
+   "kit-flight",
+   "kit-vertical"
+  ],
+  "vesna": [
+   "kit-flight"
+  ],
+  "kinich": [
+   "kit-vertical"
+  ],
+  "kaedehara-kazuha": [
+   "kit-vertical"
+  ],
+  "venti": [
+   "kit-vertical"
+  ],
+  "xianyun": [
+   "kit-vertical"
+  ],
+  "citlali": [
+   "kit-vertical"
+  ]
  }
 }
