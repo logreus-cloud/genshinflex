@@ -6,6 +6,7 @@ import CharacterIcon from '../../components/CharacterIcon.astro';
 import Team from '../../components/Team.astro';
 import rating from '../../data/rating.json';
 import investments from '../../data/investments.json';
+import damageLimits from '../../data/damage-limits.json';
 import manual from '../../data/rating-manual.json';
 import bossData from '../../data/rating-bosses.json';
 import enemies from '../../data/generated/enemies.json';
@@ -15,7 +16,7 @@ import { BOSS_TAGS, bossGroup, mechanicTags, rankBossTeams, type Boss, type Boss
 import { EXPLORE_CATEGORIES, EXPLORE_TAGS, explorationTags, rankExploration } from '../../lib/rating/exploration';
 // Каждая страница существует в трёх языках: / (ru), /en/, /es/
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
-const { base, t, lang, characters, fmtNumber } = useData(Astro.currentLocale);
+const { base, t, lang, characters, fmtNumber, fmtFullDate } = useData(Astro.currentLocale);
 const data = rating as RatingData;
 const expert = manual as RatingManual;
 const overall = buildOverall(data, expert);
@@ -39,6 +40,7 @@ const roles: { id: Role; label: string }[] = [
 const roleCons = new Map(roles.map(({ id }) => [id, consVariants(overall[id], gainOf)] as const));
 const tabs = [...roles, { id: 'abyss', label: 'Бездна' }, { id: 'theater', label: 'Театр' }, { id: 'bosses', label: 'Боссы' }, { id: 'explore', label: 'Исследование' }, { id: 'method', label: 'Как считаем' }];
 const compact = new Intl.NumberFormat({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { notation: 'compact', maximumFractionDigits: 2 });
+const damageCompact = new Intl.NumberFormat({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { notation: 'compact', maximumFractionDigits: 1 });
 const teams = data.teams.filter((team) => team.m.length === 4 && team.m.every((slug) => bySlug.has(slug)));
 const members = (team: TeamRow) => team.m.map((slug) => bySlug.get(slug)!);
 const bossMembers = (team: TeamRow): BossMember[] => team.m.map((slug) => ({
@@ -83,6 +85,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
             const sustain = expert.sustain[row.slug];
             const sources = row.kind === 'expert' ? expert.characters[row.slug]?.sources ?? [] : [];
             const variants = roleCons.get(id)!.get(row.slug)!;
+            const limit = damageLimits.limits[row.slug as keyof typeof damageLimits.limits];
             const cons = Object.fromEntries(([0, 1, 2] as const).map((level) => {
               const { score, tier, rank, gain } = variants[level];
               return [level, [score, tier, rank, gain]];
@@ -101,6 +104,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
                 </div>
                 <div class="rating-meta muted small">
                   <span class="cons-gain chip" hidden></span>
+                  {limit && <a class="chip dmg-limit" href={`https://www.youtube.com/watch?v=${limit.video}`} title={t('Предел урона Miron MinMax: один удар с отрядом, на момент {date}. Справка, в баллы не входит.', { date: fmtFullDate(new Date(limit.asOf)) })} target="_blank" rel="noopener noreferrer">{t('Предел')} {damageCompact.format(limit.team)}</a>}
                   {row.value !== null && (id === 'support'
                     ? <span><span title={t('Насколько урон команды выше, чем со средней поддержкой на том же месте')}>{t('{pct}% к урону команды', { pct: supportPct(row.value) })}</span> <small>{t('по {n} заменам', { n: fmtNumber(data.characters[row.slug]?.support?.n ?? 0) })}</small></span>
                     : <span>{t('{n} DPS', { n: compact.format(row.value) })}</span>)}
@@ -272,6 +276,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
         <li>{t('Переключатель C0/C1/C2 умножает балл 5★ персонажа на прирост урона команды от созвездий из наших симуляций gcsim (как в блоке «Стоит ли выбивать») и пересчитывает места. 4★ и персонажи без симуляции созвездий множитель не получают, но баллы всех пересчитываются от нового лидера.')}</li>
         <li>{t('Боссы — команды из той же базы, отобранные под механику босса: стихию щита, иммунитет, число целей, дальний бой, лечение.')}</li>
         <li>{t('Исследование — чек-лист пассивок и навыков вне боя, без симуляций.')}</li>
+        <li>{t('«Предел» у строки — рекорд одного удара из серии «Предел урона» канала Miron MinMax (C6, лучшие артефакты, отряд по правилам автора). Это справка, в баллы не входит; автор сам считает старые цифры устаревшими.')}</li>
         <li>{t('Тиры: S от 85, A от 70, B от 50, C ниже 50 баллов.')}</li>
         <li>{t('ELO сообщества появится позже.')}</li>
       </ul>
@@ -383,6 +388,7 @@ const supportPct = (value: number) => { const pct = Math.round((value - 1) * 100
   .score-track span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
   .score-line b { min-width: 2em; text-align: right; }
   .rating-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem; }
+  .dmg-limit { font-size: .75rem; text-decoration: none; }
   .explore-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem; min-width: 0; }
   .explore-group .chip { white-space: normal; overflow-wrap: anywhere; }
   .boss-group { margin-top: 1.2rem; }

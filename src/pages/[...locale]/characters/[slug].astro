@@ -7,12 +7,13 @@ import LevelStats from '../../../components/LevelStats.astro';
 import VideoGuides from '../../../components/VideoGuides.astro';
 import Investments from '../../../components/Investments.astro';
 import investments from '../../../data/investments.json';
+import damageLimits from '../../../data/damage-limits.json';
 import { ROLES } from '../../../lib/rating/core';
 import { overall } from '../../../lib/rating/data';
 import { useData, LANGS, BETA_SOURCE, BETA_KIT_SOURCE, BETA_TALENT_LEVEL, type Character } from '../../../lib/data';
 import { makeLookup, renderGuide } from '../../../lib/guide-markup';
 const ratingLabels = { carry: 'Керри', subdps: 'Саб-DPS', support: 'Поддержка', sustain: 'Сустейн' } as const;
-const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
+const { characters, weapons, artifacts, getWeapon, getArtifact, getCharacter, TALENTS, ELEMENTS, WEAPON_TYPES, MODES, stars, base, t, fmtNumber, fmtFullDate, stat, lang } = useData(Astro.currentLocale);
 
 export function getStaticPaths() {
   return LANGS.flatMap((l) => useData(l).characters.map((c) => ({ params: { locale: l === 'ru' ? undefined : l, slug: c.slug }, props: { c } })));
@@ -20,6 +21,7 @@ export function getStaticPaths() {
 
 const { c } = Astro.props as { c: Character };
 const slug = c.slug;
+const limit = damageLimits.limits[slug as keyof typeof damageLimits.limits];
 const characterRatings = ROLES.flatMap((role) => overall[role].filter((row) => row.slug === slug));
 const allBuilds = await getCollection('builds');
 const build = allBuilds.find((b) => b.data.character === c.slug);
@@ -144,6 +146,13 @@ const jsonLd = b && {
           {characterRatings.length > 0 && <div class="ratings" data-pagefind-ignore>
             <span class="muted small">{t('Рейтинг')}:</span>
             {characterRatings.map((row) => <a class="chip" href={`${base}/rating/#${row.role}`}>{t(ratingLabels[row.role])} · {row.score} · {row.tier}</a>)}
+          </div>}
+          {limit && <div class="damage-limit" data-pagefind-ignore>
+            <span class="muted small">{t('Предел урона')}:</span>
+            <a class="chip" href={`https://www.youtube.com/watch?v=${limit.video}`} target="_blank" rel="noopener noreferrer">Miron MinMax · {fmtNumber(limit.team)}</a>
+            <small class="muted">
+              {t('Один удар с отрядом по правилам автора, соло {solo}. На момент {date}, видео от {video}. Справка, в рейтинг не входит.', { solo: fmtNumber(limit.solo), date: fmtFullDate(new Date(limit.asOf)), video: fmtFullDate(new Date(limit.date)) })}
+            </small>
           </div>}
         </div>
         <LevelStats stats={c.stats} substat={c.substat} substatPercent={c.substatPercent} />
@@ -433,6 +442,9 @@ const jsonLd = b && {
   .two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; }
   .ratings { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: 1rem; }
   .ratings a { text-decoration: none; }
+  .damage-limit { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .8rem; }
+  .damage-limit small { flex-basis: 100%; }
+  .damage-limit a { text-decoration: none; }
 
   .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
   .rank { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .55rem; }

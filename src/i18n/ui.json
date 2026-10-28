@@ -2359,6 +2359,26 @@
   "en": "Level-up calculator",
   "es": "Calculadora de ascensión"
  },
+ "Предел урона": {
+  "en": "Damage limit",
+  "es": "Límite de daño"
+ },
+ "Один удар с отрядом по правилам автора, соло {solo}. На момент {date}, видео от {video}. Справка, в рейтинг не входит.": {
+  "en": "One hit with a team under the creator's rules; solo {solo}. As of {date}; video from {video}. For reference only; does not affect the rating.",
+  "es": "Un golpe con equipo según las reglas del autor; en solitario {solo}. Datos del {date}; vídeo del {video}. Solo como referencia; no afecta a la clasificación."
+ },
+ "Предел": {
+  "en": "Limit",
+  "es": "Límite"
+ },
+ "Предел урона Miron MinMax: один удар с отрядом, на момент {date}. Справка, в баллы не входит.": {
+  "en": "Miron MinMax damage limit: one hit with a team, as of {date}. For reference only; does not affect the score.",
+  "es": "Límite de daño de Miron MinMax: un golpe con equipo, datos del {date}. Solo como referencia; no afecta a la puntuación."
+ },
+ "«Предел» у строки — рекорд одного удара из серии «Предел урона» канала Miron MinMax (C6, лучшие артефакты, отряд по правилам автора). Это справка, в баллы не входит; автор сам считает старые цифры устаревшими.": {
+  "en": "The “Limit” shown on a row is a single-hit record from Miron MinMax's “Damage Limit” series (C6, best artifacts, team under the creator's rules). It is for reference only and does not affect the score; the creator considers older figures outdated.",
+  "es": "El «Límite» de cada fila es un récord de un solo golpe de la serie «Límite de daño» de Miron MinMax (C6, mejores artefactos y equipo según las reglas del autor). Es solo una referencia y no afecta a la puntuación; el propio autor considera obsoletas las cifras antiguas."
+ },
  "Кадр": {
   "en": "Framing",
   "es": "Encuadre"
