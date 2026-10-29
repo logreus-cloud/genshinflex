@@ -31,7 +31,7 @@ const linked = Object.fromEntries(SECTIONS.map((section) => [section.id, section
 const nav = NAV_GROUPS.map((group) => ({
   group,
   items: SECTIONS.filter((section) => section.navGroup === group).map((section) => ({ ...section, href: sectionHref(section, lang, social)! })),
-}));
+})).filter(({ items }) => items.length);
 const footerCols = FOOTER_COLUMNS.map((title) => ({
   title,
   links: SECTIONS.filter((section) => section.footerColumn === title).sort((a, b) => a.footerOrder! - b.footerOrder!)
@@ -125,7 +125,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           </div>
         ))}
       </nav>
-      <a class="map-card" href={linked.map} target="_blank" rel="noopener">
+      <a class="map-card" href={`${base}/map/`} aria-current={active('/map') ? 'page' : undefined}>
         <svg class="contours" viewBox="0 0 200 90" aria-hidden="true" preserveAspectRatio="none">
           <path d="M-10 70c30-18 55-8 80-22s45-30 80-18 40 6 60-4M-10 84c35-16 60-4 88-18s50-26 82-14 38 8 50 2M20 -4c10 18 30 24 52 20s40 6 48 22" />
         </svg>
@@ -138,10 +138,8 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         </svg>
         <span class="map-text">
           <b>{t('Карта Тейвата')}</b>
-          <small>{t('Официальная, от HoYoLAB')}</small>
+          <small>{t('Своя, с метками сообщества')}</small>
         </span>
-        <svg class="ext" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M6 3h7v7M13 3 4 12" /></svg>
-        <span class="sr-only">{t('(откроется в новой вкладке)')}</span>
       </a>
       <div class="side-foot">
         <p>{t('Без рекламы и регистрации.')}</p>
@@ -291,7 +289,6 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   .map-text { display: grid; flex: 1; min-width: 0; line-height: 1.2; }
   .map-text b { font: 600 .74rem var(--font-display); color: #f3d38a; }
   .map-text small { font-size: .72rem; line-height: 1.25; color: #c9c2ad; }
-  .ext { position: absolute; top: .55rem; right: .55rem; fill: none; stroke: #e3b04b; stroke-width: 1.6; stroke-linecap: round; opacity: .7; }
   .map-card:hover { border-color: var(--accent); box-shadow: inset 0 0 0 3px #171b2e, inset 0 0 0 4px var(--accent), 0 0 18px rgb(227 176 75 / .18); }
   .map-card:hover .compass { rotate: 45deg; }
   .map-card:focus-visible { outline-offset: 3px; }

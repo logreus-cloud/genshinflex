@@ -3415,9 +3415,9 @@
   "en": "Sending…",
   "es": "Enviando…"
  },
- "Официальная, от HoYoLAB": {
-  "en": "Official, by HoYoLAB",
-  "es": "Oficial, de HoYoLAB"
+ "Своя, с метками сообщества": {
+  "en": "Our own, with community markers",
+  "es": "Propio, con marcadores de la comunidad"
  },
  "Оценка складывается из уровня, оружия, сета, основных и итоговых статов (до 100 баллов на персонажа) и того, закрывает ли команда требования половины. Реальный урон зависит ещё от ротации и созвездий.": {
   "en": "The score combines level, weapon, set, main and final stats (up to 100 points per character) and whether the team meets the half's requirements. Real damage also depends on rotation and constellations.",

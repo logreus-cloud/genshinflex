@@ -13,7 +13,6 @@ type Section = {
 // shortByLang — если краткое название нельзя взять из словаря: «Натиск» по-русски совпадает с полным, а в en/es — нет
 type ModeSection = Section & { href: string; shortByLang?: Record<Lang, string> };
 
-const MAP_LANG = { ru: 'ru-ru', en: 'en-us', es: 'es-es' } as const;
 
 export const MODE_SECTIONS: Record<string, ModeSection> = {
   abyss: { id: 'abyss', href: '/abyss', label: 'Витая бездна', short: 'Бездна', icon: 'spiral', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 2 },
@@ -46,7 +45,7 @@ export const SECTIONS: Section[] = [
   { id: 'app', href: '/app', label: 'Оверлей для ПК', icon: 'tool', navGroup: 'Инструменты', footerColumn: 'Инструменты', footerOrder: 6 },
   { id: 'rating', href: '/rating', label: 'Рейтинг', icon: 'chart', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 7 },
   { id: 'banner-history', href: '/banners/#history', label: 'История баннеров', icon: 'moon', footerColumn: 'Эндгейм', footerOrder: 6, footerOnly: true },
-  { id: 'map', href: (lang: Lang) => `https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=${MAP_LANG[lang]}`, label: 'Карта Тейвата', icon: 'home', footerColumn: 'Инструменты', footerOrder: 7, footerOnly: true, external: true },
+  { id: 'map', href: '/map', label: 'Карта Тейвата', icon: 'map', footerColumn: 'Инструменты', footerOrder: 7 },
   { id: 'telegram', href: (_lang: Lang, social: Social) => social.telegram, label: 'Telegram-канал', icon: 'book', footerColumn: 'Сайт', footerOrder: 3, footerOnly: true, external: true },
   { id: 'discord', href: (_lang: Lang, social: Social) => social.discord, label: 'Discord-сервер', icon: 'book', footerColumn: 'Сайт', footerOrder: 4, footerOnly: true, external: true },
   { id: 'about', href: '/about/', label: 'О сайте', icon: 'book', footerColumn: 'Сайт', footerOrder: 5, footerOnly: true },
