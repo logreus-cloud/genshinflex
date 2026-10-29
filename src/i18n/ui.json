@@ -6778,5 +6778,89 @@
  "Меток пока нет — скоро добавим": {
   "en": "No markers yet — coming soon",
   "es": "Aún no hay marcadores — llegarán pronto"
+ },
+ "На проверке": {
+  "en": "Pending review",
+  "es": "Pendiente de revisión"
+ },
+ "Отозвать": {
+  "en": "Withdraw",
+  "es": "Retirar"
+ },
+ "Одобрить": {
+  "en": "Approve",
+  "es": "Aprobar"
+ },
+ "Удалить метку": {
+  "en": "Delete marker",
+  "es": "Eliminar marcador"
+ },
+ "Предложить метку": {
+  "en": "Suggest a marker",
+  "es": "Proponer un marcador"
+ },
+ "Нажмите на место на карте": {
+  "en": "Click a place on the map",
+  "es": "Haz clic en un lugar del mapa"
+ },
+ "Здесь нет карты": {
+  "en": "There is no map here",
+  "es": "Aquí no hay mapa"
+ },
+ "Метка отправлена на проверку": {
+  "en": "Marker sent for review",
+  "es": "Marcador enviado a revisión"
+ },
+ "Войдите, чтобы предлагать метки": {
+  "en": "Sign in to suggest markers",
+  "es": "Inicia sesión para proponer marcadores"
+ },
+ "Модерация карты": {
+  "en": "Map moderation",
+  "es": "Moderación del mapa"
+ },
+ "Очередь предложенных меток карты.": {
+  "en": "Queue of suggested map markers.",
+  "es": "Cola de marcadores propuestos para el mapa."
+ },
+ "Доступно только модераторам.": {
+  "en": "Available to moderators only.",
+  "es": "Disponible solo para moderadores."
+ },
+ "Открыть на карте": {
+  "en": "Open on map",
+  "es": "Abrir en el mapa"
+ },
+ "Тип метки": {
+  "en": "Marker type",
+  "es": "Tipo de marcador"
+ },
+ "Проверьте данные метки.": {
+  "en": "Check the marker details.",
+  "es": "Revisa los datos del marcador."
+ },
+ "Слишком много предложений, попробуйте позже.": {
+  "en": "Too many suggestions. Try again later.",
+  "es": "Demasiadas propuestas. Inténtalo más tarde."
+ },
+ "У вас слишком много меток на проверке.": {
+  "en": "You have too many markers pending review.",
+  "es": "Tienes demasiados marcadores pendientes de revisión."
+ },
+ "Такая метка здесь уже есть.": {
+  "en": "A marker like this already exists here.",
+  "es": "Ya existe un marcador como este aquí."
+ },
+ "Метка не найдена.": {
+  "en": "Marker not found.",
+  "es": "No se encontró el marcador."
+ },
+ "Недостаточно прав.": {
+  "en": "Insufficient permissions.",
+  "es": "Permisos insuficientes."
+ },
+ "Не удалось выполнить действие.": {
+  "en": "Couldn’t complete the action.",
+  "es": "No se pudo completar la acción."
  }
 }

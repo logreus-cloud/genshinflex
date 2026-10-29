@@ -1,0 +1,37 @@
+---
+import { useData, LANGS } from '../../../lib/data';
+import Layout from '../../../layouts/Layout.astro';
+
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Модерация карты')} description={t('Очередь предложенных меток карты.')} noindex>
+  <div class="forum" data-map-moderation>
+    <a href={`${base}/map/`}>{t('Карта')}</a>
+    <h1>{t('Модерация карты')}</h1>
+    <p class="status" data-status></p>
+    <div class="forum-list" data-list></div>
+    <button class="btn" type="button" data-more hidden>{t('Показать ещё')}</button>
+  </div>
+</Layout>
+
+<script>
+  import { onPage } from '../../../scripts/router';
+  import { initMapModeration } from '../../../scripts/map/moderation';
+
+  onPage((signal) => {
+    const root = document.querySelector<HTMLElement>('[data-map-moderation]');
+    if (root) void initMapModeration(root, signal);
+  });
+</script>
+
+<style>
+  .forum :global([hidden]) { display: none !important; }
+  .forum, .forum-list { display: grid; gap: 1rem; }
+  .forum-list { max-width: 900px; }
+  .forum :global(.forum-report) { display: grid; gap: .5rem; overflow-wrap: anywhere; }
+  .forum :global(.forum-actions) { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .forum :global(.map-marker-note) { white-space: pre-wrap; }
+  .forum :global(.map-marker-swatch) { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+  .forum > [data-more] { justify-self: start; }
+</style>

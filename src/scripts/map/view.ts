@@ -1,6 +1,7 @@
 import * as L from 'leaflet';
 import tiles from '../../data/map-tiles.json';
 import { MAP_TILES_URL } from '../../lib/platform';
+import { currentUser, getSupabase } from '../auth';
 import { loadMarkers, markerLayer } from './markers';
 import { createCollectedStore } from './collected';
 import 'leaflet/dist/leaflet.css';
@@ -47,6 +48,8 @@ export function mountMap(element: HTMLElement, options: MapOptions = {}): () => 
   }).addTo(map);
 
   let saved: SavedView | null = null;
+  const markerId = Number(new URLSearchParams(location.search).get('marker'));
+  const openMarker = Number.isSafeInteger(markerId) && markerId > 0 ? markerId : null;
   try { saved = JSON.parse(localStorage.getItem(VIEW_KEY) || 'null'); } catch {}
   if (saved && typeof saved.lat === 'number' && Number.isFinite(saved.lat)
     && typeof saved.lng === 'number' && Number.isFinite(saved.lng)
@@ -71,18 +74,57 @@ export function mountMap(element: HTMLElement, options: MapOptions = {}): () => 
   resize.observe(element);
 
   let destroyed = false;
-  let removeMarkers: (() => void) | undefined;
+  let layer: ReturnType<typeof markerLayer> | undefined;
   let collected: ReturnType<typeof createCollectedStore> | undefined;
-  void loadMarkers('surface').then((markers) => {
-    if (destroyed || !markers) return;
+  let request = 0;
+  let accountId: string | null | undefined;
+  let markerOpened = false;
+  const clearLayer = () => {
+    layer?.destroy();
+    layer = undefined;
+    collected?.dispose();
+    collected = undefined;
+  };
+  const reload = async () => {
+    const turn = ++request;
+    const user = await currentUser();
+    if (destroyed || turn !== request) return;
+    const userId = user?.id ?? null;
+    if (accountId !== undefined && accountId !== userId) return;
+    accountId = userId;
+    let moderator = false;
+    if (user) {
+      const result = await getSupabase().rpc('map_is_moderator');
+      if (destroyed || turn !== request) return;
+      moderator = !result.error && result.data === true;
+    }
+    const markers = await loadMarkers('surface');
+    if (destroyed || turn !== request || !markers) return;
+    clearLayer();
     collected = createCollectedStore(markers.map(marker => marker.id));
-    removeMarkers = markerLayer(map, markers, { ...options, collected });
+    layer = markerLayer(map, markers, {
+      ...options, collected, bounds,
+      role: { userId: user?.id ?? null, moderator },
+    });
+    if (openMarker && !markerOpened) markerOpened = layer.open(openMarker);
+  };
+  const { data: auth } = getSupabase().auth.onAuthStateChange((_event, session) => {
+    const userId = session?.user.id ?? null;
+    if (accountId === userId) return;
+    accountId = userId;
+    ++request;
+    clearLayer();
+    setTimeout(() => {
+      if (!destroyed) void reload();
+    }, 0);
   });
+  void reload();
   return () => {
     destroyed = true;
+    ++request;
+    auth.subscription.unsubscribe();
     resize.disconnect();
-    removeMarkers?.();
-    collected?.dispose();
+    clearLayer();
     map.remove();
   };
 }
