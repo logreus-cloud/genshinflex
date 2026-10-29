@@ -28,6 +28,17 @@ python apps/overlay/research/map-match/stitch.py --ref .cache/map-ref/ref_z11.pn
 `--gain` включён по умолчанию и выравнивает яркость по перекрытию; `--no-gain` отключает поправку.
 Эталон служит для привязки и локального сравнения; пиксели мозаики берутся из скриншотов.
 
+## Иконки (icons.py)
+
+Скрипт ищет иконки на склеенной карте и готовит метки для проверки перед первичным наполнением.
+
+```sh
+python apps/overlay/research/map-match/icons.py --mosaic .cache/map-stitch-gen5/mosaic_z12.png --stitch .cache/map-stitch-gen5/stitch.json --templates .cache/map-icons/templates --out .cache/map-icons/out --sql
+```
+
+В выводе лежат `icons.json` с координатами z12, контактные листы `review_<type>.jpg` (сомнительные совпадения первыми), `overview.jpg`, `histogram.txt` и, с флагом `--sql`, `markers.sql`. Масштабы, пороги и размер тайла задаются через `--scales`, `--threshold` и `--tile`.
+Шаблоны содержат иконки игры; они хранятся только в `.cache/` и не коммитятся.
+
 ## Результаты (19.10.2026)
 
 Прогон: эталон `tiles_twt672` z11 (7680×6656), скриншоты тестера — 37 шт. в 1080p (ru, полный экран) и 29 шт. в окне 1600 px (en), плюс 50 синтетических кадров. ПК на 12 ядер, замеры в один поток.
