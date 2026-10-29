@@ -141,7 +141,7 @@ function markerPopup(type: (typeof MARKER_TYPES)[number], marker: MapMarker, col
     let confirmed = false;
     const deletion = document.createElement('button');
     deletion.type = 'button';
-    deletion.className = 'gf-marker-popup__button';
+    deletion.className = 'gf-marker-popup__button gf-marker-popup__button--delete';
     deletion.textContent = t('Удалить метку');
     deletion.addEventListener('click', async () => {
       if (!confirmed) {

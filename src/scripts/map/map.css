@@ -9,6 +9,7 @@
 .gf-marker-popup { min-width: 120px; }
 .gf-marker-popup strong, .gf-marker-popup p { display: block; margin: 0 0 4px; white-space: pre-wrap; }
 .gf-marker-popup__button { margin-top: 6px; padding: 4px 8px; color: inherit; font: inherit; cursor: pointer; background: transparent; border: 1px solid var(--border, #56616f); border-radius: var(--radius, 10px); }
+.gf-marker-popup__button--delete { display: block; min-width: 9.5em; }
 .gf-marker-popup__button:disabled { opacity: 0.5; cursor: wait; }
 .gf-marker-popup__error { color: var(--danger, #dc7777); }
 
