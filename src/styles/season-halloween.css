@@ -52,7 +52,7 @@
 :root[data-season="halloween"] .shell > .top { background: var(--top-glass); backdrop-filter: blur(10px) saturate(1.2); }
 :root[data-season="halloween"] .shell > .top::after { content: ""; position: absolute; top: 100%; right: 0; left: 0; height: 68px; pointer-events: none; background: url('/img/season/halloween/garland.svg') left top / 1728px 68px repeat-x; }
 :root[data-season="halloween"] .top-logo { color: var(--halloween-orange); }
-:root[data-season="halloween"] .top-logo b { color: var(--halloween-orange); }
+:root[data-season="halloween"] .top-logo strong b { color: var(--halloween-orange); }
 :root[data-season="halloween"] .shell > .top .search-pill { border-color: var(--halloween-orange); border-radius: 999px; }
 :root[data-season="halloween"] .shell > .top .icon-btn { color: var(--halloween-orange); }
 @media (max-width: 700px) { :root[data-season="halloween"] .shell > .top::after { height: 40px; background-size: 1016px 40px; } }
