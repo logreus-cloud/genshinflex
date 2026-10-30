@@ -59,7 +59,7 @@ const newWeapons = weapons.filter((w) => w.version?.trim()).sort((a, b) => compa
   <HeroCarousel slides={slides} />
 
   <div class="feature-band">
-    <div class="hero-snow"><SnowDivider edge seed={0x0b1a5ed} /></div>
+    {season.theme === 'snezhnaya' && <div class="hero-snow"><SnowDivider edge seed={0x0b1a5ed} /></div>}
     <FeatureTabs heroIcon={slides[0]?.hero.icon} weaponImage={weaponImage} artifactIcon={latestArtifact?.icon} modes={modes} />
   </div>
 

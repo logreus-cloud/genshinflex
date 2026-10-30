@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import '../styles/season-snezhnaya.css';
+import '../styles/season-halloween.css';
 import QuickSearch from '../components/QuickSearch.astro';
 import { ClientRouter } from 'astro:transitions';
 import Splash from '../components/Splash.astro';
@@ -89,7 +90,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
   </head>
   <body>
     {season.theme && <div class="season-scene" aria-hidden="true" transition:persist="season-scene"></div>}
-    {season.theme && <div class="season-snow" aria-hidden="true" transition:persist="season-snow"><span class="snow-small"></span><span class="snow-medium"></span></div>}
+    {season.theme === 'snezhnaya' && <div class="season-snow" aria-hidden="true" transition:persist="season-snow"><span class="snow-small"></span><span class="snow-medium"></span></div>}
     {season.theme && <script>
       import { parallax } from '../scripts/parallax';
       const startSeasonParallax = () => {
