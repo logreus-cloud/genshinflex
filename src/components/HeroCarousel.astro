@@ -70,7 +70,6 @@ const { slides } = Astro.props;
     const focusFrames = new Set<number>();
     const measureHeight = () => {
       root.style.height = `${root.offsetHeight}px`;
-      const mobile = window.matchMedia('(max-width: 700px)').matches;
       let maxHeight = 0;
       slides.forEach((slide) => {
         const hidden = slide.hidden;
@@ -80,7 +79,7 @@ const { slides } = Astro.props;
         slide.style.visibility = 'hidden';
         slide.style.inset = '0 auto auto 0';
         slide.style.width = '100%';
-        slide.style.minHeight = mobile ? '0' : '400px';
+        slide.style.minHeight = 'var(--hc-min-h)';
         maxHeight = Math.max(maxHeight, slide.offsetHeight);
         if (style === null) slide.removeAttribute('style');
         else slide.setAttribute('style', style);
@@ -209,9 +208,9 @@ const { slides } = Astro.props;
   });
 </script>
 <style>
-  .carousel { --hc-bg: #1b1c23; --hc-text: #ececf0; --hc-muted: #c5c6ce; --hc-strong: #fff; --hc-name-base: white; --hc-name-ratio: 70%; --hc-stars: var(--accent); --hc-arrow: rgb(255 255 255 / .45); --hc-arrow-hover: #fff; --hc-arrow-shadow: 0 0 14px rgb(255 255 255 / .75), 0 0 2px #fff; --hc-dot: rgb(255 255 255 / .5); --hc-dot-active: rgb(255 255 255 / .35); --hc-fill: #fff; position: relative; margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; overflow-anchor: none; background: var(--hc-bg); }
+  .carousel { --hc-bg: #1b1c23; --hc-text: #ececf0; --hc-muted: #c5c6ce; --hc-strong: #fff; --hc-name-base: white; --hc-name-ratio: 70%; --hc-stars: var(--accent); --hc-arrow: rgb(255 255 255 / .45); --hc-arrow-hover: #fff; --hc-arrow-shadow: 0 0 14px rgb(255 255 255 / .75), 0 0 2px #fff; --hc-dot: rgb(255 255 255 / .5); --hc-dot-active: rgb(255 255 255 / .35); --hc-fill: #fff; --hc-min-h: 400px; position: relative; min-height: var(--hc-min-h); margin: -1.8rem calc(50% - 50vw) 3rem; overflow: hidden; overflow-anchor: none; background: var(--hc-bg); }
   .carousel.ready .slide { min-height: 100%; box-sizing: border-box; }
-  .slide { --bg-deep: var(--hc-bg); --hc-slide-bg: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 400px; overflow: hidden; isolation: isolate; color: var(--hc-text); background: var(--hc-slide-bg); }
+  .slide { --bg-deep: var(--hc-bg); --hc-slide-bg: linear-gradient(90deg, var(--bg-deep) 14%, color-mix(in srgb, var(--el) 55%, #dff) 100%); --hc-overlay-bg: linear-gradient(90deg, var(--bg-deep) 9%, transparent 80%); position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: var(--hc-min-h); overflow: hidden; isolation: isolate; color: var(--hc-text); background: var(--hc-slide-bg); }
   .slide[hidden] { display: none; }
   .slide.moving { position: absolute; top: 0; left: 0; width: 100%; }
   .slide.enter-forward { animation: enter-forward calc(var(--dur) * 2) var(--ease) both; }
@@ -268,8 +267,8 @@ const { slides } = Astro.props;
     .ready .dot.active .fill { animation: none; transform: scaleX(1); }
   }
   @media (max-width: 700px) {
-    .carousel { margin: -1.2rem -16px 2.5rem; }
-    .slide { min-height: 0; padding-top: 170px; touch-action: pan-y; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
+    .carousel { --hc-min-h: 0; margin: -1.2rem -16px 2.5rem; }
+    .slide { padding-top: 170px; touch-action: pan-y; background: linear-gradient(180deg, color-mix(in srgb, var(--el) 35%, var(--bg-deep)), var(--bg-deep) 75%); }
     .slide::after { background: linear-gradient(0deg, var(--bg-deep) 35%, transparent 80%); }
     .splash-art { right: 0; top: 0; width: 100%; height: 230px; opacity: .8; object-position: center top; }
     .namecard { inset: auto 0 auto 0; top: 0; height: 230px; mask-image: linear-gradient(180deg, #000 40%, transparent 100%); }
