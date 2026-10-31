@@ -3,16 +3,164 @@
     "id": "version-7.2",
     "kind": "version",
     "start": "2026-11-04T07:00",
-    "estimated": true,
     "title": {
       "ru": "Версия 7.2",
       "en": "Version 7.2",
       "es": "Versión 7.2"
     },
     "note": {
-      "ru": "Ожидается сразу после окончания 7.1",
-      "en": "Expected right after 7.1 ends",
-      "es": "Se espera justo al terminar la 7.1"
+      "ru": "Дата из официального календаря событий 7.2",
+      "en": "Date from the official 7.2 event calendar",
+      "es": "Fecha del calendario oficial de eventos de la 7.2"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-grand-defense",
+    "kind": "event",
+    "start": "2026-11-04T11:00",
+    "end": "2026-12-16T03:59",
+    "title": {
+      "ru": "Всеобщая оборона: Отпор",
+      "en": "The Grand Defense: Defy the Unjust Judgment",
+      "es": "Defensa global: Contra el castigo injusto"
+    },
+    "note": {
+      "ru": "Нужен архонтский квест, глава VII, акт V. Сюжет остаётся навсегда, ограничены по времени боевые испытания",
+      "en": "Requires Archon Quest Chapter VII, Act V. Story stays permanently; combat challenges are time-limited",
+      "es": "Requiere la misión del Arconte, capítulo VII, acto V. La historia es permanente; los desafíos de combate son temporales"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-keep-up-with-mitya",
+    "kind": "event",
+    "start": "2026-11-04T11:00",
+    "end": "2026-11-12T23:59",
+    "title": {
+      "ru": "Элементарно, Митя!",
+      "en": "Keep Up With Mitya!",
+      "es": "¡Síguele el paso a Mitya!"
+    },
+    "note": {
+      "ru": "Событие сообщества HoYoLAB",
+      "en": "HoYoLAB community event",
+      "es": "Evento de la comunidad de HoYoLAB"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-trial-of-the-usurper",
+    "kind": "event",
+    "start": "2026-11-16T10:00",
+    "end": "2026-11-26T23:59",
+    "title": {
+      "ru": "Испытание узурпации",
+      "en": "Trial of the Usurper",
+      "es": "Las pruebas de los usurpadores"
+    },
+    "note": {
+      "ru": "Событие сообщества HoYoLAB",
+      "en": "HoYoLAB community event",
+      "es": "Evento de la comunidad de HoYoLAB"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-stress-block-smashing",
+    "kind": "event",
+    "start": "2026-11-20T10:00",
+    "end": "2026-11-30T03:59",
+    "title": {
+      "ru": "План разрушения блоков давления",
+      "en": "Stress Block Smashing Project",
+      "es": "Plan de destrucción de bloques de presión"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-frames-of-fierce-splendor",
+    "kind": "event",
+    "start": "2026-11-27T10:00",
+    "end": "2026-12-07T03:59",
+    "title": {
+      "ru": "Хроника застывших теней",
+      "en": "Frames of Fierce Splendor",
+      "es": "Capturando lo épico"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-the-long-night",
+    "kind": "event",
+    "start": "2026-12-04T10:00",
+    "end": "2026-12-15T23:59",
+    "title": {
+      "ru": "Долгая ночь",
+      "en": "The Long Night",
+      "es": "La larga noche"
+    },
+    "note": {
+      "ru": "Браузерное событие",
+      "en": "Web event",
+      "es": "Evento web"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-ley-line-overflow-7-2",
+    "kind": "event",
+    "start": "2026-12-07T04:00",
+    "end": "2026-12-14T03:59",
+    "title": {
+      "ru": "Разлив артерий земли",
+      "en": "Ley Line Overflow",
+      "es": "Crecida de líneas ley"
+    },
+    "note": {
+      "ru": "Двойные награды за цветы опыта и моры",
+      "en": "Double rewards from Blossoms of Revelation and Wealth",
+      "es": "Recompensas dobles de las Flores de la Revelación y la Riqueza"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
+    }
+  },
+  {
+    "id": "event-temper-thyself-6",
+    "kind": "event",
+    "start": "2026-11-02T04:00",
+    "end": "2027-01-25T03:59",
+    "title": {
+      "ru": "Долгий путь совершенства: Период VI",
+      "en": "To Temper Thyself and Journey Far: Sixth Cycle",
+      "es": "Temple hacia un viaje lejano (VI)"
+    },
+    "source": {
+      "title": "HoYoLAB",
+      "url": "https://www.hoyolab.com/article/47177975"
     }
   },
   {
