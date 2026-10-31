@@ -499,6 +499,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
     void load();
     onSessionChange(() => { void load(); }, { signal });
+    document.addEventListener('gf:rewards-changed', () => { void load(); }, { signal });
   });
 </script>
 
@@ -938,6 +939,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   };
   void loadWishes();
   void loadRewards();
+  document.addEventListener('gf:rewards-changed', () => { void loadRewards(); }, { signal });
   onSessionChange(() => {
     sessionGeneration++;
     void loadRewards();
@@ -1502,6 +1504,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   @property --gf-aura-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
   .profile-card.hero[data-glow="crimson-aura"] { position: relative; box-shadow: 0 0 0 1px rgb(255 42 58 / .55), 0 0 28px rgb(255 20 40 / .28), 0 0 70px rgb(180 0 20 / .18); animation: crimson-aura-breathe 4s ease-in-out infinite, crimson-aura-glitch 7s linear infinite; }
   .profile-card.hero[data-glow="crimson-aura"]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--gf-aura-angle), transparent 0 70%, #ff2a3a 80%, #ffb3b8 83%, #ff2a3a 86%, transparent 95%); mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); pointer-events: none; animation: crimson-aura-turn 6s linear infinite; }
+  .profile-card.hero[data-glow="halloween-night"] { position: relative; box-shadow: 0 0 0 1px rgb(237 106 77 / .6), 0 0 30px rgb(251 3 79 / .32), 0 0 72px rgb(89 0 38 / .45); animation: halloween-night-breathe 5s ease-in-out infinite; }
+  .profile-card.hero[data-glow="halloween-night"]::before { content: ""; position: absolute; z-index: 1; top: 4px; left: 7%; width: 86%; height: 44px; background: linear-gradient(90deg, #590026, #fb034f 50%, #590026); -webkit-mask: url('/img/season/halloween/bat.svg') 6% 8px / 36px 17px no-repeat, url('/img/season/halloween/bat.svg') 49% 0 / 28px 14px no-repeat, url('/img/season/halloween/bat.svg') 91% 12px / 42px 20px no-repeat; mask: url('/img/season/halloween/bat.svg') 6% 8px / 36px 17px no-repeat, url('/img/season/halloween/bat.svg') 49% 0 / 28px 14px no-repeat, url('/img/season/halloween/bat.svg') 91% 12px / 42px 20px no-repeat; pointer-events: none; animation: halloween-bats-fly 16s ease-in-out infinite alternate; }
+  .profile-card.hero[data-glow="halloween-night"]::after { content: ""; position: absolute; z-index: 1; inset: 0; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--gf-aura-angle), transparent 0 70%, #ed6a4d 80%, #ffd4a1 83%, #fb034f 87%, transparent 95%); mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); pointer-events: none; animation: crimson-aura-turn 8s linear infinite; }
+  @keyframes halloween-night-breathe { 50% { box-shadow: 0 0 0 1px rgb(237 106 77 / .7), 0 0 40px rgb(251 3 79 / .42), 0 0 85px rgb(89 0 38 / .55); } }
+  @keyframes halloween-bats-fly { to { transform: translate(28px, -5px); } }
   @keyframes crimson-aura-turn { to { --gf-aura-angle: 360deg; } }
   @keyframes crimson-aura-breathe {
     50% { box-shadow: 0 0 0 1px rgb(255 42 58 / .65), 0 0 38px rgb(255 20 40 / .38), 0 0 85px rgb(180 0 20 / .24); }
@@ -1537,6 +1544,11 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .profile-root :global([data-frame="crimson-ring"] .frame-ring::before) { content: ""; position: absolute; inset: 5px; border: 1px solid rgb(255 90 90 / .55); border-radius: 50%; }
   .profile-root :global([data-frame="crimson-ring"] .frame-ring::after) { content: ""; position: absolute; inset: -5px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #ff3b4a 0deg 2deg, transparent 2deg 10deg); mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px)); animation: frame-turn 14s linear infinite; }
   .profile-root :global([data-frame="crimson-ring"] .frame-mark) { display: block; width: 2px; height: 8px; background: #ff3b4a; box-shadow: 0 0 7px #ff1f2e; transform: rotate(calc(var(--mark-index) * 45deg)) translateY(-55px); }
+  .profile-root :global([data-frame="pumpkin-lantern"] .frame-ring) { border: 3px solid #ed6a4d; box-shadow: 0 0 12px rgb(237 106 77 / .85), 0 0 26px rgb(237 106 77 / .4), inset 0 0 9px rgb(255 184 98 / .65); animation: halloween-ring-flicker 4.8s ease-in-out infinite alternate; }
+  .profile-root :global([data-frame="pumpkin-lantern"] .frame-ring::before) { content: ""; position: absolute; inset: 5px; border: 1px solid #fb034f; border-radius: 50%; }
+  .profile-root :global([data-frame="pumpkin-lantern"] .frame-ring::after) { content: ""; position: absolute; inset: -5px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #ed6a4d 0deg 4deg, transparent 4deg 15deg); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); animation: frame-turn 24s linear infinite; }
+  .profile-root :global([data-frame="pumpkin-lantern"] .frame-mark) { display: block; width: 6px; height: 6px; background: #ed6a4d; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); box-shadow: 0 0 7px #ed6a4d; transform: rotate(calc(var(--mark-index) * 45deg)) translateY(-55px); }
+  @keyframes halloween-ring-flicker { 50% { box-shadow: 0 0 18px rgb(237 106 77 / .95), 0 0 32px rgb(251 3 79 / .35), inset 0 0 13px rgb(255 184 98 / .8); } }
   @keyframes crimson-ring-pulse { 50% { box-shadow: 0 0 16px #ff1f2e, 0 0 30px rgb(255 20 40 / .6), inset 0 0 12px rgb(255 40 50 / .75); } }
   @keyframes crimson-ring-glitch { 0%, 95%, 98%, 100% { transform: translate(0); filter: brightness(1); } 96% { transform: translate(2px, -1px); filter: brightness(1.8); } 97% { transform: translate(-1px, 1px); filter: brightness(1.4); } }
   .edit-profile { position: absolute; z-index: 1; top: 1rem; right: 1rem; background: var(--surface); border-color: var(--profile-accent); }
@@ -1708,7 +1720,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .danger { border-color: var(--bad); color: var(--bad); }
   [hidden] { display: none !important; }
   @media (prefers-reduced-motion: reduce) {
-    .profile-root :global(.frame-decoration), .profile-root :global(.frame-ring), .profile-root :global(.frame-ring::after), .profile-card.hero[data-glow="crimson-aura"], .profile-card.hero[data-glow="crimson-aura"]::after { animation: none !important; }
+    .profile-root :global(.frame-decoration), .profile-root :global(.frame-ring), .profile-root :global(.frame-ring::after), .profile-card.hero[data-glow="crimson-aura"], .profile-card.hero[data-glow="crimson-aura"]::after, .profile-card.hero[data-glow="halloween-night"], .profile-card.hero[data-glow="halloween-night"]::before, .profile-card.hero[data-glow="halloween-night"]::after { animation: none !important; }
   }
   @media (max-width: 900px) { .profile-grid { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 700px) {
@@ -1741,8 +1753,14 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   }
   .title-chip[hidden] { display: none; }
   :global(:root[data-theme="light"]) .profile-card.hero[data-glow="crimson-aura"] { animation: none; box-shadow: 0 0 0 1px rgb(255 42 58 / .28), 0 0 28px rgb(255 20 40 / .14), 0 0 70px rgb(180 0 20 / .09); }
+  :global(:root[data-theme="light"]) .profile-card.hero[data-glow="halloween-night"] { animation: none; box-shadow: 0 0 0 1px rgb(237 106 77 / .3), 0 0 28px rgb(251 3 79 / .15), 0 0 70px rgb(89 0 38 / .1); }
+  :global(:root[data-theme="light"]) .profile-card.hero[data-glow="halloween-night"]::before { opacity: .55; }
+  :global(:root[data-theme="light"]) .profile-card.hero[data-glow="halloween-night"]::after { opacity: .6; }
   @media (prefers-color-scheme: light) {
     :global(:root:not([data-theme])) .profile-card.hero[data-glow="crimson-aura"] { animation: none; box-shadow: 0 0 0 1px rgb(255 42 58 / .28), 0 0 28px rgb(255 20 40 / .14), 0 0 70px rgb(180 0 20 / .09); }
+    :global(:root:not([data-theme])) .profile-card.hero[data-glow="halloween-night"] { animation: none; box-shadow: 0 0 0 1px rgb(237 106 77 / .3), 0 0 28px rgb(251 3 79 / .15), 0 0 70px rgb(89 0 38 / .1); }
+    :global(:root:not([data-theme])) .profile-card.hero[data-glow="halloween-night"]::before { opacity: .55; }
+    :global(:root:not([data-theme])) .profile-card.hero[data-glow="halloween-night"]::after { opacity: .6; }
   }
   .title-mark { font-size: .7em; }
   :global(:root[data-theme="light"]) .title-chip { color: color-mix(in srgb, var(--title-color) 70%, #000); }

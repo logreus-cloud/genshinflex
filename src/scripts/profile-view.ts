@@ -10,8 +10,8 @@ export type WishSummary = { label: string; total: number; fives: number; pity: {
 export type Avatar = { type: 'none' } | { type: 'character'; slug: string } | { type: 'upload' };
 export type CoverType = 'none' | 'namecard' | 'upload';
 export type BackgroundType = 'default' | 'namecard' | 'upload' | 'color';
-export type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss' | 'crimson-ring';
-export type Glow = 'none' | 'crimson-aura';
+export type Frame = 'none' | 'gold' | 'accent' | 'ice' | 'constellation' | 'flame' | 'petals' | 'abyss' | 'crimson-ring' | 'pumpkin-lantern';
+export type Glow = 'none' | 'crimson-aura' | 'halloween-night';
 export type Effect = 'none' | 'snow' | 'sparks' | 'petals' | 'stars' | 'fireflies' | 'blizzard';
 export type Framing = { x: number; y: number; zoom: number };
 export type Custom = { v: 1; nick: string; about: string; avatar: Avatar; media: Partial<Record<MediaKey, string>>; framing: Partial<Record<MediaKey, Framing>>; cover: string; coverType: CoverType; coverPosition: number; color: string; favorites: string[]; frame: Frame; glow: Glow; effect: Effect; intensity: number; background: { type: BackgroundType; slug: string; darken: number; blur: number; gradient: boolean } };
@@ -28,8 +28,8 @@ export const extraColors = [
   ['lavender', 'Лавандовый', '#a78bfa'], ['scarlet', 'Алый', '#ff4d5e'], ['silver', 'Серебро', '#c9d3e3'],
 ] as const;
 export const frames: [Frame, string][] = [['none', 'Без рамки'], ['gold', 'Золото'], ['accent', 'Цвет профиля'], ['ice', 'Лёд'], ['constellation', 'Созвездие'], ['flame', 'Пламя'], ['petals', 'Лепестки'], ['abyss', 'Бездна']];
-export const rewardFrames: [Frame, string][] = [['crimson-ring', 'Багровый взгляд']];
-export const glows: [Glow, string][] = [['none', 'Без свечения'], ['crimson-aura', 'Багровая аура']];
+export const rewardFrames: [Frame, string][] = [['crimson-ring', 'Багровый взгляд'], ['pumpkin-lantern', 'Тыквенный фонарь']];
+export const glows: [Glow, string][] = [['none', 'Без свечения'], ['crimson-aura', 'Багровая аура'], ['halloween-night', 'Ночь Хэллоуина']];
 export const exclusiveRewardIds = new Set<string>([...rewardFrames.map(([id]) => id), ...glows.filter(([id]) => id !== 'none').map(([id]) => id)]);
 export const effects: [Effect, string][] = [['none', 'Нет'], ['snow', 'Снегопад'], ['sparks', 'Искры'], ['petals', 'Лепестки'], ['stars', 'Звёздное небо'], ['fireflies', 'Светлячки'], ['blizzard', 'Метель']];
 export const elements = ['pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'];

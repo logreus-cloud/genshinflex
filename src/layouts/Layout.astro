@@ -103,6 +103,7 @@ const logoInner = season.theme === 'halloween' ? 'M16 11.2c3.8 0 6.4 2.4 6.4 6s-
       document.addEventListener('astro:page-load', startSeasonParallax);
       startSeasonParallax();
     </script>}
+    {season.theme === 'halloween' && <script>import '../scripts/halloween-claim';</script>}
     <Splash season={season.theme} />
     <a class="skip sr-only" href="#content">{t('К содержимому')}</a>
     <aside class="side" id="side" aria-label={t('Навигация')} aria-hidden="true" inert>

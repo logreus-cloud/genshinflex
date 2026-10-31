@@ -1,4 +1,20 @@
 {
+ "Тыквенный фонарь": {
+  "en": "Pumpkin Lantern",
+  "es": "Farol de calabaza"
+ },
+ "Ночь Хэллоуина": {
+  "en": "Halloween Night",
+  "es": "Noche de Halloween"
+ },
+ "Награда за Хэллоуин: рамка «Тыквенный фонарь», свечение «Ночь Хэллоуина» и титул «Хэллоуин 2026». Выбрать их можно в профиле.": {
+  "en": "Halloween reward: the “Pumpkin Lantern” frame, “Halloween Night” glow and “Halloween 2026” title. You can select them in your profile.",
+  "es": "Recompensa de Halloween: el marco «Farol de calabaza», el brillo «Noche de Halloween» y el título «Halloween 2026». Puedes elegirlos en tu perfil."
+ },
+ "Открыть профиль": {
+  "en": "Open profile",
+  "es": "Abrir perfil"
+ },
  "Тир-лист": {
   "en": "Tier list",
   "es": "Lista de niveles"
