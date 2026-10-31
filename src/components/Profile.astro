@@ -499,7 +499,6 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
 
     void load();
     onSessionChange(() => { void load(); }, { signal });
-    document.addEventListener('gf:rewards-changed', () => { void load(); }, { signal });
   });
 </script>
 
@@ -939,7 +938,6 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   };
   void loadWishes();
   void loadRewards();
-  document.addEventListener('gf:rewards-changed', () => { void loadRewards(); }, { signal });
   onSessionChange(() => {
     sessionGeneration++;
     void loadRewards();
