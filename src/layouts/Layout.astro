@@ -42,6 +42,7 @@ const footerCols = FOOTER_COLUMNS.map((title) => ({
     }),
 }));
 const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+const logoInner = season.theme === 'halloween' ? 'M16 11.2c3.8 0 6.4 2.4 6.4 6s-2.6 5.2-6.4 5.2-6.4-1.6-6.4-5.2 2.6-6 6.4-6ZM15 11.4v-2h1.2l.4-1.1 1.2.4-.5 2.7ZM11.6 15.8l2.8-1.8.4 3.2ZM20.4 15.8l-2.8-1.8-.4 3.2ZM11.6 18.4l2.1 1.5.5-.9 1.8 1.5 1.8-1.5.5.9 2.1-1.5-.8 2.4h-7.2Z' : 'M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z';
 ---
 <!doctype html>
 <html lang={lang} data-season={season.theme ?? undefined}>
@@ -107,7 +108,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     <aside class="side" id="side" aria-label={t('Навигация')} aria-hidden="true" inert>
       <div class="side-head">
         <a class="logo" href={`${base}/`}>
-          <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+          <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d={logoInner} fill="currentColor" fill-rule="evenodd"/></svg>
           <span>Genshin<b>Flex</b></span>
         </a>
         <button class="icon-btn side-close" type="button" aria-label={t('Закрыть меню')}>×</button>
@@ -154,7 +155,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
           <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" /></svg>
         </button>
         <a class="top-logo" href={`${base}/`}>
-          <svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+          <svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d={logoInner} fill="currentColor" fill-rule="evenodd"/></svg>
           <span><strong>Genshin<b>Flex</b></strong><small>{t('Билды, команды и многое другое!')}</small></span>
         </a>
         <div class="top-actions">
@@ -206,7 +207,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <div class="search-panel" id="search-panel" hidden><QuickSearch /></div>
       </header>
       <main id="content" class:list={['content', { wide }]}><slot /></main>
-      <SnowDivider />
+      {season.theme === 'halloween' ? <div class="halloween-footer-edge" aria-hidden="true"></div> : <SnowDivider />}
       <footer class="footer">
         <div class="f-grid">
           {footerCols.map(({ title, links }) => (
@@ -221,7 +222,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         <div class="f-bottom">
           <div class="f-brand">
             <a class="f-logo" href={`${base}/`}>
-              <svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8.5 22.5 12v8L16 23.5 9.5 20v-8Z" fill="currentColor"/></svg>
+              <svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d={logoInner} fill="currentColor" fill-rule="evenodd"/></svg>
               <span>Genshin<b>Flex</b></span>
             </a>
             <p>{t('Билды, команды и многое другое!')}</p>
