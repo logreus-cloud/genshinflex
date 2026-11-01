@@ -1,19 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
   "tileSize": 256,
-  "minZoom": 9,
-  "maxZoom": 12,
-  "boundsZ12": [
-    -9107,
-    -4288,
-    6176,
-    7776
-  ],
   "layers": [
-    {
-      "id": "surface",
-      "minZoom": 9,
-      "maxZoom": 12
-    }
+    { "id": "surface", "label": "Поверхность", "minZoom": 9, "maxZoom": 12, "boundsZ12": [-9107, -4288, 6176, 7776] },
+    { "id": "enkanomiya", "label": "Энканомия", "minZoom": 9, "maxZoom": 12, "boundsZ12": [-184, 108, 3918, 4053] },
+    { "id": "chasm", "label": "Разлом: подземные шахты", "minZoom": 9, "maxZoom": 12, "boundsZ12": [-908, 328, 2509, 2368] },
+    { "id": "sacred-mountain", "label": "Древняя священная гора", "minZoom": 9, "maxZoom": 12, "boundsZ12": [1474, 1383, 4310, 3636] }
   ]
 }

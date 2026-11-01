@@ -103,7 +103,10 @@ export async function initMapModeration(root: HTMLElement, signal: AbortSignal) 
         actions.className = 'forum-actions';
         const open = document.createElement('a');
         open.className = 'btn small';
-        open.href = `${BASE}/map/?marker=${row.id}`;
+        const params = new URLSearchParams();
+        params.set('layer', row.layer);
+        params.set('marker', String(row.id));
+        open.href = `${BASE}/map/?${params}`;
         open.target = '_blank';
         open.rel = 'noopener noreferrer';
         open.textContent = t('Открыть на карте');

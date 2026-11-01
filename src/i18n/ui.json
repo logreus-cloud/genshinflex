@@ -6870,5 +6870,25 @@
  "Не удалось выполнить действие.": {
   "en": "Couldn’t complete the action.",
   "es": "No se pudo completar la acción."
+ },
+ "Слой карты": {
+  "en": "Map layer",
+  "es": "Capa del mapa"
+ },
+ "Поверхность": {
+  "en": "Surface",
+  "es": "Superficie"
+ },
+ "Энканомия": {
+  "en": "Enkanomiya",
+  "es": "Enkanomiya"
+ },
+ "Разлом: подземные шахты": {
+  "en": "The Chasm: Underground Mines",
+  "es": "La Sima: Minas subterráneas"
+ },
+ "Древняя священная гора": {
+  "en": "Ancient Sacred Mountain",
+  "es": "Antigua Montaña Sagrada"
  }
 }

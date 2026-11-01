@@ -168,7 +168,7 @@ function markerPopup(type: (typeof MARKER_TYPES)[number], marker: MapMarker, col
 }
 
 export function markerLayer(map: L.Map, markers: MapMarker[], options: {
-  compact?: boolean; collected: CollectedStore; role: MapRole; bounds: L.LatLngBounds;
+  compact?: boolean; collected: CollectedStore; role: MapRole; bounds: L.LatLngBounds; layer: string;
 }): { destroy(): void; add(marker: MapMarker): void; open(id: number): boolean } {
   let destroyed = false;
   let hideCollected = false;
@@ -332,7 +332,7 @@ export function markerLayer(map: L.Map, markers: MapMarker[], options: {
     form.addEventListener('submit', async (submitEvent) => {
       submitEvent.preventDefault();
       const suggestion = {
-        p_layer: 'surface', p_type: typeInput.value, p_x: x, p_y: y,
+        p_layer: options.layer, p_type: typeInput.value, p_x: x, p_y: y,
         p_title: titleInput.value, p_note: noteInput.value,
       };
       submit.disabled = cancel.disabled = true;
