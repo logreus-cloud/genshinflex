@@ -63,8 +63,28 @@ try {
   const pages = build.match(/(\d+) page\(s\) built/)?.[1];
   if (pages) console.log(`   📄 страниц: ${pages}`);
   await step('Индексирую поиск', 'npx pagefind --site dist');
+  let indexNowPrepared = false;
+  if (!test && !process.argv.includes('--no-indexnow')) {
+    try {
+      const indexNow = await step('Готовлю IndexNow', 'node scripts/indexnow.mjs prepare');
+      for (const line of indexNow.split(/\r?\n/).filter((line) => line.startsWith('IndexNow:')))
+        console.log(`   ${line}`);
+      indexNowPrepared = true;
+    } catch {
+      console.warn('⚠️ Не удалось подготовить IndexNow');
+    }
+  }
   const out = await step(test ? 'Выкладываю тестовую версию' : 'Выкладываю на Cloudflare', `npx wrangler pages deploy dist --project-name genshinflex${branch ? ` --branch ${branch}` : ''}`);
   const url = out.match(/https:\/\/\S+\.pages\.dev\S*/)?.[0];
+  if (indexNowPrepared) {
+    try {
+      const indexNow = await step('Сообщаю поисковикам (IndexNow)', 'node scripts/indexnow.mjs submit');
+      for (const line of indexNow.split(/\r?\n/).filter((line) => line.startsWith('IndexNow:')))
+        console.log(`   ${line}`);
+    } catch {
+      console.warn('⚠️ Не удалось сообщить поисковикам через IndexNow');
+    }
+  }
   // Публикация новостей из Sanity в Discord — отдельная задача.
   if (!test && !process.argv.includes('--no-discord')) {
     try {
