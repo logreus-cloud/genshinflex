@@ -225,7 +225,11 @@ const jsonLd = b && {
             </div>
           )}
           {b.sources.length > 0 && (
-            <p class="muted small">{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`} rel="nofollow">{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`} rel="nofollow">{t('Дополнить гайд')}</a></p>
+            <>
+              <Fragment set:html="<!--noindex-->" />
+              <p class="muted small" data-nosnippet>{t('Источники')}: {b.sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.title}</a></>)}. {t('Тексты — наш пересказ.')} <a href={`${base}/feedback/?kind=data&from=/characters/${c.slug}/`} rel="nofollow">{t('Нашли ошибку в билде?')}</a>{' · '}<a href={`${base}/guides/editor/?c=${c.slug}`} rel="nofollow">{t('Дополнить гайд')}</a></p>
+              <Fragment set:html="<!--/noindex-->" />
+            </>
           )}
         </section>
 

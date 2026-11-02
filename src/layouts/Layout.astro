@@ -26,6 +26,24 @@ const ogImage = image ?? new URL('/og.png', Astro.site).toString();
 const path = Astro.url.pathname.replace(/^\/(en|es)(?=\/|$)/, '').replace(/\/$/, '') || '/';
 // Та же страница на других языках — для переключателя и hreflang
 const alt = (l: typeof lang) => new URL(`${prefixOf(l)}${path === '/' ? '' : path}/`, Astro.site).toString();
+const siteRoot = new URL('/', Astro.site).toString();
+const siteJsonLd = path === '/' ? {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite', '@id': `${siteRoot}#website`,
+      url: new URL(`${prefixOf(lang)}/`, siteRoot).toString(),
+      name: 'GenshinFlex', alternateName: ['Genshin Flex', 'genshinflex.com'],
+      inLanguage: lang, publisher: { '@id': `${siteRoot}#organization` },
+    },
+    {
+      '@type': 'Organization', '@id': `${siteRoot}#organization`,
+      name: 'GenshinFlex', url: siteRoot,
+      logo: new URL('/icon-512.png', Astro.site).toString(),
+      sameAs: [social.telegram, social.discord, 'https://github.com/logreus-cloud/genshinflex'].filter(Boolean),
+    },
+  ],
+} : undefined;
 const OG_LOCALE = { ru: 'ru_RU', en: 'en_US', es: 'es_ES' } as const;
 const linked = Object.fromEntries(SECTIONS.map((section) => [section.id, sectionHref(section, lang, social)]));
 const nav = NAV_GROUPS.map((group) => ({
@@ -64,6 +82,7 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="sitemap" href="/sitemap.xml" />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
+    {siteJsonLd && <script type="application/ld+json" set:html={JSON.stringify(siteJsonLd).replace(/</g, '\\u003c')} />}
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
