@@ -2,11 +2,11 @@
  "_meta": {
   "date": "2026-11-03",
   "source": "https://db.kqm.gg",
-  "entries": 6020,
-  "baseline": 5329,
-  "teams": 4214,
-  "shares": 356,
-  "pairs": 14070,
+  "entries": 6024,
+  "baseline": 5330,
+  "teams": 4215,
+  "shares": 355,
+  "pairs": 14079,
   "own": 8
  },
  "characters": {
@@ -27,7 +27,7 @@
   },
   "escoffier": {
    "support": {
-    "value": 1.1983880762926025,
+    "value": 1.1976990494236566,
     "n": 850,
     "best": {
      "id": "FzcfMQJmQw6j",
@@ -40,14 +40,14 @@
     }
    },
    "subdps": {
-    "value": 24749.01788151943,
-    "n": 22,
+    "value": 21458.100789267308,
+    "n": 21,
     "best": {
-     "id": "7ghprFmpTnKw",
+     "id": "LFN8jdKHpF7H",
      "team": [
-      "kamisato-ayaka",
+      "skirk",
       "furina",
-      "shenhe",
+      "sigewinne",
       "escoffier"
      ]
     }
@@ -55,7 +55,7 @@
   },
   "citlali": {
    "support": {
-    "value": 1.112309551620399,
+    "value": 1.1116704171454637,
     "n": 738,
     "best": {
      "id": "FzcfMQJmQw6j",
@@ -70,7 +70,7 @@
   },
   "bennett": {
    "support": {
-    "value": 1.0752422190778552,
+    "value": 1.0746169298523855,
     "n": 1276,
     "best": {
      "id": "FzcfMQJmQw6j",
@@ -130,7 +130,7 @@
   },
   "sucrose": {
    "support": {
-    "value": 1.0984204537877513,
+    "value": 1.097855363976296,
     "n": 600,
     "best": {
      "id": "6h7dhCQQCNbc",
@@ -161,7 +161,7 @@
   "furina": {
    "subdps": {
     "value": 26900.102086650084,
-    "n": 65,
+    "n": 64,
     "best": {
      "id": "dNTctfRbwMLN",
      "team": [
@@ -188,10 +188,24 @@
     }
    }
   },
-  "jahoda": {},
+  "jahoda": {
+   "support": {
+    "value": 1.0603285081282818,
+    "n": 10,
+    "best": {
+     "id": "DDG9TCNWWLMf",
+     "team": [
+      "flins",
+      "ineffa",
+      "columbina",
+      "jahoda"
+     ]
+    }
+   }
+  },
   "lauma": {
    "support": {
-    "value": 1.237994044862029,
+    "value": 1.2372926757478449,
     "n": 180,
     "best": {
      "id": "t8BrTMfrd6Dn",
@@ -221,7 +235,7 @@
   },
   "prune": {
    "support": {
-    "value": 1.2202616009896194,
+    "value": 1.2195818128157896,
     "n": 53,
     "best": {
      "id": "KFq9TgbqjWzL",
@@ -236,7 +250,7 @@
   },
   "nicole": {
    "support": {
-    "value": 1.2963679322328143,
+    "value": 1.2956305133088364,
     "n": 188,
     "best": {
      "id": "KFq9TgbqjWzL",
@@ -266,7 +280,7 @@
   },
   "shenhe": {
    "support": {
-    "value": 1.0419221488212171,
+    "value": 1.0413252575331375,
     "n": 576,
     "best": {
      "id": "wdWgfTPhWk77",
@@ -281,8 +295,8 @@
   },
   "yelan": {
    "support": {
-    "value": 1.12655844077148,
-    "n": 1423,
+    "value": 1.1258481939326468,
+    "n": 1424,
     "best": {
      "id": "p8Crm967dKBD",
      "team": [
@@ -309,7 +323,7 @@
   },
   "xilonen": {
    "support": {
-    "value": 1.139581187014683,
+    "value": 1.138925513378693,
     "n": 1095,
     "best": {
      "id": "kNgftcWMgtfT",
@@ -324,7 +338,7 @@
   },
   "lynette": {
    "support": {
-    "value": 1.009276508422468,
+    "value": 1.0086943749077004,
     "n": 534,
     "best": {
      "id": "FmbLb8TcpzkJ",
@@ -339,8 +353,8 @@
   },
   "candace": {
    "support": {
-    "value": 0.9593147020971885,
-    "n": 416,
+    "value": 0.9589340044809099,
+    "n": 417,
     "best": {
      "id": "gHkWHPnL7Rbz",
      "team": [
@@ -369,7 +383,7 @@
   },
   "rosaria": {
    "support": {
-    "value": 1.0101898424300282,
+    "value": 1.009603322479162,
     "n": 895,
     "best": {
      "id": "69nzHHMNJ8cJ",
@@ -384,8 +398,8 @@
   },
   "aino": {
    "support": {
-    "value": 1.0054489426315987,
-    "n": 26,
+    "value": 1.0052833934193435,
+    "n": 27,
     "best": {
      "id": "D8RCGKJR8tM6",
      "team": [
@@ -399,8 +413,8 @@
   },
   "nahida": {
    "support": {
-    "value": 1.0852984215234882,
-    "n": 853,
+    "value": 1.0845739041790097,
+    "n": 854,
     "best": {
      "id": "9HKFkCzLkMCL",
      "team": [
@@ -414,7 +428,7 @@
   },
   "mona": {
    "support": {
-    "value": 0.9593285155688266,
+    "value": 0.9587900281686818,
     "n": 476,
     "best": {
      "id": "nqJBpqKFzjnC",
@@ -429,8 +443,8 @@
   },
   "barbara": {
    "support": {
-    "value": 0.8626412156803541,
-    "n": 129,
+    "value": 0.8631384638353826,
+    "n": 130,
     "best": {
      "id": "6wgdRChgFgkq",
      "team": [
@@ -444,8 +458,8 @@
   },
   "xingqiu": {
    "support": {
-    "value": 1.0933687153186729,
-    "n": 1019,
+    "value": 1.092636808309746,
+    "n": 1020,
     "best": {
      "id": "RwCNHCBfCmDT",
      "team": [
@@ -487,7 +501,7 @@
   },
   "diona": {
    "support": {
-    "value": 0.9311027290057349,
+    "value": 0.9305740409616746,
     "n": 364,
     "best": {
      "id": "JRLrhkQDpgk8",
@@ -502,8 +516,8 @@
   },
   "dahlia": {
    "support": {
-    "value": 0.9873918037937967,
-    "n": 174,
+    "value": 0.9867291188921228,
+    "n": 175,
     "best": {
      "id": "MjqBJjtCpBdT",
      "team": [
@@ -532,7 +546,7 @@
   },
   "chevreuse": {
    "support": {
-    "value": 1.1391179436656351,
+    "value": 1.138455870752399,
     "n": 443,
     "best": {
      "id": "9LFLLKhWwgHm",
@@ -547,7 +561,7 @@
   },
   "ororon": {
    "support": {
-    "value": 1.0675406594418497,
+    "value": 1.0669254086856375,
     "n": 593,
     "best": {
      "id": "9LFLLKhWwgHm",
@@ -590,7 +604,7 @@
   },
   "kaeya": {
    "support": {
-    "value": 1.0296063172098404,
+    "value": 1.0290076283189609,
     "n": 271,
     "best": {
      "id": "CMTnCprkTfrL",
@@ -605,8 +619,8 @@
   },
   "traveler-hydro": {
    "support": {
-    "value": 0.9131058764696502,
-    "n": 63,
+    "value": 0.9130099774160171,
+    "n": 64,
     "best": {
      "id": "JfmwWJ9wGQrP",
      "team": [
@@ -646,7 +660,7 @@
   },
   "kaedehara-kazuha": {
    "support": {
-    "value": 1.0415038895104807,
+    "value": 1.0408971056195173,
     "n": 1256,
     "best": {
      "id": "djprtcCPkdtP",
@@ -721,7 +735,7 @@
   },
   "sigewinne": {
    "support": {
-    "value": 0.9964878167235389,
+    "value": 0.9959176772494193,
     "n": 234,
     "best": {
      "id": "LFN8jdKHpF7H",
@@ -736,7 +750,7 @@
   },
   "charlotte": {
    "support": {
-    "value": 0.9433605173532151,
+    "value": 0.9428257064593216,
     "n": 423,
     "best": {
      "id": "M8dHqNTHtRmm",
@@ -766,8 +780,8 @@
   },
   "kamisato-ayato": {
    "support": {
-    "value": 0.9682515239163416,
-    "n": 336,
+    "value": 0.9673022470053664,
+    "n": 337,
     "best": {
      "id": "MPrfBwBLkTqC",
      "team": [
@@ -822,7 +836,7 @@
   },
   "layla": {
    "support": {
-    "value": 0.9436916028305371,
+    "value": 0.9431486896502274,
     "n": 558,
     "best": {
      "id": "LtncqKF9H7Cf",
@@ -867,7 +881,7 @@
   },
   "kamisato-ayaka": {
    "support": {
-    "value": 1.1336621813364172,
+    "value": 1.1329904918688753,
     "n": 298,
     "best": {
      "id": "BQMzFRgR98Tm",
@@ -891,24 +905,11 @@
       "aloy"
      ]
     }
-   },
-   "carry": {
-    "value": 45775.68009554998,
-    "n": 2,
-    "best": {
-     "id": "7ghprFmpTnKw",
-     "team": [
-      "kamisato-ayaka",
-      "furina",
-      "shenhe",
-      "escoffier"
-     ]
-    }
    }
   },
   "wriothesley": {
    "support": {
-    "value": 1.0267387626775017,
+    "value": 1.0261281492986207,
     "n": 314,
     "best": {
      "id": "MT8QBLWzKjFr",
@@ -936,7 +937,7 @@
   },
   "chongyun": {
    "support": {
-    "value": 0.9451658126271386,
+    "value": 0.9446259466565345,
     "n": 467,
     "best": {
      "id": "BLKw7gNMgkJN",
@@ -979,7 +980,7 @@
   },
   "mika": {
    "support": {
-    "value": 0.9226491139076115,
+    "value": 0.922117751237553,
     "n": 319,
     "best": {
      "id": "LMQFDTQW9QQQ",
@@ -1024,7 +1025,7 @@
   },
   "tartaglia": {
    "support": {
-    "value": 0.9465152811992664,
+    "value": 0.9459551827633577,
     "n": 185,
     "best": {
      "id": "HgFzBnH7WpRt",
@@ -1080,7 +1081,7 @@
   },
   "aloy": {
    "support": {
-    "value": 0.8827747053190991,
+    "value": 0.8822657301665592,
     "n": 54,
     "best": {
      "id": "kT9KKRQHrPJm",
@@ -1110,7 +1111,7 @@
   },
   "xianyun": {
    "support": {
-    "value": 1.0778530348878672,
+    "value": 1.0772275173185175,
     "n": 805,
     "best": {
      "id": "BGgKcmcr7WkR",
@@ -1168,7 +1169,7 @@
   },
   "eula": {
    "support": {
-    "value": 0.983665355478888,
+    "value": 0.9830810175203768,
     "n": 236,
     "best": {
      "id": "Gm6KKKLCDT8m",
@@ -1211,7 +1212,7 @@
   },
   "qiqi": {
    "support": {
-    "value": 0.8647602621146357,
+    "value": 0.8642604582723589,
     "n": 109,
     "best": {
      "id": "C6b9NjPTNbMk",
@@ -1226,7 +1227,7 @@
   },
   "kirara": {
    "support": {
-    "value": 1.0058552240040337,
+    "value": 1.0052704063050553,
     "n": 403,
     "best": {
      "id": "mhbccfFBFqFn",
@@ -1254,7 +1255,7 @@
     }
    },
    "support": {
-    "value": 1.058376047339703,
+    "value": 1.0577641212752062,
     "n": 879,
     "best": {
      "id": "WPwTfHb8grpb",
@@ -1269,7 +1270,7 @@
   },
   "faruzan": {
    "support": {
-    "value": 1.058526713045349,
+    "value": 1.0579128690730901,
     "n": 199,
     "best": {
      "id": "gf6NkPnJFPjF",
@@ -1314,7 +1315,7 @@
   },
   "albedo": {
    "support": {
-    "value": 0.9560167161396504,
+    "value": 0.9554758344060426,
     "n": 318,
     "best": {
      "id": "PjF69wpBpgmL",
@@ -1357,7 +1358,7 @@
   },
   "amber": {
    "support": {
-    "value": 0.8412063440665313,
+    "value": 0.8407130945533522,
     "n": 80,
     "best": {
      "id": "JLPQHzdNJpDB",
@@ -1372,7 +1373,7 @@
   },
   "arataki-itto": {
    "support": {
-    "value": 0.9012703316239246,
+    "value": 0.9007467938005984,
     "n": 85,
     "best": {
      "id": "fcbLgdBbC7bF",
@@ -1400,7 +1401,7 @@
   },
   "baizhu": {
    "support": {
-    "value": 0.9902711002255657,
+    "value": 0.9896944415289441,
     "n": 524,
     "best": {
      "id": "TgPTW6JTJCLc",
@@ -1428,7 +1429,7 @@
     }
    },
    "support": {
-    "value": 0.9583799400657171,
+    "value": 0.9578200485852165,
     "n": 219,
     "best": {
      "id": "CrRmHmjrQrgr",
@@ -1471,7 +1472,7 @@
     }
    },
    "support": {
-    "value": 0.9819309232860302,
+    "value": 0.9813642350954841,
     "n": 1015,
     "best": {
      "id": "MRTFmLBb7cMM",
@@ -1486,7 +1487,7 @@
   },
   "collei": {
    "support": {
-    "value": 0.9457534369852986,
+    "value": 0.9451753287717287,
     "n": 182,
     "best": {
      "id": "wztH7krjDNbb",
@@ -1542,7 +1543,7 @@
     }
    },
    "support": {
-    "value": 0.9498255445310769,
+    "value": 0.9492724512907983,
     "n": 220,
     "best": {
      "id": "GhzmbLLJmKcq",
@@ -1557,7 +1558,7 @@
   },
   "dehya": {
    "support": {
-    "value": 0.9053952309456517,
+    "value": 0.9048685055137105,
     "n": 351,
     "best": {
      "id": "9LnFLh9MNqQH",
@@ -1587,7 +1588,7 @@
   },
   "dori": {
    "support": {
-    "value": 1.0002621477760851,
+    "value": 0.9996913457538493,
     "n": 259,
     "best": {
      "id": "QdNGpnCDLjHL",
@@ -1643,7 +1644,7 @@
   },
   "gorou": {
    "support": {
-    "value": 0.9754572281004633,
+    "value": 0.9749040526422923,
     "n": 95,
     "best": {
      "id": "RwzfgtngJjkJ",
@@ -1686,7 +1687,7 @@
   },
   "jean": {
    "support": {
-    "value": 0.9626730682247139,
+    "value": 0.962115655935497,
     "n": 407,
     "best": {
      "id": "gdbJLcc8BGFN",
@@ -1701,7 +1702,7 @@
   },
   "traveler-pyro": {
    "support": {
-    "value": 1.0532791388296396,
+    "value": 1.052685510178932,
     "n": 320,
     "best": {
      "id": "NBgwgHcGHNcH",
@@ -1729,7 +1730,7 @@
     }
    },
    "support": {
-    "value": 0.9196789970773134,
+    "value": 0.9191396546042003,
     "n": 82,
     "best": {
      "id": "p8wq8NbGBtQh",
@@ -1772,7 +1773,7 @@
     }
    },
    "support": {
-    "value": 1.0642747056150585,
+    "value": 1.0636611457059977,
     "n": 237,
     "best": {
      "id": "frPPqjzbfWTd",
@@ -1800,7 +1801,7 @@
   },
   "kujou-sara": {
    "support": {
-    "value": 1.002119665999901,
+    "value": 1.0015361603200548,
     "n": 269,
     "best": {
      "id": "7KDWzpphmLmm",
@@ -1828,7 +1829,7 @@
     }
    },
    "support": {
-    "value": 0.9753653542210031,
+    "value": 0.9748041314852139,
     "n": 425,
     "best": {
      "id": "KPBbHPMRQcNK",
@@ -1843,7 +1844,7 @@
   },
   "lisa": {
    "support": {
-    "value": 1.0119832117983942,
+    "value": 1.0113964605342403,
     "n": 582,
     "best": {
      "id": "FtzDCgdhcTqH",
@@ -1886,7 +1887,7 @@
   },
   "sayu": {
    "support": {
-    "value": 0.9493500969541451,
+    "value": 0.948807878467393,
     "n": 194,
     "best": {
      "id": "HgTDB9JWg6tT",
@@ -1901,7 +1902,7 @@
   },
   "shikanoin-heizou": {
    "support": {
-    "value": 0.9824140589052107,
+    "value": 0.9818486191114005,
     "n": 155,
     "best": {
      "id": "7qrhrbqBKQP9",
@@ -1916,7 +1917,7 @@
   },
   "thoma": {
    "support": {
-    "value": 0.9552788833847629,
+    "value": 0.9547250926641405,
     "n": 316,
     "best": {
      "id": "RqJncdBNLCQ6",
@@ -1944,7 +1945,7 @@
     }
    },
    "support": {
-    "value": 1.0151867187699977,
+    "value": 1.014593466227337,
     "n": 218,
     "best": {
      "id": "dmFptgHRLgrT",
@@ -1959,7 +1960,7 @@
   },
   "traveler-anemo": {
    "support": {
-    "value": 0.9471547886482362,
+    "value": 0.9466179734184521,
     "n": 132,
     "best": {
      "id": "pjqpwNdGrjcp",
@@ -1974,7 +1975,7 @@
   },
   "traveler-dendro": {
    "support": {
-    "value": 0.9846206604061015,
+    "value": 0.9840277725096993,
     "n": 166,
     "best": {
      "id": "CJGtJcWHTczD",
@@ -1989,7 +1990,7 @@
   },
   "traveler-electro": {
    "support": {
-    "value": 0.9593714525505493,
+    "value": 0.9588516065629407,
     "n": 60,
     "best": {
      "id": "7T6RHqFN6Ltf",
@@ -2004,7 +2005,7 @@
   },
   "traveler-geo": {
    "support": {
-    "value": 1.004578407069316,
+    "value": 1.0040225470238306,
     "n": 90,
     "best": {
      "id": "C7GCNHgqCgGM",
@@ -2032,7 +2033,7 @@
   },
   "venti": {
    "support": {
-    "value": 0.9396949132609409,
+    "value": 0.9391565337560858,
     "n": 114,
     "best": {
      "id": "dgrnFfccBCDb",
@@ -2047,7 +2048,7 @@
   },
   "xinyan": {
    "support": {
-    "value": 0.8735567839846845,
+    "value": 0.8730500750997648,
     "n": 233,
     "best": {
      "id": "kfgzk9DLhJ7q",
@@ -2077,7 +2078,7 @@
   },
   "yaoyao": {
    "support": {
-    "value": 0.9266733149571448,
+    "value": 0.9261310040797105,
     "n": 248,
     "best": {
      "id": "BWdzkwfD6HkF",
@@ -2107,7 +2108,7 @@
   },
   "yumemizuki-mizuki": {
    "support": {
-    "value": 0.9207400172358746,
+    "value": 0.920251979142396,
     "n": 39,
     "best": {
      "id": "td98bJWKcqjH",
@@ -2135,7 +2136,7 @@
   },
   "yun-jin": {
    "support": {
-    "value": 0.9544212047368782,
+    "value": 0.9538729172831707,
     "n": 186,
     "best": {
      "id": "crQPFDNczRjC",
@@ -2257,6 +2258,17 @@
    "dps": 138088,
    "targets": 1,
    "reaction": "freeze"
+  },
+  {
+   "id": "kqm-c7247e22-5793-4797-98a9-21065318de3b",
+   "m": [
+    "columbina",
+    "ineffa",
+    "lauma",
+    "jahoda"
+   ],
+   "dps": 137555,
+   "targets": 1
   },
   {
    "id": "kNgftcWMgtfT",
@@ -4547,8 +4559,7 @@
     "escoffier"
    ],
    "dps": 100222,
-   "targets": 1,
-   "reaction": "freeze"
+   "targets": 1
   },
   {
    "id": "BFgrbccMDJQR",
@@ -4678,18 +4689,6 @@
    "reaction": "freeze"
   },
   {
-   "id": "own:sandrone",
-   "m": [
-    "sandrone",
-    "odette",
-    "yae-miko",
-    "alyosha"
-   ],
-   "dps": 99230,
-   "targets": 1,
-   "reaction": "stellar-conduct"
-  },
-  {
    "id": "ffBLNtrJRJnp",
    "m": [
     "mavuika",
@@ -4700,6 +4699,18 @@
    "dps": 99198,
    "targets": 1,
    "reaction": "melt"
+  },
+  {
+   "id": "own:sandrone",
+   "m": [
+    "sandrone",
+    "odette",
+    "yae-miko",
+    "alyosha"
+   ],
+   "dps": 99182,
+   "targets": 1,
+   "reaction": "stellar-conduct"
   },
   {
    "id": "rpG6whzjcDWm",
