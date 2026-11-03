@@ -51,6 +51,10 @@
   "en": "More details in the list",
   "es": "Más detalles en la lista"
  },
+ "Характеристики пока неизвестны.": {
+  "en": "Stats are not known yet.",
+  "es": "Las estadísticas aún no se conocen."
+ },
  "эксп.": {
   "en": "expert",
   "es": "experto"
@@ -2650,6 +2654,10 @@
  "Материал с еженедельного босса": {
   "en": "Weekly boss material",
   "es": "Material de jefe semanal"
+ },
+ "Материалы пока неизвестны.": {
+  "en": "Materials are not known yet.",
+  "es": "Los materiales aún no se conocen."
  },
  "Материалы": {
   "en": "Materials",

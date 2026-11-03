@@ -1,0 +1,145 @@
+name: Автообновление данных игры
+
+# Подтягивает свежие данные игры (genshin-db, HoYoLAB, paimon.moe, AnimeGameData, enka) и выкладывает сайт.
+# Каждые 3 часа — проверка: выкладка только при новых данных. Раз в день — пересборка в любом случае:
+# текущая версия, баннеры и календарь на главной считаются в момент сборки.
+on:
+  schedule:
+    - cron: '20 */3 * * *'
+    - cron: '40 3 * * *'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Выложить сайт, даже если данные не изменились
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: patch-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      DATA_PATHS: src/data/generated public/data public/img package.json package-lock.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Установить зависимости
+        run: |
+          npm ci
+          pip install pillow
+
+      - name: Обновить genshin-db
+        id: db
+        shell: bash
+        run: |
+          before=$(node -p "require('genshin-db/package.json').version")
+          npm install genshin-db@latest --no-audit --no-fund
+          after=$(node -p "require('genshin-db/package.json').version")
+          echo "version=$after" >> "$GITHUB_OUTPUT"
+          echo "genshin-db: $before → $after"
+          echo "genshin-db: $before → $after" >> "$GITHUB_STEP_SUMMARY"
+
+      # Источник может не ответить: тогда откатываем частично обновлённые данные и работаем со старыми,
+      # чтобы ежедневная пересборка всё равно прошла (даты на главной считаются при сборке)
+      - name: Импорт данных
+        id: import
+        continue-on-error: true
+        run: npm run import
+
+      - name: Проверить изменения
+        id: diff
+        shell: bash
+        env:
+          IMPORT: ${{ steps.import.outcome }}
+        run: |
+          if [[ "$IMPORT" != success ]]; then
+            git checkout -- $DATA_PATHS
+            git clean -fdq -- $DATA_PATHS
+            npm ci --no-audit --no-fund
+            echo "::warning::Импорт данных упал, оставлены прежние данные"
+            echo "Импорт данных упал, оставлены прежние данные" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          files=$(git status --porcelain -- $DATA_PATHS)
+          if [[ -n "$files" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "Изменённые файлы:"
+              echo '```'
+              echo "$files" | head -30
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Новых данных нет" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Решить, выкладывать ли
+        id: decide
+        shell: bash
+        env:
+          CHANGED: ${{ steps.diff.outputs.changed }}
+          SCHEDULE: ${{ github.event.schedule }}
+          EVENT: ${{ github.event_name }}
+          FORCE: ${{ inputs.deploy }}
+        run: |
+          if [[ "$CHANGED" == true || "$SCHEDULE" == '40 3 * * *' || ( "$EVENT" == workflow_dispatch && "$FORCE" == true ) ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Тесты
+        if: steps.decide.outputs.deploy == 'true'
+        run: npm test
+
+      - name: Собрать и выложить
+        if: steps.decide.outputs.deploy == 'true'
+        env:
+          I18N_STRICT: '1'
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # Явно main (production-ветка Pages), как в deploy-sanity.yml
+        run: node scripts/deploy.mjs --sanity --no-discord --branch=main
+
+      # Коммит только после успешной выкладки, чтобы репозиторий не опережал прод
+      - name: Закоммитить данные
+        if: steps.decide.outputs.deploy == 'true' && steps.diff.outputs.changed == 'true'
+        shell: bash
+        env:
+          VERSION: ${{ steps.db.outputs.version }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898+github-actions[bot]@users.noreply.github.com'
+          git add -- $DATA_PATHS
+          git commit -m "Данные: автообновление (genshin-db $VERSION)"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            echo "main ушёл вперёд, попытка $attempt: rebase"
+            git pull --rebase origin main || { echo "Конфликт с main при rebase, данные не запушены" >&2; exit 1; }
+          done
+          echo "Не удалось запушить данные за 3 попытки" >&2
+          exit 1
+
+      - name: Ссылка на сайт
+        if: steps.decide.outputs.deploy == 'true'
+        run: |
+          echo "Выкладка: [https://genshinflex.com](https://genshinflex.com)" >> "$GITHUB_STEP_SUMMARY"

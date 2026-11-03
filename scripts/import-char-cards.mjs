@@ -4,6 +4,7 @@
 // Сплэши беты берутся из public/img/beta/<slug>-splash.webp. Уже готовые не трогаем; --force — пересоздать все.
 // Запуск: node scripts/import-char-cards.mjs [--force]
 import fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
@@ -14,7 +15,8 @@ const characters = JSON.parse(await fs.readFile(path.join(root, 'src/data/genera
 const beta = JSON.parse(await fs.readFile(path.join(root, 'src/data/beta-characters.json'), 'utf8')).characters;
 const list = [
   ...(Array.isArray(characters) ? characters : Object.values(characters)),
-  ...beta.map((b) => ({ slug: b.slug, splash: path.join(root, `public/img/beta/${b.slug}-splash.webp`) })),
+  // Бета без сплэша (утечка без арта) пропускается
+  ...beta.map((b) => ({ slug: b.slug, splash: path.join(root, `public/img/beta/${b.slug}-splash.webp`) })).filter((b) => existsSync(b.splash)),
 ];
 const faces = JSON.parse(await fs.readFile(path.join(root, 'src/data/char-card-faces.json'), 'utf8'));
 await fs.mkdir(out, { recursive: true });

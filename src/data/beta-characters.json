@@ -169,6 +169,1146 @@
           "analysis": "Valery es un espadachín Electro 4★ y, en esencia, un potenciador al estilo de Shenhe o Yun Jin, pero para Electro. Acumula Potencial de Asalto con su Habilidad Elemental y su Habilidad Definitiva, lo gasta en Fuego Directo de Mortero (320% ATQ) y reparte 15 acumulaciones de Órdenes de Avance y Supresión: cada golpe Electro del personaje activo recibe daño extra basado en el ATQ de Valery. Por eso escala con ATQ: su estadística de ascensión es ATQ % y, con el Potencial al máximo, su pasiva añade hasta +90% de ATQ a la bonificación de cada acumulación.\n\nSu sinergia principal es con Mitya. Dentro de un Campo de Luz Estelar Polar, Valery entra en Resplandor, y las acumulaciones pasan a aplicarse al daño de Superconducción Estelar con una bonificación unas tres veces mayor (88% de ATQ en lugar de 29%, y 0,9% en lugar de 0,3% por punto). Fuera de esos equipos puede ayudar igualmente a impulsores Electro como Clorinde, Raiden o Varesa, aunque menos.\n\nC1 resuelve su energía, C2 da al equipo +100 de Maestría Elemental y C6 duplica el daño del disparo y añade CRIT: una línea de constelaciones muy fuerte para un 4★. Su Habilidad Elemental y su Habilidad Definitiva aún no se han filtrado, así que esta valoración es preliminar."
         }
       }
+    },
+    {
+      "slug": "danica",
+      "rarity": 4,
+      "element": "electro",
+      "weapon": "sword",
+      "stats": null,
+      "materials": [],
+      "i18n": {
+        "ru": {
+          "name": "Даника",
+          "nameEn": "Danica"
+        },
+        "en": {
+          "name": "Danica",
+          "nameEn": "Danica"
+        },
+        "es": {
+          "name": "Danica",
+          "nameEn": "Danica"
+        }
+      },
+      "kit": {
+        "ru": {
+          "normal": {
+            "name": "Название пока неизвестно",
+            "description": "Обычная атака\nДо 4 последовательных ударов мечом.\n\nЗаряженная атака\nРасходует выносливость, нанося серию быстрых ударов. В конце выполняет особенно мощный удар.\n\nАтака в падении\nПадает на землю с высоты, поражая врагов на пути, и при приземлении наносит урон по площади.",
+            "scaling": []
+          },
+          "skill": {
+            "name": "Название пока неизвестно",
+            "level": 10,
+            "description": "Даника размахивает цепью с якорем, нанося ближайшим врагам Электро урон по площади, и призывает якорь, который следует за активным персонажем. Пока якорь существует, он помогает по-разному в зависимости от того, на поле ли Даника.\n\nДаника вне поля боя\nКогда Электро или Крио атаки активного персонажа попадают по врагу, якорь проводит совместную атаку и наносит Электро урон по площади в месте нахождения врага. Не чаще раза в 1,5 сек.\n\nДаника на поле боя\nОбычные атаки заменяются особыми атаками якорем: они наносят Электро урон, который нельзя заменить другим элементом, и считаются уроном обычной атаки.\n\nОчки возбуждения\nПока якорь существует, Даника копит очки возбуждения (максимум 100):\n• вне поля: 50 очков, когда Электро или Крио атака активного персонажа попадает по врагу, не чаще раза в 0,1 сек.;\n• на поле: 25 очков за попадание особой атакой якорем, не больше одного раза за этап обычной атаки.\nВ форме Горничной-хранительницы очки дают только попадания Электро и Крио атак активного персонажа, в форме Боевой горничной — только особые атаки якорем.\nПри полном запасе Даника тратит все очки на особый навык «Вступление E2» или «На поле E2» и переходит в соответствующую форму горничной.\n\n«Вступление E2»\nСрабатывает автоматически, когда на Данику переключаются при полном запасе очков. Даника цепью притягивается к врагу и бьёт якорем о землю, нанося Электро урон по площади, который считается уроном «Звёздной сверхпроводимости». Затем она переходит в форму Горничной-хранительницы: обновляет длительность якоря и даёт активному персонажу щит, который зависит от её силы атаки, поглощает Электро урон с эффективностью 250% и держится, пока Даника в этой форме.\n\n«На поле E2»\nКогда Даника на поле и очки возбуждения на максимуме, навык заменяется на «На поле E2»: мощный удар якорем с Электро уроном по площади, который считается уроном «Звёздной сверхпроводимости». Затем Даника переходит в форму Боевой горничной: после каждого «На поле E2» следующая серия атак якорем пропускает один этап, всего можно пропустить до трёх первых этапов и сразу перейти к последнему удару. После пяти использований «На поле E2» Даника выходит из формы, а якорь исчезает.\n\nОграничения форм\nКогда якорь исчезает, Даника выходит из текущей формы. Пока якорь существует, обе формы не могут быть активны одновременно, и переключиться из одной в другую нельзя.",
+            "scaling": [
+              [
+                "Урон навыка",
+                "77,0%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» от «Вступление E2»",
+                "122,1%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» от «На поле E2»",
+                "143,7%"
+              ],
+              [
+                "Урон совместной атаки якоря",
+                "68,5%"
+              ],
+              [
+                "Поглощение щита",
+                "420,2% силы атаки + 3220,4"
+              ],
+              [
+                "Электро урон 1-й атаки якорем",
+                "132,6%"
+              ],
+              [
+                "Электро урон 2-й атаки якорем",
+                "121,3%"
+              ],
+              [
+                "Электро урон 3-й атаки якорем",
+                "79,1% × 2"
+              ],
+              [
+                "Электро урон 4-й атаки якорем",
+                "193,9%"
+              ],
+              [
+                "Длительность якоря",
+                "25 сек."
+              ],
+              [
+                "Перезарядка «Вступление E2»",
+                "14 сек."
+              ],
+              [
+                "Перезарядка навыка",
+                "18 сек."
+              ]
+            ]
+          },
+          "burst": {
+            "name": "Название пока неизвестно",
+            "level": 10,
+            "description": "С достоинством приближённой императрицы Даника наносит пять мощных атак по большой площади с Электро уроном.\n\nСияние · Звёздная сверхпроводимость\nПервая и пятая атаки дополнительно наносят Электро урон по площади, который считается уроном «Звёздной сверхпроводимости».\n\nНа время после взрыва стихии текущая форма горничной получает усиление (оно пропадает вместе с формой):\n• Горничная-хранительница: сила атаки всех персонажей отряда повышается;\n• Боевая горничная: Даника сразу восстанавливает все очки возбуждения, а урон «На поле E2» повышается.",
+            "scaling": [
+              [
+                "Электро урон 1-й атаки / урон «Звёздной сверхпроводимости»",
+                "134,6% / 79,6%"
+              ],
+              [
+                "Электро урон 2-й / 3-й / 4-й атаки",
+                "21,3%"
+              ],
+              [
+                "Электро урон 5-й атаки / урон «Звёздной сверхпроводимости»",
+                "155,9% / 119,3%"
+              ],
+              [
+                "Повышение силы атаки",
+                "12,5% силы атаки Даники"
+              ],
+              [
+                "Максимальное повышение силы атаки",
+                "500"
+              ],
+              [
+                "Повышение урона «На поле E2»",
+                "70,3%"
+              ],
+              [
+                "Длительность усиления",
+                "20 сек."
+              ],
+              [
+                "Перезарядка",
+                "15 сек."
+              ],
+              [
+                "Энергия",
+                "60"
+              ]
+            ]
+          },
+          "passives": [
+            {
+              "name": "Первый талант возвышения",
+              "description": "Сопротивление Электро у врагов вокруг якоря снижается на 15%.\nВ состоянии «Сияние · Звёздная сверхпроводимость» сопротивление Электро снижается ещё на 15%, а сопротивление Крио — на 30%."
+            },
+            {
+              "name": "Второй талант возвышения",
+              "description": "После «Вступление E2» сила атаки Даники повышается на 20%. После «На поле E2» её скорость атаки повышается на 20%, а попадание особой атакой якорем дополнительно даёт 25 очков возбуждения.\nКаждый эффект складывается до 3 раз и действует, пока Даника не выйдет из текущей формы горничной. Повторная активация обновляет длительность."
+            },
+            {
+              "name": "Звёздный талант",
+              "description": "Когда персонажи отряда вызывают Сверхпроводник, вместо него срабатывает «Звёздная сверхпроводимость».\nБазовый урон «Звёздной сверхпроводимости» от персонажей отряда повышается на 0,7% за каждые 100 ед. силы атаки Даники, максимум на 14%.\nКроме того, в Поле полярного звёздного сияния Даника переходит в состояние «Сияние · Звёздная сверхпроводимость»."
+            },
+            {
+              "name": "Бытовой талант",
+              "description": "При экстремально низкой температуре скорость передвижения отряда повышается на 10%, а расход выносливости снижается на 10%."
+            }
+          ],
+          "constellations": [
+            {
+              "name": "Первое созвездие",
+              "description": "После «Вступление E2» или «На поле E2» Даника восстанавливает 20 ед. энергии, не чаще раза в 14 сек.\nКроме того, усиление Горничной-хранительницы от взрыва стихии повышается на 80%, а усиление Боевой горничной — на 120%."
+            },
+            {
+              "name": "Второе созвездие",
+              "description": "Пока якорь существует, Даника даёт всем ближайшим персонажам 7 уровней «Застольного тоста». Когда они суммарно потратят 6 уровней, активный персонаж получает ещё 1.\n«Застольный тост»: урон «Звёздной сверхпроводимости» от персонажа отряда тратит 1 уровень и повышается на 100% силы атаки Даники. Даника в форме Боевой горничной тратит сразу все уровни, и урон повышается на 150% её силы атаки за каждый.\nПри повторном призыве якоря или обновлении его длительности число уровней сбрасывается к начальному."
+            },
+            null,
+            {
+              "name": "Четвёртое созвездие",
+              "description": "Когда активный персонаж под щитом Даники наносит урон «Звёздной сверхпроводимости», остальные ближайшие персонажи восстанавливают по 3 ед. энергии, не чаще раза в 3,5 сек.\nКроме того, в форме Боевой горничной Даника тоже создаёт щит; если она покидает поле, щит пропадает."
+            },
+            null,
+            {
+              "name": "Шестое созвездие",
+              "description": "Пока якорь существует, урон «Звёздной сверхпроводимости» ближайших персонажей повышается на 20%.\nВ форме Горничной-хранительницы каждые 1000 ед. силы атаки Даники повышают урон «Звёздной сверхпроводимости» активного персонажа на 10%, максимум на 40%.\nВ форме Боевой горничной каждые 500 ед. её силы атаки повышают шанс крит. попадания «На поле E2» на 2,5% и крит. урон на 25%, максимум +10% и +100%.\nЭффекты действуют, пока Даника не выйдет из текущей формы."
+            }
+          ],
+          "missing": [],
+          "analysis": "Даника — 4★ Электро-мечница для команд на «Звёздной сверхпроводимости» (Электро + Крио) и, по сути, гибрид саппорта и саб-ДД. Вне поля её якорь бьёт совместными атаками от Электро и Крио ударов активного персонажа, копит очки возбуждения и при переключении на Данику превращается во «Вступление E2»: удар по реакции плюс щит, поглощающий Электро урон на 250%. На поле она играет как Электро-драйвер с атаками якорем и «На поле E2».\n\nГлавная ценность — снижение сопротивления: до −30% Электро и −30% Крио вокруг якоря в «Сиянии», плюс бонус к базовому урону реакции от силы атаки и бафф атаки отряду взрывом стихии (до 500 ед.). Отсюда сборка от силы атаки. Естественные партнёры — Митя, Валерий и Анастасия.\n\nС2 («Застольный тост») сильно поднимает урон реакции всего отряда, С4 закрывает энергию, С6 добавляет урон и крит. Характеристики и материалы ещё не утекли, так что оценка предварительная."
+        },
+        "en": {
+          "normal": {
+            "name": "Name not leaked yet",
+            "description": "Normal Attack\nPerforms up to 4 consecutive sword strikes.\n\nCharged Attack\nConsumes Stamina to unleash a flurry of rapid strikes, ending with a particularly powerful blow.\n\nPlunging Attack\nPlunges from mid-air to strike the ground below, damaging opponents along the path and dealing AoE DMG upon impact.",
+            "scaling": []
+          },
+          "skill": {
+            "name": "Name not leaked yet",
+            "level": 10,
+            "description": "Danica swings her anchor and chain, dealing AoE Electro DMG to nearby opponents, and summons an anchor that follows the active character. While the anchor exists, it helps in different ways depending on whether Danica is on the field.\n\nDanica off-field\nWhen the active character's Electro or Cryo attacks hit an opponent, the anchor performs a coordinated attack, dealing AoE Electro DMG at the opponent's location. Once every 1.5s.\n\nDanica on-field\nHer Normal Attacks are replaced by special anchor attacks that deal Electro DMG which cannot be overridden and counts as Normal Attack DMG.\n\nExcitement Points\nWhile the anchor exists, Danica gains Excitement Points (max 100):\n• off-field: 50 points when the active character's Electro or Cryo attack hits an opponent, once every 0.1s;\n• on-field: 25 points when a special anchor attack hits, once per Normal Attack stage.\nIn Guardian Maid form, only the active character's Electro and Cryo hits grant points; in Battle Maid form, only special anchor attacks do.\nAt maximum, Danica consumes all points to use the special skill \"Entrance E2\" or \"On-Field E2\" and enters the matching maid form.\n\nEntrance E2\nTriggers automatically when switching to Danica with full points. She pulls herself to an opponent with her chain and slams the anchor down, dealing AoE Electro DMG counted as Stellar Superconduct DMG. She then enters Guardian Maid form: the anchor's duration is refreshed and the active character gains a shield based on Danica's ATK that absorbs Electro DMG with 250% effectiveness and lasts while she remains in this form.\n\nOn-Field E2\nWhile Danica is on the field with full points, her skill is replaced by \"On-Field E2\": a powerful anchor slam dealing AoE Electro DMG counted as Stellar Superconduct DMG. She then enters Battle Maid form: after each On-Field E2, her next anchor combo skips one stage, up to the first three stages, jumping straight to the final hit. After five uses of On-Field E2, she leaves the form and the anchor disappears.\n\nForm limits\nWhen the anchor disappears, Danica leaves her current form. While the anchor exists, the two forms cannot be active at the same time and she cannot switch between them.",
+            "scaling": [
+              [
+                "Skill DMG",
+                "77.0%"
+              ],
+              [
+                "Entrance E2 Stellar Superconduct DMG",
+                "122.1%"
+              ],
+              [
+                "On-Field E2 Stellar Superconduct DMG",
+                "143.7%"
+              ],
+              [
+                "Anchor coordinated attack DMG",
+                "68.5%"
+              ],
+              [
+                "Shield absorption",
+                "420.2% ATK + 3220.4"
+              ],
+              [
+                "1-Hit anchor Electro DMG",
+                "132.6%"
+              ],
+              [
+                "2-Hit anchor Electro DMG",
+                "121.3%"
+              ],
+              [
+                "3-Hit anchor Electro DMG",
+                "79.1% × 2"
+              ],
+              [
+                "4-Hit anchor Electro DMG",
+                "193.9%"
+              ],
+              [
+                "Anchor duration",
+                "25s"
+              ],
+              [
+                "Entrance E2 CD",
+                "14s"
+              ],
+              [
+                "Skill CD",
+                "18s"
+              ]
+            ]
+          },
+          "burst": {
+            "name": "Name not leaked yet",
+            "level": 10,
+            "description": "With the poise of an empress's confidante, Danica performs five powerful wide-area attacks dealing AoE Electro DMG.\n\nRadiance: Stellar Superconduct\nThe first and fifth attacks additionally deal AoE Electro DMG counted as Stellar Superconduct DMG.\n\nFor a while after the Burst, her current maid form is empowered (the buff ends with the form):\n• Guardian Maid: all party members gain increased ATK;\n• Battle Maid: Danica instantly restores all Excitement Points and On-Field E2 DMG is increased.",
+            "scaling": [
+              [
+                "1-Hit Electro DMG / Stellar Superconduct DMG",
+                "134.6% / 79.6%"
+              ],
+              [
+                "2/3/4-Hit Electro DMG",
+                "21.3%"
+              ],
+              [
+                "5-Hit Electro DMG / Stellar Superconduct DMG",
+                "155.9% / 119.3%"
+              ],
+              [
+                "ATK Bonus",
+                "12.5% of Danica's ATK"
+              ],
+              [
+                "Max ATK Bonus",
+                "500"
+              ],
+              [
+                "On-Field E2 DMG Bonus",
+                "70.3%"
+              ],
+              [
+                "Buff duration",
+                "20s"
+              ],
+              [
+                "CD",
+                "15s"
+              ],
+              [
+                "Energy Cost",
+                "60"
+              ]
+            ]
+          },
+          "passives": [
+            {
+              "name": "First Ascension Passive",
+              "description": "Opponents around the anchor have their Electro RES decreased by 15%.\nIn the Radiance: Stellar Superconduct state, their Electro RES is decreased by a further 15% and their Cryo RES by 30%."
+            },
+            {
+              "name": "Fourth Ascension Passive",
+              "description": "After Entrance E2, Danica's ATK is increased by 20%. After On-Field E2, her ATK SPD is increased by 20%, and special anchor attack hits grant an extra 25 Excitement Points.\nEach effect stacks up to 3 times and lasts until Danica leaves her current maid form. Re-triggering refreshes the duration."
+            },
+            {
+              "name": "Stellar Talent",
+              "description": "When party members trigger Superconduct, Stellar Superconduct is triggered instead.\nThe base DMG of Stellar Superconduct triggered by party members is increased by 0.7% for every 100 of Danica's ATK, up to 14%.\nIn addition, inside a Polar Starlight Field, Danica enters the Radiance: Stellar Superconduct state."
+            },
+            {
+              "name": "Utility Passive",
+              "description": "Under extreme cold, party movement SPD is increased by 10% and Stamina consumption is decreased by 10%."
+            }
+          ],
+          "constellations": [
+            {
+              "name": "Constellation 1",
+              "description": "After Entrance E2 or On-Field E2, Danica restores 20 Energy, once every 14s.\nIn addition, the Burst's Guardian Maid buff is increased by 80% and the Battle Maid buff by 120%."
+            },
+            {
+              "name": "Constellation 2",
+              "description": "While the anchor exists, Danica grants all nearby party members 7 stacks of Banquet Toast. Each time they consume 6 stacks in total, the active character gains 1 more.\nBanquet Toast: when a party member deals Stellar Superconduct DMG, 1 stack is consumed and the DMG is increased by 100% of Danica's ATK. In Battle Maid form, Danica consumes all her stacks at once, gaining 150% of her ATK per stack.\nResummoning the anchor or refreshing its duration resets the stacks to the starting amount."
+            },
+            null,
+            {
+              "name": "Constellation 4",
+              "description": "When the active character shielded by Danica deals Stellar Superconduct DMG, the other nearby party members restore 3 Energy, once every 3.5s.\nIn addition, entering Battle Maid form also creates a shield; it disappears if Danica leaves the field."
+            },
+            null,
+            {
+              "name": "Constellation 6",
+              "description": "While the anchor exists, nearby party members' Stellar Superconduct DMG is increased by 20%.\nIn Guardian Maid form, every 1,000 of Danica's ATK increases the active character's Stellar Superconduct DMG by 10%, up to 40%.\nIn Battle Maid form, every 500 ATK increases On-Field E2 CRIT Rate by 2.5% and CRIT DMG by 25%, up to +10% and +100%.\nThese effects last until Danica leaves her current form."
+            }
+          ],
+          "missing": [],
+          "analysis": "Danica is a 4★ Electro sword user for Stellar Superconduct (Electro + Cryo) teams, a hybrid of support and sub-DPS. Off-field, her anchor follows up on the active character's Electro and Cryo hits, builds Excitement Points, and turns into Entrance E2 when you switch to her: a reaction hit plus a shield that absorbs Electro DMG at 250%. On-field she plays as an Electro driver with anchor attacks and On-Field E2.\n\nHer main value is RES shred: up to −30% Electro and −30% Cryo around the anchor in Radiance, plus a reaction base DMG bonus from ATK and a party ATK buff from her Burst (up to 500). That points to an ATK build. Natural partners are Mitya, Valery and Anastasya.\n\nC2 (Banquet Toast) adds a lot of reaction DMG for the whole party, C4 fixes energy, and C6 adds damage and CRIT. Stats and materials have not leaked yet, so this assessment is preliminary."
+        },
+        "es": {
+          "normal": {
+            "name": "Nombre aún no filtrado",
+            "description": "Ataque Normal\nRealiza hasta 4 golpes consecutivos con la espada.\n\nAtaque Cargado\nConsume Aguante para lanzar una ráfaga de golpes rápidos y termina con un golpe especialmente potente.\n\nAtaque Descendente\nCae desde el aire golpeando a los enemigos en su camino e inflige daño en un área al aterrizar.",
+            "scaling": []
+          },
+          "skill": {
+            "name": "Nombre aún no filtrado",
+            "level": 10,
+            "description": "Danica blande su ancla y su cadena, inflige Daño Electro en un área a los enemigos cercanos e invoca un ancla que sigue al personaje activo. Mientras el ancla existe, ayuda de distintas formas según Danica esté o no en el campo.\n\nDanica fuera del campo\nCuando los ataques Electro o Cryo del personaje activo golpean a un enemigo, el ancla realiza un ataque coordinado que inflige Daño Electro en un área donde está el enemigo. Una vez cada 1,5 s.\n\nDanica en el campo\nSus Ataques Normales se sustituyen por ataques especiales con el ancla, que infligen Daño Electro que no puede ser reemplazado y cuenta como daño de Ataque Normal.\n\nPuntos de Excitación\nMientras el ancla existe, Danica acumula Puntos de Excitación (máx. 100):\n• fuera del campo: 50 puntos cuando un ataque Electro o Cryo del personaje activo golpea, una vez cada 0,1 s;\n• en el campo: 25 puntos por golpe de ataque especial con el ancla, una vez por fase del Ataque Normal.\nEn la forma de Doncella Guardiana solo dan puntos los golpes Electro y Cryo del personaje activo; en la de Doncella de Combate, solo los ataques especiales con el ancla.\nAl máximo, Danica gasta todos los puntos en la habilidad especial «Entrada E2» o «En el Campo E2» y adopta la forma de doncella correspondiente.\n\nEntrada E2\nSe activa automáticamente al cambiar a Danica con los puntos al máximo. Se impulsa con la cadena hacia un enemigo y golpea el suelo con el ancla, infligiendo Daño Electro en un área considerado daño de Superconducción Estelar. Después adopta la forma de Doncella Guardiana: renueva la duración del ancla y otorga al personaje activo un escudo basado en su ATQ que absorbe Daño Electro con un 250% de eficacia y dura mientras siga en esa forma.\n\nEn el Campo E2\nCon Danica en el campo y los puntos al máximo, su habilidad se sustituye por «En el Campo E2»: un potente golpe con el ancla que inflige Daño Electro en un área considerado daño de Superconducción Estelar. Después adopta la forma de Doncella de Combate: tras cada «En el Campo E2», su siguiente combo con el ancla se salta una fase, hasta las tres primeras, pasando directamente al golpe final. Tras cinco usos, sale de la forma y el ancla desaparece.\n\nLímites de las formas\nAl desaparecer el ancla, Danica sale de su forma actual. Mientras el ancla existe, ambas formas no pueden estar activas a la vez ni se puede cambiar de una a otra.",
+            "scaling": [
+              [
+                "Daño de la habilidad",
+                "77,0%"
+              ],
+              [
+                "Daño de Superconducción Estelar de Entrada E2",
+                "122,1%"
+              ],
+              [
+                "Daño de Superconducción Estelar de En el Campo E2",
+                "143,7%"
+              ],
+              [
+                "Daño del ataque coordinado del ancla",
+                "68,5%"
+              ],
+              [
+                "Absorción del escudo",
+                "420,2% ATQ + 3220,4"
+              ],
+              [
+                "Daño Electro del 1.er golpe con el ancla",
+                "132,6%"
+              ],
+              [
+                "Daño Electro del 2.º golpe con el ancla",
+                "121,3%"
+              ],
+              [
+                "Daño Electro del 3.er golpe con el ancla",
+                "79,1% × 2"
+              ],
+              [
+                "Daño Electro del 4.º golpe con el ancla",
+                "193,9%"
+              ],
+              [
+                "Duración del ancla",
+                "25 s"
+              ],
+              [
+                "TdR de Entrada E2",
+                "14 s"
+              ],
+              [
+                "TdR de la habilidad",
+                "18 s"
+              ]
+            ]
+          },
+          "burst": {
+            "name": "Nombre aún no filtrado",
+            "level": 10,
+            "description": "Con la dignidad de una confidente de la emperatriz, Danica realiza cinco potentes ataques en un área amplia que infligen Daño Electro.\n\nResplandor: Superconducción Estelar\nEl primer y el quinto ataque infligen además Daño Electro en un área considerado daño de Superconducción Estelar.\n\nDurante un tiempo tras la Habilidad Definitiva, su forma de doncella actual recibe una mejora (desaparece con la forma):\n• Doncella Guardiana: aumenta el ATQ de todos los personajes del equipo;\n• Doncella de Combate: Danica recupera al instante todos los Puntos de Excitación y aumenta el daño de En el Campo E2.",
+            "scaling": [
+              [
+                "Daño Electro del 1.er ataque / daño de Superconducción Estelar",
+                "134,6% / 79,6%"
+              ],
+              [
+                "Daño Electro del 2.º/3.er/4.º ataque",
+                "21,3%"
+              ],
+              [
+                "Daño Electro del 5.º ataque / daño de Superconducción Estelar",
+                "155,9% / 119,3%"
+              ],
+              [
+                "Aumento de ATQ",
+                "12,5% del ATQ de Danica"
+              ],
+              [
+                "Aumento máximo de ATQ",
+                "500"
+              ],
+              [
+                "Aumento del daño de En el Campo E2",
+                "70,3%"
+              ],
+              [
+                "Duración de la mejora",
+                "20 s"
+              ],
+              [
+                "TdR",
+                "15 s"
+              ],
+              [
+                "Energía",
+                "60"
+              ]
+            ]
+          },
+          "passives": [
+            {
+              "name": "Talento pasivo de 1.ª Ascensión",
+              "description": "La RES Electro de los enemigos alrededor del ancla se reduce un 15%.\nEn el estado Resplandor: Superconducción Estelar, su RES Electro se reduce otro 15% y su RES Cryo un 30%."
+            },
+            {
+              "name": "Talento pasivo de 4.ª Ascensión",
+              "description": "Tras Entrada E2, el ATQ de Danica aumenta un 20%. Tras En el Campo E2, su Vel. de ATQ aumenta un 20% y sus ataques especiales con el ancla otorgan 25 Puntos de Excitación adicionales.\nCada efecto se acumula hasta 3 veces y dura hasta que Danica sale de su forma de doncella actual. Volver a activarlo renueva la duración."
+            },
+            {
+              "name": "Talento Estelar",
+              "description": "Cuando los personajes del equipo desencadenan Superconducción, se desencadena Superconducción Estelar en su lugar.\nEl daño base de Superconducción Estelar del equipo aumenta un 0,7% por cada 100 de ATQ de Danica, hasta un 14%.\nAdemás, dentro de un Campo de Luz Estelar Polar, Danica entra en el estado Resplandor: Superconducción Estelar."
+            },
+            {
+              "name": "Talento pasivo de utilidad",
+              "description": "Con frío extremo, la Vel. de Movimiento del equipo aumenta un 10% y el consumo de Aguante se reduce un 10%."
+            }
+          ],
+          "constellations": [
+            {
+              "name": "Constelación 1",
+              "description": "Tras Entrada E2 o En el Campo E2, Danica recupera 20 de Energía, una vez cada 14 s.\nAdemás, la mejora de Doncella Guardiana de la Habilidad Definitiva aumenta un 80% y la de Doncella de Combate un 120%."
+            },
+            {
+              "name": "Constelación 2",
+              "description": "Mientras el ancla existe, Danica otorga a todos los personajes cercanos 7 acumulaciones de Brindis de Banquete. Cada vez que gastan 6 en total, el personaje activo recibe 1 más.\nBrindis de Banquete: cuando un personaje inflige daño de Superconducción Estelar, gasta 1 acumulación y el daño aumenta un 100% del ATQ de Danica. En la forma de Doncella de Combate, Danica gasta todas sus acumulaciones a la vez y gana un 150% de su ATQ por cada una.\nVolver a invocar el ancla o renovar su duración restablece las acumulaciones a la cantidad inicial."
+            },
+            null,
+            {
+              "name": "Constelación 4",
+              "description": "Cuando el personaje activo protegido por el escudo de Danica inflige daño de Superconducción Estelar, los demás personajes cercanos recuperan 3 de Energía, una vez cada 3,5 s.\nAdemás, al adoptar la forma de Doncella de Combate también crea un escudo, que desaparece si Danica sale del campo."
+            },
+            null,
+            {
+              "name": "Constelación 6",
+              "description": "Mientras el ancla existe, el daño de Superconducción Estelar de los personajes cercanos aumenta un 20%.\nEn la forma de Doncella Guardiana, cada 1000 de ATQ de Danica aumenta un 10% el daño de Superconducción Estelar del personaje activo, hasta un 40%.\nEn la forma de Doncella de Combate, cada 500 de ATQ aumenta la Prob. CRIT de En el Campo E2 un 2,5% y el Daño CRIT un 25%, hasta +10% y +100%.\nEstos efectos duran hasta que Danica sale de su forma actual."
+            }
+          ],
+          "missing": [],
+          "analysis": "Danica es una espadachina Electro 4★ para equipos de Superconducción Estelar (Electro + Cryo), un híbrido entre apoyo y sub-DPS. Fuera del campo, su ancla responde a los golpes Electro y Cryo del personaje activo, acumula Puntos de Excitación y al cambiar a ella se convierte en Entrada E2: un golpe de reacción más un escudo que absorbe Daño Electro al 250%. En el campo juega como impulsora Electro con ataques de ancla y En el Campo E2.\n\nSu mayor valor es la reducción de RES: hasta −30% Electro y −30% Cryo alrededor del ancla en Resplandor, además de un bono al daño base de la reacción según su ATQ y un aumento de ATQ al equipo con su Habilidad Definitiva (hasta 500). Por eso se construye con ATQ. Sus compañeros naturales son Mitya, Valery y Anastasya.\n\nC2 (Brindis de Banquete) añade mucho daño de reacción a todo el equipo, C4 resuelve la energía y C6 añade daño y CRIT. Sus estadísticas y materiales aún no se han filtrado, así que esta valoración es preliminar."
+        }
+      }
+    },
+    {
+      "slug": "anastasya",
+      "rarity": 5,
+      "element": "cryo",
+      "weapon": "bow",
+      "stats": null,
+      "materials": [],
+      "i18n": {
+        "ru": {
+          "name": "Анастасия",
+          "nameEn": "Anastasya"
+        },
+        "en": {
+          "name": "Anastasya",
+          "nameEn": "Anastasya"
+        },
+        "es": {
+          "name": "Anastasya",
+          "nameEn": "Anastasya"
+        }
+      },
+      "kit": {
+        "ru": {
+          "normal": {
+            "name": "Рассвет долгой зимы",
+            "level": 1,
+            "description": "Обычная атака\nДо 5 последовательных выстрелов из лука.\n\nЗаряженная атака\nБолее точный прицельный выстрел с повышенным уроном. При прицеливании на стреле копится энергия льда: полностью заряженная стрела наносит Крио урон.\n\nАтака в падении\nВыпускает в воздухе град стрел и быстро падает на землю, поражая врагов на пути и нанося урон по площади при приземлении.",
+            "scaling": [
+              [
+                "Урон 1-й атаки",
+                "39,6%"
+              ],
+              [
+                "Урон 2-й атаки",
+                "40,3%"
+              ],
+              [
+                "Урон 3-й атаки",
+                "25,2% × 2"
+              ],
+              [
+                "Урон 4-й атаки",
+                "18,3% × 3"
+              ],
+              [
+                "Урон 5-й атаки",
+                "65,7%"
+              ],
+              [
+                "Прицельный выстрел",
+                "43,9%"
+              ],
+              [
+                "Полностью заряженный прицельный выстрел",
+                "124,0%"
+              ],
+              [
+                "Урон во время падения",
+                "56,8%"
+              ],
+              [
+                "Урон низкого / высокого падения",
+                "113,6% / 141,9%"
+              ]
+            ]
+          },
+          "skill": {
+            "name": "Полярный звёздный приговор",
+            "level": 1,
+            "description": "Анастасия раскрывает истинную сущность «Превосходства», наносит Крио урон по площади и высвобождает силу в зависимости от способа нажатия.\n\nКороткое нажатие: благословение «Милосердие»\nПризывает лазурную звёздную корону, которая следует за активным персонажем и каждые 2 сек. дважды наносит ближайшим врагам Крио урон по площади.\nСияние · Звёздное сияние: второй удар короны вместо обычного Крио урона наносит Крио урон, который считается уроном соответствующей реакции «Звёздного сияния».\n\nДолгое нажатие: благословение «Слава»\nОбычные атаки заменяются серией до пяти атак Священным копьём Дегомено с Крио уроном по площади, который нельзя заменить другим элементом. Заряженные атаки недоступны.\nСияние · Звёздное сияние: последний удар каждого этапа наносит Крио урон, который считается уроном соответствующей реакции «Звёздного сияния».\n\nБлагословения\nПод каждым благословением Анастасия использует свой взрыв стихии. Если она не получила «Славу», у неё всегда есть «Милосердие».\n\nСияние · Звёздное сияние\nОбщее название состояний «Сияние · Звёздная сверхпроводимость» и «Сияние · Звёздное рассеивание». Персонаж может быть только в одном из них, приоритет у «Звёздной сверхпроводимости».",
+            "scaling": [
+              [
+                "Урон короткого нажатия",
+                "118,2%"
+              ],
+              [
+                "Урон долгого нажатия",
+                "157,6%"
+              ],
+              [
+                "Крио урон лазурной звёздной короны",
+                "64,0% × 2"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» короны",
+                "40,0% / 60,0%"
+              ],
+              [
+                "Крио урон 1-й атаки копьём",
+                "62,7%"
+              ],
+              [
+                "Крио урон 2-й атаки копьём",
+                "32,8% × 2"
+              ],
+              [
+                "Крио урон 3-й атаки копьём",
+                "79,7%"
+              ],
+              [
+                "Крио урон 4-й атаки копьём",
+                "29,4% × 3"
+              ],
+              [
+                "Крио урон 5-й атаки копьём",
+                "35,4% × 3"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 1-й атаки",
+                "39,2% / 58,8%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 2-й атаки",
+                "41,1% / 61,6%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 3-й атаки",
+                "49,9% / 74,8%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 4-й атаки",
+                "54,4% / 81,6%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 5-й атаки",
+                "66,4% / 99,6%"
+              ],
+              [
+                "Длительность короны",
+                "20 сек."
+              ],
+              [
+                "Длительность «Славы»",
+                "15 сек."
+              ],
+              [
+                "Перезарядка",
+                "15 сек."
+              ]
+            ]
+          },
+          "burst": {
+            "name": "К новому миру",
+            "level": 10,
+            "description": "Взрыв стихии зависит от текущего благословения.\n\n«К новому миру» (при «Милосердии»)\nНаносит Крио урон по площади и замораживает длительность лазурной звёздной короны. Пока эффект действует, урон реакций «Звёздного сияния» ближайших персонажей повышается, а каждая атака короны дополнительно наносит Крио урон по площади, который считается уроном «Звёздной сверхпроводимости». При переключении на другого персонажа Анастасия запечатывает себя; урон «Звёздного сияния» от ближайших персонажей сокращает это время. После печати при переключении на Анастасию она автоматически использует «Возвращение: Триумф лазурного звёздного указа».\n\n«Когда вечная ночь сменится рассветом» (при «Славе»)\nВысвобождает силу Священного копья: Крио урон по площади, считающийся уроном «Звёздной сверхпроводимости», и заморозка длительности благословения. Анастасия запечатывает до трёх других персонажей отряда; её обычные атаки сокращают время печати. После печати первое нажатие на запечатанного персонажа не выводит его на поле, а активирует «Возвращение: Истребление лазурного звёздного указа».\nСияние · Звёздное сияние: весь урон «Звёздной сверхпроводимости» выше заменяется Крио уроном соответствующей реакции «Звёздного сияния».\n\nЗапечатывание\nЗапечатанного персонажа нельзя вывести на поле. Начальная длительность печати равна длительности взрыва стихии; некоторые действия её сокращают.\n\nЗаморозка\nПока действует, оставшееся время затронутых эффектов не уменьшается.\n\nВозвращение: Триумф лазурного звёздного указа\nНаносит ближайшим врагам Крио урон по площади, считающийся уроном «Звёздной сверхпроводимости» (в «Сиянии» — соответствующей реакции «Звёздного сияния»).\n\nВозвращение: Истребление лазурного звёздного указа\nТри этапа атак: серия ударов копьём (Крио урон навыка, последний удар — «Звёздная сверхпроводимость»), прыжок с рубящим ударом и бросок копья как стрелы с повышенным уроном; третий этап завершает заморозку благословения. В «Сиянии» урон «Звёздной сверхпроводимости» заменяется соответствующей реакцией «Звёздного сияния».",
+            "scaling": [
+              [
+                "Урон «К новому миру»",
+                "360,7%"
+              ],
+              [
+                "Повышение урона «Звёздного сияния» от «К новому миру»",
+                "50,0%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» короны",
+                "20,2% / 30,2%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» «Триумфа»",
+                "400,8% / 601,2%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» «Когда вечная ночь сменится рассветом»",
+                "561,1% / 841,7%"
+              ],
+              [
+                "Крио урон 1-го этапа «Истребления»",
+                "48,1% × 5"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 1-го этапа «Истребления»",
+                "120,2% / 180,4%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 2-го этапа «Истребления»",
+                "160,3% / 240,5%"
+              ],
+              [
+                "Урон «Звёздной сверхпроводимости» / «Звёздного рассеивания» 3-го этапа «Истребления»",
+                "200,4% / 300,6%"
+              ],
+              [
+                "Длительность «К новому миру»",
+                "20 сек."
+              ],
+              [
+                "Длительность «Когда вечная ночь сменится рассветом»",
+                "14 сек."
+              ],
+              [
+                "Перезарядка",
+                "15 сек."
+              ],
+              [
+                "Энергия",
+                "50"
+              ]
+            ]
+          },
+          "passives": [
+            {
+              "name": "Сияние великолепной ночи",
+              "description": "После «Полярного звёздного приговора» все персонажи отряда получают «Почёт» на 20 сек.: крит. урон +12%.\nКогда персонаж отряда запечатан, его «Почёт» поровну распределяется между незапечатанными персонажами. Распределение действует до 8 сек. после конца печати."
+            },
+            {
+              "name": "Неотпетая скорбь",
+              "description": "Пока Анастасия в отряде, реакции «Звёздного сияния» получают дополнительные эффекты:\n• «Звёздная сверхпроводимость»: каждый раз, когда Поле полярного звёздного сияния даёт усиление, его эффективность дополнительно повышается; при создании Звёздного кристалла поле сразу даёт дополнительное усиление;\n• «Звёздное рассеивание»: Звёздный вихрь и Блуждающий вихрь сразу при создании получают второй уровень (не чаще раза в 1 сек.), а базовый коэффициент «Звёздного рассеивания» повышается на 15%."
+            },
+            {
+              "name": "Звёздное благословение, возвращение незапятнанного света",
+              "description": "В Поле полярного звёздного сияния, а также 8 сек. после того, как персонаж отряда поблизости вызвал «Звёздное рассеивание», Анастасия переходит в состояния «Сияние · Звёздная сверхпроводимость» и «Сияние · Звёздное рассеивание».\nКогда персонажи отряда вызывают Сверхпроводник или Крио Рассеивание, вместо них срабатывают «Звёздная сверхпроводимость» или «Звёздное рассеивание».\nБазовый урон этих реакций от персонажей отряда повышается на 0,7% за каждые 100 ед. силы атаки Анастасии, максимум на 14%."
+            },
+            {
+              "name": "Благословение снегопада",
+              "description": "В Снежной (кроме Нод-Края) вне боя HP отряда постепенно восстанавливается. Пока Анастасия в отряде, энергия «Серого взора» не убывает, а если её меньше 30%, сразу восстанавливается до 30%. Не действует в подземельях, на аренах боссов и в Витой Бездне."
+            }
+          ],
+          "constellations": [
+            {
+              "name": "За прошедшие годы, за сердце, что никогда не угаснет",
+              "description": "Усиливает «Сияние великолепной ночи»: «Почёт» дополнительно повышает силу атаки Крио-персонажей на 15%, а Мастерство стихий остальных — на 60.\nКроме того, при запечатывании персонажа распределение «Почёта» больше не снимает эффект с самого запечатанного. Когда запечатана сама Анастасия, передаваемый «Почёт» увеличивается до 300% от начального."
+            },
+            {
+              "name": "За суровую зиму, за тех, с кем разделяю её холод",
+              "description": "После «Полярного звёздного приговора» Анастасия получает эффект в зависимости от благословения:\n• «Милосердие»: крит. урон реакций «Звёздного сияния» всего отряда +60% на 30 сек.;\n• «Слава»: урон обычных атак, взрыва «Когда вечная ночь сменится рассветом» и «Истребления лазурного звёздного указа» повышается до 125% от начального на 15 сек.\nКроме того, урон реакций «Звёздного сияния» ближайших персонажей повышается на 5%."
+            },
+            null,
+            {
+              "name": "Тирану — песнь сопротивления",
+              "description": "Бонусы «Почёта» к крит. урону, силе атаки и Мастерству стихий увеличиваются до 130% от начальных."
+            },
+            null,
+            {
+              "name": "Взгляни же — незапятнанный рассвет уже близок",
+              "description": "После «Полярного звёздного приговора», в зависимости от благословения:\n• «Милосердие»: при следующем переключении на другого персонажа срабатывает эффект, как у «Возвращение: Триумф лазурного звёздного указа», с уроном 250% от начального; урон «Звёздного сияния» ближайших персонажей +10%;\n• «Слава»: следующее короткое нажатие навыка вызывает эффект третьего этапа «Истребления лазурного звёздного указа» с уроном 200% от начального. Если другие персонажи не запечатаны, атака учитывает «Почёт» всех персонажей отряда, а урон «Звёздного сияния» от Анастасии +20%.\nЭффекты длятся 30 сек., не чаще раза в 15 сек., и снимаются, когда заканчивается печать других персонажей."
+            }
+          ],
+          "missing": [],
+          "analysis": "Анастасия — 5★ Крио-лучница и, судя по набору, центр команд на «Звёздном сиянии»: она одна покрывает обе новые реакции — «Звёздную сверхпроводимость» (Электро + Крио) и новое «Звёздное рассеивание» (Анемо + Крио), а пассивка усиливает обе. «Почёт» даёт всему отряду +12% крит. урона, с С1 ещё силу атаки Крио-персонажам и Мастерство стихий остальным.\n\nУ неё два режима. «Милосердие» (короткое нажатие) — саппорт вне поля: корона бьёт сама, взрыв «К новому миру» на 20 сек. поднимает урон «Звёздного сияния» отряда на 50%. «Слава» (долгое нажатие) — основной ДД: атаки копьём и взрыв, который запечатывает до трёх союзников, а потом их иконки превращаются в кнопки «Истребления» с уроном до 300% у третьего этапа. Механика печати необычная: отряд временно нельзя переключать, так что ротации придётся строить вокруг неё.\n\nМножители обычной атаки и навыка даны на 1 уровне таланта, взрыва — на 10-м, поэтому напрямую их не сравнить. Характеристики и материалы ещё не утекли, так что оценка предварительная."
+        },
+        "en": {
+          "normal": {
+            "name": "Dawn of the Long Winter",
+            "level": 1,
+            "description": "Normal Attack\nPerforms up to 5 consecutive shots with a bow.\n\nCharged Attack\nPerforms a more precise Aimed Shot with increased DMG. While aiming, ice energy gathers on the arrowhead; a fully charged arrow deals Cryo DMG.\n\nPlunging Attack\nFires off a shower of arrows in mid-air before falling and striking the ground, dealing AoE DMG upon impact.",
+            "scaling": [
+              [
+                "1-Hit DMG",
+                "39.6%"
+              ],
+              [
+                "2-Hit DMG",
+                "40.3%"
+              ],
+              [
+                "3-Hit DMG",
+                "25.2% × 2"
+              ],
+              [
+                "4-Hit DMG",
+                "18.3% × 3"
+              ],
+              [
+                "5-Hit DMG",
+                "65.7%"
+              ],
+              [
+                "Aimed Shot",
+                "43.9%"
+              ],
+              [
+                "Fully-Charged Aimed Shot",
+                "124.0%"
+              ],
+              [
+                "Plunge DMG",
+                "56.8%"
+              ],
+              [
+                "Low/High Plunge DMG",
+                "113.6% / 141.9%"
+              ]
+            ]
+          },
+          "skill": {
+            "name": "Polar Star Verdict",
+            "level": 1,
+            "description": "Anastasya reveals the true nature of \"Supremacy\", dealing AoE Cryo DMG, and releases her sealed power differently depending on how the skill is used.\n\nPress: Mercy blessing\nSummons an Azure Star Crown that follows the active character and hits nearby opponents twice every 2s for AoE Cryo DMG.\nRadiance: Stellar Radiance: the crown's second hit deals Cryo DMG counted as the corresponding Stellar Radiance reaction DMG instead.\n\nHold: Glory blessing\nHer Normal Attacks are replaced by up to five strikes with the Sacred Spear Degomeno, dealing AoE Cryo DMG that cannot be overridden. Charged Attacks are unavailable.\nRadiance: Stellar Radiance: the last strike of each stage deals Cryo DMG counted as the corresponding Stellar Radiance reaction DMG.\n\nBlessings\nEach blessing gives Anastasya a different Elemental Burst. If she has not gained Glory, she always has Mercy.\n\nRadiance: Stellar Radiance\nThe collective name for the Radiance: Stellar Superconduct and Radiance: Stellar Swirl states. A character can only be in one of them; Stellar Superconduct takes priority.",
+            "scaling": [
+              [
+                "Press DMG",
+                "118.2%"
+              ],
+              [
+                "Hold DMG",
+                "157.6%"
+              ],
+              [
+                "Azure Star Crown Cryo DMG",
+                "64.0% × 2"
+              ],
+              [
+                "Crown Stellar Superconduct / Stellar Swirl DMG",
+                "40.0% / 60.0%"
+              ],
+              [
+                "1-Hit spear Cryo DMG",
+                "62.7%"
+              ],
+              [
+                "2-Hit spear Cryo DMG",
+                "32.8% × 2"
+              ],
+              [
+                "3-Hit spear Cryo DMG",
+                "79.7%"
+              ],
+              [
+                "4-Hit spear Cryo DMG",
+                "29.4% × 3"
+              ],
+              [
+                "5-Hit spear Cryo DMG",
+                "35.4% × 3"
+              ],
+              [
+                "1-Hit Stellar Superconduct / Stellar Swirl DMG",
+                "39.2% / 58.8%"
+              ],
+              [
+                "2-Hit Stellar Superconduct / Stellar Swirl DMG",
+                "41.1% / 61.6%"
+              ],
+              [
+                "3-Hit Stellar Superconduct / Stellar Swirl DMG",
+                "49.9% / 74.8%"
+              ],
+              [
+                "4-Hit Stellar Superconduct / Stellar Swirl DMG",
+                "54.4% / 81.6%"
+              ],
+              [
+                "5-Hit Stellar Superconduct / Stellar Swirl DMG",
+                "66.4% / 99.6%"
+              ],
+              [
+                "Crown duration",
+                "20s"
+              ],
+              [
+                "Glory duration",
+                "15s"
+              ],
+              [
+                "CD",
+                "15s"
+              ]
+            ]
+          },
+          "burst": {
+            "name": "Toward a New World",
+            "level": 10,
+            "description": "Her Burst depends on her current blessing.\n\nToward a New World (Mercy)\nDeals AoE Cryo DMG and freezes the Azure Star Crown's duration. While active, nearby party members' Stellar Radiance reaction DMG is increased, and each crown attack also deals AoE Cryo DMG counted as Stellar Superconduct DMG. When switching to another character, Anastasya seals herself; Stellar Radiance DMG from nearby party members shortens the seal. Afterwards, switching to her automatically uses \"Return: Triumph of the Azure Star Edict\".\n\nWhen Eternal Night Gives Way to Dawn (Glory)\nUnleashes the Sacred Spear, dealing AoE Cryo DMG counted as Stellar Superconduct DMG, and freezes the blessing's duration. Anastasya seals up to three other party members; her Normal Attacks shorten the seal. Afterwards, the first press on a sealed character does not switch them in but activates \"Return: Annihilation of the Azure Star Edict\".\nRadiance: Stellar Radiance: all Stellar Superconduct DMG above is replaced by Cryo DMG of the corresponding Stellar Radiance reaction.\n\nSeal\nA sealed character cannot be switched in. The seal initially lasts as long as the Burst; certain actions shorten it.\n\nFreeze\nWhile active, the remaining duration of affected effects does not decrease.\n\nReturn: Triumph of the Azure Star Edict\nDeals AoE Cryo DMG to nearby opponents counted as Stellar Superconduct DMG (in Radiance, the corresponding Stellar Radiance reaction).\n\nReturn: Annihilation of the Azure Star Edict\nThree stages: a spear combo (Elemental Skill Cryo DMG, the last hit counts as Stellar Superconduct), a leaping slash, and a spear thrown like an arrow for increased DMG; the third stage ends the blessing freeze. In Radiance, Stellar Superconduct DMG is replaced by the corresponding Stellar Radiance reaction.",
+            "scaling": [
+              [
+                "Toward a New World DMG",
+                "360.7%"
+              ],
+              [
+                "Stellar Radiance DMG Bonus",
+                "50.0%"
+              ],
+              [
+                "Crown Stellar Superconduct / Stellar Swirl DMG",
+                "20.2% / 30.2%"
+              ],
+              [
+                "Triumph Stellar Superconduct / Stellar Swirl DMG",
+                "400.8% / 601.2%"
+              ],
+              [
+                "When Eternal Night Gives Way to Dawn Stellar Superconduct / Stellar Swirl DMG",
+                "561.1% / 841.7%"
+              ],
+              [
+                "Annihilation stage 1 Cryo DMG",
+                "48.1% × 5"
+              ],
+              [
+                "Annihilation stage 1 Stellar Superconduct / Stellar Swirl DMG",
+                "120.2% / 180.4%"
+              ],
+              [
+                "Annihilation stage 2 Stellar Superconduct / Stellar Swirl DMG",
+                "160.3% / 240.5%"
+              ],
+              [
+                "Annihilation stage 3 Stellar Superconduct / Stellar Swirl DMG",
+                "200.4% / 300.6%"
+              ],
+              [
+                "Toward a New World duration",
+                "20s"
+              ],
+              [
+                "When Eternal Night Gives Way to Dawn duration",
+                "14s"
+              ],
+              [
+                "CD",
+                "15s"
+              ],
+              [
+                "Energy Cost",
+                "50"
+              ]
+            ]
+          },
+          "passives": [
+            {
+              "name": "Radiance of a Splendid Night",
+              "description": "After Polar Star Verdict, all party members gain Honor for 20s: CRIT DMG +12%.\nWhen a party member is sealed, their Honor is split evenly among unsealed characters. The split lasts until 8s after the seal ends."
+            },
+            {
+              "name": "Unsung Sorrow",
+              "description": "While Anastasya is in the party, Stellar Radiance reactions gain extra effects:\n• Stellar Superconduct: whenever the Polar Starlight Field grants a buff, its effectiveness is further increased; creating a Star Crystal makes the field immediately grant an extra buff;\n• Stellar Swirl: Stellar Whirls and Wandering Whirls start at level 2 when created (once every 1s), and Stellar Swirl's base multiplier is increased by 15%."
+            },
+            {
+              "name": "Starlit Blessing, Return of Unsullied Light",
+              "description": "Inside a Polar Starlight Field, and for 8s after a nearby party member triggers Stellar Swirl, Anastasya enters Radiance: Stellar Superconduct and Radiance: Stellar Swirl.\nWhen party members trigger Superconduct or Cryo Swirl, Stellar Superconduct or Stellar Swirl is triggered instead.\nThe base DMG of these reactions from party members is increased by 0.7% for every 100 of Anastasya's ATK, up to 14%."
+            },
+            {
+              "name": "Snowfall Blessing",
+              "description": "In Snezhnaya (except Nod-Krai), party HP slowly regenerates out of combat. While Anastasya is in the party, Grey Gaze energy does not decrease and is restored to 30% if below. Does not work in Domains, boss arenas or the Spiral Abyss."
+            }
+          ],
+          "constellations": [
+            {
+              "name": "For the Years Gone By, for the Heart That Never Fades",
+              "description": "Enhances Radiance of a Splendid Night: Honor also increases Cryo characters' ATK by 15% and other characters' Elemental Mastery by 60.\nSplitting Honor no longer removes it from the sealed character. When Anastasya herself is sealed, the Honor she passes on is increased to 300%."
+            },
+            {
+              "name": "For the Harsh Winter, for Those Who Share Its Cold",
+              "description": "After Polar Star Verdict, depending on her blessing:\n• Mercy: party Stellar Radiance reactions gain +60% CRIT DMG for 30s;\n• Glory: her Normal Attack, When Eternal Night Gives Way to Dawn and Annihilation of the Azure Star Edict DMG is increased to 125% for 15s.\nIn addition, nearby party members' Stellar Radiance DMG is increased by 5%."
+            },
+            null,
+            {
+              "name": "To the Tyrant, a Song of Defiance",
+              "description": "Honor's CRIT DMG, ATK and Elemental Mastery bonuses are increased to 130%."
+            },
+            null,
+            {
+              "name": "Behold, the Unsullied Dawn Draws Near",
+              "description": "After Polar Star Verdict, depending on her blessing:\n• Mercy: the next switch to another character triggers an effect like Return: Triumph of the Azure Star Edict at 250% DMG; nearby party members' Stellar Radiance DMG +10%;\n• Glory: the next skill press triggers an effect like stage 3 of Annihilation of the Azure Star Edict at 200% DMG. If no other character is sealed, the attack counts every party member's Honor, and Anastasya's Stellar Radiance DMG +20%.\nThese effects last 30s, can trigger once every 15s, and end when the other characters' seal ends."
+            }
+          ],
+          "missing": [],
+          "analysis": "Anastasya is a 5★ Cryo bow user and, judging by her kit, the centerpiece of Stellar Radiance teams: she covers both new reactions, Stellar Superconduct (Electro + Cryo) and the new Stellar Swirl (Anemo + Cryo), and her passive buffs both. Honor gives the whole party +12% CRIT DMG, plus ATK for Cryo characters and Elemental Mastery for the rest at C1.\n\nShe has two modes. Mercy (press) is an off-field support: the crown attacks on its own and Toward a New World raises party Stellar Radiance DMG by 50% for 20s. Glory (hold) is a main DPS: spear attacks and a Burst that seals up to three allies, after which their icons become Annihilation buttons with up to 300% on stage 3. The seal mechanic is unusual: the party temporarily cannot switch, so rotations will be built around her.\n\nNormal Attack and Skill multipliers are given at talent level 1 and the Burst at level 10, so they cannot be compared directly. Stats and materials are not known yet, so this assessment is preliminary."
+        },
+        "es": {
+          "normal": {
+            "name": "Amanecer del Largo Invierno",
+            "level": 1,
+            "description": "Ataque Normal\nRealiza hasta 5 disparos consecutivos con el arco.\n\nAtaque Cargado\nRealiza un Disparo Apuntado más preciso con más daño. Al apuntar, la flecha acumula energía de hielo; una flecha totalmente cargada inflige Daño Cryo.\n\nAtaque Descendente\nDispara una lluvia de flechas en el aire antes de caer y golpear el suelo, infligiendo daño en un área al aterrizar.",
+            "scaling": [
+              [
+                "Daño del 1.er golpe",
+                "39,6%"
+              ],
+              [
+                "Daño del 2.º golpe",
+                "40,3%"
+              ],
+              [
+                "Daño del 3.er golpe",
+                "25,2% × 2"
+              ],
+              [
+                "Daño del 4.º golpe",
+                "18,3% × 3"
+              ],
+              [
+                "Daño del 5.º golpe",
+                "65,7%"
+              ],
+              [
+                "Disparo Apuntado",
+                "43,9%"
+              ],
+              [
+                "Disparo Apuntado totalmente cargado",
+                "124,0%"
+              ],
+              [
+                "Daño durante la caída",
+                "56,8%"
+              ],
+              [
+                "Daño de caída baja/alta",
+                "113,6% / 141,9%"
+              ]
+            ]
+          },
+          "skill": {
+            "name": "Veredicto de la Estrella Polar",
+            "level": 1,
+            "description": "Anastasya revela la verdadera naturaleza de la «Supremacía», inflige Daño Cryo en un área y libera su poder sellado de distinta forma según cómo se use la habilidad.\n\nPulsar: bendición Misericordia\nInvoca una Corona Estelar Azur que sigue al personaje activo y golpea dos veces cada 2 s a los enemigos cercanos con Daño Cryo en un área.\nResplandor: Fulgor Estelar: el segundo golpe de la corona inflige en su lugar Daño Cryo considerado daño de la reacción de Fulgor Estelar correspondiente.\n\nMantener: bendición Gloria\nSus Ataques Normales se sustituyen por hasta cinco golpes con la Lanza Sagrada Degomeno, que infligen Daño Cryo en un área que no puede ser reemplazado. No puede usar Ataques Cargados.\nResplandor: Fulgor Estelar: el último golpe de cada fase inflige Daño Cryo considerado daño de la reacción de Fulgor Estelar correspondiente.\n\nBendiciones\nCada bendición le da una Habilidad Definitiva distinta. Si no ha obtenido Gloria, siempre tiene Misericordia.\n\nResplandor: Fulgor Estelar\nNombre conjunto de los estados Resplandor: Superconducción Estelar y Resplandor: Torbellino Estelar. Un personaje solo puede estar en uno; Superconducción Estelar tiene prioridad.",
+            "scaling": [
+              [
+                "Daño al pulsar",
+                "118,2%"
+              ],
+              [
+                "Daño al mantener",
+                "157,6%"
+              ],
+              [
+                "Daño Cryo de la Corona Estelar Azur",
+                "64,0% × 2"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de la corona",
+                "40,0% / 60,0%"
+              ],
+              [
+                "Daño Cryo del 1.er golpe de lanza",
+                "62,7%"
+              ],
+              [
+                "Daño Cryo del 2.º golpe de lanza",
+                "32,8% × 2"
+              ],
+              [
+                "Daño Cryo del 3.er golpe de lanza",
+                "79,7%"
+              ],
+              [
+                "Daño Cryo del 4.º golpe de lanza",
+                "29,4% × 3"
+              ],
+              [
+                "Daño Cryo del 5.º golpe de lanza",
+                "35,4% × 3"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar del 1.er golpe",
+                "39,2% / 58,8%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar del 2.º golpe",
+                "41,1% / 61,6%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar del 3.er golpe",
+                "49,9% / 74,8%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar del 4.º golpe",
+                "54,4% / 81,6%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar del 5.º golpe",
+                "66,4% / 99,6%"
+              ],
+              [
+                "Duración de la corona",
+                "20 s"
+              ],
+              [
+                "Duración de Gloria",
+                "15 s"
+              ],
+              [
+                "TdR",
+                "15 s"
+              ]
+            ]
+          },
+          "burst": {
+            "name": "Hacia un Nuevo Mundo",
+            "level": 10,
+            "description": "Su Habilidad Definitiva depende de la bendición actual.\n\nHacia un Nuevo Mundo (Misericordia)\nInflige Daño Cryo en un área y congela la duración de la Corona Estelar Azur. Mientras dura, aumenta el daño de Fulgor Estelar de los personajes cercanos, y cada ataque de la corona inflige además Daño Cryo en un área considerado daño de Superconducción Estelar. Al cambiar a otro personaje, Anastasya se sella a sí misma; el daño de Fulgor Estelar de los personajes cercanos acorta el sello. Después, al cambiar a ella usa automáticamente «Regreso: Triunfo del Edicto Estelar Azur».\n\nCuando la Noche Eterna Dé Paso al Alba (Gloria)\nLibera el poder de la Lanza Sagrada, infligiendo Daño Cryo en un área considerado daño de Superconducción Estelar, y congela la duración de la bendición. Anastasya sella hasta a tres personajes del equipo; sus Ataques Normales acortan el sello. Después, la primera pulsación sobre un personaje sellado no lo pone en el campo, sino que activa «Regreso: Aniquilación del Edicto Estelar Azur».\nResplandor: Fulgor Estelar: todo el daño de Superconducción Estelar anterior se sustituye por Daño Cryo de la reacción de Fulgor Estelar correspondiente.\n\nSello\nUn personaje sellado no puede entrar al campo. El sello dura inicialmente lo mismo que la Habilidad Definitiva; ciertas acciones lo acortan.\n\nCongelación\nMientras dura, el tiempo restante de los efectos afectados no disminuye.\n\nRegreso: Triunfo del Edicto Estelar Azur\nInflige a los enemigos cercanos Daño Cryo en un área considerado daño de Superconducción Estelar (en Resplandor, de la reacción de Fulgor Estelar correspondiente).\n\nRegreso: Aniquilación del Edicto Estelar Azur\nTres fases: un combo de lanza (Daño Cryo de habilidad; el último golpe cuenta como Superconducción Estelar), un salto con tajo y la lanza lanzada como una flecha con más daño; la tercera fase termina la congelación de la bendición. En Resplandor, el daño de Superconducción Estelar se sustituye por la reacción de Fulgor Estelar correspondiente.",
+            "scaling": [
+              [
+                "Daño de Hacia un Nuevo Mundo",
+                "360,7%"
+              ],
+              [
+                "Aumento del daño de Fulgor Estelar",
+                "50,0%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de la corona",
+                "20,2% / 30,2%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de Triunfo",
+                "400,8% / 601,2%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de Cuando la Noche Eterna Dé Paso al Alba",
+                "561,1% / 841,7%"
+              ],
+              [
+                "Daño Cryo de la 1.ª fase de Aniquilación",
+                "48,1% × 5"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de la 1.ª fase",
+                "120,2% / 180,4%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de la 2.ª fase",
+                "160,3% / 240,5%"
+              ],
+              [
+                "Daño de Superconducción / Torbellino Estelar de la 3.ª fase",
+                "200,4% / 300,6%"
+              ],
+              [
+                "Duración de Hacia un Nuevo Mundo",
+                "20 s"
+              ],
+              [
+                "Duración de Cuando la Noche Eterna Dé Paso al Alba",
+                "14 s"
+              ],
+              [
+                "TdR",
+                "15 s"
+              ],
+              [
+                "Energía",
+                "50"
+              ]
+            ]
+          },
+          "passives": [
+            {
+              "name": "Resplandor de una Noche Espléndida",
+              "description": "Tras Veredicto de la Estrella Polar, todos los personajes del equipo obtienen Honor durante 20 s: Daño CRIT +12%.\nCuando un personaje es sellado, su Honor se reparte a partes iguales entre los no sellados. El reparto dura hasta 8 s después de terminar el sello."
+            },
+            {
+              "name": "Pena No Cantada",
+              "description": "Mientras Anastasya esté en el equipo, las reacciones de Fulgor Estelar obtienen efectos extra:\n• Superconducción Estelar: cada vez que el Campo de Luz Estelar Polar otorga una mejora, su eficacia aumenta aún más; al crear un Cristal Estelar, el campo otorga al instante una mejora adicional;\n• Torbellino Estelar: los Torbellinos Estelares y Errantes empiezan en nivel 2 al crearse (una vez por segundo) y el multiplicador base de Torbellino Estelar aumenta un 15%."
+            },
+            {
+              "name": "Bendición Estelar, Regreso de la Luz Inmaculada",
+              "description": "Dentro de un Campo de Luz Estelar Polar, y durante 8 s después de que un personaje cercano desencadene Torbellino Estelar, Anastasya entra en Resplandor: Superconducción Estelar y Resplandor: Torbellino Estelar.\nCuando el equipo desencadena Superconducción o Torbellino Cryo, se desencadena Superconducción Estelar o Torbellino Estelar en su lugar.\nEl daño base de estas reacciones del equipo aumenta un 0,7% por cada 100 de ATQ de Anastasya, hasta un 14%."
+            },
+            {
+              "name": "Bendición de la Nevada",
+              "description": "En Snezhnaya (excepto Nod-Krai), la Vida del equipo se regenera fuera de combate. Mientras Anastasya esté en el equipo, la energía de Mirada Gris no disminuye y, si baja del 30%, se restablece al 30%. No funciona en dominios, zonas de jefes ni en el Abismo de Espiral."
+            }
+          ],
+          "constellations": [
+            {
+              "name": "Por los Años Pasados, por el Corazón Que Nunca se Apaga",
+              "description": "Mejora Resplandor de una Noche Espléndida: Honor también aumenta un 15% el ATQ de los personajes Cryo y en 60 la Maestría Elemental de los demás.\nRepartir el Honor ya no se lo quita al personaje sellado. Cuando la sellada es Anastasya, el Honor que transmite aumenta al 300%."
+            },
+            {
+              "name": "Por el Duro Invierno, por Quienes Comparten Su Frío",
+              "description": "Tras Veredicto de la Estrella Polar, según la bendición:\n• Misericordia: las reacciones de Fulgor Estelar del equipo obtienen +60% de Daño CRIT durante 30 s;\n• Gloria: el daño de sus Ataques Normales, de Cuando la Noche Eterna Dé Paso al Alba y de Aniquilación del Edicto Estelar Azur aumenta al 125% durante 15 s.\nAdemás, el daño de Fulgor Estelar de los personajes cercanos aumenta un 5%."
+            },
+            null,
+            {
+              "name": "Al Tirano, un Canto de Resistencia",
+              "description": "Las bonificaciones de Daño CRIT, ATQ y Maestría Elemental de Honor aumentan al 130%."
+            },
+            null,
+            {
+              "name": "Mira, el Alba Inmaculada Está Cerca",
+              "description": "Tras Veredicto de la Estrella Polar, según la bendición:\n• Misericordia: el siguiente cambio a otro personaje activa un efecto como Regreso: Triunfo del Edicto Estelar Azur con un 250% del daño; el daño de Fulgor Estelar de los personajes cercanos +10%;\n• Gloria: la siguiente pulsación de la habilidad activa un efecto como la 3.ª fase de Aniquilación del Edicto Estelar Azur con un 200% del daño. Si ningún otro personaje está sellado, el ataque cuenta con el Honor de todo el equipo, y el daño de Fulgor Estelar de Anastasya +20%.\nEstos efectos duran 30 s, se activan una vez cada 15 s y terminan cuando acaba el sello de los demás personajes."
+            }
+          ],
+          "missing": [],
+          "analysis": "Anastasya es una arquera Cryo 5★ y, por su kit, el centro de los equipos de Fulgor Estelar: cubre las dos reacciones nuevas, Superconducción Estelar (Electro + Cryo) y el nuevo Torbellino Estelar (Anemo + Cryo), y su pasiva mejora ambas. Honor da a todo el equipo +12% de Daño CRIT y, con C1, ATQ a los personajes Cryo y Maestría Elemental al resto.\n\nTiene dos modos. Misericordia (pulsar) es un apoyo fuera del campo: la corona ataca sola y Hacia un Nuevo Mundo aumenta un 50% el daño de Fulgor Estelar del equipo durante 20 s. Gloria (mantener) es una DPS principal: ataques con la lanza y una Habilidad Definitiva que sella hasta a tres aliados, cuyos iconos se convierten después en botones de Aniquilación con hasta un 300% en la tercera fase. El sello es una mecánica inusual: el equipo no puede cambiar de personaje durante un tiempo, así que las rotaciones girarán en torno a ella.\n\nLos multiplicadores del Ataque Normal y la habilidad están al nivel 1 de talento y los de la Habilidad Definitiva al nivel 10, así que no se comparan directamente. Sus estadísticas y materiales aún no se conocen, así que esta valoración es preliminar."
+        }
+      }
     }
   ]
 }

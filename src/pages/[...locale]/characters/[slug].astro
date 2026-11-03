@@ -155,7 +155,7 @@ const jsonLd = b && {
             </small>
           </div>}
         </div>
-        <LevelStats stats={c.stats} substat={c.substat} substatPercent={c.substatPercent} />
+        {c.betaNoStats ? <p class="muted small">{t('Характеристики пока неизвестны.')}</p> : <LevelStats stats={c.stats} substat={c.substat} substatPercent={c.substatPercent} />}
       </div>
     </section>
 
@@ -286,13 +286,14 @@ const jsonLd = b && {
         <dl class="panel mats">
           {(c.betaMaterials ?? []).map(([k, v]) => <div><dt>{betaLabels[k] ?? k}</dt><dd>{v}</dd></div>)}
         </dl>
+        {!c.betaMaterials?.length && <p class="muted small">{t('Материалы пока неизвестны.')}</p>}
       </section>
     )}
     {(<>
     <section id="talents">
       <h2 class="h-sec">{t('Таланты')}
         {c.beta ? (
-          <small data-pagefind-ignore>{t('множители на {n} уровне таланта', { n: BETA_TALENT_LEVEL })}</small>
+          !Object.keys(c.betaLevels ?? {}).length && <small data-pagefind-ignore>{t('множители на {n} уровне таланта', { n: BETA_TALENT_LEVEL })}</small>
         ) : (
         <small data-pagefind-ignore>
           <label class="lvl">{t('Уровень')} <output>10</output>
@@ -316,7 +317,7 @@ const jsonLd = b && {
             <p class="desc">{c.talents[k].description}</p>
             {c.talents[k].scaling?.length > 0 && (
               <details data-pagefind-ignore>
-                <summary>{t('Множители')}</summary>
+                <summary>{t('Множители')}{c.beta && Object.keys(c.betaLevels ?? {}).length > 0 && <> · {t('множители на {n} уровне таланта', { n: c.betaLevels?.[k as 'normal'] ?? BETA_TALENT_LEVEL })}</>}</summary>
                 <table>
                   <tbody>
                     {c.talents[k].scaling.map((r) => (

@@ -11,6 +11,7 @@ import { translate, type Lang } from '../i18n';
 import { MODE_SECTIONS } from './sections';
 
 import beta from '../data/beta-characters.json';
+import { existsSync } from 'node:fs';
 
 export type { Lang };
 // beta — персонаж из утечек: данных мало, в инструментах (проверка команды, конструктор ротаций) не участвует
@@ -18,6 +19,8 @@ export type Character = (typeof characters)[number] & {
   beta?: boolean; betaMaterials?: string[][];
   // Утёкшие навыки: чего нет в утечке (skill/burst) и краткий разбор, помеченный как «анализ ИИ»
   betaMissing?: string[]; betaAnalysis?: string;
+  // Утечка без характеристик; уровни таланта, на которых даны множители, если отличаются от общего BETA_TALENT_LEVEL
+  betaNoStats?: boolean; betaLevels?: Partial<Record<'normal' | 'skill' | 'burst', number>>;
 };
 export type Weapon = (typeof weapons)[number];
 export type Artifact = (typeof artifacts)[number];
@@ -79,29 +82,42 @@ export const LANGS: Lang[] = ['ru', 'en', 'es'];
 export const prefixOf = (lang: Lang) => (lang === 'ru' ? '' : `/${lang}`);
 export const toLang = (v: string | undefined): Lang => (v === 'en' || v === 'es' ? v : 'ru');
 
-type KitTalent = { name: string; description: string; scaling: string[][] };
+type KitTalent = { name: string; description: string; scaling: string[][]; level?: number };
 const talent = (k?: KitTalent | null) => k ? { name: k.name, description: k.description, icon: null, scaling: k.scaling.map(([name, value]) => ({ name, values: [value] })) } : null;
 
+// Сплэш беты — только если арт уже лежит в public/img/beta
 // Утечки дописываем в конец списка в том же формате, что и сгенерированные персонажи
-const betaCharacters = (lang: Lang): Character[] => beta.characters.map((b) => {
+// Слаг или английское имя без регистра и знаков: так бета находит своего вышедшего персонажа в genshin-db
+const nameKey = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, '');
+const released = new Set(characters.flatMap((c) => [nameKey(c.slug), nameKey(c.nameEn ?? '')]).filter(Boolean));
+// Вышедший персонаж заменяет бету на всех языках сразу, иначе слаги задвоятся
+const betaList = beta.characters.filter((b) => !released.has(nameKey(b.slug)) && !released.has(nameKey(b.i18n.en.nameEn)));
+
+const betaCharacters = (lang: Lang): Character[] => betaList.map((b) => {
   const t = translate(lang);
-  const text = b.i18n[lang];
-  const kit = b.kit[lang];
+  const text = b.i18n[lang] as { name: string; nameEn: string; substat?: string };
+  const kit = b.kit[lang] as typeof b.kit.ru & { skill?: KitTalent; burst?: KitTalent };
+  const stats = b.stats as { hp: number; atk: number; def: number; sub: number } | null;
+  const levels = Object.fromEntries((['normal', 'skill', 'burst'] as const).flatMap((k) => {
+    const level = (kit[k] as KitTalent | undefined)?.level;
+    return level ? [[k, level]] : [];
+  }));
   return {
     id: 0, slug: b.slug, nameEn: text.nameEn, name: text.name,
     title: t('Утечка из бета-версии'),
     description: t('Персонаж из утечек бета-версии. Имя, стихия, характеристики и материалы могут измениться к релизу.'),
     rarity: b.rarity, element: b.element, elementText: ELEMENTS[lang][b.element], weapon: b.weapon, weaponText: WEAPON_TYPES[lang][b.weapon],
-    region: '', constellationName: '', birthday: '', substat: text.substat, version: '',
-    icon: `/img/beta/${b.slug}-icon.webp?v=2`, card: `/img/beta/${b.slug}-icon.webp?v=2`, splash: `/img/beta/${b.slug}-splash.webp?v=2`, emblem: null,
-    stats: [{ level: '90', ...b.stats }], substatPercent: b.substatPercent,
+    region: '', constellationName: '', birthday: '', substat: text.substat ?? '', version: '',
+    icon: `/img/beta/${b.slug}-icon.webp?v=2`, card: `/img/beta/${b.slug}-icon.webp?v=2`, splash: existsSync(`public/img/beta/${b.slug}-splash.webp`) ? `/img/beta/${b.slug}-splash.webp?v=2` : null, emblem: null,
+    stats: stats ? [{ level: '90', ...stats }] : [], substatPercent: (b as { substatPercent?: boolean }).substatPercent ?? false,
     // Навыки из утечки — в формате сгенерированных: множители только на одном уровне таланта
     talents: {
-      normal: talent(kit.normal), skill: talent((kit as { skill?: KitTalent }).skill), burst: talent((kit as { burst?: KitTalent }).burst),
+      normal: talent(kit.normal as KitTalent), skill: talent(kit.skill), burst: talent(kit.burst),
       passives: kit.passives.map((p) => ({ ...p, icon: null })),
     } as unknown as Character['talents'],
     constellations: kit.constellations.map((k) => (k ? { ...k, icon: null } : null)) as unknown as Character['constellations'],
-    beta: true, betaMaterials: b.materials, betaMissing: kit.missing, betaAnalysis: kit.analysis,
+    beta: true, betaMaterials: (b as { materials?: string[][] }).materials ?? [], betaMissing: kit.missing, betaAnalysis: kit.analysis,
+    betaNoStats: !stats, betaLevels: levels,
   } as Character;
 });
 

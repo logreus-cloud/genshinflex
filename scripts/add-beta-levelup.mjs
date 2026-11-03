@@ -9,7 +9,11 @@ const beta = JSON.parse(readFileSync('src/data/beta-characters.json', 'utf8'));
 
 const MORA = 202, CROWN = 104319;
 // Самоцветы по стихии: осколок, фрагмент, кусок, камень
-const GEMS = { electro: [104141, 104142, 104143, 104144] };
+const GEMS = { electro: [104141, 104142, 104143, 104144], cryo: [104161, 104162, 104163, 104164] };
+// Вышедший персонаж уже есть в levelup.json из игровых данных — бету для него не пишем (сравнение по слагу и английскому имени)
+const nameKey = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const released = new Set(JSON.parse(readFileSync('src/data/generated/characters.json', 'utf8')).flatMap((c) => [nameKey(c.slug), nameKey(c.nameEn)]).filter(Boolean));
+let added = 0;
 
 const NAMES = {
   weekly: ['Материал с еженедельного босса', 'Weekly boss material', 'Material de jefe semanal'],
@@ -22,6 +26,10 @@ const NAMES = {
 const SORT = { weekly: 11101, specialty: 317, boss: 11101, books: 13120, common: 10637 };
 
 beta.characters.forEach((c, n) => {
+  if (released.has(nameKey(c.slug)) || released.has(nameKey(c.i18n.en.nameEn))) return;
+  // Материалы ещё не утекли — в калькуляторе такого персонажа пока нет
+  if (!c.materials?.length) return;
+  added++;
   const gem = GEMS[c.element];
   if (!gem) throw new Error(`Нет самоцветов для стихии ${c.element} (${c.slug})`);
   const base = 990000 + (n + 1) * 100;
@@ -63,4 +71,4 @@ beta.characters.forEach((c, n) => {
 });
 
 writeFileSync(FILE, JSON.stringify(data));
-console.log(`калькулятор: BETA-персонажей ${beta.characters.length}`);
+console.log(`калькулятор: BETA-персонажей ${added}`);
