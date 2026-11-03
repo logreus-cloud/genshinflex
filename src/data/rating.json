@@ -1,13 +1,13 @@
 {
  "_meta": {
-  "date": "2026-10-27",
+  "date": "2026-11-03",
   "source": "https://db.kqm.gg",
   "entries": 6020,
   "baseline": 5329,
-  "teams": 4213,
-  "shares": 357,
+  "teams": 4214,
+  "shares": 356,
   "pairs": 14070,
-  "own": 7
+  "own": 8
  },
  "characters": {
   "mavuika": {
@@ -808,7 +808,7 @@
   "arlecchino": {
    "carry": {
     "value": 93835.9825555385,
-    "n": 21,
+    "n": 20,
     "best": {
      "id": "jCTQmbBrbcGQ",
      "team": [
@@ -1515,7 +1515,7 @@
    },
    "subdps": {
     "value": 18147.77276015932,
-    "n": 5,
+    "n": 4,
     "best": {
      "id": "BFnJRpfz8Rnq",
      "team": [
@@ -4678,6 +4678,18 @@
    "reaction": "freeze"
   },
   {
+   "id": "own:sandrone",
+   "m": [
+    "sandrone",
+    "odette",
+    "yae-miko",
+    "alyosha"
+   ],
+   "dps": 99230,
+   "targets": 1,
+   "reaction": "stellar-conduct"
+  },
+  {
    "id": "ffBLNtrJRJnp",
    "m": [
     "mavuika",
@@ -5573,8 +5585,7 @@
     "bennett"
    ],
    "dps": 94030,
-   "targets": 1,
-   "reaction": "overload"
+   "targets": 1
   },
   {
    "id": "FtRhQD7TRCjW",

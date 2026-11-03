@@ -1,0 +1,43 @@
+# Сандроне — Одетта — Яэ Мико — Алёша (C6). Ротация из нашего гайда (src/content/builds/sandrone.md), https://genshin.gg/characters/sandrone/
+# Yae 3[E] > Odette 2[E] > Alyosha EQ > Sandrone CA (до полной шкалы) > E > CA > E > CA > E > Q.
+# Кит Сандроне — своя реализация gcsim (ветка add-sandrone), кадры сняты с видео. Билды — по нашим гайдам, доп. статы подбирает оптимизатор gcsim.
+sandrone char lvl=90/90 cons=0 talent=9,9,9;
+sandrone add weapon="ateaspoonoftranscendence" refine=1 lvl=90/90;
+sandrone add set="disenchantmentindeepshadow" count=4;
+sandrone add stats hp=4780 atk=311 atk%=0.466 atk%=0.466 cr=0.311;
+
+odette char lvl=90/90 cons=0 talent=9,9,9;
+odette add weapon="finaleofthedeep" refine=5 lvl=90/90;
+odette add set="heartofthefurnace" count=4;
+odette add stats hp=4780 atk=311 atk%=0.466 atk%=0.466 cr=0.311;
+
+yaemiko char lvl=90/90 cons=0 talent=9,9,9;
+yaemiko add weapon="thewidsith" refine=5 lvl=90/90;
+yaemiko add set="noblesseoblige" count=4;
+yaemiko add stats hp=4780 atk=311 atk%=0.466 electro%=0.466 cr=0.311;
+
+alyosha char lvl=90/90 cons=6 talent=9,9,9;
+alyosha add weapon="frostbreath" refine=5 lvl=90/90;
+alyosha add set="thunderingfury" count=4;
+alyosha add stats hp=4780 atk=311 er=0.518 atk%=0.466 atk%=0.466;
+
+options swap_delay=12 iteration=1000;
+target lvl=100 resist=0.1 radius=2 pos=0,2.4 hp=999999999;
+energy every interval=480,720 amount=1;
+
+active yaemiko;
+for let i=0; i<5; i=i+1 {
+  yaemiko skill:3;
+  odette skill:2;
+  alyosha skill;
+  if .alyosha.burst.ready {
+    alyosha burst;
+  }
+  sandrone charge[hold=250];
+  sandrone skill, charge[hold=250];
+  sandrone skill, charge[hold=250];
+  sandrone skill;
+  if .sandrone.burst.ready {
+    sandrone burst;
+  }
+}
