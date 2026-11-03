@@ -53,8 +53,10 @@ export const region = {
   set: (r: Region) => { store.set('gf:region', r); document.dispatchEvent(new CustomEvent('gf:region', { detail: r })); },
 };
 
-// «2026-10-16T04:00» по времени сервера → момент в UTC
+// «2026-10-16T04:00» по времени сервера → момент в UTC.
+// С явным поясом («2026-11-04T11:00+08:00») — абсолютный момент, регион не учитывается.
 export function serverMoment(local: string, r: Region = region.get()) {
+  if (/T\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/.test(local)) return Date.parse(local);
   const [d, t = '04:00'] = local.split('T');
   const [y, m, day] = d.split('-').map(Number);
   const [h, min] = t.split(':').map(Number);

@@ -6,7 +6,9 @@ type Reminder = { id: string; type: ReminderType; title: string; at: string; url
 const SITE = 'https://genshinflex.com';
 
 // Календарь хранит время сервера Европа (UTC+1), без перехода на летнее время.
+// С явным поясом («2026-11-04T11:00+08:00») — абсолютный момент.
 const serverTime = (local: string) => {
+  if (/T\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/.test(local)) return Date.parse(local);
   const [date, time] = local.split('T');
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);

@@ -109,7 +109,8 @@ const rotationsArchive = rotations.extend({
 });
 
 // Баннеры: время начала/конца — по времени сервера («2026-10-13T18:00»), таймеры пересчитываются под регион
-const serverTime = z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/);
+// Время сервера; с явным поясом (2026-11-04T11:00+08:00) — общее для всех регионов, как старт 1-й фазы версии
+const serverTime = z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})?)?$/);
 const banners = z.object({
   version: z.string(),
   phase: z.number().int(),

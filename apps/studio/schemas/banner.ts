@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-const serverTime = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
+const serverTime = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})?)?$/;
 
 export const banner = defineType({
   name: 'banner',
@@ -14,7 +14,7 @@ export const banner = defineType({
     defineField({ name: 'version', title: 'Версия', type: 'string', validation: (Rule) => Rule.required() }),
     defineField({ name: 'phase', title: 'Фаза', type: 'number', validation: (Rule) => Rule.required().integer() }),
     // Серверное время сохраняем строкой: его нельзя переводить в UTC до выбора региона.
-    defineField({ name: 'start', title: 'Начало по серверу', type: 'string', validation: (Rule) => Rule.required().regex(serverTime) }),
+    defineField({ name: 'start', title: 'Начало по серверу', type: 'string', description: '1-я фаза версии открывается во всех регионах одновременно — пишите с поясом: 2026-11-04T11:00+08:00. 2-я фаза — без пояса: 2026-11-24T18:00.', validation: (Rule) => Rule.required().regex(serverTime) }),
     defineField({ name: 'end', title: 'Конец по серверу', type: 'string', validation: (Rule) => Rule.required().regex(serverTime) }),
     defineField({ name: 'featured', title: 'Главные персонажи', type: 'array', of: [{ type: 'featuredCharacter' }], validation: (Rule) => Rule.required() }),
     defineField({ name: 'fourStars', title: 'Персонажи 4★', type: 'array', of: [{ type: 'string' }], initialValue: [] }),

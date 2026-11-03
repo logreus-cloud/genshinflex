@@ -11,9 +11,17 @@ export type CalItem = { id: string; kind: CalKind; start: string; end: string | 
 type Localized = Record<Lang, string>;
 type Manual = { id: string; kind: 'version' | 'livestream' | 'banner' | 'event'; start: string; end?: string; estimated?: boolean; title: Localized; note?: Localized; source?: { title: string; url: string } };
 type Phase = { version: string; phase?: number; start: string; end: string; featured?: { slug: string }[]; weapons?: unknown; characters?: { five?: string[] }[] };
-const normalize = (value: string) => value.replace(' ', 'T').slice(0, 16);
-// Время событий при сборке считаем по европейскому серверу.
-export const serverTime = (value: string) => Date.parse(`${normalize(value)}+01:00`);
+// Явный пояс в конце строки (Z или ±ЧЧ:ММ) — абсолютный момент, общий для всех регионов (старт 1-й фазы версии)
+const ZONE = /(Z|[+-]\d{2}:\d{2})$/;
+const normalize = (value: string) => {
+  const v = value.replace(' ', 'T');
+  return v.slice(0, 16) + (ZONE.exec(v)?.[1] ?? '');
+};
+// Время событий при сборке считаем по европейскому серверу, если пояс не указан явно.
+export const serverTime = (value: string) => {
+  const v = normalize(value);
+  return Date.parse(ZONE.test(v) ? v : `${v}+01:00`);
+};
 const monthStart = (date: Date, delta: number) => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + delta, 1));
 const nextCycle = (date: Date, day: number) => `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T04:00`;
 const cycleEnd = (date: Date, day: number) => `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T03:59`;

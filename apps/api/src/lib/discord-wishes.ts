@@ -27,7 +27,9 @@ const strings = (value: unknown): value is string[] => Array.isArray(value) && v
 const serverTimeRe = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/;
 
 // «2026-10-13T18:00» по времени сервера Европы (UTC+1) → момент в UTC, как serverMoment в src/scripts/common.ts
+// С явным поясом («2026-11-04T11:00+08:00») — абсолютный момент.
 export function serverMoment(value: string): number {
+  if (/T\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/.test(value)) return Date.parse(value);
   const match = serverTimeRe.exec(value);
   if (!match) return Number.NaN;
   const [, y, m, d, h, min] = match.map(Number);
