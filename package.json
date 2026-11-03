@@ -31,6 +31,7 @@
     "deploy:platform": "node scripts/deploy.mjs --branch=platform --sanity",
     "deploy:verbose": "npm run build && wrangler pages deploy dist --project-name genshinflex",
     "discord:news": "node --import tsx scripts/discord-news.mjs",
+    "discord:languages": "node scripts/discord-languages.mjs",
     "discord:commands": "node scripts/discord-commands.mjs",
     "discord:tickets-panel": "node scripts/discord-tickets-panel.mjs",
     "cms:external": "node --import tsx scripts/find-external-guides.mjs",
