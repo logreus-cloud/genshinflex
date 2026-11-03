@@ -32,7 +32,7 @@ const mirrors = [
 const tagNames = {
   'Пиро': ['Pyro', 'Pyro'], 'Гидро': ['Hydro', 'Hydro'], 'Анемо': ['Anemo', 'Anemo'], 'Электро': ['Electro', 'Electro'],
   'Дендро': ['Dendro', 'Dendro'], 'Крио': ['Cryo', 'Cryo'], 'Гео': ['Geo', 'Geo'], '5★': ['5★', '5★'], '4★': ['4★', '4★'], 'BETA': ['BETA', 'BETA'],
-  'Бездна': ['Abyss', 'Abismo'], 'Театр': ['Theater', 'Teatro'], 'Натиск': ['Stygian Onslaught', 'Asalto Estigio'],
+  'Бездна': ['Abyss', 'Abismo'], 'Театр': ['Theater', 'Teatro'], 'Натиск': ['Stygian Onslaught', 'Conflagración'],
   'Открытый мир': ['Open world', 'Mundo abierto'], 'Новичок': ['Beginner', 'Principiante'], 'Решено': ['Solved', 'Resuelto'],
   'На рассмотрении': ['Under review', 'En revisión'], 'Инструмент': ['Tool', 'Herramienta'], 'Гайды и данные': ['Guides & data', 'Guías y datos'],
   'Дизайн': ['Design', 'Diseño'], 'Запланировано': ['Planned', 'Planeado'], 'В работе': ['In progress', 'En progreso'],
