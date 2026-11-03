@@ -16,7 +16,7 @@ import type { DiscordBuild, DiscordInteraction } from './lib/discord.ts';
 import { loadDiscordProfile } from './lib/discord-profile.ts';
 import type { PublicProfileCard } from './lib/discord-profile.ts';
 import { localizedDataUrl, parseChannelLangs } from './lib/discord-i18n.ts';
-import { deliverDiscordNotifications } from './lib/discord-notify.ts';
+import { deliverDiscordNotifications, parseLangRoles } from './lib/discord-notify.ts';
 import { isPityData, parseBannersData } from './lib/discord-wishes.ts';
 import { authorizeUrl, completeLink, rolePage, syncRoleConnections } from './lib/discord-roles.ts';
 import type { TicketDeps } from './lib/discord-tickets.ts';
@@ -36,7 +36,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.24.0';
+const version = '0.25.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -793,7 +793,9 @@ function scheduled(event: { scheduledTime?: number }, env: Env, ctx: { waitUntil
   const mediaGc = new Date(event.scheduledTime ?? Date.now()).getUTCMinutes() === 17;
   ctx.waitUntil(Promise.allSettled([
     deliverTelegramNotifications(client, env.TELEGRAM_BOT_TOKEN),
-    deliverDiscordNotifications(client, env.DISCORD_BOT_TOKEN || ''),
+    deliverDiscordNotifications(client, env.DISCORD_BOT_TOKEN || '', fetch, {
+      guildId: env.DISCORD_GUILD_ID, langRoles: parseLangRoles(env.DISCORD_LANG_ROLE_IDS),
+    }),
     roles ? syncRoleConnections(client, { applicationId: env.DISCORD_APPLICATION_ID!, clientSecret: env.DISCORD_CLIENT_SECRET! }) : null,
     mediaGc ? collectProfileMedia(client) : null,
   ]).then(([telegram, discord, linkedRoles, media]) => {

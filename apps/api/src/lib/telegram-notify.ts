@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Lang } from './discord-i18n.ts';
 
 export type NotificationItem = {
   id: number;
@@ -14,41 +15,44 @@ export type TelegramNotification = NotificationItem & { telegram_id: number };
 const escapes: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
 const escapeHtml = (value: string) => value.replace(/[&<>]/g, (char) => escapes[char]);
 
-export function notificationParts(item: NotificationItem, site = 'https://genshinflex.com'): { heading: string; snippet: string; href: string } {
-  const name = item.actor?.name ?? 'Удалённый пользователь';
-  const topic = item.thread_title ? ` в теме «${item.thread_title}»` : '';
+export function notificationParts(item: NotificationItem, site = 'https://genshinflex.com', lang: Lang = 'ru'): { heading: string; snippet: string; href: string } {
+  const name = item.actor?.name ?? (lang === 'en' ? 'Deleted user' : lang === 'es' ? 'Usuario eliminado' : 'Удалённый пользователь');
+  const topic = item.thread_title
+    ? lang === 'en' ? ` in “${item.thread_title}”` : lang === 'es' ? ` en «${item.thread_title}»` : ` в теме «${item.thread_title}»`
+    : '';
   let heading: string;
   switch (item.kind) {
     case 'reply':
-      heading = `Ответ от ${name}${topic}`;
+      heading = lang === 'en' ? `Reply from ${name}${topic}` : lang === 'es' ? `Respuesta de ${name}${topic}` : `Ответ от ${name}${topic}`;
       break;
     case 'mention':
-      heading = `Упоминание от ${name}${topic}`;
+      heading = lang === 'en' ? `Mention from ${name}${topic}` : lang === 'es' ? `Mención de ${name}${topic}` : `Упоминание от ${name}${topic}`;
       break;
     case 'follow':
-      heading = `Новый подписчик: ${name}`;
+      heading = lang === 'en' ? `New follower: ${name}` : lang === 'es' ? `Nuevo seguidor: ${name}` : `Новый подписчик: ${name}`;
       break;
     case 'friend_request':
-      heading = `Заявка в друзья от ${name}`;
+      heading = lang === 'en' ? `Friend request from ${name}` : lang === 'es' ? `Solicitud de amistad de ${name}` : `Заявка в друзья от ${name}`;
       break;
     case 'friend_accept':
-      heading = `${name} теперь у вас в друзьях`;
+      heading = lang === 'en' ? `${name} is now your friend` : lang === 'es' ? `${name} ahora es tu amigo` : `${name} теперь у вас в друзьях`;
       break;
     case 'message':
-      heading = `Сообщение от ${name}`;
+      heading = lang === 'en' ? `Message from ${name}` : lang === 'es' ? `Mensaje de ${name}` : `Сообщение от ${name}`;
       break;
     default:
-      heading = `Уведомление от ${name}`;
+      heading = lang === 'en' ? `Notification from ${name}` : lang === 'es' ? `Notificación de ${name}` : `Уведомление от ${name}`;
   }
-  let href = item.kind === 'message' ? `${site}/messages/` : `${site}/notifications/`;
+  const localizedSite = lang === 'ru' ? site : `${site.replace(/\/$/, '')}/${lang}`;
+  let href = item.kind === 'message' ? `${localizedSite}/messages/` : `${localizedSite}/notifications/`;
   if (item.kind === 'message' && item.actor?.id)
     href += `?u=${encodeURIComponent(item.actor.id)}`;
   else if ((item.kind === 'reply' || item.kind === 'mention') && item.thread_id !== null)
-    href = `${site}/forum/t/${item.thread_id}/${item.post_id !== null ? `#p${item.post_id}` : ''}`;
+    href = `${localizedSite}/forum/t/${item.thread_id}/${item.post_id !== null ? `#p${item.post_id}` : ''}`;
   else if (item.kind === 'friend_request')
-    href = `${site}/friends/`;
+    href = `${localizedSite}/friends/`;
   else if ((item.kind === 'follow' || item.kind === 'friend_accept') && item.actor?.public && item.actor.nickname)
-    href = `${site}/u/${encodeURIComponent(item.actor.nickname)}/`;
+    href = `${localizedSite}/u/${encodeURIComponent(item.actor.nickname)}/`;
   const snippet = item.snippet?.replace(/\s+/g, ' ').trim();
   const short = snippet ? Array.from(snippet).slice(0, 160).join('') : '';
   return { heading, snippet: short, href };

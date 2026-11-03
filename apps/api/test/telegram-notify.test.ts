@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { deliverTelegramNotifications, telegramMessage } from '../src/lib/telegram-notify.ts';
+import { deliverTelegramNotifications, notificationParts, telegramMessage } from '../src/lib/telegram-notify.ts';
 import type { TelegramNotification } from '../src/lib/telegram-notify.ts';
 
 const item: TelegramNotification = {
@@ -25,6 +25,28 @@ test('telegramMessage formats every notification kind and link', () => {
   ];
   for (const [kind, heading, href] of cases)
     assert.equal(telegramMessage({ ...item, kind }), `${heading}\n\n<a href="${href}">Открыть на GenshinFlex</a>`);
+});
+
+test('notificationParts localizes headings and links', () => {
+  const cases = [
+    ['reply', 'Reply from Анна in “Тема”', 'Respuesta de Анна en «Тема»', '/forum/t/42/#p7'],
+    ['mention', 'Mention from Анна in “Тема”', 'Mención de Анна en «Тема»', '/forum/t/42/#p7'],
+    ['follow', 'New follower: Анна', 'Nuevo seguidor: Анна', '/u/Anna/'],
+    ['friend_request', 'Friend request from Анна', 'Solicitud de amistad de Анна', '/friends/'],
+    ['friend_accept', 'Анна is now your friend', 'Анна ahora es tu amigo', '/u/Anna/'],
+    ['message', 'Message from Анна', 'Mensaje de Анна', '/messages/?u=123e4567-e89b-12d3-a456-426614174000'],
+    ['other', 'Notification from Анна', 'Notificación de Анна', '/notifications/'],
+  ];
+  for (const [kind, enHeading, esHeading, path] of cases) {
+    assert.deepEqual(notificationParts({ ...item, kind }, undefined, 'en'), {
+      heading: enHeading, snippet: '', href: `https://genshinflex.com/en${path}`,
+    });
+    assert.deepEqual(notificationParts({ ...item, kind }, undefined, 'es'), {
+      heading: esHeading, snippet: '', href: `https://genshinflex.com/es${path}`,
+    });
+  }
+  assert.equal(notificationParts({ ...item, actor: null, thread_title: null }, undefined, 'en').heading, 'Reply from Deleted user');
+  assert.equal(notificationParts({ ...item, actor: null, thread_title: null }, undefined, 'es').heading, 'Respuesta de Usuario eliminado');
 });
 
 test('telegramMessage escapes user content and handles missing destinations', () => {

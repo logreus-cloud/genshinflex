@@ -1,7 +1,21 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Lang } from './discord-i18n.ts';
 import { notificationParts, type NotificationItem } from './telegram-notify.ts';
 
 export type DiscordNotification = NotificationItem & { discord_id: string };
+
+export function parseLangRoles(value?: string): Map<string, Lang> {
+  const roles = new Map<string, Lang>();
+  for (const entry of (value || '').split(',')) {
+    const match = /^([0-9]{5,25}):(ru|en|es)$/.exec(entry.trim());
+    if (match) roles.set(match[1], match[2] as Lang);
+  }
+  return roles;
+}
+
+const openLabels: Record<Lang, string> = {
+  ru: 'Открыть на GenshinFlex', en: 'Open on GenshinFlex', es: 'Abrir en GenshinFlex',
+};
 
 class DiscordRateLimit extends Error {}
 
@@ -29,6 +43,31 @@ async function discordRequest(
   }
 }
 
+async function memberLang(
+  fetchImpl: typeof fetch,
+  token: string,
+  discordId: string,
+  guildId?: string,
+  langRoles?: Map<string, Lang>,
+): Promise<Lang> {
+  if (!guildId || !langRoles?.size) return 'ru';
+  try {
+    const response = await fetchImpl(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
+      method: 'GET',
+      signal: AbortSignal.timeout(5_000),
+      headers: { Authorization: `Bot ${token}` },
+    });
+    if (!response.ok) return 'ru';
+    const member = await response.json() as { roles?: unknown };
+    if (!Array.isArray(member.roles)) return 'ru';
+    const langs = new Set(member.roles.map((role: unknown) =>
+      typeof role === 'string' ? langRoles.get(role) : undefined));
+    return langs.has('ru') ? 'ru' : langs.has('en') ? 'en' : langs.has('es') ? 'es' : 'ru';
+  } catch {
+    return 'ru';
+  }
+}
+
 async function logFailure(id: number, response: Response): Promise<void> {
   const text = await response.text().catch(() => '');
   let code: unknown;
@@ -44,16 +83,23 @@ export async function deliverDiscordNotifications(
   client: Pick<SupabaseClient, 'rpc'>,
   botToken: string,
   fetchImpl: typeof fetch = fetch,
+  options: { guildId?: string; langRoles?: Map<string, Lang> } = {},
 ): Promise<{ claimed: number; sent: number }> {
   if (!botToken) return { claimed: 0, sent: 0 };
   const { data, error } = await client.rpc('discord_notifications_claim', { p_limit: 50 });
   if (error) throw error;
   const items = (data ?? []) as DiscordNotification[];
   const channels = new Map<string, string>();
+  const langs = new Map<string, Lang>();
   const ack: number[] = [];
   let sent = 0;
   for (const item of items) {
     try {
+      let lang = langs.get(item.discord_id);
+      if (!lang) {
+        lang = await memberLang(fetchImpl, botToken, item.discord_id, options.guildId, options.langRoles);
+        langs.set(item.discord_id, lang);
+      }
       let channelId = channels.get(item.discord_id);
       if (!channelId) {
         const response = await discordRequest(fetchImpl, botToken, 'https://discord.com/api/v10/users/@me/channels', {
@@ -70,7 +116,7 @@ export async function deliverDiscordNotifications(
         channelId = channel.id;
         channels.set(item.discord_id, channelId);
       }
-      const { heading, snippet, href } = notificationParts(item);
+      const { heading, snippet, href } = notificationParts(item, undefined, lang);
       const response = await discordRequest(fetchImpl, botToken, `https://discord.com/api/v10/channels/${channelId}/messages`, {
         embeds: [{
           title: Array.from(heading).slice(0, 256).join(''),
@@ -79,7 +125,7 @@ export async function deliverDiscordNotifications(
           color: 0xD3BC8E,
           footer: { text: 'GenshinFlex' },
         }],
-        components: [{ type: 1, components: [{ type: 2, style: 5, label: 'Открыть на GenshinFlex', url: href }] }],
+        components: [{ type: 1, components: [{ type: 2, style: 5, label: openLabels[lang], url: href }] }],
         allowed_mentions: { parse: [] },
       });
       if (response.ok) {

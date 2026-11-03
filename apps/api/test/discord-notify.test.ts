@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { deliverDiscordNotifications } from '../src/lib/discord-notify.ts';
+import { deliverDiscordNotifications, parseLangRoles } from '../src/lib/discord-notify.ts';
 import type { DiscordNotification } from '../src/lib/discord-notify.ts';
 
 const item: DiscordNotification = {
@@ -53,6 +53,59 @@ test('delivers embeds and buttons while opening one DM per user', async () => {
     components: [{ type: 1, components: [{ type: 2, style: 5, label: 'Открыть на GenshinFlex', url: 'https://genshinflex.com/forum/t/42/#p7' }] }],
     allowed_mentions: { parse: [] },
   });
+});
+
+test('parseLangRoles ignores invalid entries', () => {
+  assert.deepEqual([...parseLangRoles(' 12345:ru,23456:en,34567:es,bad,1234:ru,45678:fr,56789 :en,67890:es:extra ')], [
+    ['12345', 'ru'], ['23456', 'en'], ['34567', 'es'],
+  ]);
+  assert.deepEqual([...parseLangRoles()], []);
+});
+
+test('localizes DMs from member roles and caches the lookup', async () => {
+  const cases: Array<{ roles: string[] | null; status?: number; heading: string; label: string; path: string }> = [
+    { roles: ['23456'], heading: 'Reply from Анна in “Тема”', label: 'Open on GenshinFlex', path: '/en/forum/t/42/#p7' },
+    { roles: ['34567'], heading: 'Respuesta de Анна en «Тема»', label: 'Abrir en GenshinFlex', path: '/es/forum/t/42/#p7' },
+    { roles: ['23456', '12345'], heading: 'Ответ от Анна в теме «Тема»', label: 'Открыть на GenshinFlex', path: '/forum/t/42/#p7' },
+    { roles: null, status: 404, heading: 'Ответ от Анна в теме «Тема»', label: 'Открыть на GenshinFlex', path: '/forum/t/42/#p7' },
+    { roles: null, status: 429, heading: 'Ответ от Анна в теме «Тема»', label: 'Открыть на GenshinFlex', path: '/forum/t/42/#p7' },
+  ];
+  for (const { roles, status, heading, label, path } of cases) {
+    const acks: number[][] = [];
+    const payloads: Array<{
+      embeds: Array<{ title: string; url: string }>;
+      components: Array<{ components: Array<{ label: string; url: string }> }>;
+    }> = [];
+    let memberRequests = 0;
+    const send: typeof fetch = async (input, init) => {
+      const url = String(input);
+      if (url === 'https://discord.com/api/v10/guilds/98765/members/user') {
+        memberRequests++;
+        assert.equal(init?.method, 'GET');
+        assert.equal((init?.headers as Record<string, string>).Authorization, 'Bot token');
+        assert.ok(init?.signal);
+        return status ? new Response(null, { status }) : json({ roles });
+      }
+      if (url.endsWith('/users/@me/channels')) return json({ id: 'channel' }, 201);
+      payloads.push(JSON.parse(String(init?.body)) as typeof payloads[number]);
+      return json({ id: 'message' });
+    };
+    assert.deepEqual(
+      await deliverDiscordNotifications(client([item, { ...item, id: 2 }], acks), 'token', send, {
+        guildId: '98765', langRoles: parseLangRoles('12345:ru,23456:en,34567:es'),
+      }),
+      { claimed: 2, sent: 2 },
+    );
+    assert.equal(memberRequests, 1);
+    assert.equal(payloads.length, 2);
+    assert.deepEqual(acks, [[1, 2]]);
+    for (const payload of payloads) {
+      assert.equal(payload.embeds[0].title, heading);
+      assert.equal(payload.embeds[0].url, `https://genshinflex.com${path}`);
+      assert.equal(payload.components[0].components[0].label, label);
+      assert.equal(payload.components[0].components[0].url, `https://genshinflex.com${path}`);
+    }
+  }
 });
 
 test('50007 does not stop later notifications', async () => {

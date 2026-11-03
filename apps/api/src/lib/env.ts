@@ -27,6 +27,7 @@ export interface Env {
   DISCORD_SUPPORT_ROLE_IDS?: string;
   DISCORD_GUILD_ID?: string;
   DISCORD_CHANNEL_LANGS?: string;
+  DISCORD_LANG_ROLE_IDS?: string;
   DISCORD_DATA_URL?: string;
   DISCORD_BANNERS_URL?: string;
   DISCORD_CLIENT_SECRET?: string;
