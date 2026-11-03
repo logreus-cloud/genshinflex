@@ -7,12 +7,11 @@ import { store } from './cms/store.mjs';
 
 try { process.loadEnvFile('.env'); } catch {}
 
-const webhooks = { ru: process.env.DISCORD_WEBHOOK_NEWS, en: process.env.DISCORD_WEBHOOK_NEWS_EN, es: process.env.DISCORD_WEBHOOK_NEWS_ES };
-const active = Object.entries(webhooks).filter(([, url]) => url);
-if (!active.length) {
+// Общий канал site-news: новость уходит одним сообщением на трёх языках
+const webhook = process.env.DISCORD_WEBHOOK_NEWS;
+if (!webhook) {
   console.log('Discord: вебхук новостей не задан, пропускаю');
 } else {
-  for (const lang of ['ru', 'en', 'es']) if (!webhooks[lang]) console.log(`Discord (${lang}): вебхук новостей не задан, пропускаю`);
   const dry = process.argv.includes('--dry');
   let stateFile = '.cache/discord-news.json';
   let sharedState = false;
@@ -126,60 +125,58 @@ if (!active.length) {
       if (migrated) console.log(`Discord: перенёс состояние из ${migrated} старых файлов`);
       else state.posted = items.slice(0, -1).map((item) => item.anchor);
     }
-    for (const [lang] of active) {
-      if (lang !== 'ru' && !(lang in state)) {
-        state[lang] = items.slice(0, -1).map((item) => item.anchor);
-        initialized = true;
-      }
-    }
-    for (const [lang] of active) {
-      const key = lang === 'ru' ? 'posted' : lang;
-      state[key] = new Set(state[key]);
-    }
+    // Ключи en/es от прежних отдельных каналов сохраняются в файле как есть, но больше не используются
+    const posted = new Set(state.posted);
+    state.posted = posted;
     if (initialized && !dry) await save(state);
     const role = process.env.DISCORD_NEWS_ROLE_ID?.trim();
     const mention = role && /^\d+$/.test(role) ? role : null;
-    const labels = {
-      ru: ['Новое на сайте', 'GenshinFlex · новости сайта'],
-      en: ['New on the site', 'GenshinFlex · site news'],
-      es: ['Novedades en el sitio', 'GenshinFlex · noticias del sitio'],
-    };
-    for (const [lang, webhook] of active) {
-      const posted = state[lang === 'ru' ? 'posted' : lang];
-      const pending = items.filter((item) => !posted.has(item.anchor));
-      if (!pending.length) console.log(`Discord (${lang}): новых новостей нет`);
-      for (const item of pending) {
+    const footers = { ru: 'GenshinFlex · новости сайта', en: 'GenshinFlex · site news', es: 'GenshinFlex · noticias del sitio' };
+    const label = 'Новое на сайте · New on the site · Novedades en el sitio';
+    const pending = items.filter((item) => !posted.has(item.anchor));
+    if (!pending.length) console.log('Discord: новых новостей нет');
+    for (const item of pending) {
+      // Одна новость — одно сообщение в общем канале: RU и готовые переводы EN/ES
+      const versions = [];
+      for (const lang of ['ru', 'en', 'es']) {
         const localized = await translation(item, lang, files);
-        if (!localized) continue;
-        const body = {
-          username: 'GenshinFlex',
-          content: mention ? `<@&${mention}> ${labels[lang][0]}` : labels[lang][0],
-          allowed_mentions: mention ? { parse: [], roles: [mention] } : { parse: [] },
-          embeds: [{
-            title: clip(localized.title, 256),
-            description: clip(localized.summary, 4096),
-            url: `https://genshinflex.com/${lang === 'ru' ? '' : `${lang}/`}news/#${encodeURIComponent(item.anchor)}`,
-            color: 0xE3B04B,
-            timestamp: item.date,
-            footer: { text: labels[lang][1] },
-          }],
-        };
-        if (dry) {
-          console.log(`Discord (${lang}): отправил бы «${localized.title}»`);
-          continue;
-        }
-        const response = await fetch(webhook, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-          // Зависший Discord не должен держать деплой, который уже выложен
-          signal: AbortSignal.timeout(15_000),
-        });
-        if (!response.ok) throw new Error(`Discord (${lang}): HTTP ${response.status} для «${localized.title}»`);
-        posted.add(item.anchor);
-        await save(state);
-        console.log(`Discord (${lang}): опубликовано «${localized.title}»`);
+        if (localized) versions.push([lang, localized]);
       }
+      // Discord: не больше 6000 символов на все embed-ы сообщения
+      const budget = Math.floor(5600 / versions.length);
+      const embeds = versions.map(([lang, localized]) => {
+        const title = clip(localized.title, 256);
+        return {
+          title,
+          description: clip(localized.summary, Math.max(200, Math.min(4096, budget - Array.from(title).length - footers[lang].length))),
+          url: `https://genshinflex.com/${lang === 'ru' ? '' : `${lang}/`}news/#${encodeURIComponent(item.anchor)}`,
+          color: 0xE3B04B,
+          timestamp: item.date,
+          footer: { text: footers[lang] },
+        };
+      });
+      const body = {
+        username: 'GenshinFlex',
+        content: mention ? `<@&${mention}> ${label}` : label,
+        allowed_mentions: mention ? { parse: [], roles: [mention] } : { parse: [] },
+        embeds,
+      };
+      const languages = versions.map(([lang]) => lang).join('/');
+      if (dry) {
+        console.log(`Discord: отправил бы «${item.title}» (${languages})`);
+        continue;
+      }
+      const response = await fetch(webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        // Зависший Discord не должен держать деплой, который уже выложен
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!response.ok) throw new Error(`Discord: HTTP ${response.status} для «${item.title}»`);
+      posted.add(item.anchor);
+      await save(state);
+      console.log(`Discord: опубликовано «${item.title}» (${languages})`);
     }
   }
 
