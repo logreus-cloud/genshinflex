@@ -33,7 +33,10 @@ const slides = [banner, nextBanner].filter((b): b is typeof banner => Boolean(b)
     .map((hero) => ({ banner: b, hero: { ...hero, namecard: (namecards as Record<string, string>)[hero.slug] }, upcoming: new Date(b.start) > now })));
 const newsImage = latestNews?.data.image || slides[0]?.hero.splash;
 const newsFallback = !latestNews?.data.image;
-const featuredWeapon = (banner as { weapons?: (string | { slug: string })[] }).weapons?.[0];
+// Оружие нового баннера часто объявляют позже персонажей: тогда берём последний баннер, где оно уже есть
+const bannerWeapons = (b: typeof banner) => (b as { weapons?: (string | { slug: string })[] }).weapons ?? [];
+const weaponBanner = bannerWeapons(banner).length ? banner : banners.filter((b) => b.start <= banner.start && bannerWeapons(b).length).at(-1);
+const featuredWeapon = weaponBanner && bannerWeapons(weaponBanner)[0];
 const weaponSlug = typeof featuredWeapon === 'string' ? featuredWeapon : featuredWeapon?.slug;
 const weapon = weapons.find((w) => w.slug === weaponSlug);
 // weapon-art.json — массив слагов оружия, у которых есть полный арт
