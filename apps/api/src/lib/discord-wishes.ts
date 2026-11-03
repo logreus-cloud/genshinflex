@@ -1,6 +1,9 @@
 // Команды /баннеры и /гарант. Данные баннеров — https://genshinflex.com/data/discord-banners.json,
 // счётчики гаранта — RPC discord_wish_pity (миграция 20261011122330).
 
+import { msg } from './discord-i18n.ts';
+import type { Lang } from './discord-i18n.ts';
+
 export type DiscordBanner = {
   version: string; phase: number; start: string; end: string;
   featured: { s: string; n: string; el?: string; i?: string; rerun?: boolean }[];
@@ -51,37 +54,37 @@ export function parseBannersData(data: unknown): DiscordBannersData {
 }
 
 const unix = (ms: number) => Math.floor(ms / 1000);
-const featuredLine = (banner: DiscordBanner) => banner.featured.map((item) => `${item.n}${item.rerun ? ' (повтор)' : ''}`).join(', ');
+const featuredLine = (banner: DiscordBanner, lang: Lang) => banner.featured.map((item) => `${item.n}${item.rerun ? ` (${msg(lang, 'rerun')})` : ''}`).join(', ');
 
-export function bannersReply(data: DiscordBannersData, site: string, colors: Record<string, number>, now = Date.now()) {
+export function bannersReply(data: DiscordBannersData, site: string, colors: Record<string, number>, now = Date.now(), lang: Lang = 'ru') {
   const sorted = [...data.banners].sort((a, b) => serverMoment(a.start) - serverMoment(b.start));
   const current = sorted.filter((item) => serverMoment(item.start) <= now && now < serverMoment(item.end));
   const next = sorted.find((item) => serverMoment(item.start) > now);
-  const nextLine = next && `${featuredLine(next) || `Молитвы ${next.version}, фаза ${next.phase}`} — старт <t:${unix(serverMoment(next.start))}:R>`;
-  const components = [{ type: 1, components: [{ type: 2, style: 5, label: 'Все баннеры', url: `${site}/banners/` }] }];
+  const nextLine = next && msg(lang, 'nextStart', { name: featuredLine(next, lang) || msg(lang, 'bannerTitle', { version: next.version, phase: next.phase }), time: `<t:${unix(serverMoment(next.start))}:R>` });
+  const components = [{ type: 1, components: [{ type: 2, style: 5, label: msg(lang, 'allBanners'), url: `${site}/banners/` }] }];
   if (!current.length) {
-    const content = nextLine ? `Сейчас баннеры не идут. Дальше: ${nextLine}` : 'Данных о баннерах пока нет';
+    const content = nextLine ? msg(lang, 'noCurrent', { next: nextLine }) : msg(lang, 'noBanners');
     return { type: 4, data: { content: clip(content, 2000), components } };
   }
   const candidates = current.slice(0, 5).map((banner, index) => {
     const end = unix(serverMoment(banner.end));
     const lines = [
-      banner.featured.length ? `★5: ${featuredLine(banner)}` : '',
-      banner.fourStars.length ? `★4: ${banner.fourStars.join(', ')}` : '',
-      banner.weapons.length ? `Оружие: ${banner.weapons.join(', ')}` : '',
-      `Конец: <t:${end}:f> (<t:${end}:R>)`,
+      banner.featured.length ? `${msg(lang, 'fiveStar')}: ${featuredLine(banner, lang)}` : '',
+      banner.fourStars.length ? `${msg(lang, 'fourStar')}: ${banner.fourStars.join(', ')}` : '',
+      banner.weapons.length ? `${msg(lang, 'weapons')}: ${banner.weapons.join(', ')}` : '',
+      `${msg(lang, 'end')}: <t:${end}:f> (<t:${end}:R>)`,
     ].filter(Boolean);
     const first = banner.featured[0];
     const color = (first?.el && Object.hasOwn(colors, first.el) ? colors[first.el] : undefined) ?? GOLD;
     const last = index === Math.min(current.length, 5) - 1;
     return {
-      title: clip(`Молитвы ${banner.version}, фаза ${banner.phase}`, 256),
+      title: clip(msg(lang, 'bannerTitle', { version: banner.version, phase: banner.phase }), 256),
       url: `${site}/banners/`,
       description: lines.join('\n'),
       color,
       ...(first?.i ? { thumbnail: { url: first.i } } : {}),
-      ...(last && nextLine ? { fields: [{ name: 'Дальше', value: clip(nextLine, 1024), inline: false }] } : {}),
-      footer: { text: 'Время сервера Европы (UTC+1)' },
+      ...(last && nextLine ? { fields: [{ name: msg(lang, 'next'), value: clip(nextLine, 1024), inline: false }] } : {}),
+      footer: { text: msg(lang, 'serverTime') },
     };
   });
   const embeds: typeof candidates = [];
@@ -101,7 +104,7 @@ export function bannersReply(data: DiscordBannersData, site: string, colors: Rec
   const omitted = current.length - embeds.length + (truncated ? 1 : 0);
   if (omitted && embeds.length) {
     const last = embeds[embeds.length - 1];
-    const marker = `…и ещё ${omitted}`;
+    const marker = msg(lang, 'omitted', { count: omitted });
     const limit = Math.min(4096 - length(marker) - 1, 6000 - used + length(last.description) - length(marker) - 1);
     last.description = `${clip(last.description, Math.max(1, limit))}\n${marker}`;
   }
@@ -116,11 +119,11 @@ export function isPityData(value: unknown): value is PityData {
       && [group.last5_name, group.last5_item_id].every((field) => field === null || field === undefined || typeof field === 'string')));
 }
 
-const GROUPS: Record<PityGroup['key'], { title: string; pity: number; soft: number }> = {
-  char: { title: 'Событие персонажа', pity: 90, soft: 74 },
-  weapon: { title: 'Оружие', pity: 80, soft: 63 },
-  standard: { title: 'Стандартный', pity: 90, soft: 74 },
-  chronicled: { title: 'Хроники', pity: 90, soft: 74 },
+const GROUPS: Record<PityGroup['key'], { title: 'groupChar' | 'groupWeapon' | 'groupStandard' | 'groupChronicled'; pity: number; soft: number }> = {
+  char: { title: 'groupChar', pity: 90, soft: 74 },
+  weapon: { title: 'groupWeapon', pity: 80, soft: 63 },
+  standard: { title: 'groupStandard', pity: 90, soft: 74 },
+  chronicled: { title: 'groupChronicled', pity: 90, soft: 74 },
 };
 const ORDER: PityGroup['key'][] = ['char', 'weapon', 'standard', 'chronicled'];
 
@@ -128,38 +131,38 @@ function lostFiftyFifty(group: PityGroup, standard: DiscordBannersData['standard
   const id = group.last5_item_id || null;
   const name = group.last5_name?.trim().toLowerCase();
   if (!id && !name) return false;
-  return standard.some((item) => (id !== null && item.id === id) || (!!name && item.names.includes(name)));
+  return standard.some((item) => (id !== null && item.id === id) || (!!name && item.names.some((value) => value.toLowerCase() === name)));
 }
 
-function groupLine(group: PityGroup, standard: DiscordBannersData['standard'] | null): string {
+function groupLine(group: PityGroup, standard: DiscordBannersData['standard'] | null, lang: Lang): string {
   const meta = GROUPS[group.key];
-  let line = `${meta.title}: **${group.p5}**/${meta.pity} · 4★ ${group.p4}/10`;
+  let line = `${msg(lang, meta.title)}: **${group.p5}**/${meta.pity} · 4★ ${group.p4}/10`;
   if (group.key === 'char' && standard) {
-    line += lostFiftyFifty(group, standard) ? ' · следующий 5★ — гарантированно лимитный' : ' · 50/50';
+    line += lostFiftyFifty(group, standard) ? ` · ${msg(lang, 'guaranteed')}` : ' · 50/50';
   }
-  if (group.p5 >= meta.soft) line += ' · мягкий гарант';
+  if (group.p5 >= meta.soft) line += ` · ${msg(lang, 'softPity')}`;
   return line;
 }
 
-export function pityReply(pity: PityData | null, standard: DiscordBannersData['standard'] | null, site: string) {
+export function pityReply(pity: PityData | null, standard: DiscordBannersData['standard'] | null, site: string, lang: Lang = 'ru') {
   if (!pity) return { type: 4, data: {
-    content: `Discord не привязан к аккаунту GenshinFlex. Войдите на сайт через Discord или привяжите его в настройках: ${site}/account/`,
+    content: msg(lang, 'linkedRequired', { url: `${site}/account/` }),
     flags: 64,
   } };
   const url = `${site}/tools/wishes/`;
   const uids = pity.uids.filter((uid) => uid.groups.length);
   if (!uids.length) return { type: 4, data: {
-    content: `История молитв не загружена. Загрузите её на ${url} — счётчики гаранта появятся здесь.`,
+    content: msg(lang, 'noWishHistory', { url }),
     flags: 64,
   } };
   const fields = uids.slice(0, 3).map((uid) => ({
-    name: uid.game_uid === 'manual' ? 'Ручной ввод' : clip(`UID ${uid.game_uid}`, 256),
-    value: clip(ORDER.flatMap((key) => uid.groups.filter((group) => group.key === key)).map((group) => groupLine(group, standard)).join('\n'), 1024),
+    name: uid.game_uid === 'manual' ? msg(lang, 'manual') : clip(`UID ${uid.game_uid}`, 256),
+    value: clip(ORDER.flatMap((key) => uid.groups.filter((group) => group.key === key)).map((group) => groupLine(group, standard, lang)).join('\n'), 1024),
     inline: false,
   }));
   return { type: 4, data: {
-    embeds: [{ title: 'Гарант молитв', url, color: GOLD, fields, footer: { text: 'GenshinFlex' } }],
-    components: [{ type: 1, components: [{ type: 2, style: 5, label: 'История молитв', url }] }],
+    embeds: [{ title: msg(lang, 'pityTitle'), url, color: GOLD, fields, footer: { text: 'GenshinFlex' } }],
+    components: [{ type: 1, components: [{ type: 2, style: 5, label: msg(lang, 'wishHistory'), url }] }],
     flags: 64,
   } };
 }

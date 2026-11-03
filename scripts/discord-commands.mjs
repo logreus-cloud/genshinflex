@@ -1,37 +1,53 @@
+const localized = (en, es) => ({ 'en-US': en, 'en-GB': en, 'es-ES': es, 'es-419': es });
+
 export const commands = [{
   name: 'гайд',
+  name_localizations: localized('guide', 'guia'),
   description: 'Гайд по персонажу: оружие, артефакты, статы, команды',
+  description_localizations: localized('Character guide: weapons, artifacts, stats, and teams', 'Guía de personaje: armas, artefactos, estadísticas y equipos'),
   type: 1,
   options: [{
     type: 3,
     name: 'персонаж',
+    name_localizations: localized('character', 'personaje'),
     description: 'Имя персонажа',
+    description_localizations: localized('Character name', 'Nombre del personaje'),
     required: true,
     autocomplete: true,
     max_length: 100,
   }],
 }, {
   name: 'профиль',
+  name_localizations: localized('profile', 'perfil'),
   description: 'Публичный профиль GenshinFlex',
+  description_localizations: localized('Public GenshinFlex profile', 'Perfil público de GenshinFlex'),
   type: 1,
   options: [{
     type: 3,
     name: 'ник',
+    name_localizations: localized('nickname', 'apodo'),
     description: 'Ник на сайте; без него — ваш профиль',
+    description_localizations: localized('Site nickname; omit to view your profile', 'Apodo en el sitio; omítelo para ver tu perfil'),
     required: false,
     max_length: 24,
   }],
 }, {
   name: 'баннеры',
+  name_localizations: localized('banners', 'banners'),
   description: 'Текущие баннеры и время до конца',
+  description_localizations: localized('Current banners and time remaining', 'Banners actuales y tiempo restante'),
   type: 1,
 }, {
   name: 'гарант',
+  name_localizations: localized('pity', 'garantia'),
   description: 'Счётчики гаранта по вашей истории молитв',
+  description_localizations: localized('Pity counters from your Wish history', 'Contadores de garantía de tu historial de Gachapones'),
   type: 1,
 }, {
   name: 'тикет',
+  name_localizations: localized('ticket', 'ticket'),
   description: 'Создать тикет в техподдержку',
+  description_localizations: localized('Create a support ticket', 'Crear un ticket de soporte'),
   type: 1,
 }];
 
@@ -39,17 +55,23 @@ export const commands = [{
 export const roleMetadata = [{
   key: 'linked',
   name: 'Аккаунт GenshinFlex',
+  name_localizations: localized('GenshinFlex account', 'Cuenta de GenshinFlex'),
   description: 'Discord привязан к аккаунту на genshinflex.com',
+  description_localizations: localized('Discord is linked to an account on genshinflex.com', 'Discord está vinculado a una cuenta de genshinflex.com'),
   type: 7,
 }, {
   key: 'rating',
   name: 'Рейтинг сообщества',
+  name_localizations: localized('Community rating', 'Puntuación de la comunidad'),
   description: 'Очков рейтинга форума GenshinFlex не меньше',
+  description_localizations: localized('Minimum GenshinFlex forum rating points', 'Puntuación mínima en el foro de GenshinFlex'),
   type: 2,
 }, {
   key: 'guild',
   name: 'Участник гильдии',
+  name_localizations: localized('Guild member', 'Miembro de un gremio'),
   description: 'Состоит в гильдии GenshinFlex',
+  description_localizations: localized('Member of a GenshinFlex guild', 'Pertenece a un gremio de GenshinFlex'),
   type: 7,
 }];
 

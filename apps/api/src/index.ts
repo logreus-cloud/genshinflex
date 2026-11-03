@@ -15,6 +15,7 @@ import { createBuildsLoader, createJsonLoader, handleInteraction, verifyDiscordR
 import type { DiscordBuild, DiscordInteraction } from './lib/discord.ts';
 import { loadDiscordProfile } from './lib/discord-profile.ts';
 import type { PublicProfileCard } from './lib/discord-profile.ts';
+import { localizedDataUrl, parseChannelLangs } from './lib/discord-i18n.ts';
 import { deliverDiscordNotifications } from './lib/discord-notify.ts';
 import { isPityData, parseBannersData } from './lib/discord-wishes.ts';
 import { authorizeUrl, completeLink, rolePage, syncRoleConnections } from './lib/discord-roles.ts';
@@ -35,7 +36,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.23.0';
+const version = '0.24.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -281,11 +282,25 @@ app.post('/discord/interactions', async (c) => {
   }
   const url = c.env.DISCORD_DATA_URL || 'https://genshinflex.com/data/discord-builds.json';
   const bannersUrl = c.env.DISCORD_BANNERS_URL || 'https://genshinflex.com/data/discord-banners.json';
+  const loadLocalized = async <T>(baseUrl: string, lang: 'ru' | 'en' | 'es', load: (url: string) => Promise<T>): Promise<T> => {
+    if (lang === 'ru') return load(baseUrl);
+    const localized = load(localizedDataUrl(baseUrl, lang));
+    const fallback = Promise.allSettled([load(baseUrl)]);
+    try {
+      return await localized;
+    } catch {
+      const [result] = await fallback;
+      if (result.status === 'rejected') throw result.reason;
+      return result.value;
+    }
+  };
   return c.json(await handleInteraction(interaction, {
-    loadBuilds: () => c.get('discordBuilds')(url), site: 'https://genshinflex.com',
+    loadBuilds: (lang) => loadLocalized(url, lang, c.get('discordBuilds')),
+    channelLangs: parseChannelLangs(c.env.DISCORD_CHANNEL_LANGS),
+    site: 'https://genshinflex.com',
     loadProfile: (nickname, signal, deadline) => c.get('discordProfile')(nickname, c.env, signal, deadline),
     findLinkedProfile: (discordId, signal) => c.get('discordLinkedProfile')(discordId, c.env, signal),
-    loadBanners: () => c.get('discordBanners')(bannersUrl),
+    loadBanners: (lang) => loadLocalized(bannersUrl, lang, c.get('discordBanners')),
     loadPity: (discordId, signal) => c.get('discordPity')(discordId, c.env, signal),
     ticket: {
       client: () => c.get('discordTicketClient')(c.env),

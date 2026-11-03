@@ -2,13 +2,13 @@ try { process.loadEnvFile('.env'); } catch {}
 
 const body = {
   embeds: [{
-    title: 'Техподдержка GenshinFlex',
-    description: 'Проблема с сайтом, аккаунтом или ботом? Нажмите кнопку — откроется форма, а бот создаст приватную ветку, которую видите только вы и поддержка. Идеи и найденные баги лучше оставлять в форумах #предложения и #баги.',
+    title: 'Техподдержка · Support · Soporte GenshinFlex',
+    description: 'RU: Проблема с сайтом, аккаунтом или ботом? Нажмите кнопку — откроется форма, а бот создаст приватную ветку, которую видите только вы и поддержка. Идеи и найденные баги лучше оставлять в форумах #предложения и #баги.\n\nEN: Having trouble with the site, your account, or the bot? Press the button to open a form. The bot will create a private thread visible only to you and support. Share ideas and bug reports in the suggestions and bugs forums.\n\nES: ¿Tienes problemas con el sitio, tu cuenta o el bot? Pulsa el botón para abrir un formulario. El bot creará un hilo privado que solo veréis tú y el equipo de soporte. Comparte ideas y errores en los foros de sugerencias y errores.',
     color: 0xD3BC8E,
   }],
   components: [{
     type: 1,
-    components: [{ type: 2, style: 1, label: 'Создать тикет', custom_id: 'ticket:open' }],
+    components: [{ type: 2, style: 1, label: 'Создать тикет · Create ticket · Crear ticket', custom_id: 'ticket:open' }],
   }],
 };
 

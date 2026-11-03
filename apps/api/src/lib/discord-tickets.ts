@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { DiscordInteraction } from './discord.ts';
+import { msg, siteForLang } from './discord-i18n.ts';
+import type { Lang } from './discord-i18n.ts';
 
 type TicketClient = Pick<SupabaseClient, 'rpc'>;
 type OpenResult = { status: 'duplicate' | 'creating' | 'limit' }
@@ -21,8 +23,6 @@ export type TicketDeps = {
 
 const API = 'https://discord.com/api/v10';
 const ephemeral = (content: string) => ({ type: 4, data: { content, flags: 64 } });
-const unavailable = ephemeral('Тикеты временно недоступны');
-const failed = 'Не удалось создать тикет, попробуйте позже';
 
 export function isTicketInteraction(interaction: DiscordInteraction): boolean {
   return (interaction.type === 2 && interaction.data?.name === 'тикет')
@@ -75,8 +75,8 @@ async function originalReply(deps: TicketDeps, interaction: DiscordInteraction, 
     { content, allowed_mentions: { parse: [] } });
 }
 
-async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, discordId: string): Promise<void> {
-  let content: string | undefined = failed;
+async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, discordId: string, lang: Lang): Promise<void> {
+  let content: string | undefined = msg(lang, 'ticketCreateFailed');
   let ticketId: number | undefined;
   let threadId: string | undefined;
   let attached = false;
@@ -102,11 +102,11 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
         return;
       }
       if (opened.status === 'creating') {
-        content = 'Тикет уже создаётся, подождите минуту';
+        content = msg(lang, 'ticketCreating');
         return;
       }
       if (opened.status === 'limit') {
-        content = 'Слишком много тикетов за сутки, попробуйте завтра';
+        content = msg(lang, 'ticketLimit');
         return;
       }
       if (opened.status === 'created') {
@@ -119,7 +119,7 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
       const archived = deleted
         || ((await response.json()) as { thread_metadata?: { archived?: boolean } }).thread_metadata?.archived === true;
       if (!archived) {
-        content = `У вас уже есть открытый тикет: <#${opened.thread_id}>`;
+        content = msg(lang, 'ticketExists', { thread: `<#${opened.thread_id}>` });
         return;
       }
       const token = crypto.randomUUID();
@@ -172,29 +172,29 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
       if (await archiveThread(deps, threadId)) {
         await ticketRpc(client, 'discord_ticket_abandon', { p_id: id }).catch(() => undefined);
       }
-      content = 'Не удалось создать тикет, попробуйте ещё раз';
+      content = msg(lang, 'ticketAttachFailed');
       return;
     }
     await checkedRequest(deps, `/channels/${threadId}/thread-members/${discordId}`, 'PUT', {});
     const linked = await deps.findLinkedProfile(discordId, AbortSignal.timeout(10_000));
     const account = linked
       ? linked.is_public
-        ? `[@${linked.nickname}](https://genshinflex.com/u/${encodeURIComponent(linked.nickname)}/)`
+        ? `[@${linked.nickname}](${siteForLang('https://genshinflex.com', lang)}/u/${encodeURIComponent(linked.nickname)}/)`
         : `@${linked.nickname}`
-      : 'не привязан';
+      : msg(lang, 'ticketUnlinked');
     await checkedRequest(deps, `/channels/${threadId}/messages`, 'POST', {
       content: [`<@${discordId}>`, ...deps.supportRoleIds.map((id) => `<@&${id}>`)].join(' '),
       allowed_mentions: { users: [discordId], roles: deps.supportRoleIds },
       embeds: [{
         title: subject, description: details, color: 0xD3BC8E,
-        fields: [{ name: 'Аккаунт GenshinFlex', value: account }],
-        footer: { text: `Тикет #${number}` },
+        fields: [{ name: msg(lang, 'ticketAccount'), value: account }],
+        footer: { text: msg(lang, 'ticketFooter', { number }) },
       }],
       components: [{ type: 1, components: [{
-        type: 2, style: 4, label: 'Закрыть тикет', custom_id: `ticket:close:${ticketId}`,
+        type: 2, style: 4, label: msg(lang, 'ticketCloseButton'), custom_id: `ticket:close:${ticketId}`,
       }] }],
     });
-    content = `Тикет создан: <#${threadId}>`;
+    content = msg(lang, 'ticketCreated', { thread: `<#${threadId}>` });
     ticketId = undefined;
   } catch (error) {
     console.warn('discord ticket create failed', String(error));
@@ -218,9 +218,9 @@ async function createTicket(interaction: DiscordInteraction, deps: TicketDeps, d
   }
 }
 
-async function closeTicket(interaction: DiscordInteraction, deps: TicketDeps, discordId: string): Promise<void> {
+async function closeTicket(interaction: DiscordInteraction, deps: TicketDeps, discordId: string, lang: Lang): Promise<void> {
   const id = Number(interaction.data?.custom_id?.slice('ticket:close:'.length));
-  let content = 'Не удалось закрыть тикет, попробуйте ещё раз';
+  let content = msg(lang, 'ticketCloseFailed');
   let claimedId: number | undefined;
   const token = crypto.randomUUID();
   try {
@@ -235,22 +235,22 @@ async function closeTicket(interaction: DiscordInteraction, deps: TicketDeps, di
         await ticketRpc(client, 'discord_ticket_close_finish', { p_id: claimedId, p_ok: false, p_token: token });
         claimedId = undefined;
       }
-      content = 'Тикет не найден';
+      content = msg(lang, 'ticketMissing');
       return;
     }
-    if (result.status === 'closed') { content = 'Тикет уже закрыт'; return; }
-    if (result.status !== 'claimed') { content = 'Тикет уже закрывается'; return; }
+    if (result.status === 'closed') { content = msg(lang, 'ticketClosed'); return; }
+    if (result.status !== 'claimed') { content = msg(lang, 'ticketClosing'); return; }
     const roles = interaction.member?.roles || [];
     const support = roles.some((role) => deps.supportRoleIds.includes(role));
     const permissions = BigInt(interaction.member?.permissions || '0');
     if (result.discord_id !== discordId && !support && (permissions & (1n << 34n)) === 0n) {
       await ticketRpc(client, 'discord_ticket_close_finish', { p_id: result.id, p_ok: false, p_token: token });
       claimedId = undefined;
-      content = 'Закрыть тикет может автор или поддержка';
+      content = msg(lang, 'ticketCloseDenied');
       return;
     }
     await checkedRequest(deps, `/channels/${interaction.channel_id}/messages`, 'POST', {
-      content: `Тикет закрыл <@${discordId}>. Если вопрос не решён — создайте новый.`,
+      content: msg(lang, 'ticketClosedMessage', { user: discordId }),
       allowed_mentions: { parse: [] },
     });
     await checkedRequest(deps, `/channels/${interaction.channel_id}`, 'PATCH', {
@@ -258,7 +258,7 @@ async function closeTicket(interaction: DiscordInteraction, deps: TicketDeps, di
     });
     await ticketRpc(client, 'discord_ticket_close_finish', { p_id: result.id, p_ok: true, p_token: token });
     claimedId = undefined;
-    content = 'Тикет закрыт';
+    content = msg(lang, 'ticketCloseSuccess');
   } catch (error) {
     console.warn('discord ticket close failed', String(error));
     if (claimedId !== undefined) {
@@ -277,30 +277,30 @@ async function closeTicket(interaction: DiscordInteraction, deps: TicketDeps, di
   }
 }
 
-export async function handleTicketInteraction(interaction: DiscordInteraction, deps?: TicketDeps) {
-  if (!deps?.channelId || !deps.botToken || !deps.applicationId) return unavailable;
+export async function handleTicketInteraction(interaction: DiscordInteraction, deps?: TicketDeps, lang: Lang = 'ru') {
+  if (!deps?.channelId || !deps.botToken || !deps.applicationId) return ephemeral(msg(lang, 'ticketUnavailable'));
   const discordId = interaction.member?.user?.id ?? interaction.user?.id;
-  if (!discordId || !/^[0-9]{5,25}$/.test(discordId)) return unavailable;
+  if (!discordId || !/^[0-9]{5,25}$/.test(discordId)) return ephemeral(msg(lang, 'ticketUnavailable'));
   if (interaction.type === 2 || interaction.data?.custom_id === 'ticket:open') {
     return { type: 9, data: {
-      custom_id: 'ticket:create', title: 'Новый тикет',
+      custom_id: 'ticket:create', title: msg(lang, 'ticketModalTitle'),
       components: [
-        { type: 1, components: [{ type: 4, custom_id: 'subject', label: 'Тема',
+        { type: 1, components: [{ type: 4, custom_id: 'subject', label: msg(lang, 'ticketSubject'),
           style: 1, required: true, max_length: 80 }] },
-        { type: 1, components: [{ type: 4, custom_id: 'details', label: 'Что случилось',
+        { type: 1, components: [{ type: 4, custom_id: 'details', label: msg(lang, 'ticketDetails'),
           style: 2, required: true, min_length: 10, max_length: 1500,
-          placeholder: 'Опишите проблему: что делали, что ожидали, что получилось. Ссылки и скриншоты можно добавить в ветке' }] },
+          placeholder: msg(lang, 'ticketPlaceholder') }] },
       ],
     } };
   }
   if (interaction.type === 5) {
-    if (!interaction.token) return unavailable;
+    if (!interaction.token) return ephemeral(msg(lang, 'ticketUnavailable'));
     deps.waitUntil(new Promise<void>((resolve) => setTimeout(resolve, 0))
-      .then(() => createTicket(interaction, deps, discordId)));
+      .then(() => createTicket(interaction, deps, discordId, lang)));
     return { type: 5, data: { flags: 64 } };
   }
-  if (!interaction.token) return unavailable;
+  if (!interaction.token) return ephemeral(msg(lang, 'ticketUnavailable'));
   deps.waitUntil(new Promise<void>((resolve) => setTimeout(resolve, 0))
-    .then(() => closeTicket(interaction, deps, discordId)));
+    .then(() => closeTicket(interaction, deps, discordId, lang)));
   return { type: 5, data: { flags: 64 } };
 }

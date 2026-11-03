@@ -5,6 +5,7 @@ import { createBuildsLoader, handleInteraction, verifyDiscordRequest } from '../
 import type { DiscordBuild } from '../src/lib/discord.ts';
 import type { PublicProfileCard } from '../src/lib/discord-profile.ts';
 import type { Env } from '../src/lib/env.ts';
+import { msg, parseChannelLangs, pickLang } from '../src/lib/discord-i18n.ts';
 
 const hex = (bytes: ArrayBuffer) => Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
 const keys = async () => {
@@ -26,6 +27,44 @@ const build: DiscordBuild = {
 };
 const deps = { loadBuilds: async () => [build], site: 'https://genshinflex.com' };
 
+test('разбирает карту языков и выбирает канал, родителя или язык клиента', () => {
+  const channels = parseChannelLangs('12345:en,23456:es,34567:ru,мусор,45678:de,99999:en:ru');
+  assert.deepEqual([...channels], [['12345', 'en'], ['23456', 'es'], ['34567', 'ru']]);
+  assert.equal(pickLang({ channel_id: '12345', channel: { parent_id: '23456' }, locale: 'ru' }, channels), 'en');
+  assert.equal(pickLang({ channel_id: '77777', channel: { parent_id: '23456' }, locale: 'en-US' }, channels), 'es');
+  for (const locale of ['ru', 'uk', 'be']) assert.equal(pickLang({ locale }, channels), 'ru');
+  assert.equal(pickLang({ locale: 'es-419' }, channels), 'es');
+  for (const locale of ['en-US', 'de']) assert.equal(pickLang({ locale }, channels), 'en');
+  assert.equal(pickLang({}, channels), 'ru');
+});
+
+test('строки компонентов Discord укладываются в лимиты', () => {
+  for (const lang of ['ru', 'en', 'es'] as const) {
+    for (const [key, limit] of [
+      ['ticketPlaceholder', 100],
+      ['ticketSubject', 45],
+      ['ticketDetails', 45],
+      ['ticketModalTitle', 45],
+      ['ticketCloseButton', 80],
+      ['openGuide', 80],
+      ['openProfile', 80],
+    ] as const) {
+      assert.ok(Array.from(msg(lang, key)).length <= limit, `${lang}.${key} превышает лимит ${limit}`);
+    }
+  }
+});
+
+test('гайд использует язык канала и локализованную ссылку', async () => {
+  for (const [lang, title, label] of [['en', 'Aino — guide', 'Weapons'], ['es', 'Aino — guía', 'Armas']] as const) {
+    const reply = await handleInteraction({
+      type: 2, channel_id: '12345', locale: 'ru', data: { name: 'гайд', options: [{ name: 'персонаж', value: 'aino' }] },
+    }, { ...deps, channelLangs: new Map([['12345', lang]]), loadBuilds: async () => [{ ...build, n: 'Aino', url: `/${lang}/characters/aino/` }] }) as any;
+    assert.equal(reply.data.embeds[0].title, title);
+    assert.equal(reply.data.embeds[0].fields[0].name, label);
+    assert.equal(reply.data.components[0].components[0].url, `https://genshinflex.com/${lang}/characters/aino/`);
+  }
+});
+
 test('проверяет подпись Ed25519', async () => {
   const { pair, publicKey } = await keys();
   const timestamp = '123456';
@@ -36,6 +75,65 @@ test('проверяет подпись Ed25519', async () => {
   assert.equal(await verifyDiscordRequest((await keys()).publicKey, signature, timestamp, body), false);
   assert.equal(await verifyDiscordRequest('мусор', signature, timestamp, body), false);
   assert.equal(await verifyDiscordRequest(publicKey, 'мусор', timestamp, body), false);
+});
+
+test('маршрут откатывается на русские данные при ошибке локализованных', async () => {
+  const { pair, publicKey } = await keys();
+  const urls: string[] = [];
+  const app = createApp({ discordBuilds: async (url) => {
+    urls.push(url);
+    if (url.includes('/en/data/')) throw new Error('offline');
+    return [build];
+  } });
+  const body = JSON.stringify({ type: 2, locale: 'en-US', data: { name: 'гайд', options: [{ name: 'персонаж', value: 'aino' }] } });
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const response = await app.request('/discord/interactions', {
+    method: 'POST', body, headers: {
+      'X-Signature-Timestamp': timestamp,
+      'X-Signature-Ed25519': await sign(pair, timestamp, body),
+    },
+  }, { SITE_ORIGINS: '', DISCORD_PUBLIC_KEY: publicKey } as Env);
+  const reply = await response.json() as any;
+  assert.deepEqual(urls, [
+    'https://genshinflex.com/en/data/discord-builds.json',
+    'https://genshinflex.com/data/discord-builds.json',
+  ]);
+  assert.equal(reply.data.embeds[0].title, 'Айно — guide');
+  assert.equal(reply.data.components[0].components[0].url, 'https://genshinflex.com/en/characters/aino/');
+});
+
+test('отвечает с русскими данными за один таймаут локализованной загрузки', async () => {
+  const { pair, publicKey } = await keys();
+  const timeoutMs = 200;
+  const urls: string[] = [];
+  let ruStartedBeforeTimeout = false;
+  const app = createApp({ discordBuilds: (url) => new Promise<DiscordBuild[]>((resolve, reject) => {
+    urls.push(url);
+    setTimeout(() => {
+      if (url.includes('/en/data/')) {
+        ruStartedBeforeTimeout = urls.length === 2;
+        reject(new Error('timeout'));
+      } else resolve([build]);
+    }, timeoutMs);
+  }) });
+  const body = JSON.stringify({ type: 2, locale: 'en-US', data: { name: 'гайд', options: [{ name: 'персонаж', value: 'aino' }] } });
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const signature = await sign(pair, timestamp, body);
+  const started = Date.now();
+  const response = await app.request('/discord/interactions', {
+    method: 'POST', body, headers: {
+      'X-Signature-Timestamp': timestamp,
+      'X-Signature-Ed25519': signature,
+    },
+  }, { SITE_ORIGINS: '', DISCORD_PUBLIC_KEY: publicKey } as Env);
+  assert.ok(Date.now() - started < timeoutMs * 1.5);
+  assert.equal(ruStartedBeforeTimeout, true);
+  assert.deepEqual(urls, [
+    'https://genshinflex.com/en/data/discord-builds.json',
+    'https://genshinflex.com/data/discord-builds.json',
+  ]);
+  const reply = await response.json() as any;
+  assert.equal(reply.data.embeds[0].title, 'Айно — guide');
 });
 
 test('отвечает на PING и подбирает персонажей', async () => {

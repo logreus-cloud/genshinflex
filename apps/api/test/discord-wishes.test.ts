@@ -44,6 +44,24 @@ test('/баннеры показывает текущую фазу и следу
   assert.equal(reply.data.components[0].components[0].url, `${site}/banners/`);
 });
 
+test('/баннеры отвечает по-английски и по-испански', async () => {
+  const localized = { ...data, banners: [{
+    ...data.banners[0], start: '2000-01-01T00:00', end: '2099-01-01T00:00',
+    featured: [{ s: 'skirk', n: 'Skirk' }],
+  }] };
+  for (const [lang, title, end] of [
+    ['en', 'Wishes 7.1, Phase 1', 'Ends'],
+    ['es', 'Gachapones 7.1, fase 1', 'Termina'],
+  ] as const) {
+    const reply = await handleInteraction({ type: 2, locale: `${lang}-US`, data: { name: 'баннеры' } }, {
+      ...baseDeps, loadBanners: async () => localized,
+    }) as any;
+    assert.equal(reply.data.embeds[0].title, title);
+    assert.match(reply.data.embeds[0].description, new RegExp(end));
+    assert.equal(reply.data.components[0].components[0].url, `${site}/${lang}/banners/`);
+  }
+});
+
 test('/баннеры укладывает большую историю в общий лимит Discord', () => {
   const banners = Array.from({ length: 7 }, (_, index) => ({
     ...data.banners[0],

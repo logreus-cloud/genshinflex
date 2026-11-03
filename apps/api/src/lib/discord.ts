@@ -1,3 +1,5 @@
+import { localizedPath, msg, pickLang, siteForLang } from './discord-i18n.ts';
+import type { Lang } from './discord-i18n.ts';
 import type { PublicProfileCard } from './discord-profile.ts';
 import { handleTicketInteraction, isTicketInteraction } from './discord-tickets.ts';
 import { bannersReply, pityReply } from './discord-wishes.ts';
@@ -18,6 +20,8 @@ export type DiscordInteraction = {
   id?: string;
   token?: string;
   channel_id?: string;
+  channel?: { parent_id?: string | null };
+  locale?: string;
   type: number;
   data?: {
     name?: string; custom_id?: string;
@@ -59,11 +63,7 @@ export async function verifyDiscordRequest(
 const fold = (value: string | undefined) => (value || '').toLocaleLowerCase('ru').replaceAll('ё', 'е');
 const length = (value: string) => Array.from(value).length;
 const clip = (value: string, limit: number) => limit <= 0 ? '' : length(value) <= limit ? value : `${Array.from(value).slice(0, limit - 1).join('')}…`;
-const unknownCommand = { type: 4, data: { content: 'Неизвестная команда', flags: 64 } };
-const unavailable = { type: 4, data: { content: 'Гайды временно недоступны, попробуйте позже', flags: 64 } };
-const profileUnavailable = { type: 4, data: { content: 'Профиль временно недоступен, попробуйте позже', flags: 64 } };
-const bannersUnavailable = { type: 4, data: { content: 'Баннеры временно недоступны, попробуйте позже', flags: 64 } };
-const pityUnavailable = { type: 4, data: { content: 'Гарант временно недоступен, попробуйте позже', flags: 64 } };
+const ephemeral = (content: string) => ({ type: 4, data: { content, flags: 64 } });
 
 function fitEmbed(
   title: string, initialDescription: string, footer: string,
@@ -86,20 +86,20 @@ function fitEmbed(
   return description;
 }
 
-function buildEmbed(build: DiscordBuild, site: string) {
-  const url = `${site}${build.url}`;
-  const title = clip(`${build.n} — гайд`, 256);
-  const footer = clip(build.patch ? `GenshinFlex · патч ${build.patch}` : 'GenshinFlex', 2048);
+function buildEmbed(build: DiscordBuild, site: string, lang: Lang) {
+  const url = `${site}${localizedPath(build.url, lang)}`;
+  const title = clip(msg(lang, 'guideTitle', { name: build.n }), 256);
+  const footer = clip(build.patch ? msg(lang, 'patch', { patch: build.patch }) : 'GenshinFlex', 2048);
   const initialDescription = build.role ? clip(build.role, 4096) : '';
   const fields: { name: string; value: string; inline: false }[] = [];
   const add = (name: string, value: string) => {
     if (value) fields.push({ name, value: clip(value, 1024), inline: false });
   };
-  if (build.weapons?.length) add('Оружие', build.weapons.slice(0, 5).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
-  if (build.artifacts?.length) add('Артефакты', build.artifacts.slice(0, 4).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
-  if (build.mainStats) add('Основные статы', `Пески: ${build.mainStats.sands}\nКубок: ${build.mainStats.goblet}\nКорона: ${build.mainStats.circlet}`);
-  if (build.substats?.length) add('Доп. статы', build.substats.join(' > '));
-  if (build.teams?.length) add('Команды', build.teams.slice(0, 3).map((team) => `**${team.name}**: ${team.members.join(', ')}`).join('\n'));
+  if (build.weapons?.length) add(msg(lang, 'weapons'), build.weapons.slice(0, 5).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
+  if (build.artifacts?.length) add(msg(lang, 'artifacts'), build.artifacts.slice(0, 4).map((item, i) => `${i + 1}. ${item.n}${item.note ? ` — ${item.note}` : ''}`).join('\n'));
+  if (build.mainStats) add(msg(lang, 'mainStats'), `${msg(lang, 'sands')}: ${build.mainStats.sands}\n${msg(lang, 'goblet')}: ${build.mainStats.goblet}\n${msg(lang, 'circlet')}: ${build.mainStats.circlet}`);
+  if (build.substats?.length) add(msg(lang, 'substats'), build.substats.join(' > '));
+  if (build.teams?.length) add(msg(lang, 'teams'), build.teams.slice(0, 3).map((team) => `**${team.name}**: ${team.members.join(', ')}`).join('\n'));
   const description = fitEmbed(title, initialDescription, footer, fields);
   return {
     title,
@@ -111,23 +111,23 @@ function buildEmbed(build: DiscordBuild, site: string) {
   };
 }
 
-function profileEmbed(profile: PublicProfileCard, site: string) {
+function profileEmbed(profile: PublicProfileCard, site: string, lang: Lang) {
   const url = `${site}/u/${encodeURIComponent(profile.nickname)}/`;
   const author = clip(profile.name, 256);
   const title = clip(`@${profile.nickname}`, 256);
   const date = profile.createdAt ? new Date(profile.createdAt) : null;
   const footer = date && !Number.isNaN(date.getTime())
-    ? `На GenshinFlex с ${date.toLocaleDateString('ru', { month: 'long', year: 'numeric' })}` : 'GenshinFlex';
+    ? msg(lang, 'profileSince', { date: date.toLocaleDateString({ ru: 'ru-RU', en: 'en-US', es: 'es-ES' }[lang], { month: 'long', year: 'numeric' }) }) : 'GenshinFlex';
   const fields: { name: string; value: string; inline: true }[] = [];
   const add = (name: string, value: string | undefined) => {
     if (value) fields.push({ name, value: clip(value, 1024), inline: true });
   };
-  add('Титул', profile.title);
-  add('Гильдия', profile.guild);
-  if (profile.forum) add('Рейтинг форума',
-    `${profile.forum.points} очк.${profile.forum.place ? ` · #${profile.forum.place}` : ''}`);
-  if (profile.followers !== undefined) add('Подписчики', String(profile.followers));
-  if (profile.listsHidden !== true && profile.friends !== undefined) add('Друзья', String(profile.friends));
+  add(msg(lang, 'title'), profile.title);
+  add(msg(lang, 'guild'), profile.guild);
+  if (profile.forum) add(msg(lang, 'forumRating'),
+    `${profile.forum.points} ${msg(lang, 'points')}${profile.forum.place ? ` · #${profile.forum.place}` : ''}`);
+  if (profile.followers !== undefined) add(msg(lang, 'followers'), String(profile.followers));
+  if (profile.listsHidden !== true && profile.friends !== undefined) add(msg(lang, 'friends'), String(profile.friends));
   add('UID', profile.uid);
   fitEmbed(title, '', footer, fields, author);
   return {
@@ -140,11 +140,12 @@ function profileEmbed(profile: PublicProfileCard, site: string) {
 }
 
 type InteractionDeps = {
-  loadBuilds(): Promise<DiscordBuild[]>;
+  loadBuilds(lang: Lang): Promise<DiscordBuild[]>;
+  channelLangs?: ReadonlyMap<string, Lang>;
   site: string;
   loadProfile?(nickname: string, signal: AbortSignal, auxiliaryDeadline: number): Promise<PublicProfileCard | null>;
   findLinkedProfile?(discordId: string, signal: AbortSignal): Promise<{ nickname: string; is_public: boolean } | null>;
-  loadBanners?(): Promise<DiscordBannersData>;
+  loadBanners?(lang: Lang): Promise<DiscordBannersData>;
   loadPity?(discordId: string, signal: AbortSignal): Promise<PityData | null>;
   ticket?: TicketDeps;
 };
@@ -152,14 +153,16 @@ type InteractionDeps = {
 export async function handleInteraction(
   interaction: DiscordInteraction, deps: InteractionDeps,
 ) {
+  const lang = pickLang(interaction, deps.channelLangs || new Map());
+  const site = siteForLang(deps.site, lang);
   if (interaction.type === 1) return { type: 1 };
-  if (isTicketInteraction(interaction)) return handleTicketInteraction(interaction, deps.ticket);
+  if (isTicketInteraction(interaction)) return handleTicketInteraction(interaction, deps.ticket, lang);
   if (interaction.type === 2 && interaction.data?.name === 'баннеры') {
     try {
       if (!deps.loadBanners) throw new Error('Нет загрузчика баннеров');
-      return bannersReply(await deps.loadBanners(), deps.site, colors);
+      return bannersReply(await deps.loadBanners(lang), site, colors, Date.now(), lang);
     } catch {
-      return bannersUnavailable;
+      return ephemeral(msg(lang, 'bannersUnavailable'));
     }
   }
   if (interaction.type === 2 && interaction.data?.name === 'гарант') {
@@ -173,14 +176,14 @@ export async function handleInteraction(
           if (!discordId || !deps.loadPity) throw new Error('Нет загрузчика гаранта');
           // Без данных баннеров счётчики всё равно показываем, только без строки про 50/50
           const standard = deps.loadBanners
-            ? deps.loadBanners().then((data) => data.standard, () => null)
+            ? deps.loadBanners(lang).then((data) => data.standard, () => null)
             : Promise.resolve(null);
           const pity = await deps.loadPity(discordId, controller.signal);
-          if (!pity) return pityReply(null, null, deps.site);
+          if (!pity) return pityReply(null, null, site, lang);
           let wait: ReturnType<typeof setTimeout> | undefined;
           const late = new Promise<null>((resolve) => { wait = setTimeout(() => resolve(null), Math.max(0, auxiliaryDeadline - Date.now())); });
           try {
-            return pityReply(pity, await Promise.race([standard, late]), deps.site);
+            return pityReply(pity, await Promise.race([standard, late]), site, lang);
           } finally {
             clearTimeout(wait);
           }
@@ -193,7 +196,7 @@ export async function handleInteraction(
         }),
       ]);
     } catch {
-      return pityUnavailable;
+      return ephemeral(msg(lang, 'pityUnavailable'));
     } finally {
       if (timer) clearTimeout(timer);
       controller.abort();
@@ -216,23 +219,23 @@ export async function handleInteraction(
             if (!discordId || !deps.findLinkedProfile) throw new Error('Нет привязки Discord');
             const linked = await deps.findLinkedProfile(discordId, controller.signal);
             if (!linked) return { type: 4, data: {
-              content: `Discord не привязан к аккаунту GenshinFlex. Войдите на сайт через Discord или привяжите его в настройках: ${deps.site}/account/`,
+              content: msg(lang, 'linkedRequired', { url: `${site}/account/` }),
               flags: 64,
             } };
             if (!linked.is_public) return { type: 4, data: {
-              content: `Ваш профиль скрыт. Открыть его можно в настройках профиля: ${deps.site}/profile/`,
+              content: msg(lang, 'hiddenProfile', { url: `${site}/profile/` }),
               flags: 64,
             } };
             nickname = linked.nickname;
           }
           const profile = await deps.loadProfile(nickname, controller.signal, auxiliaryDeadline);
           if (!profile) return { type: 4, data: {
-            content: `Профиль «${clip(nickname, 100)}» не найден или скрыт.`, flags: 64,
+            content: msg(lang, 'profileMissing', { name: clip(nickname, 100) }), flags: 64,
           } };
-          const url = `${deps.site}/u/${encodeURIComponent(profile.nickname)}/`;
+          const url = `${site}/u/${encodeURIComponent(profile.nickname)}/`;
           return { type: 4, data: {
-            embeds: [profileEmbed(profile, deps.site)],
-            components: [{ type: 1, components: [{ type: 2, style: 5, label: 'Открыть профиль', url }] }],
+            embeds: [profileEmbed(profile, site, lang)],
+            components: [{ type: 1, components: [{ type: 2, style: 5, label: msg(lang, 'openProfile'), url }] }],
           } };
         })(),
         new Promise<never>((_, reject) => {
@@ -243,7 +246,7 @@ export async function handleInteraction(
         }),
       ]);
     } catch {
-      return profileUnavailable;
+      return ephemeral(msg(lang, 'profileUnavailable'));
     } finally {
       if (timer) clearTimeout(timer);
       controller.abort();
@@ -253,7 +256,7 @@ export async function handleInteraction(
     const option = interaction.data.options?.find((item) => item.name === 'персонаж');
     const query = fold(option?.value || '');
     try {
-      const builds = [...await deps.loadBuilds()].sort((a, b) => a.n.localeCompare(b.n, 'ru'));
+      const builds = [...await deps.loadBuilds(lang)].sort((a, b) => a.n.localeCompare(b.n, lang));
       const choices = builds.filter((build) => !query || [build.n, build.e, build.s].some((value) => fold(value).startsWith(query)));
       if (query) choices.push(...builds.filter((build) => !choices.includes(build) && [build.n, build.e, build.s].some((value) => fold(value).includes(query))));
       return { type: 8, data: { choices: choices.slice(0, 25).map((build) => ({ name: build.n, value: build.s })) } };
@@ -261,13 +264,13 @@ export async function handleInteraction(
       return { type: 8, data: { choices: [] } };
     }
   }
-  if (interaction.type !== 2 || interaction.data?.name !== 'гайд') return unknownCommand;
+  if (interaction.type !== 2 || interaction.data?.name !== 'гайд') return ephemeral(msg(lang, 'unknownCommand'));
   const value = interaction.data.options?.find((item) => item.name === 'персонаж')?.value || '';
   let builds: DiscordBuild[];
   try {
-    builds = await deps.loadBuilds();
+    builds = await deps.loadBuilds(lang);
   } catch {
-    return unavailable;
+    return ephemeral(msg(lang, 'guidesUnavailable'));
   }
   const query = fold(value);
   const build = query && (builds.find((item) => fold(item.s) === query)
@@ -276,11 +279,11 @@ export async function handleInteraction(
       const matches = builds.filter((item) => [item.n, item.e, item.s].some((name) => fold(name).includes(query)));
       return matches.length === 1 ? matches[0] : undefined;
     })());
-  if (!build) return { type: 4, data: { content: `Не нашёл гайд для «${clip(value, 100)}». Начните вводить имя и выберите персонажа из списка.`, flags: 64 } };
-  const url = `${deps.site}${build.url}`;
+  if (!build) return ephemeral(msg(lang, 'guideMissing', { name: clip(value, 100) }));
+  const url = `${deps.site}${localizedPath(build.url, lang)}`;
   return { type: 4, data: {
-    embeds: [buildEmbed(build, deps.site)],
-    components: [{ type: 1, components: [{ type: 2, style: 5, label: 'Открыть гайд на сайте', url }] }],
+    embeds: [buildEmbed(build, deps.site, lang)],
+    components: [{ type: 1, components: [{ type: 2, style: 5, label: msg(lang, 'openGuide'), url }] }],
   } };
 }
 
