@@ -137,16 +137,21 @@ if (missing.length) {
       });
       const shape = (list) => JSON.stringify(list.map((tag) => [tag.name, Boolean(tag.moderated), tag.emoji_id ?? null, tag.emoji_name ?? null]));
       const flags = ((channel.flags ?? 0) & ~requireTag) | ((source.flags ?? 0) & requireTag);
-      const patch = {};
-      if (shape(current) !== shape(tags)) patch.available_tags = tags;
-      if (flags !== (channel.flags ?? 0)) patch.flags = flags;
-      if (!Object.keys(patch).length) {
+      const tagsChanged = shape(current) !== shape(tags);
+      const flagsChanged = flags !== (channel.flags ?? 0);
+      if (!tagsChanged && !flagsChanged) {
         stats.unchanged++;
         return;
       }
-      const label = [patch.available_tags && `теги (${tags.length})`, 'flags' in patch && 'обязательный тег'].filter(Boolean).join(', ');
-      await change(`${label} ${branch.name} / ${channel.name}`, 'PATCH', `/channels/${channel.id}`, patch);
-      Object.assign(channel, patch);
+      // Discord проверяет «обязательный тег» по текущим тегам форума, поэтому сначала теги, потом флаг
+      if (tagsChanged) {
+        await change(`теги (${tags.length}) ${branch.name} / ${channel.name}`, 'PATCH', `/channels/${channel.id}`, { available_tags: tags });
+        channel.available_tags = tags;
+      }
+      if (flagsChanged) {
+        await change(`обязательный тег ${branch.name} / ${channel.name}`, 'PATCH', `/channels/${channel.id}`, { flags });
+        channel.flags = flags;
+      }
     }
 
     for (const name of ['Русский', 'English', 'Español']) {
