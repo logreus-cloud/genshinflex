@@ -2746,5 +2746,229 @@
  "Боссы": {
   "en": "Bosses",
   "es": "Jefes"
+ },
+ "(100 очков) смена на Данику: «Вступление E2»": {
+  "en": "(100 points) swap to Danica: Entrance E2",
+  "es": "(100 puntos) cambio a Danica: Entrada E2"
+ },
+ "2 + 2 — ДД, +160 МС": {
+  "en": "2 + 2 — DPS, +160 EM",
+  "es": "2 + 2 — DPS, +160 de Maestría Elemental"
+ },
+ "2 + 2 — для «Славы», временно": {
+  "en": "2 + 2 — for Glory, temporary",
+  "es": "2 + 2 — para Gloria, temporal"
+ },
+ "4 предмета — ДД, бонус к урону Звёздного проводника": {
+  "en": "4-piece — DPS, Stellar-Conduct DMG bonus",
+  "es": "4 piezas — DPS, bono de daño de Superconductor Estelar"
+ },
+ "4 предмета — атака отряду": {
+  "en": "4-piece — party ATK",
+  "es": "4 piezas — ATQ para el equipo"
+ },
+ "4 предмета — атака отряду от навыка": {
+  "en": "4-piece — party ATK from his Skill",
+  "es": "4 piezas — ATQ para el equipo con su habilidad"
+ },
+ "4 предмета — для «Милосердия»": {
+  "en": "4-piece — for Mercy",
+  "es": "4 piezas — para Misericordia"
+ },
+ "4 предмета — саппорт, атака отряду": {
+  "en": "4-piece — support, party ATK",
+  "es": "4 piezas — apoyo, ATQ para el equipo"
+ },
+ "4 предмета — саппорт, если его не носит Одетта": {
+  "en": "4-piece — support, if Odette isn't using it",
+  "es": "4 piezas — apoyo, si Odette no lo usa"
+ },
+ "4 предмета — урон Звёздного блеска отряду, если его не носит Одетта": {
+  "en": "4-piece — party Stellar Glimmer DMG, if Odette isn't using it",
+  "es": "4 piezas — daño de Destello Estelar para el equipo, si Odette no lo usa"
+ },
+ "4 предмета, если его не носят Одетта или Митя": {
+  "en": "4-piece, if neither Odette nor Mitya is using it",
+  "es": "4 piezas, si no lo usan ni Odette ni Mitya"
+ },
+ "E (коротко)": {
+  "en": "E (tap)",
+  "es": "E (pulsación corta)"
+ },
+ "E (удерж.)": {
+  "en": "E (hold)",
+  "es": "E (mantener)"
+ },
+ "Q «К новому миру»": {
+  "en": "Q: Toward a New World",
+  "es": "Q: Hacia un nuevo mundo"
+ },
+ "Q «Когда вечная ночь сменится рассветом»": {
+  "en": "Q: When Eternal Night Gives Way to Dawn",
+  "es": "Q: Cuando la noche eterna dé paso al alba"
+ },
+ "«Милосердие» — баффер": {
+  "en": "Mercy — buffer",
+  "es": "Misericordia — potenciadora"
+ },
+ "«Слава» — ДД": {
+  "en": "Glory — DPS",
+  "es": "Gloria — DPS"
+ },
+ "Анастасия: «Триумф лазурного звёздного указа»": {
+  "en": "Anastasya: Triumph of the Azure Star Edict",
+  "es": "Anastasya: Triunfo del Edicto Estelar Azur"
+ },
+ "Атака и щит": {
+  "en": "ATK and shield",
+  "es": "ATQ y escudo"
+ },
+ "Атака отряду": {
+  "en": "Party ATK",
+  "es": "ATQ para el equipo"
+ },
+ "Валерий CA (от 40 потенциала)": {
+  "en": "Valeriy CA (40+ Potential)",
+  "es": "Valeriy CA (con 40+ de Potencial)"
+ },
+ "Валерий E": {
+  "en": "Valeriy E",
+  "es": "Valeriy E"
+ },
+ "Валерий Q": {
+  "en": "Valeriy Q",
+  "es": "Valeriy Q"
+ },
+ "ДД или баффер Звёздного сияния": {
+  "en": "Stellar Glimmer DPS or buffer",
+  "es": "DPS o potenciadora de Destello Estelar"
+ },
+ "ДД или саппорт Звёздного проводника": {
+  "en": "Stellar-Conduct DPS or support",
+  "es": "DPS o apoyo de Superconductor Estelar"
+ },
+ "Для «Милосердия»: баффы отряду": {
+  "en": "For Mercy: party buffs",
+  "es": "Para Misericordia: mejoras al equipo"
+ },
+ "Заряженную атаку жать сразу при выходе на поле: раньше — ничего не происходит, позже — теряется урон. За ротацию около 15 выстрелов «Эволюционного взрыва».": {
+  "en": "Press Charged Attack right as he comes on field: too early does nothing, too late loses damage. About 15 Gradient Detonation shots per rotation.",
+  "es": "Pulsa el Ataque Cargado justo al entrar al campo: antes no pasa nada y después se pierde daño. Unos 15 disparos de Detonación de gradiente por rotación."
+ },
+ "Звёздный проводник Анастасии": {
+  "en": "Anastasya Stellar-Conduct",
+  "es": "Superconductor Estelar de Anastasya"
+ },
+ "Звёздный проводник Мити": {
+  "en": "Mitya Stellar-Conduct",
+  "es": "Superconductor Estelar de Mitya"
+ },
+ "Звёздный проводник с Валерием": {
+  "en": "Stellar-Conduct with Valeriy",
+  "es": "Superconductor Estelar con Valeriy"
+ },
+ "Корона замораживается и бьёт уроном реакции, а урон Звёздного сияния отряда растёт на 50%. Анастасия запечатана, пока команда не набьёт реакциями; при возврате на неё срабатывает «Триумф».": {
+  "en": "The crown's timer freezes and it deals reaction damage, and the party's Stellar Glimmer DMG rises by 50%. Anastasya stays sealed until the team deals enough reaction damage; swapping back to her triggers Triumph.",
+  "es": "El tiempo de la corona se congela y hace daño de reacción, y el daño de Destello Estelar del equipo sube un 50%. Anastasya queda sellada hasta que el equipo haga suficiente daño de reacción; al volver a ella se activa Triunfo."
+ },
+ "Крит. урон": {
+  "en": "CRIT DMG",
+  "es": "Daño CRIT"
+ },
+ "Крит. урон и бонус урона": {
+  "en": "CRIT DMG and DMG bonus",
+  "es": "Daño CRIT y bono de daño"
+ },
+ "Лучший 4★: МС и урон Звёздного блеска за Крио и Электро в отряде": {
+  "en": "Best 4★: EM and Stellar Glimmer DMG per Cryo and Electro party member",
+  "es": "Mejor 4★: Maestría Elemental y daño de Destello Estelar por cada Cryo y Electro del equipo"
+ },
+ "Лучший вариант: атака и щит": {
+  "en": "Best option: ATK and shield",
+  "es": "Mejor opción: ATQ y escudo"
+ },
+ "МС в доп. стате, сброс навыка почти не нужен": {
+  "en": "EM substat; the Skill reset barely matters",
+  "es": "Maestría Elemental como secundaria; el reinicio de habilidad apenas importa"
+ },
+ "Митя CA": {
+  "en": "Mitya CA",
+  "es": "Mitya CA"
+ },
+ "Митя E (удерж.)": {
+  "en": "Mitya E (hold)",
+  "es": "Mitya E (mantener)"
+ },
+ "Митя — главный ДД": {
+  "en": "Mitya as main DPS",
+  "es": "Mitya como DPS principal"
+ },
+ "Навык даёт 40 Ударного потенциала и щит. Пока идёт взрыв стихии, Электро-удары активного персонажа докидывают ещё до 80. Заряженная атака тратит весь запас и выдаёт 15 зарядов бонуса к урону: чем больше потенциала потрачено, тем сильнее каждый заряд.": {
+  "en": "The Skill gives 40 Impact Potential and a shield. During the Burst, the active character's Electro hits add up to 80 more. The Charged Attack spends it all and grants 15 damage-bonus stacks: the more Potential spent, the stronger each stack.",
+  "es": "La habilidad da 40 de Potencial de impacto y un escudo. Durante la definitiva, los golpes Electro del personaje activo suman hasta 80 más. El Ataque Cargado lo gasta todo y otorga 15 cargas de bono de daño: cuanto más Potencial gastado, más fuerte es cada carga."
+ },
+ "Одетта E": {
+  "en": "Odette E",
+  "es": "Odette E"
+ },
+ "Пока Даника вне поля, якорь копит очки от Электро и Крио ударов активного персонажа. При полном запасе переключение на неё само запускает «Вступление E2»: удар реакцией и щит. Взрыв стихии в форме Горничной-хранительницы даёт отряду до +500 атаки на 20 сек.": {
+  "en": "While Danica is off-field, the anchor builds points from the active character's Electro and Cryo hits. At full points, swapping to her triggers Entrance E2 automatically: a reaction hit and a shield. Her Burst in Guardian Maid form gives the party up to +500 ATK for 20s.",
+  "es": "Mientras Danica está fuera del campo, el ancla acumula puntos con los golpes Electro y Cryo del personaje activo. Con los puntos al máximo, cambiar a ella activa Entrada E2 sola: golpe de reacción y escudo. Su definitiva en forma de Doncella guardiana da al equipo hasta +500 de ATQ durante 20 s."
+ },
+ "Саппорт Звёздного проводника: щит, снижение сопротивления, атака отряду": {
+  "en": "Stellar-Conduct support: shield, RES shred, party ATK",
+  "es": "Apoyo de Superconductor Estelar: escudo, reducción de RES, ATQ para el equipo"
+ },
+ "Саппорт Ризли": {
+  "en": "Support for Wriothesley",
+  "es": "Apoyo para Wriothesley"
+ },
+ "Саппорт Сайно": {
+  "en": "Support for Cyno",
+  "es": "Apoyo para Cyno"
+ },
+ "Саппорт Сандроне": {
+  "en": "Support for Sandrone",
+  "es": "Apoyo para Sandrone"
+ },
+ "Союзники запечатаны, обычные атаки копьём сокращают печать. После неё каждое нажатие на союзника не выводит его, а запускает этап «Истребления»; третий этап снимает заморозку.": {
+  "en": "Allies are sealed, and spear Normal Attacks shorten the seal. Afterward, each press on an ally doesn't swap them in but triggers a stage of Annihilation; the third stage ends the freeze.",
+  "es": "Los aliados quedan sellados y los Ataques Normales de lanza acortan el sello. Después, cada pulsación sobre un aliado no lo saca al campo, sino que activa una fase de Aniquilación; la tercera fase termina la congelación."
+ },
+ "Те же статы без сброса навыка": {
+  "en": "Same stats without the Skill reset",
+  "es": "Mismas estadísticas sin el reinicio de habilidad"
+ },
+ "Только для саппорта: атака следующему персонажу": {
+  "en": "Support only: ATK for the next character",
+  "es": "Solo para apoyo: ATQ para el siguiente personaje"
+ },
+ "Щит и бафф Электро урона для Звёздного проводника": {
+  "en": "Shield and Electro DMG buff for Stellar-Conduct",
+  "es": "Escudo y mejora de daño Electro para Superconductor Estelar"
+ },
+ "Энергия, пока нет C1": {
+  "en": "Energy until C1",
+  "es": "Energía hasta C1"
+ },
+ "Ядро само копит Маяки эволюции от реакций отряда и взрывается при уходе Мити или по истечении времени.": {
+  "en": "The core collects Gradient Beacons from party reactions on its own and detonates when Mitya leaves or when it expires.",
+  "es": "El núcleo reúne Balizas de gradiente con las reacciones del equipo por sí solo y estalla cuando Mitya sale o al terminar su duración."
+ },
+ "Яэ E": {
+  "en": "Yae E",
+  "es": "Yae E"
+ },
+ "атаки копьём": {
+  "en": "spear attacks",
+  "es": "ataques de lanza"
+ },
+ "нажатия по союзникам: «Истребление» × 3": {
+  "en": "presses on allies: Annihilation × 3",
+  "es": "pulsaciones sobre aliados: Aniquilación × 3"
+ },
+ "смена на ДД": {
+  "en": "swap to DPS",
+  "es": "cambio al DPS"
  }
 }
