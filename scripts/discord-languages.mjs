@@ -28,6 +28,17 @@ const mirrors = [
   { ru: 'Коопчик', en: 'Co-op', es: 'Cooperativo', type: 2 },
   { ru: 'Стрим', en: 'Stage', es: 'Escenario', type: 13 },
 ];
+// Теги форумов: русское имя тега → [en, es]; эмодзи и «только модераторы» берутся у RU-тега (имя ≤ 20 символов)
+const tagNames = {
+  'Пиро': ['Pyro', 'Pyro'], 'Гидро': ['Hydro', 'Hydro'], 'Анемо': ['Anemo', 'Anemo'], 'Электро': ['Electro', 'Electro'],
+  'Дендро': ['Dendro', 'Dendro'], 'Крио': ['Cryo', 'Cryo'], 'Гео': ['Geo', 'Geo'], '5★': ['5★', '5★'], '4★': ['4★', '4★'], 'BETA': ['BETA', 'BETA'],
+  'Бездна': ['Abyss', 'Abismo'], 'Театр': ['Theater', 'Teatro'], 'Натиск': ['Stygian Onslaught', 'Asalto Estigio'],
+  'Открытый мир': ['Open world', 'Mundo abierto'], 'Новичок': ['Beginner', 'Principiante'], 'Решено': ['Solved', 'Resuelto'],
+  'На рассмотрении': ['Under review', 'En revisión'], 'Инструмент': ['Tool', 'Herramienta'], 'Гайды и данные': ['Guides & data', 'Guías y datos'],
+  'Дизайн': ['Design', 'Diseño'], 'Запланировано': ['Planned', 'Planeado'], 'В работе': ['In progress', 'En progreso'],
+  'Сделано': ['Done', 'Hecho'], 'Отклонено': ['Declined', 'Rechazado'],
+};
+const requireTag = 1 << 4;
 const branches = [{ lang: 'en', name: '🌐 ENGLISH', role: 'English' }, { lang: 'es', name: '🌐 ESPAÑOL', role: 'Español' }];
 const supportChannel = '1558832985246146560';
 const languageTitle = 'Язык · Language · Idioma';
@@ -108,6 +119,36 @@ if (missing.length) {
       return list;
     }
 
+    // Теги и «обязательный тег» форума-зеркала по RU-источнику; у уже существующих тегов сохраняется id
+    async function syncTags(source, channel, branch) {
+      const index = branch.lang === 'en' ? 0 : 1;
+      const current = channel.available_tags ?? [];
+      const tags = (source.available_tags ?? []).map((tag) => {
+        const name = tagNames[tag.name]?.[index];
+        if (!name) throw new Error(`нет перевода тега «${tag.name}» (${source.name})`);
+        const existing = current.find((item) => item.name === name);
+        return {
+          ...(existing ? { id: existing.id } : {}),
+          name,
+          moderated: Boolean(tag.moderated),
+          emoji_id: tag.emoji_id ?? null,
+          emoji_name: tag.emoji_name ?? null,
+        };
+      });
+      const shape = (list) => JSON.stringify(list.map((tag) => [tag.name, Boolean(tag.moderated), tag.emoji_id ?? null, tag.emoji_name ?? null]));
+      const flags = ((channel.flags ?? 0) & ~requireTag) | ((source.flags ?? 0) & requireTag);
+      const patch = {};
+      if (shape(current) !== shape(tags)) patch.available_tags = tags;
+      if (flags !== (channel.flags ?? 0)) patch.flags = flags;
+      if (!Object.keys(patch).length) {
+        stats.unchanged++;
+        return;
+      }
+      const label = [patch.available_tags && `теги (${tags.length})`, 'flags' in patch && 'обязательный тег'].filter(Boolean).join(', ');
+      await change(`${label} ${branch.name} / ${channel.name}`, 'PATCH', `/channels/${channel.id}`, patch);
+      Object.assign(channel, patch);
+    }
+
     for (const name of ['Русский', 'English', 'Español']) {
       let role = roles.find((item) => item.name === name);
       if (!role) {
@@ -174,6 +215,7 @@ if (missing.length) {
           } else stats.unchanged++;
           await syncOverwrites(channel, expected, true);
         }
+        if (source.type === 15) await syncTags(source, channel, branch);
       }
       for (const channel of channels.filter((item) => item.parent_id === category.id)) mapped.push([channel.id, branch.lang]);
     }
