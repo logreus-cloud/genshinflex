@@ -14,7 +14,7 @@ El [calendario](/es/calendar/) reúne en una sola línea de tiempo todo lo que p
 
 - gachapones de personajes con los iconos de los destacados y gachapones de armas, incluidas las fases anteriores;
 - eventos y versiones, directamente de los anuncios oficiales del juego;
-- reinicios del Abismo de Espiral, el Teatro Imaginario y la Embestida Estigia, incluidos los próximos ciclos previstos;
+- reinicios del Abismo de Espiral, el Teatro Imaginario y la Conflagración Estigia, incluidos los próximos ciclos previstos;
 - anuncios de las transmisiones de los desarrolladores cuando se publiquen.
 
 Puedes acercar la escala a una semana o alejarla a un trimestre, filtrar categorías y saltar al día de hoy. Al pulsar una barra verás sus fechas, la imagen y una cuenta atrás de «quedan» o «empieza en». Las horas siguen el servidor de la región elegida. En el móvil el calendario se abre como lista: «En curso», «Próximamente» y «Terminado hace poco». Los eventos más cercanos también aparecen ahora en la [página principal](/es/).

@@ -14,7 +14,7 @@ Esta es la primera entrada de la historia del proyecto. A continuación encontra
 
 ### Inicio, búsqueda y comodidad
 
-- La [página de inicio](/es/) reúne los gachapones actuales, los temporizadores del Abismo, el Teatro y la Embestida, los personajes y armas nuevos y los accesos a las herramientas.
+- La [página de inicio](/es/) reúne los gachapones actuales, los temporizadores del Abismo, el Teatro y la Conflagración, los personajes y armas nuevos y los accesos a las herramientas.
 - La búsqueda encuentra nombres y textos de las guías. También hay páginas recientes y favoritos.
 - Versiones en ruso, inglés y español, temas claro y oscuro e interfaz para móviles y ordenadores.
 - El selector de servidor adapta los temporizadores a la región. La navegación incluye un enlace al mapa interactivo oficial.
@@ -33,11 +33,11 @@ Esta es la primera entrada de la historia del proyecto. A continuación encontra
 - Cuando hay datos de simulación, las páginas de personajes incluyen un apartado sobre si merece la pena obtener constelaciones o armas, con aumentos del daño del equipo calculados mediante gcsim. Los resultados corresponden al equipo y a las condiciones indicadas.
 - El [editor de guías](/es/guides/editor/) permite proponer contenido o correcciones sobre personajes, armas y modos de desafío. Las propuestas pasan por moderación antes de publicarse.
 
-### Abismo, Teatro y Embestida
+### Abismo, Teatro y Conflagración
 
-- Un [resumen de los desafíos](/es/rotation/) y páginas dedicadas al [Abismo de Espiral](/es/abyss/), el [Teatro Imaginario](/es/theater/) y la [Embestida Estigia](/es/onslaught/).
+- Un [resumen de los desafíos](/es/rotation/) y páginas dedicadas al [Abismo de Espiral](/es/abyss/), el [Teatro Imaginario](/es/theater/) y la [Conflagración Estigia](/es/onslaught/).
 - Pisos 9–12 del Abismo, enemigos por sala y mitad, condiciones y recomendaciones de equipos.
-- Información del ciclo, restricciones, bonificaciones, enemigos y equipos recomendados para el Teatro y la Embestida.
+- Información del ciclo, restricciones, bonificaciones, enemigos y equipos recomendados para el Teatro y la Conflagración.
 - Fechas y temporizadores de los ciclos, con soporte para guías de la comunidad vinculadas a un ciclo concreto.
 
 ### Comprobación de equipos del Abismo

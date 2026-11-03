@@ -17,7 +17,7 @@ type ModeSection = Section & { href: string; shortByLang?: Record<Lang, string> 
 export const MODE_SECTIONS: Record<string, ModeSection> = {
   abyss: { id: 'abyss', href: '/abyss', label: 'Витая бездна', short: 'Бездна', icon: 'spiral', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 2 },
   theater: { id: 'theater', href: '/theater', label: 'Театр воображариума', short: 'Театр', icon: 'mask', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 3 },
-  onslaught: { id: 'onslaught', href: '/onslaught', label: 'Натиск', shortByLang: { ru: 'Натиск', en: 'Onslaught', es: 'Embestida' }, icon: 'flame', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 4 },
+  onslaught: { id: 'onslaught', href: '/onslaught', label: 'Натиск', shortByLang: { ru: 'Натиск', en: 'Onslaught', es: 'Conflagración' }, icon: 'flame', navGroup: 'Эндгейм', footerColumn: 'Эндгейм', footerOrder: 4 },
 };
 
 export const ROTATION_SECTION = { id: 'rotation', href: '/rotation', label: 'Все режимы', icon: 'moon', navGroup: 'Эндгейм' } as const;

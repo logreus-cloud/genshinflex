@@ -1,16 +1,16 @@
 ---
 lang: es
 anchor: onslaught-7-1-theater-28
-title: Nueva Embestida Estigia y el Teatro Imaginario de octubre
-summary: 'Embestida Estigia 7.1 «Frente Luminoso»: tres jefes, cómo vencerlos y un equipo para cada combate. Teatro, temporada 28: Hydro, Cryo y Anemo, personajes iniciales, estrellas invitadas y equipos listos.'
+title: Nueva Conflagración Estigia y el Teatro Imaginario de octubre
+summary: 'Conflagración Estigia 7.1 «Frente Luminoso»: tres jefes, cómo vencerlos y un equipo para cada combate. Teatro, temporada 28: Hydro, Cryo y Anemo, personajes iniciales, estrellas invitadas y equipos listos.'
 date: 2026-10-01T11:00:00+05:00
 ---
 
 Dos modos de endgame han cambiado a la vez, y hemos actualizado ambas páginas.
 
-### Embestida Estigia: «Frente Luminoso»
+### Conflagración Estigia: «Frente Luminoso»
 
-La [Embestida](/es/onslaught/) de la versión 7.1 dura del 30 de septiembre al 3 de noviembre. Esta temporada tiene tres jefes:
+La [Conflagración](/es/onslaught/) de la versión 7.1 dura del 30 de septiembre al 3 de noviembre. Esta temporada tiene tres jefes:
 
 - **Escultor domovói curtido («Churin»)** talla esculturas de hielo que golpean al personaje en el campo. Si lo golpeas con Destello Estelar antes de que termine una escultura, esta estalla y reduce las resistencias del jefe.
 - **Autómata Fuentenigma - Máquina de control** empieza el combate con una resistencia enorme. Los golpes Cryo frecuentes agotan su impulso y abren una ventana de daño, así que aquí rinden más muchos golpes pequeños que una sola gran explosión.

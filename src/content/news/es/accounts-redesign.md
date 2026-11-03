@@ -31,7 +31,7 @@ En la [política de privacidad](/es/privacy/) explicamos qué datos guarda el si
 
 ### Comunidad
 
-- Ya tenemos [servidor de Discord](https://discord.gg/rQ6pTDqdX9): noticias del sitio, foros de errores e ideas y un bot que avisa de los reinicios del Abismo, el Teatro y la Embestida, y del inicio y fin de banners y eventos.
+- Ya tenemos [servidor de Discord](https://discord.gg/rQ6pTDqdX9): noticias del sitio, foros de errores e ideas y un bot que avisa de los reinicios del Abismo, el Teatro y la Conflagración, y del inicio y fin de banners y eventos.
 - Los mensajes de [comentarios](/es/feedback/) llegan al equipo al instante.
 
 ### Personajes filtrados (BETA)

@@ -13,7 +13,7 @@ El sitio ya tiene su propio [foro](/es/forum/). Secciones: Builds y equipos, End
 - Los temas admiten formato: **negrita**, *cursiva*, citas, listas, enlaces y ||spoilers||. Puedes responder citando, reaccionar y editar o eliminar tus mensajes.
 - **@apodo** se convierte en un enlace al perfil y el jugador mencionado recibe una notificación.
 - Un solo foro para los tres idiomas, con filtro por idioma del tema.
-- Al final de las páginas de personajes, del Abismo de Espiral, del Teatro Imaginario y de la Embestida Estigia hay un bloque **Debates**: los últimos temas sobre ellos y un botón «Crear un tema sobre …».
+- Al final de las páginas de personajes, del Abismo de Espiral, del Teatro Imaginario y de la Conflagración Estigia hay un bloque **Debates**: los últimos temas sobre ellos y un botón «Crear un tema sobre …».
 - Las [normas de la comunidad](/es/rules/) están en el pie de página y junto al formulario de respuesta.
 
 ### Seguidores, amigos y feed

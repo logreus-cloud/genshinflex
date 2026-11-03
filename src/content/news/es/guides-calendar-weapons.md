@@ -1,23 +1,23 @@
 ---
 lang: es
 anchor: endgame-guides-calendar-weapons
-title: Guías completas del Teatro y la Embestida, nuevo calendario, armas y artefactos
-summary: 'Teatro y Embestida Estigia: enemigos por acto y dificultad, debilidades, consejos, vídeos y enlaces a más guías. El calendario se puede arrastrar con el ratón, armas y artefactos tienen nuevo diseño, Illuga llega al simulador y hay correcciones del perfil y del rastreador de gachapón.'
+title: Guías completas del Teatro y la Conflagración, nuevo calendario, armas y artefactos
+summary: 'Teatro y Conflagración Estigia: enemigos por acto y dificultad, debilidades, consejos, vídeos y enlaces a más guías. El calendario se puede arrastrar con el ratón, armas y artefactos tienen nuevo diseño, Illuga llega al simulador y hay correcciones del perfil y del rastreador de gachapón.'
 date: 2026-10-03T17:45:00+05:00
 ---
 
 En los últimos días se han acumulado muchas novedades en el sitio, así que las reunimos en una sola noticia.
 
-### Guías completas del Teatro y la Embestida
+### Guías completas del Teatro y la Conflagración
 
-Las páginas del [Teatro Imaginario](/es/theater/) y la [Embestida Estigia](/es/onslaught/) ahora son guías completas:
+Las páginas del [Teatro Imaginario](/es/theater/) y la [Conflagración Estigia](/es/onslaught/) ahora son guías completas:
 
-- **Tabla de dificultades**: niveles de los enemigos y qué cambia en cada una. El Teatro tiene cinco modos, de Fácil a Lunar; la Embestida, seis dificultades, de Normal a Funesta.
-- **Todos los actos del Teatro** (1–10 y los dos Desafíos Arcanos) y **los tres combates de la Embestida**. En cada uno verás los enemigos por partes del combate, la condición de la estrella, las ventajas, los efectos del escenario y las mecánicas del jefe. En la Embestida también se indica cómo cambian los jefes en las dificultades altas.
+- **Tabla de dificultades**: niveles de los enemigos y qué cambia en cada una. El Teatro tiene cinco modos, de Fácil a Lunar; la Conflagración, seis dificultades, de Normal a Funesta.
+- **Todos los actos del Teatro** (1–10 y los dos Desafíos Arcanos) y **los tres combates de la Conflagración**. En cada uno verás los enemigos por partes del combate, la condición de la estrella, las ventajas, los efectos del escenario y las mecánicas del jefe. En la Conflagración también se indica cómo cambian los jefes en las dificultades altas.
 - **Consejos y equipos para cada etapa**, ocultos tras el botón «Cómo superarlo» para no recargar la página.
 - **Vídeos y enlaces a más guías**, en ruso e inglés.
 
-También corregimos algunos datos: el nombre oficial de la Embestida es «Campaña luminosa», y el jefe del acto 8 del Teatro depende del modo: la Máquina de control en Difícil y el León Quimérico Alado en Visionario y Lunar.
+También corregimos algunos datos: el nombre oficial de la Conflagración es «Campaña luminosa», y el jefe del acto 8 del Teatro depende del modo: la Máquina de control en Difícil y el León Quimérico Alado en Visionario y Lunar.
 
 ### Calendario
 
