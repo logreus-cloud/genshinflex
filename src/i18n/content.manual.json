@@ -2951,9 +2951,9 @@
   "en": "Energy until C1",
   "es": "Energía hasta C1"
  },
- "Ядро само копит Маячки превращения от реакций отряда и взрывается при уходе Мити или по истечении времени.": {
-  "en": "The core collects Gradient Beacons from party reactions on its own and detonates when Mitya leaves or when it expires.",
-  "es": "El núcleo reúne balizas de gradiente con las reacciones del equipo por sí solo y estalla cuando Mitya sale o al terminar su duración."
+ "Ядро само копит Маячки превращения от реакций отряда и расходует их, когда истекает срок ядра или создаётся новое.": {
+  "en": "The core collects Gradient Beacons from party reactions on its own and spends them when it expires or a new core is created.",
+  "es": "El núcleo reúne balizas de gradiente con las reacciones del equipo por sí solo y las gasta al terminar su duración o al crearse un núcleo nuevo."
  },
  "Яэ E": {
   "en": "Yae E",
