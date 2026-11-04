@@ -1,6 +1,7 @@
 export const LANG_COOKIE = 'gf_lang';
 
 const excluded = new Set(['en', 'es', 'api', 'admin', 'data', 'download', '_astro', 'img', 'gcsim', 'elements', 'pagefind']);
+const russianFamiliar = new Set(['uk', 'be', 'kk', 'uz', 'ky', 'tg', 'tk', 'az', 'hy', 'ka']);
 
 export function localeRedirect(request: Request): string | null {
   const url = new URL(request.url);
@@ -22,10 +23,13 @@ export function localeRedirect(request: Request): string | null {
     const match = quality?.trim().match(/^q\s*=\s*(\d+(?:\.\d*)?|\.\d+)$/i);
     const q = quality === undefined ? 1 : Number(match?.[1]);
     const base = tag.trim().split('-')[0].toLowerCase();
-    return q > 0 && Number.isFinite(q) && base !== '*' ? [{ base, q, index }] : [];
+    return q > 0 && Number.isFinite(q) && base && base !== '*' ? [{ base, q, index }] : [];
   }).sort((a, b) => b.q - a.q || a.index - b.index);
   // Русский язык в списке всегда оставляет основную версию, независимо от приоритета.
   if (languages.some(({ base }) => base === 'ru')) return null;
   const chosenLanguage = languages.find(({ base }) => base === 'en' || base === 'es')?.base;
-  return chosenLanguage ? `/${chosenLanguage}${url.pathname}${url.search}` : null;
+  if (chosenLanguage) return `/${chosenLanguage}${url.pathname}${url.search}`;
+  // Для этих языков оставляем русскую версию.
+  if (languages.some(({ base }) => russianFamiliar.has(base))) return null;
+  return languages.length ? `/en${url.pathname}${url.search}` : null;
 }
