@@ -1,3 +1,5 @@
+import { localeRedirect } from './lib/locale';
+
 // Один основной адрес для поисковиков: www.genshinflex.com → genshinflex.com (301, путь и параметры сохраняются)
 // Копия значений по умолчанию из src/lib/platform.ts: там import.meta.env, которого нет в Pages Functions.
 // Публичный ключ — тот же, что уходит в браузер.
@@ -17,6 +19,14 @@ export async function onRequest({ request, next, env }: Ctx) {
     url.hostname = 'genshinflex.com';
     return Response.redirect(url.toString(), 301);
   }
+  const redirect = localeRedirect(request);
+  if (redirect) {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: redirect, 'Cache-Control': 'private, no-store', Vary: 'Accept-Language, Cookie' },
+    });
+  }
+
   const match = url.pathname.match(/^\/(?:(en|es)\/)?u\/([^/]+)\/?$/);
   if (match) {
     const prefix = match[1] ? `/${match[1]}` : '';

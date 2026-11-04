@@ -73,6 +73,13 @@ onPage((signal) => {
     languageButton.setAttribute('aria-expanded', String(open));
     if (open) languageMenu.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
   }, { signal });
+  languageMenu.addEventListener('click', (e) => {
+    const link = (e.target as Element).closest<HTMLAnchorElement>('a[hreflang]');
+    if (!link || !languageMenu.contains(link)) return;
+    const lang = link.hreflang;
+    if (lang !== 'ru' && lang !== 'en' && lang !== 'es') return;
+    document.cookie = `gf_lang=${lang}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+  }, { signal });
   document.addEventListener('pointerdown', (e) => {
     const target = e.target as Node;
     if (!searchPanel.contains(target) && !searchButtons.some((button) => button.contains(target))) closeSearch();
