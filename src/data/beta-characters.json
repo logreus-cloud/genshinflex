@@ -307,7 +307,7 @@
             },
             {
               "name": "Звёздный талант",
-              "description": "Когда персонажи отряда вызывают Сверхпроводник, вместо него срабатывает «Звёздная сверхпроводимость».\nБазовый урон «Звёздной сверхпроводимости» от персонажей отряда повышается на 0,7% за каждые 100 ед. силы атаки Даники, максимум на 14%.\nКроме того, в Поле полярного звёздного сияния Даника переходит в состояние «Сияние · Звёздная сверхпроводимость»."
+              "description": "Когда персонажи отряда вызывают Сверхпроводник, вместо него срабатывает «Звёздная сверхпроводимость».\nБазовый урон «Звёздной сверхпроводимости» от персонажей отряда повышается на 0,7% за каждые 100 ед. силы атаки Даники, максимум на 14%.\nКроме того, в Пределе путеводной звезды Даника переходит в состояние «Сияние · Звёздная сверхпроводимость»."
             },
             {
               "name": "Бытовой талант",
@@ -452,7 +452,7 @@
             },
             {
               "name": "Stellar Talent",
-              "description": "When party members trigger Superconduct, Stellar Superconduct is triggered instead.\nThe base DMG of Stellar Superconduct triggered by party members is increased by 0.7% for every 100 of Danica's ATK, up to 14%.\nIn addition, inside a Polar Starlight Field, Danica enters the Radiance: Stellar Superconduct state."
+              "description": "When party members trigger Superconduct, Stellar Superconduct is triggered instead.\nThe base DMG of Stellar Superconduct triggered by party members is increased by 0.7% for every 100 of Danica's ATK, up to 14%.\nIn addition, inside a Polestar Field, Danica enters the Radiance: Stellar Superconduct state."
             },
             {
               "name": "Utility Passive",
@@ -597,7 +597,7 @@
             },
             {
               "name": "Talento Estelar",
-              "description": "Cuando los personajes del equipo desencadenan Superconducción, se desencadena Superconducción Estelar en su lugar.\nEl daño base de Superconducción Estelar del equipo aumenta un 0,7% por cada 100 de ATQ de Danica, hasta un 14%.\nAdemás, dentro de un Campo de Luz Estelar Polar, Danica entra en el estado Resplandor: Superconducción Estelar."
+              "description": "Cuando los personajes del equipo desencadenan Superconducción, se desencadena Superconducción Estelar en su lugar.\nEl daño base de Superconducción Estelar del equipo aumenta un 0,7% por cada 100 de ATQ de Danica, hasta un 14%.\nAdemás, dentro de un campo estrellapolar, Danica entra en el estado Resplandor: Superconducción Estelar."
             },
             {
               "name": "Talento pasivo de utilidad",

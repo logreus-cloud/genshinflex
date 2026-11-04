@@ -24,7 +24,7 @@ mainStats:
   goblet: "Сила атаки %"
   circlet: "Сила атаки %"
 substats: ["Восст. энергии", "Сила атаки %", "Шанс / Крит. урон"]
-talents: [skill, normal, burst]
+talents: [normal, skill, burst]
 teams:
   - name: "Звёздный проводник Мити"
     members: [mitya, odette, yae-miko, valery]
