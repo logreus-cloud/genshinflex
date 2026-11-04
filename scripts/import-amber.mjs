@@ -68,6 +68,7 @@ const text = (s = '') => s
   .replace(/\{LAYOUT_MOBILE#[^}]*\}|\{LAYOUT_PS#[^}]*\}/g, '')
   .replace(/\{LAYOUT_PC#([^}]*)\}/g, '$1')
   .replace(/<color=[^>]*>|<\/color>/g, '')
+  .replace(/\{LINK#[^}]*\}\{\/LINK\}/g, '')
   .replace(/\{LINK#[^}]*\}([^{]*)\{\/LINK\}/g, '**$1**');
 
 // «Урон навыка|{param1:F1P}» → строка значений по уровням таланта, как в import-data.mjs

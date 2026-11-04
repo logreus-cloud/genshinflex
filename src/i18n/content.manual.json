@@ -2827,9 +2827,9 @@
   "en": "Party ATK",
   "es": "ATQ para el equipo"
  },
- "Валерий CA (от 40 потенциала)": {
-  "en": "Valeriy CA (40+ Potential)",
-  "es": "Valeriy CA (con 40+ de Potencial)"
+ "Валерий CA (от 40 Импульсной энергии)": {
+  "en": "Valeriy CA (40+ Impact Momentum)",
+  "es": "Valeri CA (con 40+ de energía de choque)"
  },
  "Валерий E": {
   "en": "Valeriy E",
@@ -2851,9 +2851,9 @@
   "en": "For Mercy: party buffs",
   "es": "Para Misericordia: mejoras al equipo"
  },
- "Заряженную атаку жать сразу при выходе на поле: раньше — ничего не происходит, позже — теряется урон. За ротацию около 15 выстрелов «Эволюционного взрыва».": {
+ "Заряженную атаку жать сразу при выходе на поле: раньше — ничего не происходит, позже — теряется урон. За ротацию около 15 выстрелов «Имплозии превращения».": {
   "en": "Press Charged Attack right as he comes on field: too early does nothing, too late loses damage. About 15 Gradient Detonation shots per rotation.",
-  "es": "Pulsa el Ataque Cargado justo al entrar al campo: antes no pasa nada y después se pierde daño. Unos 15 disparos de Detonación de gradiente por rotación."
+  "es": "Pulsa el Ataque Cargado justo al entrar al campo: antes no pasa nada y después se pierde daño. Unos 15 disparos de Implosión de gradiente por rotación."
  },
  "Звёздный проводник Анастасии": {
   "en": "Anastasya Stellar-Conduct",
@@ -2903,9 +2903,9 @@
   "en": "Mitya as main DPS",
   "es": "Mitya como DPS principal"
  },
- "Навык даёт 40 Ударного потенциала и щит. Пока идёт взрыв стихии, Электро-удары активного персонажа докидывают ещё до 80. Заряженная атака тратит весь запас и выдаёт 15 зарядов бонуса к урону: чем больше потенциала потрачено, тем сильнее каждый заряд.": {
-  "en": "The Skill gives 40 Impact Potential and a shield. During the Burst, the active character's Electro hits add up to 80 more. The Charged Attack spends it all and grants 15 damage-bonus stacks: the more Potential spent, the stronger each stack.",
-  "es": "La habilidad da 40 de Potencial de impacto y un escudo. Durante la definitiva, los golpes Electro del personaje activo suman hasta 80 más. El Ataque Cargado lo gasta todo y otorga 15 cargas de bono de daño: cuanto más Potencial gastado, más fuerte es cada carga."
+ "Навык даёт 40 Импульсной энергии и щит. Пока идёт взрыв стихии, Электро-удары активного персонажа докидывают ещё до 80. Заряженная атака тратит весь запас и выдаёт 15 зарядов Приказа о штурме: чем больше энергии потрачено, тем сильнее каждый заряд.": {
+  "en": "The Skill gives 40 Impact Momentum and a shield. During the Burst, the active character's Electro hits add up to 80 more. The Charged Attack spends it all and grants 15 Offensive Directive stacks: the more Momentum spent, the stronger each stack.",
+  "es": "La habilidad da 40 de energía de choque y un escudo. Durante la definitiva, los golpes Electro del personaje activo suman hasta 80 más. El Ataque Cargado lo gasta todo y otorga 15 cargas de orden expeledora: cuanta más energía se gasta, más fuerte es cada carga."
  },
  "Одетта E": {
   "en": "Odette E",
@@ -2951,9 +2951,9 @@
   "en": "Energy until C1",
   "es": "Energía hasta C1"
  },
- "Ядро само копит Маяки эволюции от реакций отряда и взрывается при уходе Мити или по истечении времени.": {
+ "Ядро само копит Маячки превращения от реакций отряда и взрывается при уходе Мити или по истечении времени.": {
   "en": "The core collects Gradient Beacons from party reactions on its own and detonates when Mitya leaves or when it expires.",
-  "es": "El núcleo reúne Balizas de gradiente con las reacciones del equipo por sí solo y estalla cuando Mitya sale o al terminar su duración."
+  "es": "El núcleo reúne balizas de gradiente con las reacciones del equipo por sí solo y estalla cuando Mitya sale o al terminar su duración."
  },
  "Яэ E": {
   "en": "Yae E",
