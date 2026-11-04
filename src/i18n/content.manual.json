@@ -2751,17 +2751,9 @@
   "en": "(100 points) swap to Danica: Entrance E2",
   "es": "(100 puntos) cambio a Danica: Entrada E2"
  },
- "2 + 2 — ДД, +160 МС": {
-  "en": "2 + 2 — DPS, +160 EM",
-  "es": "2 + 2 — DPS, +160 de Maestría Elemental"
- },
  "2 + 2 — для «Славы», временно": {
   "en": "2 + 2 — for Glory, temporary",
   "es": "2 + 2 — para Gloria, temporal"
- },
- "4 предмета — ДД, бонус к урону Звёздного проводника": {
-  "en": "4-piece — DPS, Stellar-Conduct DMG bonus",
-  "es": "4 piezas — DPS, bono de daño de Superconductor Estelar"
  },
  "4 предмета — атака отряду": {
   "en": "4-piece — party ATK",
@@ -2851,10 +2843,6 @@
   "en": "For Mercy: party buffs",
   "es": "Para Misericordia: mejoras al equipo"
  },
- "Заряженную атаку жать сразу при выходе на поле: раньше — ничего не происходит, позже — теряется урон. За ротацию около 15 выстрелов «Имплозии превращения».": {
-  "en": "Press Charged Attack right as he comes on field: too early does nothing, too late loses damage. About 15 Gradient Detonation shots per rotation.",
-  "es": "Pulsa el Ataque Cargado justo al entrar al campo: antes no pasa nada y después se pierde daño. Unos 15 disparos de Implosión de gradiente por rotación."
- },
  "Звёздный проводник Анастасии": {
   "en": "Anastasya Stellar-Conduct",
   "es": "Superconductor Estelar de Anastasya"
@@ -2878,10 +2866,6 @@
  "Крит. урон и бонус урона": {
   "en": "CRIT DMG and DMG bonus",
   "es": "Daño CRIT y bono de daño"
- },
- "Лучший 4★: МС и урон Звёздного блеска за Крио и Электро в отряде": {
-  "en": "Best 4★: EM and Stellar Glimmer DMG per Cryo and Electro party member",
-  "es": "Mejor 4★: Maestría Elemental y daño de Destello Estelar por cada Cryo y Electro del equipo"
  },
  "Лучший вариант: атака и щит": {
   "en": "Best option: ATK and shield",
@@ -2970,5 +2954,61 @@
  "смена на ДД": {
   "en": "swap to DPS",
   "es": "cambio al DPS"
+ },
+ "Заряженную атаку жать сразу при выходе на поле: раньше — ничего не происходит, позже — теряется урон. Дальше — каждый раз, когда набралось 4 Маячка превращения: взрыв стихии даёт сразу 3. За ротацию около 15 выстрелов «Имплозии превращения».": {
+  "en": "Press Charged Attack right as he comes on field: too early does nothing, too late loses damage. After that, press it whenever you reach 4 Gradient Beacons: his Burst gives 3 at once. About 15 Gradient Detonation shots per rotation.",
+  "es": "Pulsa el Ataque Cargado justo al entrar al campo: antes no pasa nada y después se pierde daño. Luego, cada vez que reúnas 4 balizas de gradiente: la definitiva da 3 de golpe. Unos 15 disparos de Implosión de gradiente por rotación."
+ },
+ "Сигнатурка Нефер: крит и МС. С ней сигнатурку Мити можно не крутить": {
+  "en": "Nefer's signature: crit and EM. With it, you can skip Mitya's signature",
+  "es": "Arma exclusiva de Nefer: CRIT y Maestría Elemental. Con ella puedes saltarte la de Mitya"
+ },
+ "Лучший 4★ наравне с Застывшим сердцем зимы: МС от заряженной атаки и навыка": {
+  "en": "Best 4★ alongside Winter's Heavy Heart: EM from Charged Attack and Skill hits",
+  "es": "Mejor 4★ junto a Corazón del Invierno: Maestría Elemental por Ataque Cargado y habilidad"
+ },
+ "Лучший 4★ наравне с Рассветным инеем: МС и урон Звёздного блеска за Крио и Электро в отряде": {
+  "en": "Best 4★ alongside Dawning Frost: EM and Stellar Glimmer DMG per Cryo and Electro party member",
+  "es": "Mejor 4★ junto a Escarcha del Albor: Maestría Elemental y daño de Destello Estelar por cada Cryo y Electro del equipo"
+ },
+ "Бесплатный вариант: МС после навыка": {
+  "en": "Free option: EM after using his Skill",
+  "es": "Opción gratuita: Maestría Elemental tras usar la habilidad"
+ },
+ "2 + 2 — ДД, лучший вариант, +160 МС": {
+  "en": "2 + 2 — DPS, best option, +160 EM",
+  "es": "2 + 2 — DPS, la mejor opción, +160 de Maestría Elemental"
+ },
+ "4 предмета — ДД, бонус к урону Звёздного проводника, чуть слабее 2 + 2": {
+  "en": "4-piece — DPS, Stellar-Conduct DMG bonus, slightly weaker than 2 + 2",
+  "es": "4 piezas — DPS, bono de daño de Superconductor Estelar, algo peor que 2 + 2"
+ },
+ "4 предмета — ДД, запасной вариант: 2 + 2 собрать проще": {
+  "en": "4-piece — DPS, fallback: 2 + 2 is easier to farm",
+  "es": "4 piezas — DPS, opción de reserva: 2 + 2 es más fácil de conseguir"
+ },
+ "Митя с Сахарозой": {
+  "en": "Mitya with Sucrose",
+  "es": "Mitya con Sacarosa"
+ },
+ "Звёздный проводник без новых персонажей": {
+  "en": "Stellar-Conduct without new characters",
+  "es": "Superconductor Estelar sin personajes nuevos"
+ },
+ "Бесплатный отряд с Алёшей": {
+  "en": "Free team with Alyosha",
+  "es": "Equipo gratuito con Aliosha"
+ },
+ "Если не хватает восстановления энергии на взрыв стихии": {
+  "en": "If you lack Energy Recharge for his Burst",
+  "es": "Si te falta Recarga de Energía para la definitiva"
+ },
+ "2 + 2 — лучший вариант для Мити: подойдут любые два сета на +18% атаки": {
+  "en": "2 + 2 — best option for Mitya: any two sets with +18% ATK work",
+  "es": "2 + 2 — la mejor opción para Mitya: sirven dos sets cualesquiera con +18% de ATQ"
+ },
+ "4 предмета — если ДД отряда считает урон от атаки": {
+  "en": "4-piece — if the team's DPS scales on ATK",
+  "es": "4 piezas — si el DPS del equipo escala con ATQ"
  }
 }

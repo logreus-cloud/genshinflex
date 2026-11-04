@@ -7,8 +7,10 @@
 
 **Stats:** EM on sands and goblet, crit on the circlet. His passive raises the party's base Stellar-Conduct DMG by 0.028% per EM point, capped at 14% at 500 EM. Creating beacons gives him up to +20% CRIT Rate, so he needs less crit in substats than usual.
 
-**Weapons:** in early access tests his signature catalyst gives about +35% damage over Sacrificial Fragments, but it's not on the site yet. The best 4★ is Winter's Heavy Heart.
+**Weapons:** in early access tests his signature catalyst gives about +35% damage over Sacrificial Fragments, but it's not on the site yet. It's a poor pull for party damage: C1 and C2 give more, and if you own Reliquary of Truth you can skip the signature. The best 4★ options are Dawning Frost and Winter's Heavy Heart, and the best free one is Etherlight Spindlelute.
 
 **Partners:** Odette or Diona as the Cryo for the reaction, Yae Miko as the second Electro, and Valeriy as the buffer: inside a Polestar Field he enters Radiance and boosts reaction damage specifically. If you only need an off-field support, you can wait for Danica in 7.3.
 
-Talents and multipliers are checked against 7.2 game data. Weapon comparisons and rotations come from early access tests.
+**Pulls and talents:** pull C1, then C2, then the signature. C1 adds a beacon on Skill, raises the cap to 5, gives the active character +40% CRIT DMG and restores energy. C2 cuts enemy Cryo and Electro RES by 20%. As main DPS, level Normal Attack first, with Skill and Burst equal after it. As a support, level Skill, then Burst, and Normal Attack last.
+
+Talents and multipliers are checked against 7.2 game data. Weapon comparisons and rotations come from early access tests; gear and constellation priorities come from the Genshin Impact | iNFO guide.
