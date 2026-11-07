@@ -16,7 +16,7 @@ const roleText = role ? t(role) : '';
 const nameFit = Math.min(11.5, 104 / Math.max(...c.name.split(/\s+/).map((word) => word.length)));
 ---
 <a class:list={['tile', `r${c.rarity}`]} href={`${base}/characters/${c.slug}/`} data-el={c.element}>
-  <img class:list={['art', { fallback: !hasArt }]} src={hasArt ? `/img/chars/${c.slug}.webp` : c.icon} alt="" loading="lazy" decoding="async" width="320" height="800" />
+  <img class:list={['art', { fallback: !hasArt }]} src={hasArt ? `/img/chars/${c.slug}.webp` : c.icon} alt="" loading="lazy" decoding="async" width="320" height="1024" />
   {c.emblem && <img class="skill" src={c.emblem} alt="" loading="lazy" decoding="async" width="40" height="40" />}
   {c.beta ? <span class="badge beta">BETA</span> : badge && <span class="badge">{badge}</span>}
   <span class="name" style={`--fit: ${nameFit.toFixed(2)}`}>{c.name}</span>
@@ -57,7 +57,7 @@ const nameFit = Math.min(11.5, 104 / Math.max(...c.name.split(/\s+/).map((word) 
 
 <style>
   .tile { position: relative; display: block; aspect-ratio: 2 / 5; overflow: hidden; border: 1px solid rgb(255 255 255 / .06); border-radius: 12px; isolation: isolate; container-type: inline-size; text-decoration: none; color: #fff; background: #0a0a0a; transition: transform .4s ease-out, box-shadow .4s ease-out; }
-  .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 27%; transform-origin: 50% 27%; z-index: -1; transition: transform .4s ease-out; }
+  .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; transform-origin: 50% 27%; z-index: -1; transition: transform .4s ease-out; }
   .art.fallback { object-position: top; }
   .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #000 0%, rgb(0 0 0 / .25) 50%, transparent 100%); z-index: -1; }
   .skill { position: absolute; top: 6px; left: 6px; width: 30px; height: 30px; padding: 3px; border-radius: 50%; background: rgb(15 18 32 / .75); box-shadow: 0 0 0 2px var(--el); object-fit: contain; }
