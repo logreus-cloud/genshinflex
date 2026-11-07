@@ -1,12 +1,13 @@
 // Карточки персонажей для /characters: официальная карточка молитвы с enka (UI_Gacha_AvatarIcon, 320×1024);
-// если её нет (путешественник, бета) — вырезка 2:5 из сплэш-арта на заливке по стихии
+// если её нет (путешественник, бета) — вырезка 2:5 из сплэш-арта
 // от макушки примерно до пояса, голова по центру → public/img/chars/<slug>.webp.
+// У всех карточек rembg вырезает персонажа, фон заменяется градиентом по редкости.
 // Путешественник чередуется Люмин/Итер по порядку в списке.
 // Точки лиц — src/data/char-card-faces.json ([x, y, размер лица] в долях арта; найдены детектором аниме-лиц и поправлены вручную).
 // Сплэши беты берутся из public/img/beta/<slug>-splash.webp. Уже готовые не трогаем; --force — пересоздать все.
-// Персонажа отделяет от фона сплэша rembg (scripts/cut-char-cards.py; нужен pip install rembg[cpu]).
+// Для вырезания нужен rembg (scripts/cut-char-cards.py; pip install rembg[cpu]).
 // Промежуточные файлы — .cache/char-cards.
-// Запуск: node scripts/import-char-cards.mjs [--force]
+// Запуск: node scripts/import-char-cards.mjs [--force] [--only=slug1,slug2]
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
@@ -17,30 +18,28 @@ const root = path.resolve(import.meta.dirname, '..');
 const out = path.join(root, 'public/img/chars');
 const cropDir = path.join(root, '.cache/char-cards/crop');
 const cutDir = path.join(root, '.cache/char-cards/cut');
+const readyDir = path.join(root, '.cache/char-cards/ready');
 const force = process.argv.includes('--force');
+const onlyArg = process.argv.find((arg) => arg.startsWith('--only='));
+const only = onlyArg ? new Set(onlyArg.slice('--only='.length).split(',').filter(Boolean)) : null;
 const characters = JSON.parse(await fs.readFile(path.join(root, 'src/data/generated/characters.json'), 'utf8'));
 const beta = JSON.parse(await fs.readFile(path.join(root, 'src/data/beta-characters.json'), 'utf8')).characters;
+const released = Array.isArray(characters) ? characters : Object.values(characters);
+const releasedSlugs = new Set(released.map((c) => c.slug));
 const list = [
-  ...(Array.isArray(characters) ? characters : Object.values(characters)),
-  // Бета без сплэша (утечка без арта) пропускается
-  ...beta.map((b) => ({ slug: b.slug, element: b.element, splash: path.join(root, `public/img/beta/${b.slug}-splash.webp`) })).filter((b) => existsSync(b.splash)),
+  ...released,
+  // Бета без сплэша (утечка без арта) пропускается; вышедшего персонажа берём из основных данных
+  ...beta.filter((b) => !releasedSlugs.has(b.slug)).map((b) => ({ slug: b.slug, rarity: b.rarity, splash: path.join(root, `public/img/beta/${b.slug}-splash.webp`) })).filter((b) => existsSync(b.splash)),
 ];
 const faces = JSON.parse(await fs.readFile(path.join(root, 'src/data/char-card-faces.json'), 'utf8'));
 await fs.mkdir(out, { recursive: true });
 // Только кадры текущего запуска: Python режет всё, что лежит в папке
 await fs.rm(cropDir, { recursive: true, force: true });
 await fs.mkdir(cropDir, { recursive: true });
+await fs.rm(readyDir, { recursive: true, force: true });
+await fs.mkdir(readyDir, { recursive: true });
 
 const W = 320, H = 800;
-const ELEMENT_COLORS = {
-  anemo: '#5fd1b3',
-  geo: '#e5b44a',
-  electro: '#b07cf0',
-  dendro: '#8fc94a',
-  hydro: '#4aa8f0',
-  pyro: '#f0683e',
-  cryo: '#8fdcef',
-};
 // Без точки лица: доля высоты фигуры в кадре (≈ от макушки до пояса) и отступ над макушкой
 const SHARE = .62, HEADROOM = .04;
 // С точкой лица: лицо ≈ 15% высоты карточки, его центр — на 20% от верха
@@ -50,22 +49,15 @@ let made = 0, failed = 0;
 const tasks = [];
 let traveler = 0;
 
-function background(color) {
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+function background(rarity, width, height) {
+  const [top, bottom] = Number(rarity) === 5 ? ['#7a5226', '#d1953f'] : ['#5b4b82', '#9679c4'];
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
       <defs>
-        <linearGradient id="base" x2="0%" y2="100%">
-          <stop stop-color="#11131c"/><stop offset="75%" stop-color="#0a0a0a"/>
+        <linearGradient id="base" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop stop-color="${top}"/><stop offset="100%" stop-color="${bottom}"/>
         </linearGradient>
-        <linearGradient id="tint" x2="0%" y2="100%">
-          <stop stop-color="${color}" stop-opacity=".4"/><stop offset="75%" stop-color="${color}" stop-opacity="0"/>
-        </linearGradient>
-        <radialGradient id="glow">
-          <stop stop-color="${color}" stop-opacity=".55"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-        </radialGradient>
       </defs>
-      <rect width="${W}" height="${H}" fill="url(#base)"/>
-      <rect width="${W}" height="${H}" fill="url(#tint)"/>
-      <circle cx="${W / 2}" cy="${H * .24}" r="${W * .65}" fill="url(#glow)"/>
+      <rect width="${width}" height="${height}" fill="url(#base)"/>
     </svg>`);
 }
 
@@ -107,8 +99,12 @@ async function load(src) {
 for (const c of list) {
   const aether = c.slug.startsWith('traveler-') && traveler++ % 2 === 1;
   const file = path.join(out, `${c.slug}.webp`);
-  if (!force && await fs.stat(file).then(() => true, () => false)) { have.push(c.slug); continue; }
-  // Официальная карточка молитвы (320×1024) — как есть, кадр 2:5 по центру делает CSS.
+  if (only && !only.has(c.slug)) {
+    if (await fs.stat(file).then(() => true, () => false)) have.push(c.slug);
+    continue;
+  }
+  if (!force && !only && await fs.stat(file).then(() => true, () => false)) { have.push(c.slug); continue; }
+  // Официальная карточка молитвы (320×1024) — кадр 2:5 по центру делает CSS.
   // Вырезка из сплэша — только когда карточки нет (404); при сбое сети оставляем старый файл
   if (c.icon?.includes('UI_AvatarIcon_')) {
     const response = await fetch(c.icon.replace('UI_AvatarIcon_', 'UI_Gacha_AvatarIcon_'), {
@@ -121,11 +117,15 @@ for (const c of list) {
       continue;
     }
     if (response.ok) {
-      await sharp(Buffer.from(await response.arrayBuffer()))
-        .resize({ width: W }).webp({ quality: 80, effort: 6 }).toFile(file);
-      have.push(c.slug);
-      made++;
-      process.stdout.write(`${c.slug} `);
+      try {
+        await sharp(Buffer.from(await response.arrayBuffer()))
+          .resize({ width: W }).png().toFile(path.join(cropDir, `${c.slug}.png`));
+        tasks.push({ slug: c.slug, rarity: c.rarity, file, width: W, height: 1024 });
+      } catch (error) {
+        failed++;
+        console.warn(`\n${c.slug}: карточка не скачалась (${error.message})`);
+        if (await fs.stat(file).then(() => true, () => false)) have.push(c.slug);
+      }
       continue;
     }
   }
@@ -155,9 +155,11 @@ for (const c of list) {
     top += pad;
     const padded = await sharp(buffer).ensureAlpha()
       .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
-    await sharp(padded).extract({ left, top, width: cropW, height: cropH })
-      .png().toFile(path.join(cropDir, `${c.slug}.png`));
-    tasks.push({ slug: c.slug, element: c.element, file });
+    // Сплэш с прозрачным фоном уже вырезан — rembg на нём только портит фигуру (тёмная одежда, маленький кадр)
+    const transparent = !(await sharp(buffer).stats()).isOpaque;
+    const crop = path.join(transparent ? readyDir : cropDir, `${c.slug}.png`);
+    await sharp(padded).extract({ left, top, width: cropW, height: cropH }).png().toFile(crop);
+    tasks.push({ slug: c.slug, rarity: c.rarity, file, width: W, height: H, cut: transparent ? crop : undefined });
   } catch (error) {
     failed++;
     console.warn(`\n${c.slug}: ${error.message}`);
@@ -166,8 +168,8 @@ for (const c of list) {
   }
 }
 
-if (tasks.length) {
-  await fs.rm(cutDir, { recursive: true, force: true });
+if (tasks.some((task) => !task.cut)) {
+  // Готовые вырезки не удаляем: cut-char-cards.py пропускает их по отпечатку
   await fs.mkdir(cutDir, { recursive: true });
   const result = spawnSync('python', ['scripts/cut-char-cards.py', cropDir, cutDir], {
     cwd: root,
@@ -178,13 +180,12 @@ if (tasks.length) {
   }
 }
 
-for (const { slug, element, file } of tasks) {
-  const cut = path.join(cutDir, `${slug}.png`);
+for (const { slug, rarity, file, width, height, cut: ready } of tasks) {
+  const cut = ready ?? path.join(cutDir, `${slug}.png`);
   try {
     if (!existsSync(cut)) throw new Error('нет вырезанного персонажа');
-    const cutout = await sharp(cut).resize(W, H).png().toBuffer();
-    const color = ELEMENT_COLORS[element] || '#8a8fb0';
-    await sharp(background(color)).composite([{ input: cutout }])
+    const cutout = await sharp(cut).resize(width, height).png().toBuffer();
+    await sharp(background(rarity, width, height)).composite([{ input: cutout }])
       .removeAlpha().webp({ quality: 82, effort: 6 }).toFile(file);
     have.push(slug);
     made++;
