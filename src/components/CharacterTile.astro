@@ -83,6 +83,7 @@ const roleText = role ? t(role) : '';
   .weapon-mark { display: flex; width: 19px; height: 19px; align-items: center; justify-content: center; }
   .weapon-mark svg { width: 16px; height: 16px; }
   .preview { position: absolute; inset: auto 0 0; display: flex; box-sizing: border-box; width: 100%; min-height: 54%; max-height: 100%; align-items: center; justify-content: center; padding: .55rem; background: rgb(9 12 25 / .86); backdrop-filter: blur(10px); opacity: 0; transform: translateY(8px); overflow: hidden; pointer-events: none; transition: opacity .2s, transform .2s; }
+  :global(:root[data-gfx="low"]) .preview { background: rgb(9 12 25 / .94); backdrop-filter: none; }
   .preview-content { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 4px; }
   .preview-name { font: 600 .9rem var(--font-display); color: #fff; }
   .role { color: var(--accent-text); max-width: min(22ch, 100%); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .8rem; font-weight: 600; }

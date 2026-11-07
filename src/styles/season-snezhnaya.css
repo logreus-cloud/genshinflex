@@ -55,6 +55,13 @@
   background: var(--scene-shade), var(--scene-img) 71.9% top / cover no-repeat;
   transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(1.06); will-change: transform;
 }
+:root[data-season="snezhnaya"][data-gfx="low"] .season-scene {
+  transform: none; will-change: auto !important;
+}
+:root[data-season="snezhnaya"][data-gfx="low"] .season-snow { display: none; }
+:root[data-season="snezhnaya"][data-gfx="low"] .shell > .top {
+  background: var(--surface); backdrop-filter: none;
+}
 :root[data-season="snezhnaya"] :is(body, .shell, .content) { background: transparent; }
 :root[data-season="snezhnaya"] .promo-card { background: linear-gradient(90deg, var(--surface-2), var(--surface)); }
 /* Только шапка сайта (.shell > .top): класс .top есть и у заголовков страниц (руководства, эндгейм, админка) */

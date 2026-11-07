@@ -105,6 +105,44 @@ const active = (href: string) => (href === '/' ? path === '/' : path === href ||
         }
       })();
     </script>
+    <script is:inline>
+      (() => {
+        const detect = () => {
+          try {
+            const cached = sessionStorage.getItem('gf:lowgfx');
+            if (cached === '1' || cached === '0') return cached === '1';
+          } catch {}
+          let low = false;
+          try {
+            const gl = document.createElement('canvas').getContext('webgl', { failIfMajorPerformanceCaveat: true });
+            if (!gl) low = true;
+            else {
+              const info = gl.getExtension('WEBGL_debug_renderer_info');
+              const renderer = gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER);
+              low = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(renderer));
+              gl.getExtension('WEBGL_lose_context')?.loseContext();
+            }
+          } catch { low = false; }
+          try { sessionStorage.setItem('gf:lowgfx', low ? '1' : '0'); } catch {}
+          return low;
+        };
+        const apply = () => {
+          let override;
+          try { override = localStorage.getItem('gf:gfx'); } catch {}
+          const low = override === 'low' ? true : override === 'full' ? false : detect();
+          if (low) document.documentElement.dataset.gfx = 'low';
+          else delete document.documentElement.dataset.gfx;
+        };
+        apply();
+        if (!window.gfGfxAfterSwap) {
+          window.gfGfxAfterSwap = true;
+          document.addEventListener('astro:after-swap', apply);
+          document.addEventListener('astro:before-swap', (event) => {
+            if (document.documentElement.dataset.gfx === 'low') event.viewTransition?.skipTransition();
+          });
+        }
+      })();
+    </script>
   </head>
   <body>
     {season.theme && <div class="season-scene" aria-hidden="true" transition:persist="season-scene"></div>}

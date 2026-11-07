@@ -1519,6 +1519,7 @@ const charsJson = JSON.stringify(characters.map(({ slug, name, icon, element, ra
   .profile-bg { position: fixed; inset: var(--top-h) 0 0; z-index: 0; overflow: hidden; pointer-events: none; }
   .profile-bg-image { position: absolute; inset: 0; background-position: center; background-size: cover; }
   .profile-bg::after { content: ""; position: absolute; inset: 0; background: rgb(0 0 0 / var(--profile-darken, 0)); backdrop-filter: blur(var(--profile-blur, 0px)); }
+  :global(:root[data-gfx="low"]) .profile-bg::after { backdrop-filter: none; }
   .profile-effect { position: fixed; top: var(--top-h); left: 0; z-index: 5; pointer-events: none; }
   :global(html.profile-custom-bg .season-scene), :global(html.profile-custom-bg .season-snow) { display: none; }
   :global(html.profile-custom-bg .footer) { position: relative; z-index: 1; }

@@ -2,7 +2,7 @@ export function parallax(element: HTMLElement, maxX: number, maxY: number): () =
   var reduced = matchMedia('(prefers-reduced-motion: reduce)');
   var coarse = matchMedia('(hover: none), (pointer: coarse)');
   var x = 0, y = 0, targetX = 0, targetY = 0, frame = 0;
-  function enabled() { return !reduced.matches && !coarse.matches && !document.hidden; }
+  function enabled() { return !reduced.matches && !coarse.matches && !document.hidden && document.documentElement.dataset.gfx !== 'low'; }
   function stop() {
     cancelAnimationFrame(frame);
     frame = 0; x = y = targetX = targetY = 0;
