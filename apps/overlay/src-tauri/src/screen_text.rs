@@ -5,7 +5,7 @@ use std::collections::HashMap;
 pub enum Screen { Wishes, Character(String) }
 
 #[derive(Default)]
-pub struct Names { by_name: HashMap<String, Vec<String>> }
+pub struct Names { by_name: HashMap<String, Vec<String>>, travelers: HashMap<usize, String> }
 
 #[derive(Deserialize)]
 struct NameFile { v: u8, characters: Vec<NameEntry> }
@@ -18,6 +18,12 @@ impl Names {
         if file.v != 1 { return None; }
         let mut names = Self::default();
         for entry in file.characters {
+            if let Some(element) = entry.s.strip_prefix("traveler-") {
+                if let Some(index) = ELEMENTS[7..].iter().position(|known| *known == element) {
+                    names.travelers.insert(index, entry.s);
+                }
+                continue;
+            }
             if entry.s.starts_with("traveler") { continue; }
             for name in entry.n {
                 let key = compact(&name);
@@ -57,6 +63,18 @@ fn distance(a: &str, b: &str) -> usize {
 const ELEMENTS: [&str; 14] = ["пиро", "гидро", "анемо", "электро", "дендро", "крио", "гео",
     "pyro", "hydro", "anemo", "electro", "dendro", "cryo", "geo"];
 
+fn title_parts(line: &str) -> Option<(String, String)> {
+    let tokens: Vec<String> = line.split(|ch: char| ch.is_whitespace() || "/|\\".contains(ch))
+        .map(compact).filter(|token| !token.is_empty() && token != "i" && token != "l" && token != "1").collect();
+    let element = tokens.first()?;
+    if !ELEMENTS.iter().any(|known| distance(element, known) <= 1) { return None; }
+    let mut tail = tokens[1..].to_vec();
+    while tail.last().is_some_and(|token| token.chars().count() == 1) { tail.pop(); }
+    let query = tail.join("");
+    if query.is_empty() { return None; }
+    Some((element.clone(), query))
+}
+
 pub fn classify(lines: &[String], names: &Names) -> Option<Screen> {
     for line in lines {
         let clean = normalize(line);
@@ -66,14 +84,7 @@ pub fn classify(lines: &[String], names: &Names) -> Option<Screen> {
             ["молитв", "wish", "gachap"].iter().any(|prefix| word.starts_with(prefix))) {
             return Some(Screen::Wishes);
         }
-        let tokens: Vec<String> = line.split(|ch: char| ch.is_whitespace() || "/|\\".contains(ch))
-            .map(compact).filter(|token| !token.is_empty() && token != "i" && token != "l" && token != "1").collect();
-        let Some(element) = tokens.first() else { continue };
-        if !ELEMENTS.iter().any(|known| distance(element, known) <= 1) { continue; }
-        let mut tail = tokens[1..].to_vec();
-        while tail.last().is_some_and(|token| token.chars().count() == 1) { tail.pop(); }
-        let query = tail.join("");
-        if query.is_empty() { continue; }
+        let Some((_, query)) = title_parts(line) else { continue };
         let mut best = usize::MAX;
         let mut slug = None;
         let mut tied = false;
@@ -98,6 +109,36 @@ pub fn classify(lines: &[String], names: &Names) -> Option<Screen> {
     None
 }
 
+pub fn classify_traveler(lines: &[String], names: &Names) -> Option<Screen> {
+    for line in lines {
+        let Some((element, query)) = title_parts(line) else { continue };
+        if query.chars().filter(|ch| ch.is_alphabetic()).count() < 2 { continue; }
+        let mut best = usize::MAX;
+        let mut index = None;
+        let mut tied = false;
+        for (i, known) in ELEMENTS.iter().enumerate() {
+            let d = distance(&element, known);
+            if d > 1 { continue; }
+            if d < best {
+                best = d;
+                index = Some(i % 7);
+                tied = false;
+            } else if d == best && index != Some(i % 7) {
+                tied = true;
+            }
+        }
+        if tied { continue; }
+        let Some(index) = index else { continue };
+        // Тот же допуск, что в classify: шире нельзя — «Итэр» в двух буквах от «Итто», «Lumine» в трёх от «Furina»
+        if names.by_name.keys().any(|name| {
+            let len = query.chars().count().min(name.chars().count());
+            distance(&query, name) <= if len >= 8 { 2 } else if len >= 4 { 1 } else { 0 }
+        }) { continue; }
+        if let Some(slug) = names.travelers.get(&index) { return Some(Screen::Character(slug.clone())); }
+    }
+    None
+}
+
 #[derive(Default)]
 pub struct Debounce { pending: Option<Screen>, count: u8, applied: Option<Screen> }
 
@@ -115,7 +156,7 @@ impl Debounce {
 }
 
 #[cfg(test)]
-pub(crate) const SAMPLE_NAMES: &str = r#"{"v":1,"characters":[{"s":"vesna","n":["Весна","Vesna"]},{"s":"eula","n":["Эола","Eula"]},{"s":"fischl","n":["Фишль","Fischl"]},{"s":"hu-tao","n":["Ху Тао","Hu Tao"]},{"s":"kachina","n":["Качина","Kachina"]},{"s":"tighnari","n":["Тигнари","Tighnari"]},{"s":"vodyanitsa","n":["Водяница","Vodyanitsa"]},{"s":"varesa","n":["Вареса","Varesa"]},{"s":"traveler-anemo","n":["Путешественник","Traveler"]}]}"#;
+pub(crate) const SAMPLE_NAMES: &str = r#"{"v":1,"characters":[{"s":"vesna","n":["Весна","Vesna"]},{"s":"eula","n":["Эола","Eula"]},{"s":"fischl","n":["Фишль","Fischl"]},{"s":"hu-tao","n":["Ху Тао","Hu Tao"]},{"s":"kachina","n":["Качина","Kachina"]},{"s":"tighnari","n":["Тигнари","Tighnari"]},{"s":"vodyanitsa","n":["Водяница","Vodyanitsa"]},{"s":"varesa","n":["Вареса","Varesa"]},{"s":"traveler-anemo","n":["Путешественник","Traveler"]},{"s":"traveler-geo","n":["Путешественник","Traveler"]},{"s":"traveler-electro","n":["Путешественник","Traveler"]}]}"#;
 
 #[cfg(test)]
 mod tests {
@@ -149,6 +190,29 @@ mod tests {
         }
         assert_eq!(classify(&[], &names), None);
         assert_eq!(classify(&["Анемо I Весна".into()], &Names::default()), None);
+    }
+
+    #[test]
+    fn traveler_titles() {
+        let names = Names::from_json(SAMPLE_NAMES).unwrap();
+        for (title, slug) in [
+            ("Анемо / Путешественник", "traveler-anemo"),
+            ("Anemo / Traveler", "traveler-anemo"),
+            ("Анемо / Ligreus", "traveler-anemo"),
+            ("Anemo I Итэр", "traveler-anemo"),
+            ("Гео I Люмин", "traveler-geo"),
+            ("Электро / Aether", "traveler-electro"),
+            ("Гео / Lumine", "traveler-geo"),
+        ] {
+            assert_eq!(classify(&[title.into()], &names), None, "{title}");
+            assert_eq!(classify_traveler(&[title.into()], &names), Some(Screen::Character(slug.into())), "{title}");
+        }
+        for title in ["Анемо / Весна", "Анемо I Верна", "Inventory / Weapons",
+            "Анемо", "Анемо / Q", ""] {
+            assert_eq!(classify_traveler(&[title.into()], &names), None, "{title}");
+        }
+        assert_eq!(classify_traveler(&[], &names), None);
+        assert_eq!(classify_traveler(&["Пиро / Ligreus".into()], &names), None);
     }
 
     #[test]

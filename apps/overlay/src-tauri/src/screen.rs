@@ -1,4 +1,4 @@
-use crate::screen_text::{classify, Debounce, Names, Screen};
+use crate::screen_text::{classify, classify_traveler, Debounce, Names, Screen};
 use std::{ffi::c_void, path::Path, ptr, sync::{atomic::{AtomicBool, Ordering}, mpsc, Arc}, thread, time::Duration};
 use tauri::{AppHandle, Manager, WebviewWindow};
 use windows::{core::HSTRING, Foundation::Uri, Graphics::Imaging::{BitmapPixelFormat, SoftwareBitmap}, Media::Ocr::OcrEngine, Security::Cryptography::CryptographicBuffer, Web::Http::HttpClient};
@@ -209,7 +209,7 @@ fn recognize(gray: &[u8], w: u32, h: u32, engines: &[OcrEngine], preferred: &mut
         seen_lines.extend(text.iter().cloned());
         if let Some(screen) = classify(&text, names) { *preferred = index; return Ok((Some(screen), seen_lines)); }
     }
-    Ok((None, seen_lines))
+    Ok((classify_traveler(&seen_lines, names), seen_lines))
 }
 
 fn fetch_names(base: &tauri::Url) -> Option<Names> {
