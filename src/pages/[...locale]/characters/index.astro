@@ -206,7 +206,7 @@ const ordered = [...characters.filter((c) => c.beta).sort(byRarity), ...released
   .group button:disabled { opacity: .5; cursor: default; }
   .view button { display: inline-flex; align-items: center; gap: .35rem; }
   .view svg { width: 16px; height: 16px; flex: none; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
   .cards[data-view="grid"] { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
   .cards[data-view="list"] { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .version-heading { grid-column: 1 / -1; margin: .7rem 0 0; font-size: 1.2rem; }
