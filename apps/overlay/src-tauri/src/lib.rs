@@ -3,6 +3,7 @@ mod wish_cache;
 #[cfg(windows)] mod screen;
 mod screen_text;
 #[cfg(windows)] mod webview_crash;
+mod hoyolab_map;
 
 use serde::Deserialize;
 use std::{fs, sync::{atomic::{AtomicBool, AtomicU64, Ordering}, mpsc, Arc}, thread, time::Duration};
@@ -177,9 +178,13 @@ fn fit_to_work_area(window: &tauri::WebviewWindow) -> tauri::Result<()> {
 fn toggle(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let result = if window.is_visible().unwrap_or(false) {
+            hoyolab_map::hide_with_panel(app);
             window.hide()
         } else {
-            window.show().and_then(|_| fit_to_work_area(&window)).and_then(|_| window.set_focus())
+            window.show().and_then(|_| fit_to_work_area(&window)).and_then(|_| {
+                hoyolab_map::restore_with_panel(app);
+                window.set_focus()
+            })
         };
         if let Err(error) = result { eprintln!("Окно: {error}"); }
     }
@@ -221,13 +226,14 @@ fn handle_link(app: &AppHandle, link: &Url) {
 
 fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
     let show_item = MenuItem::with_id(app, "toggle", "Показать/скрыть", true, None::<&str>)?;
+    let map_item = MenuItem::with_id(app, "map", "Карта HoYoLAB", true, None::<&str>)?;
     let autostart = CheckMenuItem::with_id(app, "autostart", "Запускать при входе в игру", true,
         launch_enabled(app.handle()), None::<&str>)?;
     let screen_item = CheckMenuItem::with_id(app, "screen", "Распознавание экрана", true, settings.screen_detection, None::<&str>)?;
     let update_item = MenuItem::with_id(app, "update", "Обновлений нет", false, None::<&str>)?;
     let site = MenuItem::with_id(app, "site", "Открыть сайт", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Выход", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show_item, &autostart, &screen_item, &update_item, &site, &quit])?;
+    let menu = Menu::with_items(app, &[&show_item, &map_item, &autostart, &screen_item, &update_item, &site, &quit])?;
     app.manage(TrayChecks { launch: autostart, screen: screen_item });
     updates::set_menu_item(app.handle(), update_item);
     let base = settings.base.to_string();
@@ -235,6 +241,10 @@ fn tray(app: &tauri::App, settings: &Settings) -> tauri::Result<()> {
         .tooltip(format!("GenshinFlex — {}", settings.shortcut))
         .on_menu_event(move |app, event| match event.id().as_ref() {
             "toggle" => toggle(app),
+            "map" => match Url::parse("https://act.hoyolab.com/ys/app/interactive-map/index.html") {
+                Ok(url) => hoyolab_map::open(app, url),
+                Err(error) => eprintln!("Карта HoYoLAB: {error}"),
+            },
             "autostart" => set_launch_with_game(app, !launch_enabled(app)),
             "screen" => set_screen_detection(app, !app.state::<Arc<AtomicBool>>().load(Ordering::SeqCst)),
             "update" => updates::install(app),
@@ -284,10 +294,12 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     app.manage(detection.clone());
     app.manage(wish_cache::WishLinkState::default());
     app.manage(updates::UpdateState::default());
+    app.manage(hoyolab_map::MapState::default());
     let origin = settings.base.origin().ascii_serialization();
     let script = format!(r#"
         if (location.origin === {origin:?}) {{
             window.__GF_OVERLAY_APP__ = {version:?};
+            window.__GF_OVERLAY_HOYOLAB_MAP__ = true;
             window.open = function(url) {{
                 if (url) {{
                     const next = new URL(String(url), location.href);
@@ -341,6 +353,11 @@ fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
                 return true;
             }
             if !matches!(url.scheme(), "http" | "https") { return false; }
+            // Официальная карта HoYoLAB — в своём окне поверх игры
+            if hoyolab_map::is_official_map(url) {
+                hoyolab_map::open(&handle, url.clone());
+                return false;
+            }
             // В панели — только компактные страницы и вход по почте; остальной сайт открываем в браузере,
             // иначе полная страница (оружие, персонаж) втискивается в узкое окно
             if url.origin() == base.origin() && in_panel(url.path()) { return true; }

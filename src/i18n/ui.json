@@ -1,4 +1,24 @@
 {
+ "Официальная карта HoYoLAB": {
+  "en": "Official HoYoLAB map",
+  "es": "Mapa oficial de HoYoLAB"
+ },
+ "Откроется отдельным окном поверх игры. Отметки хранятся в вашем аккаунте HoYoLAB.": {
+  "en": "Opens in a separate window over the game. Your marks are stored in your HoYoLAB account.",
+  "es": "Se abre en una ventana aparte sobre el juego. Tus marcas se guardan en tu cuenta de HoYoLAB."
+ },
+ "Открыть карту HoYoLAB": {
+  "en": "Open HoYoLAB map",
+  "es": "Abrir el mapa de HoYoLAB"
+ },
+ "Карта GenshinFlex": {
+  "en": "GenshinFlex map",
+  "es": "Mapa de GenshinFlex"
+ },
+ "Бета": {
+  "en": "Beta",
+  "es": "Beta"
+ },
  "Тыквенный фонарь": {
   "en": "Pumpkin Lantern",
   "es": "Farol de calabaza"

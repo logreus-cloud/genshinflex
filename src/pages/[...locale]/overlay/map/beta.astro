@@ -1,6 +1,6 @@
 ---
-import OverlayLayout from '../../../layouts/OverlayLayout.astro';
-import { LANGS, useData } from '../../../lib/data';
+import OverlayLayout from '../../../../layouts/OverlayLayout.astro';
+import { LANGS, useData } from '../../../../lib/data';
 export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
 const { t } = useData(Astro.currentLocale);
 ---
@@ -9,8 +9,8 @@ const { t } = useData(Astro.currentLocale);
 </OverlayLayout>
 
 <script>
-  import { mountMap } from '../../../scripts/map/view';
-  import { onPage, cleanup } from '../../../scripts/router';
+  import { mountMap } from '../../../../scripts/map/view';
+  import { onPage, cleanup } from '../../../../scripts/router';
 
   onPage((signal) => {
     const el = document.getElementById('ov-map-view');

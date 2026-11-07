@@ -1,0 +1,41 @@
+---
+import OverlayLayout from '../../../../layouts/OverlayLayout.astro';
+import { LANGS, useData } from '../../../../lib/data';
+import { hoyolabMapUrl } from '../../../../lib/platform';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { lang, base, t } = useData(Astro.currentLocale);
+---
+<OverlayLayout title={t('Карта Тейвата')} active="map">
+  <section class="ov-panel ov-map-card">
+    <h1>{t('Официальная карта HoYoLAB')}</h1>
+    <p>{t('Откроется отдельным окном поверх игры. Отметки хранятся в вашем аккаунте HoYoLAB.')}</p>
+    <a id="ov-hoyolab-map" class="ov-map-open" href={hoyolabMapUrl(lang)} target="_blank" rel="noopener">{t('Открыть карту HoYoLAB')}</a>
+    <a class="ov-map-beta" href={`${base}/overlay/map/beta/`}>
+      {t('Карта GenshinFlex')}
+      <span>{t('Бета')}</span>
+    </a>
+  </section>
+</OverlayLayout>
+
+<script>
+  import { onPage } from '../../../../scripts/router';
+
+  declare global { interface Window { __GF_OVERLAY_HOYOLAB_MAP__?: boolean } }
+
+  onPage(() => {
+    if (window.__GF_OVERLAY_HOYOLAB_MAP__ !== true) return;
+    const link = document.querySelector<HTMLAnchorElement>('#ov-hoyolab-map');
+    if (link) location.href = link.href;
+  });
+</script>
+
+<style>
+  .ov-map-card { box-sizing: border-box; width: 100%; max-width: 420px; padding: 1rem; }
+  .ov-map-card h1 { margin: 0 0 .75rem; }
+  .ov-map-card p { margin: 0 0 1.25rem; color: var(--muted); line-height: 1.45; }
+  .ov-map-open { display: block; padding: .8rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--accent-soft); color: var(--accent-text); text-align: center; text-decoration: none; font-weight: 600; }
+  .ov-map-open:hover, .ov-map-open:focus-visible { filter: brightness(1.12); }
+  .ov-map-beta { display: flex; align-items: center; justify-content: center; gap: .5rem; margin-top: 1rem; color: var(--accent-text); text-decoration: none; }
+  .ov-map-beta:hover, .ov-map-beta:focus-visible { text-decoration: underline; }
+  .ov-map-beta span { padding: .15rem .45rem; border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-size: .7rem; }
+</style>
