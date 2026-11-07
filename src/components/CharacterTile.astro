@@ -1,4 +1,7 @@
 ---
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import cardArt from '../data/generated/char-cards.json';
 import { useData } from '../lib/data';
 const { getCharacter, base, t } = useData(Astro.currentLocale);
@@ -11,12 +14,22 @@ interface Props {
 const { slug, badge, role, weapons, artifacts } = Astro.props;
 const c = getCharacter(slug);
 const hasArt = (cardArt as string[]).includes(c.slug);
+// Отпечаток файла в адресе: картинки кешируются браузером на 4 часа, без него после обновления видна старая карточка
+const artVersion = (slug: string) => {
+  try {
+    return createHash('sha1').update(readFileSync(path.join(process.cwd(), 'public/img/chars', `${slug}.webp`))).digest('hex').slice(0, 8);
+  } catch {
+    return '';
+  }
+};
+const version = hasArt ? artVersion(c.slug) : '';
+const artSrc = hasArt ? `/img/chars/${c.slug}.webp${version ? `?v=${version}` : ''}` : c.icon;
 const roleText = role ? t(role) : '';
 // Самое длинное слово имени должно влезать в ширину карточки: размер шрифта в cqi (≈104 / число букв)
 const nameFit = Math.min(11.5, 104 / Math.max(...c.name.split(/\s+/).map((word) => word.length)));
 ---
 <a class:list={['tile', `r${c.rarity}`]} href={`${base}/characters/${c.slug}/`} data-el={c.element}>
-  <img class:list={['art', { fallback: !hasArt }]} src={hasArt ? `/img/chars/${c.slug}.webp` : c.icon} alt="" loading="lazy" decoding="async" width="320" height="1024" />
+  <img class:list={['art', { fallback: !hasArt }]} src={artSrc} alt="" loading="lazy" decoding="async" width="320" height="1024" />
   {c.emblem && <img class="skill" src={c.emblem} alt="" loading="lazy" decoding="async" width="40" height="40" />}
   {c.beta ? <span class="badge beta">BETA</span> : badge && <span class="badge">{badge}</span>}
   <span class="name" style={`--fit: ${nameFit.toFixed(2)}`}>{c.name}</span>
