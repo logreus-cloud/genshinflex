@@ -8,7 +8,12 @@ const OUT = new URL('../src/data/generated/', import.meta.url);
 const LOCALES = { ru: { lang: 'Russian', dec: ',' }, en: { lang: 'English', dec: '.' }, es: { lang: 'Spanish', dec: ',' } };
 const CDN = 'https://enka.network/ui/';
 
-const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Слаги, которые на сайте появились раньше genshin-db (из Amber) и уже в адресах — не менять
+const SLUG_OVERRIDES = { valeriy: 'valery' };
+const slug = (s) => {
+  const base = s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return SLUG_OVERRIDES[base] ?? base;
+};
 const img = (file) => (file ? `${CDN}${file}.png` : null);
 const names = (fn) => fn('names', { matchCategories: true });
 const round = (n, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
