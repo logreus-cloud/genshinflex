@@ -76,7 +76,7 @@
     "@astrojs/check": "^0.9.10",
     "@portabletext/block-tools": "^3.0.0",
     "@sanity/schema": "^4.0.0",
-    "genshin-db": "^5.2.14",
+    "genshin-db": "^5.2.15",
     "gray-matter": "^4.0.3",
     "jsdom": "^26.0.0",
     "marked": "^15.0.0",
