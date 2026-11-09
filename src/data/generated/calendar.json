@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-08",
+  "updated": "2026-11-09",
   "items": [
     {
       "id": "ann-21988",
@@ -13,6 +13,18 @@
         "es": "Detalles de la versión 7.2"
       },
       "version": "7.2"
+    },
+    {
+      "id": "ann-21168",
+      "kind": "event",
+      "start": "2026-11-09T05:00",
+      "end": "2026-12-15T03:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2025/10/23/40da7ab1ce17afd008e7a10c6ee6e67b_3372052251159312794_transformed.jpg",
+      "title": {
+        "en": "Stygian Onslaught",
+        "ru": "Мрачный натиск",
+        "es": "Evento «Conflagración estigia»"
+      }
     },
     {
       "id": "ann-21969",
