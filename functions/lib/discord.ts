@@ -76,7 +76,7 @@ export function feedbackMessages(
       url: forum,
       body: {
         // Название треда — обычный текст, разметку в нём Discord не разбирает
-        thread_name: clip(`${kind.thread}: ${clip(item.message, 60)}`, 100),
+        thread_name: clip(`${kind.thread}: ${Array.from(item.message).slice(0, 60).join('')}`, 100),
         // id тегов у каждого форума свои: «Новый» (DISCORD_TAG_NEW) есть только в форуме багов
         applied_tags: item.kind === 'idea' ? tags(tag) : tags(env.DISCORD_TAG_NEW, tag),
         allowed_mentions: { parse: [] },

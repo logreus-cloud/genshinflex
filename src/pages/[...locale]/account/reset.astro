@@ -57,6 +57,7 @@ const labels = {
     login.href = authUrl(base, 'login');
     const auth = getSupabase().auth;
     let active = true;
+    const controller = new AbortController();
     // Форма открыта для одного аккаунта: если сессия сменилась, пароль чужого аккаунта не меняем
     let formUser: string | null = null;
     const showExpired = () => {
@@ -77,14 +78,14 @@ const labels = {
       status.className = 'status small';
     };
     let unsubscribe = () => {};
-    document.addEventListener('astro:before-swap', () => { active = false; unsubscribe(); }, { once: true });
+    document.addEventListener('astro:before-swap', () => { active = false; controller.abort(); unsubscribe(); }, { once: true });
     void (async () => {
       // Ссылка вернулась с ошибкой (устарела, уже использована): форму не показываем даже при открытой сессии
       const linkError = [new URLSearchParams(location.hash.slice(1)), new URLSearchParams(location.search)]
         .some((params) => params.has('error') || params.has('error_code') || params.has('error_description'));
       if (linkError) { showExpired(); return; }
-      const result = await consumeUrlSession({ confirm: (email) => confirmUrlSession(root, email) });
-      if (!active || !root.isConnected) return;
+      const result = await consumeUrlSession({ confirm: (email) => confirmUrlSession(root, email, controller.signal), signal: controller.signal });
+      if (result === 'aborted' || !active || !root.isConnected) return;
       if (result === 'declined') {
         status.textContent = root.dataset.declined || '';
         status.className = 'status small';

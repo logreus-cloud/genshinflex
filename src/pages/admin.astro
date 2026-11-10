@@ -105,7 +105,8 @@ onPage(async (signal) => {
   const KIND = { data: 'Ошибка в данных', idea: 'Идея', bug: 'Баг', other: 'Другое' } as Record<string, string>;
   const STATUS = { pending: 'ждёт', approved: 'одобрен', rejected: 'отклонён', new: 'новое', done: 'прочитано' } as Record<string, string>;
   const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
-  const when = (s: string) => new Date(`${s.replace(' ', 'T')}Z`).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const str = (value: unknown) => typeof value === 'string' ? value : value == null ? '' : String(value);
+  const when = (value: unknown) => new Date(`${str(value).replace(' ', 'T')}Z`).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
   const controller = new AbortController();
   const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -119,23 +120,27 @@ onPage(async (signal) => {
   let titleLoad = 0;
   let userLoad = 0;
   let searchTimer: ReturnType<typeof setTimeout> | undefined;
-  const make = <K extends keyof HTMLElementTagNameMap>(tag: K, value = '', className = '') => {
+  const make = <K extends keyof HTMLElementTagNameMap>(tag: K, value: unknown = '', className = '') => {
     const el = document.createElement(tag);
-    el.textContent = value;
+    el.textContent = str(value);
     if (className) el.className = className;
     return el;
   };
+  const safeCards = <T, R>(items: T[], card: (item: T) => R): R[] => items.flatMap((item) => {
+    try { return [card(item)]; } catch { return []; }
+  });
   const titleName = (t: Title) => {
     const lang = document.documentElement.lang.slice(0, 2);
-    return (lang === 'en' ? t.name_en : lang === 'es' ? t.name_es : t.name_ru) || t.name_ru;
+    return str((lang === 'en' ? t.name_en : lang === 'es' ? t.name_es : t.name_ru) || t.name_ru);
   };
   const rewardName = (reward: Reward) => {
     const lang = document.documentElement.lang.slice(0, 2);
-    return (lang === 'en' ? reward.name_en : lang === 'es' ? reward.name_es : reward.name_ru) || reward.name_ru;
+    return str((lang === 'en' ? reward.name_en : lang === 'es' ? reward.name_es : reward.name_ru) || reward.name_ru);
   };
   const titleChip = (t: Title) => {
     const chip = make('span', `◆ ${titleName(t)}`, 'title-chip');
-    chip.style.setProperty('--title-color', /^#[0-9a-fA-F]{6}$/.test(t.color) ? t.color : '#e3b04b');
+    const color = str(t.color);
+    chip.style.setProperty('--title-color', /^#[0-9a-fA-F]{6}$/.test(color) ? color : '#e3b04b');
     return chip;
   };
   const showTitleAccess = (kind: 'login' | 'forbidden' | null) => {
@@ -158,7 +163,7 @@ onPage(async (signal) => {
     if (value.status === 403) return showTitleAccess('forbidden');
     showTitleAccess(null);
     const notice = $(selector);
-    notice.textContent = value.message || 'Не удалось выполнить запрос';
+    notice.textContent = str(value.message) || 'Не удалось выполнить запрос';
     notice.hidden = false;
   };
   async function titleApi<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
@@ -172,23 +177,23 @@ onPage(async (signal) => {
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
     const out = await res.json().catch(() => ({})) as T & { error?: string };
-    if (!res.ok) throw Object.assign(new Error(out.error || `Ошибка ${res.status}`), { status: res.status });
+    if (!res.ok) throw Object.assign(new Error(str(out.error) || `Ошибка ${res.status}`), { status: res.status });
     return out;
   }
   function renderTitles() {
     const list = $('#titles-list');
     if (!titleItems.length) return list.replaceChildren(make('p', 'Титулов нет.', 'muted'));
-    list.replaceChildren(...titleItems.map((t) => {
+    list.replaceChildren(...safeCards(titleItems, (t) => {
       const card = make('article', '', 'panel card title-card');
       const header = make('header');
-      header.append(titleChip(t), make('code', t.id, 'small'), make('span', `Владельцев: ${t.holders}`, 'muted small'));
-      card.append(header, make('p', `RU: ${t.name_ru} · EN: ${t.name_en || '—'} · ES: ${t.name_es || '—'}`, 'small'));
+      header.append(titleChip(t), make('code', t.id, 'small'), make('span', `Владельцев: ${Number.isFinite(t.holders) ? t.holders : 0}`, 'muted small'));
+      card.append(header, make('p', `RU: ${str(t.name_ru)} · EN: ${str(t.name_en) || '—'} · ES: ${str(t.name_es) || '—'}`, 'small'));
       if (t.description) card.append(make('p', t.description, 'muted small'));
       if (t.id !== 'admin') {
         const button = make('button', 'Удалить', 'btn small');
         button.type = 'button';
         button.dataset.titleAction = 'delete';
-        button.dataset.titleId = t.id;
+        button.dataset.titleId = str(t.id);
         card.append(button);
       }
       return card;
@@ -200,9 +205,9 @@ onPage(async (signal) => {
     try {
       const [items, rewards] = await Promise.all([titleApi<Title[]>('/admin/titles'), titleApi<Reward[]>('/admin/rewards')]);
       if (signal.aborted || current !== titleLoad) return;
-      titleItems = items;
+      titleItems = Array.isArray(items) ? items : [];
       showTitleAccess(null);
-      rewardItems = rewards;
+      rewardItems = Array.isArray(rewards) ? rewards : [];
       renderTitles();
     } catch (error) {
       if (current === titleLoad) titleError(error, '#titles-error');
@@ -211,26 +216,26 @@ onPage(async (signal) => {
   function renderUsers(users: TitleUser[]) {
     const list = $('#title-users');
     if (!users.length) return list.replaceChildren(make('p', 'Пользователи не найдены.', 'muted'));
-    list.replaceChildren(...users.map((user) => {
+    list.replaceChildren(...safeCards(users, (user) => {
       const card = make('article', '', 'panel card title-user');
-      card.dataset.userId = user.id;
+      card.dataset.userId = str(user.id);
       const header = make('header');
       header.append(make('b', user.nickname));
       if (user.display_name) header.append(make('span', user.display_name, 'muted small'));
-      card.append(header, make('p', `Роли: ${user.roles.join(', ') || 'нет'}`, 'muted small'));
+      card.append(header, make('p', `Роли: ${Array.isArray(user.roles) ? user.roles.map(str).join(', ') || 'нет' : 'нет'}`, 'muted small'));
       const chips = make('div', '', 'row title-user-chips');
-      for (const id of user.titles) {
-        const t = titleItems.find((item) => item.id === id) ?? { id, name_ru: id, name_en: null, name_es: null, color: '#e3b04b', description: null, holders: 0 };
+      for (const id of Array.isArray(user.titles) ? user.titles.map(str) : []) {
+        const t = titleItems.find((item) => item?.id === id) ?? { id, name_ru: id, name_en: null, name_es: null, color: '#e3b04b', description: null, holders: 0 };
         const chip = titleChip(t);
         const revoke = make('button', '×', 'title-revoke');
         revoke.type = 'button';
         revoke.dataset.titleAction = 'revoke';
-        revoke.dataset.titleId = id;
+        revoke.dataset.titleId = str(id);
         revoke.setAttribute('aria-label', `Забрать титул ${titleName(t)} у ${user.nickname}`);
         chip.append(revoke);
         chips.append(chip);
       }
-      if (!user.titles.length) chips.append(make('span', 'Титулов нет', 'muted small'));
+      if (!Array.isArray(user.titles) || !user.titles.length) chips.append(make('span', 'Титулов нет', 'muted small'));
       card.append(chips);
       const actions = make('div', '', 'row title-user-actions');
       const select = make('select');
@@ -238,9 +243,9 @@ onPage(async (signal) => {
       const placeholder = make('option', 'Выберите титул');
       placeholder.value = '';
       select.append(placeholder);
-      for (const t of titleItems.filter((item) => !user.titles.includes(item.id))) {
+      for (const t of titleItems.filter((item) => item && !Array.isArray(user.titles) || item && !user.titles.includes(item.id))) {
         const option = make('option', titleName(t));
-        option.value = t.id;
+        option.value = str(t.id);
         select.append(option);
       }
       const note = make('input');
@@ -256,8 +261,8 @@ onPage(async (signal) => {
       const rewards = make('section', '', 'reward-user');
       rewards.append(make('h3', 'Награды'));
       const owned = make('div', '', 'row reward-user-chips');
-      for (const id of user.rewards) {
-        const reward = rewardItems.find((item) => item.id === id);
+      for (const id of Array.isArray(user.rewards) ? user.rewards.map(str) : []) {
+        const reward = rewardItems.find((item) => item?.id === id);
         const line = make('span', reward ? rewardName(reward) : id, 'reward-chip');
         const revoke = make('button', 'Отозвать', 'btn small');
         revoke.type = 'button';
@@ -267,7 +272,7 @@ onPage(async (signal) => {
         line.append(revoke);
         owned.append(line);
       }
-      if (!user.rewards.length) owned.append(make('span', 'Наград нет', 'muted small'));
+      if (!Array.isArray(user.rewards) || !user.rewards.length) owned.append(make('span', 'Наград нет', 'muted small'));
       rewards.append(owned);
       const rewardActions = make('div', '', 'row reward-user-actions');
       const rewardSelect = make('select');
@@ -275,9 +280,9 @@ onPage(async (signal) => {
       const rewardPlaceholder = make('option', 'Выберите награду');
       rewardPlaceholder.value = '';
       rewardSelect.append(rewardPlaceholder);
-      for (const reward of rewardItems.filter((item) => !user.rewards.includes(item.id))) {
+      for (const reward of rewardItems.filter((item) => item && (!Array.isArray(user.rewards) || !user.rewards.includes(item.id)))) {
         const option = make('option', rewardName(reward));
-        option.value = reward.id;
+        option.value = str(reward.id);
         rewardSelect.append(option);
       }
       const rewardNote = make('input');
@@ -305,7 +310,7 @@ onPage(async (signal) => {
     try {
       const users = await titleApi<TitleUser[]>(`/admin/users?q=${encodeURIComponent(query)}`);
       if (signal.aborted || current !== userLoad) return;
-      renderUsers(users);
+      renderUsers(Array.isArray(users) ? users : []);
     } catch (error) {
       if (current === userLoad) titleError(error, '#title-users-error');
     }
@@ -438,7 +443,7 @@ onPage(async (signal) => {
 
   // Куда ведёт заявка: страница персонажа, оружия или эндгейма
   const target = (g: Guide) => {
-    const kind = g.payload.kind ?? 'char', t = g.payload.target ?? g.payload.character ?? '';
+    const kind = str(g.payload.kind ?? 'char'), t = str(g.payload.target ?? g.payload.character ?? '');
     if (!/^[a-z0-9-]{1,60}$/.test(t)) return { label: t, href: '#' };
     if (kind === 'weapon') return { label: `Оружие: ${names.get(t) ?? t}`, href: `/weapons/${t}/` };
     if (kind === 'endgame') return { label: `Эндгейм: ${editor.endgame[t]?.title ?? t}`, href: t.startsWith('abyss') ? `/abyss/#floor-${t.split('-')[1]}` : `/${t}/` };
@@ -456,8 +461,8 @@ onPage(async (signal) => {
     const count = (value: unknown) => (Array.isArray(value) ? value.length : 0);
     const weapons = Array.isArray(p.weapons) ? p.weapons : [];
     const extra = [
-      p.role && `Роль: ${esc(String(p.role))}`,
-      weapons.length && `Оружие: ${weapons.map((w) => esc(String(names.get(w?.slug) ?? w?.slug ?? ''))).join(', ')}`,
+      p.role && `Роль: ${esc(str(p.role))}`,
+      weapons.length && `Оружие: ${weapons.map((w) => esc(str(names.get(w?.slug) ?? w?.slug))).join(', ')}`,
       count(p.artifacts) && `Сеты: ${count(p.artifacts)} вар.`,
       count(p.teams) && `Команд: ${count(p.teams)}`,
       count(p.external) && `Ссылок: ${count(p.external)}`,
@@ -465,18 +470,18 @@ onPage(async (signal) => {
     const tgHref = linkHref(tg.href);
     return `<article class="panel card" data-id="${id}">
       <header>
-        <b>#${id}</b> ${tgHref ? `<a href="${esc(tgHref)}" target="_blank" rel="noopener">${esc(tg.label)}</a>` : `<span>${esc(tg.label)}</span>`}
-        <span class="chip ${g.status === 'pending' ? 'gold' : ''}">${esc(STATUS[g.status] ?? g.status)}</span>
+        <b>#${id}</b> ${tgHref ? `<a href="${esc(tgHref)}" target="_blank" rel="noopener">${esc(str(tg.label))}</a>` : `<span>${esc(str(tg.label))}</span>`}
+        <span class="chip ${g.status === 'pending' ? 'gold' : ''}">${esc(str(STATUS[str(g.status)] ?? g.status))}</span>
         <span class="chip">${esc(g.mode === 'edit' ? 'правка' : 'новый')}</span>
-        <span class="chip">${esc((p.lang ?? 'ru').toUpperCase())}</span>
+        <span class="chip">${esc(str(p.lang ?? 'ru').toUpperCase())}</span>
         <span class="muted small">${esc(when(g.created_at))}</span>
       </header>
-      <p class="small">Автор: <b>${esc(g.author)}</b>${g.contact ? ` · ${esc(g.contact)}` : ''}</p>
-      ${g.comment ? `<p class="small comment">«${esc(g.comment)}»</p>` : ''}
+      <p class="small">Автор: <b>${esc(str(g.author))}</b>${g.contact ? ` · ${esc(str(g.contact))}` : ''}</p>
+      ${g.comment ? `<p class="small comment">«${esc(str(g.comment))}»</p>` : ''}
       ${extra ? `<p class="muted small">${extra}</p>` : ''}
       <details><summary class="small">Текст и данные</summary>
-        ${p.body?.trim() ? `<div class="prose panel">${renderGuide(p.body, lookup)}</div>` : '<p class="muted small">Без текста</p>'}
-        <pre class="small">${esc(JSON.stringify(p, null, 2))}</pre>
+        ${str(p.body).trim() ? `<div class="prose panel">${renderGuide(str(p.body), lookup)}</div>` : '<p class="muted small">Без текста</p>'}
+        <pre class="small">${esc(str(JSON.stringify(p, null, 2)))}</pre>
       </details>
       <div class="row actions">
         <button type="button" class="btn small copy" data-cmd="npm run guide:md -- ${id} --dry">Посмотреть файл: скопировать команду</button>
@@ -487,20 +492,23 @@ onPage(async (signal) => {
     </article>`;
   };
 
-  const feedbackCard = (f: Feedback) => `<article class="panel card" data-id="${esc(String(f.id))}">
+  const feedbackCard = (f: Feedback) => {
+    const page = str(f.page);
+    return `<article class="panel card" data-id="${esc(str(f.id))}">
       <header>
-        <b>#${esc(String(f.id))}</b> <span class="chip">${esc(KIND[f.kind] ?? f.kind)}</span>
-        <span class="chip ${f.status === 'new' ? 'gold' : ''}">${esc(STATUS[f.status] ?? f.status)}</span>
-        ${f.page ? sitePath(f.page) && linkHref(f.page) ? `<a class="small" href="${esc(f.page)}" target="_blank" rel="noopener">${esc(f.page)}</a>` : `<span class="small">${esc(f.page)}</span>` : ''}
+        <b>#${esc(str(f.id))}</b> <span class="chip">${esc(str(KIND[str(f.kind)] ?? f.kind))}</span>
+        <span class="chip ${f.status === 'new' ? 'gold' : ''}">${esc(str(STATUS[str(f.status)] ?? f.status))}</span>
+        ${page ? sitePath(page) && linkHref(page) ? `<a class="small" href="${esc(page)}" target="_blank" rel="noopener">${esc(page)}</a>` : `<span class="small">${esc(page)}</span>` : ''}
         <span class="muted small">${esc(when(f.created_at))}</span>
       </header>
-      <p class="msg">${esc(f.message)}</p>
-      ${f.contact ? `<p class="small">Контакт: <b>${esc(f.contact)}</b></p>` : ''}
+      <p class="msg">${esc(str(f.message))}</p>
+      ${f.contact ? `<p class="small">Контакт: <b>${esc(str(f.contact))}</b></p>` : ''}
       <div class="row actions">
         ${f.status === 'new' ? `<button type="button" class="btn small primary" data-set="done">Прочитано</button>` : `<button type="button" class="btn small" data-set="new">Вернуть в новые</button>`}
       </div>
     </article>`;
 
+  };
   let latest = 0;
   async function load() {
     if (signal.aborted) return;
@@ -510,13 +518,15 @@ onPage(async (signal) => {
       const res = await fetch(`/api/admin/inbox${$<HTMLInputElement>('#all').checked ? '?status=all' : ''}`, { signal: controller.signal });
       const out = await res.json().catch(() => ({ error: 'Не удалось прочитать ответ' }));
       if (signal.aborted || current !== latest) return;
-      if (!res.ok) { err.hidden = false; err.textContent = out.error ?? `Ошибка ${res.status}`; return; }
+      if (!res.ok) { err.hidden = false; err.textContent = str(out.error) || `Ошибка ${res.status}`; return; }
       err.hidden = true;
-      $('#who').textContent = out.admin === 'dev' ? 'локальный режим' : out.admin;
-      $('#c-guides').textContent = String(out.counts.guides);
-      $('#c-feedback').textContent = String(out.counts.feedback);
-      $('#guides').innerHTML = out.guides.length ? out.guides.map(guideCard).join('') : '<p class="muted">Заявок нет.</p>';
-      $('#feedback').innerHTML = out.feedback.length ? out.feedback.map(feedbackCard).join('') : '<p class="muted">Сообщений нет.</p>';
+      $('#who').textContent = out.admin === 'dev' ? 'локальный режим' : str(out.admin);
+      $('#c-guides').textContent = String(Number.isFinite(out.counts?.guides) ? out.counts.guides : 0);
+      $('#c-feedback').textContent = String(Number.isFinite(out.counts?.feedback) ? out.counts.feedback : 0);
+      const guides = safeCards(Array.isArray(out.guides) ? out.guides : [], guideCard).join('');
+      const feedback = safeCards(Array.isArray(out.feedback) ? out.feedback : [], feedbackCard).join('');
+      $('#guides').innerHTML = guides || '<p class="muted">Заявок нет.</p>';
+      $('#feedback').innerHTML = feedback || '<p class="muted">Сообщений нет.</p>';
     } catch {
       if (signal.aborted || current !== latest) return;
       err.hidden = false;
