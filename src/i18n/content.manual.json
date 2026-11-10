@@ -3010,5 +3010,577 @@
  "4 предмета — если ДД отряда считает урон от атаки": {
   "en": "4-piece — if the team's DPS scales on ATK",
   "es": "4 piezas — si el DPS del equipo escala con ATQ"
+ },
+ "Сезон 29 — стихии: Гидро, Электро, Гео": {
+  "en": "Season 29 — elements: Hydro, Electro, Geo",
+  "es": "Temporada 29 — elementos: Hydro, Electro, Geo"
+ },
+ "Гео": {
+  "en": "Geo",
+  "es": "Geo"
+ },
+ "Особые гости — Ци Ци, Одетта, Весна и Ягода: их можно взять, если они есть у вас, хотя их стихии не входят в сезон": {
+  "en": "Special guests — Qiqi, Odette, Vesna and Jahoda: you can use them if you own them, even though their elements are not part of the season",
+  "es": "Invitados especiales — Qiqi, Odette, Vesna y Jahoda: puedes usarlos si los tienes, aunque sus elementos no formen parte de la temporada"
+ },
+ "Благословения сезона усиливают Заряжен, Лунный заряд, Кристаллизацию и Лунную кристаллизацию": {
+  "en": "The season's blessings boost Electro-Charged, Lunar-Charged, Crystallize and Lunar-Crystallize",
+  "es": "Las bendiciones de la temporada potencian Electrocargado, Electrocargado Lunar, Cristalización y Cristalización Lunar"
+ },
+ "Главные злодеи: акт 3 — Пернатый плесенник, акт 6 — Повелитель скрытых глубин, акт 8 — закалённый в боях шамачурл, акт 10 — Лучезарный мотылёк-призрак": {
+  "en": "Main villains: Act 3 — Jadeplume Terrorshroom, Act 6 — Lord of the Hidden Depths, Act 8 — Battle-Hardened Samachurl, Act 10 — Radiant Moonfly",
+  "es": "Villanos principales: acto 3 — Espantohongo Plumaverde, acto 6 — Susurrador de Pesadillas, acto 8 — Samachurl curtido en batalla, acto 10 — Selenimariposa Radiante"
+ },
+ "Акты 1–8. Нужно 16 персонажей 70+ уровня": {
+  "en": "Acts 1–8. Requires 16 characters at level 70+",
+  "es": "Actos 1–8. Se necesitan 16 personajes de nivel 70+"
+ },
+ "Акты 1–10. Нужно 22 персонажа 70+ уровня (можно до 26)": {
+  "en": "Acts 1–10. Requires 22 characters at level 70+ (up to 26 allowed)",
+  "es": "Actos 1–10. Se necesitan 22 personajes de nivel 70+ (hasta 26)"
+ },
+ "Запустение (натиск элиты): за персонажем гонится Дендро-сгусток и наносит большой Дендро урон всем, кого коснётся. Со временем он уменьшается и слабеет, но ускоряется": {
+  "en": "Desolation (Elite Assault): a Dendro Cluster chases your character and deals heavy Dendro DMG to anyone it touches. Over time it shrinks and weakens but speeds up",
+  "es": "Desolación (asalto de élite): un cúmulo Dendro persigue al personaje e inflige gran daño Dendro a todo lo que toca. Con el tiempo se encoge y se debilita, pero acelera"
+ },
+ "Две волны по одному врагу. Звезда — за 85 с.": {
+  "en": "Two waves of one enemy each. Star — within 85 s.",
+  "es": "Dos oleadas de un enemigo. Estrella — en 85 s."
+ },
+ "Две волны по три врага. Звезда — за 75 с.": {
+  "en": "Two waves of three enemies. Star — within 75 s.",
+  "es": "Dos oleadas de tres enemigos. Estrella — en 75 s."
+ },
+ "Отправляйте сюда слабых персонажей и Качину: враги ещё низкого уровня, а сильных лучше приберечь для злодеев": {
+  "en": "Send your weaker characters and Kachina here: enemies are still low level, and the strong ones are better saved for the villains",
+  "es": "Envía aquí a tus personajes débiles y a Kachina: los enemigos aún son de nivel bajo y a los fuertes conviene guardarlos para los villanos"
+ },
+ "Е Лань и Фишль из стартового состава спокойно проводят отряд через первые два акта": {
+  "en": "Yelan and Fischl from the opening cast comfortably carry a team through the first two acts",
+  "es": "Yelan y Fischl, del elenco inicial, llevan al equipo sin problemas por los dos primeros actos"
+ },
+ "В натиске элиты уводите Дендро-сгусток на врагов: им он тоже наносит урон": {
+  "en": "In Elite Assault, lead the Dendro Cluster into enemies: it damages them too",
+  "es": "En el asalto de élite, lleva el cúmulo Dendro hacia los enemigos: a ellos también los daña"
+ },
+ "Гидро — против воплощений лавы": {
+  "en": "Hydro — against the Fluid Avatars of Lava",
+  "es": "Hydro — contra los Surcamagmas"
+ },
+ "Жуткий взрыв (натиск элиты): часть врагов выходит с бомбами. Бомба взрывается и переходит на ближайшего врага; с каждым переходом таймер короче, а урон выше, до 4 раз": {
+  "en": "Horrific Explosion (Elite Assault): some enemies enter carrying time bombs. A bomb explodes and jumps to the nearest enemy; each transfer shortens the timer and raises the damage, up to 4 times",
+  "es": "Explosión terrorífica (asalto de élite): algunos enemigos entran con bombas. La bomba explota y pasa al enemigo más cercano; con cada salto el temporizador se acorta y el daño sube, hasta 4 veces"
+ },
+ "Две волны по три врага. Звезда — за 65 с.": {
+  "en": "Two waves of three enemies. Star — within 65 s.",
+  "es": "Dos oleadas de tres enemigos. Estrella — en 65 s."
+ },
+ "Против воплощений лавы нужен Гидро: он остужает их и снимает защиту": {
+  "en": "Bring Hydro against the Fluid Avatars of Lava: it cools them down and strips their protection",
+  "es": "Contra los Surcamagmas hace falta Hydro: los enfría y les quita la protección"
+ },
+ "В натиске элиты держитесь подальше от врага с бомбой и добивайте всех быстро — каждый переход бомбы усиливает взрыв": {
+  "en": "In Elite Assault keep away from the bomb carrier and finish everyone quickly — every transfer makes the explosion stronger",
+  "es": "En el asalto de élite, aléjate del enemigo con la bomba y acaba rápido con todos: cada salto de la bomba refuerza la explosión"
+ },
+ "Электро-атаки заполняют шкалу активации под полоской HP босса. Когда она полна, плесенник проводит усиленные атаки, после чего выдыхается и надолго замирает": {
+  "en": "Electro attacks fill the Activation gauge under the boss's HP bar. When it is full, the Terrorshroom unleashes stronger attacks, then becomes exhausted and stays down for a long time",
+  "es": "Los ataques Electro llenan la barra de activación bajo los PV del jefe. Cuando se llena, el Espantohongo lanza ataques más fuertes, luego queda exhausto e inmóvil durante un buen rato"
+ },
+ "У босса высокое сопротивление Дендро, но в этом сезоне Дендро и так нет": {
+  "en": "The boss has high Dendro RES, but there is no Dendro this season anyway",
+  "es": "El jefe tiene alta RES Dendro, pero esta temporada no hay Dendro de todos modos"
+ },
+ "Накладывайте Электро без перерыва: важна частота попаданий, а не сила удара, поэтому хватит и одного Электро-персонажа вне поля вроде Фишль": {
+  "en": "Apply Electro nonstop: hit frequency matters, not hit strength, so a single off-field Electro character like Fischl is enough",
+  "es": "Aplica Electro sin parar: importa la frecuencia de los golpes, no su fuerza, así que basta con un personaje Electro fuera del campo como Fischl"
+ },
+ "Взрывы стихий приберегите к моменту, когда плесенник выдохся и лежит": {
+  "en": "Save your Elemental Bursts for when the Terrorshroom is exhausted and down",
+  "es": "Guarda las Habilidades Definitivas para cuando el Espantohongo esté exhausto y en el suelo"
+ },
+ "Флинса и Айно сюда лучше не тратить: Лунный заряд нужнее в акте 6": {
+  "en": "Better not to spend Flins and Aino here: Lunar-Charged is needed more in Act 6",
+  "es": "Mejor no gastar aquí a Flins y Aino: el Electrocargado Lunar hace más falta en el acto 6"
+ },
+ "Клоринда": {
+  "en": "Clorinde",
+  "es": "Clorinde"
+ },
+ "Фишль и Е Лань — стартовые": {
+  "en": "Fischl and Yelan are opening characters",
+  "es": "Fischl y Yelan son iniciales"
+ },
+ "Райдэн": {
+  "en": "Raiden",
+  "es": "Raiden"
+ },
+ "Без 5★": {
+  "en": "No 5★",
+  "es": "Sin 5★"
+ },
+ "Вместо Сайно подойдёт любой Электро-ДД": {
+  "en": "Any Electro DPS works instead of Cyno",
+  "es": "En lugar de Cyno sirve cualquier DPS Electro"
+ },
+ "Гео-разряд: время от времени взрывы наносят Гео урон активному персонажу": {
+  "en": "Geo Discharge: from time to time bursts deal Geo DMG to the active character",
+  "es": "Descarga Geo: de vez en cuando unas explosiones infligen daño Geo al personaje activo"
+ },
+ "Возьмите щит (Чжун Ли, Валерий, Ноэлль) или постоянное лечение: Гео-разряды бьют весь бой": {
+  "en": "Bring a shield (Zhongli, Valeriy, Noelle) or constant healing: Geo Discharges hit throughout the fight",
+  "es": "Lleva un escudo (Zhongli, Valeriy, Noelle) o curación constante: las descargas Geo golpean durante todo el combate"
+ },
+ "Священные звери много двигаются — добивайте их по одному, здесь важен урон по одной цели": {
+  "en": "Consecrated Beasts move around a lot — finish them one at a time; single-target damage matters here",
+  "es": "Las bestias consagradas se mueven mucho: remátalas de una en una; aquí importa el daño a un solo objetivo"
+ },
+ "Для самого испытания достаточно дожить до конца отсчёта, звезда — за десять побед": {
+  "en": "To clear the challenge you only need to survive until the countdown ends; the star takes ten kills",
+  "es": "Para superar el desafío basta con sobrevivir hasta el final de la cuenta atrás; la estrella exige diez derrotas"
+ },
+ "Навия со щитом": {
+  "en": "Navia with a shield",
+  "es": "Navia con escudo"
+ },
+ "Чжун Ли — стартовый": {
+  "en": "Zhongli is an opening character",
+  "es": "Zhongli es inicial"
+ },
+ "Одетта — особый гость": {
+  "en": "Odette is a special guest",
+  "es": "Odette es invitada especial"
+ },
+ "Сильные враги — в обороне под давлением": {
+  "en": "Powerful foes — in High-Pressure Defense",
+  "es": "Enemigos poderosos — en la defensa bajo presión"
+ },
+ "Защищать монолит 190 с. Звезда — у монолита осталось не меньше 35% HP.": {
+  "en": "Protect the Monolith for 190 s. Star — the Monolith keeps at least 35% HP.",
+  "es": "Protege el Monolito 190 s. Estrella — al Monolito le queda al menos el 35 % de PV."
+ },
+ "Защищать монолит 200 с. Звезда — не меньше 35% HP монолита.": {
+  "en": "Protect the Monolith for 200 s. Star — at least 35% Monolith HP.",
+  "es": "Protege el Monolito 200 s. Estrella — al menos el 35 % de PV del Monolito."
+ },
+ "сильный враг": {
+  "en": "powerful foe",
+  "es": "enemigo poderoso"
+ },
+ "Анемо в сезоне нет, стянуть врагов нечем — берите урон по площади: Заряжен и Лунный заряд сами перекидываются между целями": {
+  "en": "There is no Anemo this season, so nothing to group enemies with — bring AoE damage: Electro-Charged and Lunar-Charged spread between targets on their own",
+  "es": "Esta temporada no hay Anemo y no hay con qué agrupar enemigos: lleva daño en área; Electrocargado y Electrocargado Lunar saltan solos entre objetivos"
+ },
+ "Победы сокращают таймер, поэтому быстрые убийства защищают монолит лучше, чем щит": {
+  "en": "Kills shorten the timer, so fast kills protect the Monolith better than a shield",
+  "es": "Las derrotas acortan el temporizador, así que matar rápido protege el Monolito mejor que un escudo"
+ },
+ "Врагов, которые бьют монолит издалека, можно отвлечь приманкой — фантомом Моны или навыком Алёши": {
+  "en": "Enemies that hit the Monolith from range can be distracted with a decoy — Mona's phantom or Alyosha's Skill",
+  "es": "A los enemigos que atacan el Monolito a distancia se les puede distraer con un señuelo: el fantasma de Mona o la habilidad de Alyosha"
+ },
+ "Электро — против Гидро-подобий": {
+  "en": "Electro — against the Hydro Mimics",
+  "es": "Electro — contra las imitaciones Hydro"
+ },
+ "Гидро-подобия: кабан, журавль, белка, утка, зяблик, краб и лягушка": {
+  "en": "Hydro Mimics: Boar, Crane, Squirrel, Mallard, Finch, Crab and Frog",
+  "es": "Imitaciones Hydro: jabalí, grulla, ardilla, pato, pinzón, cangrejo y rana"
+ },
+ "За 120 с. победить минимум 20 врагов. Звезда — 24.": {
+  "en": "Defeat at least 20 enemies within 120 s. Star — 24.",
+  "es": "Derrota al menos a 20 enemigos en 120 s. Estrella — 24."
+ },
+ "За 120 с. победить минимум 7 врагов. Звезда — 9.": {
+  "en": "Defeat at least 7 enemies within 120 s. Star — 9.",
+  "es": "Derrota al menos a 7 enemigos en 120 s. Estrella — 9."
+ },
+ "За 120 с. победить минимум 12 врагов. Звезда — 15.": {
+  "en": "Defeat at least 12 enemies within 120 s. Star — 15.",
+  "es": "Derrota al menos a 12 enemigos en 120 s. Estrella — 15."
+ },
+ "Здесь важно число побед, а не полная зачистка": {
+  "en": "What counts here is the number of kills, not a full clear",
+  "es": "Aquí importa el número de derrotas, no limpiar todo"
+ },
+ "Гидро-подобия невосприимчивы к Гидро, а быстрее всего их убивает Электро. Если Электро-персонажи нужны на следующего злодея, выберите другой бой": {
+  "en": "Hydro Mimics are immune to Hydro, and Electro kills them fastest. If you need your Electro characters for the next villain, pick a different battle",
+  "es": "Las imitaciones Hydro son inmunes a Hydro y Electro las mata más rápido. Si necesitas a tus personajes Electro para el siguiente villano, elige otro combate"
+ },
+ "Лунные реакции": {
+  "en": "Lunar reactions",
+  "es": "Reacciones lunares"
+ },
+ "В начале боя босс закрывается Щитом глубинной тьмы и призывает четырёх Рыболовов скрытых глубин. Щит не берёт физический урон — только стихийный и урон реакций, а Лунные реакции снимают его намного быстрее": {
+  "en": "At the start of the fight the boss raises the Deepdark Shield and summons four Fishers of Hidden Depths. Physical damage does nothing to the shield — only elemental and reaction damage, and Lunar reactions break it much faster",
+  "es": "Al empezar el combate, el jefe levanta el Escudo de oscuridad profunda e invoca a cuatro Pescadores de las Profundidades Insondables. El daño físico no afecta al escudo: solo el elemental y el de reacciones, y las reacciones lunares lo rompen mucho más rápido"
+ },
+ "Каждый побеждённый Рыболов тоже снимает часть щита. Когда щит сломан, босс теряет большую долю HP и надолго падает с пониженными сопротивлениями": {
+  "en": "Each defeated Fisher also removes part of the shield. Once the shield is broken, the boss loses a large chunk of HP and stays down for a long time with lowered RES",
+  "es": "Cada Pescador derrotado también quita parte del escudo. Al romperse, el jefe pierde una gran parte de sus PV y cae durante un buen rato con las RES reducidas"
+ },
+ "Не сломали щит вовремя — босс бьёт по всей арене, а щит исчезает без пользы для вас": {
+  "en": "Fail to break the shield in time and the boss hits the whole arena, while the shield vanishes with no benefit to you",
+  "es": "Si no rompes el escudo a tiempo, el jefe golpea toda la arena y el escudo desaparece sin ningún beneficio para ti"
+ },
+ "Не тратьте взрывы стихий на появление босса: дождитесь щита, сломайте его и только потом выкладывайте весь урон в лежащего": {
+  "en": "Don't spend Elemental Bursts when the boss appears: wait for the shield, break it and only then unload everything on the downed boss",
+  "es": "No gastes las Habilidades Definitivas cuando aparece el jefe: espera al escudo, rómpelo y solo entonces descarga todo el daño sobre el jefe caído"
+ },
+ "С Лунным зарядом или Лунной кристаллизацией бейте прямо по щиту. Без лунных реакций сначала убейте Рыболовов атаками по площади": {
+  "en": "With Lunar-Charged or Lunar-Crystallize, hit the shield directly. Without Lunar reactions, kill the Fishers with AoE attacks first",
+  "es": "Con Electrocargado Lunar o Cristalización Lunar, ataca directamente al escudo. Sin reacciones lunares, mata primero a los Pescadores con ataques en área"
+ },
+ "Приберегите для этого акта Флинса с Айно или отряд Цзы Бай": {
+  "en": "Save Flins with Aino or the Zibai team for this act",
+  "es": "Guarda para este acto a Flins con Aino o al equipo de Zibai"
+ },
+ "Флинс и Айно — стартовые": {
+  "en": "Flins and Aino are opening characters",
+  "es": "Flins y Aino son iniciales"
+ },
+ "Лунная кристаллизация": {
+  "en": "Lunar-Crystallize",
+  "es": "Cristalización Lunar"
+ },
+ "Без лунных реакций": {
+  "en": "No Lunar reactions",
+  "es": "Sin reacciones lunares"
+ },
+ "Нёвиллет быстро убирает Рыболовов": {
+  "en": "Neuvillette clears the Fishers quickly",
+  "es": "Neuvillette elimina rápido a los Pescadores"
+ },
+ "Только лунный режим · враг 100 уровня": {
+  "en": "Lunar mode only · enemy Lv. 100",
+  "es": "Solo modo Lunar · enemigo de nv. 100"
+ },
+ "Рядом с отрядом появляется Дух-защитник. Любое лечение персонажей, даже лишнее, восстанавливает и его HP. Когда дух полностью здоров, он бьёт по боссу совместной атакой — чем больше вылечено, тем сильнее удар": {
+  "en": "A Protection Spirit appears next to your party. Any healing your characters receive, even overhealing, restores its HP too. When the spirit is at full HP, it strikes the boss with a coordinated attack — the more was healed, the harder the hit",
+  "es": "Junto al equipo aparece un Espíritu protector. Cualquier curación que reciban los personajes, incluso la sobrante, restaura también sus PV. Cuando el espíritu está al máximo, golpea al jefe con un ataque coordinado: cuanto más se haya curado, más fuerte es el golpe"
+ },
+ "Время от времени Вайоб проводит атаку, которая пробивает щит и снимает большую часть HP активного персонажа": {
+  "en": "From time to time the Wayob uses an attack that pierces shields and takes most of the active character's HP",
+  "es": "De vez en cuando el Wayob lanza un ataque que atraviesa escudos y quita la mayor parte de los PV del personaje activo"
+ },
+ "У босса повышено сопротивление Крио": {
+  "en": "The boss has increased Cryo RES",
+  "es": "El jefe tiene RES Cryo aumentada"
+ },
+ "закалённое в боях": {
+  "en": "battle-hardened",
+  "es": "curtida en batalla"
+ },
+ "Победить за 125 с. Звезда — за 85 с.": {
+  "en": "Defeat within 125 s. Star — within 85 s.",
+  "es": "Derrótalo en 125 s. Estrella — en 85 s."
+ },
+ "Возьмите двух лекарей и лечите без остановки, даже при полном HP: удары духа — главный источник урона": {
+  "en": "Bring two healers and heal nonstop, even at full HP: the spirit's strikes are the main source of damage",
+  "es": "Lleva dos sanadores y cura sin parar, incluso con los PV al máximo: los golpes del espíritu son la principal fuente de daño"
+ },
+ "Быстрее всего шкалу духа заполняют Кокоми, Линнея, Водяница, Сиджвин и Барбара": {
+  "en": "Kokomi, Linnea, Vodyanitsa, Sigewinne and Barbara fill the spirit's gauge fastest",
+  "es": "Kokomi, Linnea, Vodyanitsa, Sigewinne y Barbara son quienes más rápido llenan la barra del espíritu"
+ },
+ "Основной урон поручите Гидро, Электро или Гео — Крио здесь слаб": {
+  "en": "Leave the main damage to Hydro, Electro or Geo — Cryo is weak here",
+  "es": "Deja el daño principal a Hydro, Electro o Geo: Cryo rinde poco aquí"
+ },
+ "Нёвиллет с двумя лекарями": {
+  "en": "Neuvillette with two healers",
+  "es": "Neuvillette con dos sanadores"
+ },
+ "С гостем": {
+  "en": "With a guest",
+  "es": "Con invitada"
+ },
+ "Ци Ци — особый гость": {
+  "en": "Qiqi is a special guest",
+  "es": "Qiqi es invitada especial"
+ },
+ "Щиты — против священных зверей": {
+  "en": "Shields — against the Consecrated Beasts",
+  "es": "Escudos — contra las bestias consagradas"
+ },
+ "Лунные реакции и уровень Лунного знака — против Охотника пустошей": {
+  "en": "Lunar reactions and Moonsign Levels — against the Wilderness Hunter",
+  "es": "Reacciones lunares y nivel de Signo lunar — contra el Cazador de los Páramos"
+ },
+ "Против Охотника пустошей нужны лунные реакции — без них бой сильно затягивается": {
+  "en": "You need Lunar reactions against the Wilderness Hunter — without them the fight drags on badly",
+  "es": "Contra el Cazador de los Páramos hacen falta reacciones lunares: sin ellas el combate se alarga mucho"
+ },
+ "Гео-персонажей и двуручников приберегите для котла в акте 8": {
+  "en": "Save Geo characters and claymore users for the pot in Act 8",
+  "es": "Guarda a los personajes Geo y a los usuarios de mandoble para la olla del acto 8"
+ },
+ "Босс разводит посреди арены костёр и ставит на него котёл с похлёбкой. Костёр гасят Гидро и Электро — это останавливает готовку": {
+  "en": "The boss lights a bonfire in the middle of the arena and sets a pot of soup on it. Hydro and Electro put out the bonfire, which halts the cooking",
+  "es": "El jefe enciende una hoguera en el centro de la arena y pone encima una olla de sopa. Hydro y Electro apagan la hoguera, lo que detiene la cocción"
+ },
+ "Разбейте котёл до конца готовки: босс получит большой урон и ослабнет. Котёл ломают Гео-атаки и тяжёлые удары двуручных мечей": {
+  "en": "Destroy the pot before the soup is done: the boss takes heavy damage and is weakened. Geo attacks and heavy claymore hits break the pot",
+  "es": "Rompe la olla antes de que termine la cocción: el jefe recibe mucho daño y queda debilitado. La olla se rompe con ataques Geo y golpes pesados de mandoble"
+ },
+ "Если похлёбка доварилась, босс восстанавливает HP и резко поднимает все сопротивления. Если время вышло, а похлёбка не готова, он впадает в ярость": {
+  "en": "If the soup gets cooked, the boss restores HP and sharply raises all RES. If time runs out and the soup isn't ready, it becomes enraged",
+  "es": "Si la sopa se termina, el jefe recupera PV y sube mucho todas sus RES. Si se acaba el tiempo y la sopa no está lista, entra en furia"
+ },
+ "Шамачурл, закалённый в боях": {
+  "en": "Battle-Hardened Samachurl",
+  "es": "Samachurl curtido en batalla"
+ },
+ "Сначала погасите костёр Гидро, затем сразу ломайте котёл Гео или двуручником": {
+  "en": "First put out the bonfire with Hydro, then immediately break the pot with Geo or a claymore",
+  "es": "Primero apaga la hoguera con Hydro y enseguida rompe la olla con Geo o con un mandoble"
+ },
+ "Навия, Итто и Ноэлль ломают котёл быстрее всех; Айно — Гидро с двуручным мечом — и гасит костёр, и бьёт по котлу": {
+  "en": "Navia, Itto and Noelle break the pot fastest; Aino — Hydro with a claymore — both puts out the bonfire and hits the pot",
+  "es": "Navia, Itto y Noelle son quienes más rápido rompen la olla; Aino, Hydro con mandoble, apaga la hoguera y además golpea la olla"
+ },
+ "Если сильного Гео-ДД нет, поставьте Чжун Ли, Айно или Ноэлль к главному ДД: они займутся котлом, а он — ослабленным боссом": {
+  "en": "If you lack a strong Geo DPS, pair Zhongli, Aino or Noelle with your main DPS: they handle the pot while the DPS handles the weakened boss",
+  "es": "Si no tienes un DPS Geo fuerte, pon a Zhongli, Aino o Noelle junto a tu DPS principal: ellos se ocupan de la olla y él del jefe debilitado"
+ },
+ "Навия": {
+  "en": "Navia",
+  "es": "Navia"
+ },
+ "Айно — стартовая": {
+  "en": "Aino is an opening character",
+  "es": "Aino es inicial"
+ },
+ "Ближний бой — в натиске элиты": {
+  "en": "Melee — in Elite Assault",
+  "es": "Cuerpo a cuerpo — en el asalto de élite"
+ },
+ "Победить 2 цели за 85 с. Звезда — за 55 с.": {
+  "en": "Defeat 2 bounties within 85 s. Star — within 55 s.",
+  "es": "Derrota 2 objetivos en 85 s. Estrella — en 55 s."
+ },
+ "Победить 2 цели за 100 с. Звезда — за 65 с.": {
+  "en": "Defeat 2 bounties within 100 s. Star — within 65 s.",
+  "es": "Derrota 2 objetivos en 100 s. Estrella — en 65 s."
+ },
+ "Победить 3 цели за 100 с. Звезда — за 65 с.": {
+  "en": "Defeat 3 bounties within 100 s. Star — within 65 s.",
+  "es": "Derrota 3 objetivos en 100 s. Estrella — en 65 s."
+ },
+ "Гео-щит лавачурла быстрее всего ломают Гео-атаки и двуручные мечи": {
+  "en": "Geo attacks and claymores break the Lawachurl's Geo shield fastest",
+  "es": "El escudo Geo del Lawachurl se rompe más rápido con ataques Geo y mandobles"
+ },
+ "Сильного лекаря оставьте на акт 10. Перед финалом закройте оба испытания Арканы: после акта 10 выступление заканчивается": {
+  "en": "Keep a strong healer for Act 10. Finish both Arcana Challenges before the finale: the performance ends after Act 10",
+  "es": "Guarda un sanador fuerte para el acto 10. Antes del final completa los dos Desafíos Arcanos: la función termina tras el acto 10"
+ },
+ "Лучезарный кокон: мотылёк накладывает на отряд ослабление — персонажи теряют HP даже под щитом, хуже лечатся, наносят вдвое меньше урона и не могут критовать": {
+  "en": "Radiant Cocoon: the Moonfly debuffs the party — characters lose HP even under a shield, receive less healing, deal half damage and cannot crit",
+  "es": "Capullo radiante: la Selenimariposa debilita al equipo: los personajes pierden PV incluso con escudo, reciben menos curación, hacen la mitad de daño y no pueden asestar críticos"
+ },
+ "Кокон спадает, когда персонаж вылечен до полного HP. После этого он на время получает бонус к урону и шансу крита": {
+  "en": "The Cocoon drops once a character is healed to full HP. After that the character briefly gains a DMG and CRIT Rate bonus",
+  "es": "El capullo desaparece cuando el personaje se cura hasta el máximo de PV. Después obtiene durante un tiempo un bono de daño y de Prob. CRIT"
+ },
+ "Нужен лекарь, который лечит весь отряд разом: Кокоми, Сиджвин, Ци Ци, Барбара": {
+  "en": "You need a healer who heals the whole party at once: Kokomi, Sigewinne, Qiqi, Barbara",
+  "es": "Hace falta un sanador que cure a todo el equipo a la vez: Kokomi, Sigewinne, Qiqi, Barbara"
+ },
+ "Сильное лечение приберегите к моменту, когда мотылёк взлетел и расправил крылья, — сразу после этого он накладывает кокон": {
+  "en": "Save your big heal for when the Moonfly takes off and spreads its wings — it applies the Cocoon right after that",
+  "es": "Guarda la curación fuerte para cuando la Selenimariposa alce el vuelo y despliegue las alas: justo después aplica el capullo"
+ },
+ "Если лекарь лечит только активного персонажа, меняйте бойцов по очереди, пока кокон не спадёт со всех": {
+  "en": "If your healer only heals the active character, swap through the party until the Cocoon is gone from everyone",
+  "es": "Si tu sanador solo cura al personaje activo, ve cambiando de personaje hasta que el capullo desaparezca de todos"
+ },
+ "Здесь хорошо работают особые гости: Весна и Одетта с Ци Ци дают Звёздный блеск и лечение сразу": {
+  "en": "The special guests work well here: Vesna and Odette with Qiqi bring Stellar Glimmer and healing at once",
+  "es": "Aquí rinden bien los invitados especiales: Vesna y Odette con Qiqi aportan Destello Estelar y curación a la vez"
+ },
+ "Гости: Звёздное рассеивание": {
+  "en": "Guests: Stellar Swirl",
+  "es": "Invitados: Torbellino Estelar"
+ },
+ "Весна, Одетта и Ци Ци — особые гости": {
+  "en": "Vesna, Odette and Qiqi are special guests",
+  "es": "Vesna, Odette y Qiqi son invitadas especiales"
+ },
+ "Одетта и Ци Ци — особые гости": {
+  "en": "Odette and Qiqi are special guests",
+  "es": "Odette y Qiqi son invitadas especiales"
+ },
+ "Лунный заряд с Кокоми": {
+  "en": "Lunar-Charged with Kokomi",
+  "es": "Electrocargado Lunar con Kokomi"
+ },
+ "Флинс и Айно — стартовые с бонусом; лучший отряд на акт 6": {
+  "en": "Flins and Aino are opening characters with the bonus; the best team for Act 6",
+  "es": "Flins y Aino son iniciales con bono; el mejor equipo para el acto 6"
+ },
+ "Ломает и щит Повелителя глубин, и котёл шамачурла": {
+  "en": "Breaks both the Lord of the Hidden Depths' shield and the Samachurl's pot",
+  "es": "Rompe tanto el escudo del Susurrador de Pesadillas como la olla del Samachurl"
+ },
+ "Три стартовых персонажа; частое Электро против плесенника": {
+  "en": "Three opening characters; frequent Electro against the Terrorshroom",
+  "es": "Tres personajes iniciales; Electro frecuente contra el Espantohongo"
+ },
+ "Весна, Одетта и Ци Ци допускаются как гости, хотя Анемо и Крио в сезон не входят": {
+  "en": "Vesna, Odette and Qiqi are allowed as guests even though Anemo and Cryo are not part of the season",
+  "es": "Vesna, Odette y Qiqi se admiten como invitadas aunque Anemo y Cryo no formen parte de la temporada"
+ },
+ "Версия 7.2": {
+  "en": "Version 7.2",
+  "es": "Versión 7.2"
+ },
+ "Всплеск флуктуаций (11–21 ноября): после прохождения на тяжёлой сложности и выше можно тратить смолу на артефакты выбранного подземелья и копить престиж натиска": {
+  "en": "Disturbance Outbreak (November 11–21): after clearing Hard or higher you can spend Resin on artifacts from a chosen domain and earn Dire Prestige",
+  "es": "Brote de perturbación (11–21 de noviembre): tras superar Difícil o más puedes gastar resina en artefactos del dominio elegido y acumular prestigio"
+ },
+ "С зловещей сложности персонажа нельзя использовать в двух боях — Электро или Звёздный блеск нужны в первом бою, Гидро — во втором, Гео и лекарь — в третьем": {
+  "en": "From Menacing difficulty a character cannot be used in two fights — Electro or Stellar Glimmer is needed in fight 1, Hydro in fight 2, Geo and a healer in fight 3",
+  "es": "Desde la dificultad Amenazante un personaje no puede usarse en dos combates: Electro o Destello Estelar se necesitan en el combate 1, Hydro en el 2, y Geo y un sanador en el 3"
+ },
+ "Награды: 450 примогемов за первые три сложности, облик оружия «Сияющий фантазм» за безнадёжную и «Сублимация» за безнадёжную быстрее 180 с. В этом цикле у обоих обликов появился новый вариант — он выдаётся вместе со старым": {
+  "en": "Rewards: 450 Primogems for the first three difficulties, the “Radiant Phantasm” weapon appearance for Dire and “Sublimation” for Dire under 180 s. This cycle both appearances gain a new style — it is granted together with the old one",
+  "es": "Recompensas: 450 Protogemas por las tres primeras dificultades, la apariencia de arma «Fantasma radiante» por Funesta y «Sublimación» por Funesta en menos de 180 s. En este ciclo ambas apariencias reciben un estilo nuevo, que se entrega junto con el anterior"
+ },
+ "Удерживающий волны": {
+  "en": "Wavebinder",
+  "es": "Anclamareas"
+ },
+ "Все сложности · на бесстрашной и безнадёжной — усиленная форма": {
+  "en": "All difficulties · enhanced form on Fearless and Dire",
+  "es": "Todas las dificultades · forma reforzada en Intrépida y Funesta"
+ },
+ "Вскоре после начала боя босс пьёт из фляги и копит шкалу отваги. Когда она полна, он входит в состояние доблести: бьёт сильнее, закрывается щитом и резко поднимает все сопротивления, кроме Электро": {
+  "en": "Shortly after the fight starts the boss drinks from a flask and builds its Courage gauge. When it is full, he enters the Valiant state: hits harder, gains a shield and sharply raises all RES except Electro",
+  "es": "Poco después de empezar el combate, el jefe bebe de su petaca y acumula la barra de coraje. Cuando se llena, entra en estado de valentía: golpea más fuerte, se cubre con un escudo y sube mucho todas sus RES salvo la Electro"
+ },
+ "Звёздный блеск по боссу до глотка не даёт шкале заполниться целиком — он вынужден пить ещё раз": {
+  "en": "Stellar Glimmer on the boss before the drink keeps the gauge from filling completely — he has to drink again",
+  "es": "El Destello Estelar sobre el jefe antes del trago impide que la barra se llene del todo: tiene que volver a beber"
+ },
+ "Электро-удары сбивают отвагу и сокращают состояние доблести; сильнее всего — Электро урон Звёздного проводника": {
+  "en": "Electro hits drain Courage and shorten the Valiant state; Electro Stellar-Conduct DMG does it best",
+  "es": "Los golpes Electro reducen el coraje y acortan el estado de valentía; lo que más, el daño Electro de Superconductor Estelar"
+ },
+ "Когда доблесть заканчивается, босс получает отдачу — часть урона, поглощённого щитом. Урон звёздных реакций возвращается с большей силой": {
+  "en": "When the Valiant state ends, the boss takes backlash — a share of the damage the shield absorbed. Stellar reaction damage comes back harder",
+  "es": "Cuando termina la valentía, el jefe sufre un contragolpe: parte del daño absorbido por el escudo. El daño de reacciones estelares vuelve con más fuerza"
+ },
+ "Лучше всего работает Звёздный проводник — Электро и Крио вместе: он и срывает глоток, и быстрее всех сбивает отвагу": {
+  "en": "Stellar-Conduct — Electro plus Cryo — works best: it both disrupts the drink and drains Courage fastest",
+  "es": "Lo que mejor funciona es Superconductor Estelar, Electro y Cryo juntos: interrumpe el trago y reduce el coraje más rápido que nada"
+ },
+ "Не прекращайте бить во время доблести: поглощённый щитом урон вернётся боссу отдачей": {
+  "en": "Keep attacking during the Valiant state: the damage absorbed by the shield returns to the boss as backlash",
+  "es": "No dejes de atacar durante la valentía: el daño absorbido por el escudo vuelve al jefe como contragolpe"
+ },
+ "После прыжка с ударом якорем Электро ненадолго оглушает босса — это окно для урона": {
+  "en": "After his leaping anchor slam, Electro briefly stuns the boss — that's a damage window",
+  "es": "Tras su salto con golpe de ancla, Electro aturde al jefe un momento: es una ventana de daño"
+ },
+ "Якорь бьёт очень больно: держитесь на расстоянии или уворачивайтесь от замахов": {
+  "en": "The anchor hits very hard: keep your distance or dodge the swings",
+  "es": "El ancla pega muy fuerte: mantén la distancia o esquiva los golpes"
+ },
+ "Сандроне": {
+  "en": "Sandrone",
+  "es": "Sandrone"
+ },
+ "Император огня и железа": {
+  "en": "Emperor of Fire and Iron",
+  "es": "Emperador Piroacorazado"
+ },
+ "Пиро — слаб": {
+  "en": "Pyro — weak",
+  "es": "Pyro — débil"
+ },
+ "Расплавленная корона: два рога заряжены Пиро и сильно поднимают боссу все сопротивления. Когда Пиро-заряд рогов исчерпан, они ломаются, босс теряет часть HP и остаётся без защиты, пока рога не восстановятся": {
+  "en": "Molten Crown: the twin horns are charged with Pyro and greatly raise all of the boss's RES. When the horns' Pyro is exhausted, they break, the boss loses part of its HP and stays unprotected until the horns regrow",
+  "es": "Corona fundida: los dos cuernos están cargados de Pyro y suben mucho todas las RES del jefe. Cuando se agota su carga Pyro, se rompen, el jefe pierde parte de sus PV y queda sin protección hasta que los cuernos se regeneran"
+ },
+ "Босс призывает до трёх крабов-щитоносцев, которые подпитывают рога. Крабов тоже гасят стихией: побеждённый краб врезается в императора, снимает часть заряда рогов и наносит урон — тем больше, чем больше Гидро урона он получил": {
+  "en": "The boss summons up to three Sternshield Crabs that feed the horns. The crabs are also quenched with elements: a defeated crab slams into the Emperor, removes part of the horns' charge and deals damage — the more Hydro DMG it took, the more",
+  "es": "El jefe invoca hasta tres cangrejos escuderos que alimentan los cuernos. A los cangrejos también se los apaga con elementos: un cangrejo derrotado choca contra el Emperador, quita parte de la carga de los cuernos e inflige daño, mayor cuanto más daño Hydro haya recibido"
+ },
+ "Сияющая коронация: босс заряжает мощную атаку по площади. Сломанные рога прерывают её": {
+  "en": "Radiant Coronation: the boss charges a powerful AoE attack. Breaking the horns interrupts it",
+  "es": "Coronación radiante: el jefe carga un potente ataque en área. Romper los cuernos lo interrumpe"
+ },
+ "Нужен частый Гидро, желательно по площади: он гасит и рога, и крабов": {
+  "en": "You need frequent Hydro, ideally AoE: it quenches both the horns and the crabs",
+  "es": "Hace falta Hydro frecuente, a ser posible en área: apaga tanto los cuernos como los cangrejos"
+ },
+ "Сначала убирайте крабов — каждый из них бьёт по императору и приближает поломку рогов": {
+  "en": "Take out the crabs first — each one damages the Emperor and brings the horn break closer",
+  "es": "Elimina primero a los cangrejos: cada uno daña al Emperador y acerca la rotura de los cuernos"
+ },
+ "Во время некоторых атак рога опускаются к земле — в этот момент по ним проще попасть": {
+  "en": "During some attacks the horns dip low — that's when they are easiest to hit",
+  "es": "Durante algunos ataques los cuernos bajan hasta el suelo: en ese momento es más fácil alcanzarlos"
+ },
+ "Пиро-персонажей не берите: рога невосприимчивы к Пиро": {
+  "en": "Don't bring Pyro characters: the horns are immune to Pyro",
+  "es": "No lleves personajes Pyro: los cuernos son inmunes a Pyro"
+ },
+ "Нёвиллет": {
+  "en": "Neuvillette",
+  "es": "Neuvillette"
+ },
+ "Муалани": {
+  "en": "Mualani",
+  "es": "Mualani"
+ },
+ "Наш вариант: три Гидро и сбор крабов": {
+  "en": "Our pick: three Hydro plus crab grouping",
+  "es": "Nuestra propuesta: tres Hydro y agrupar a los cangrejos"
+ },
+ "Заряжен по площади": {
+  "en": "AoE Electro-Charged",
+  "es": "Electrocargado en área"
+ },
+ "Лучезарный лунный геккон": {
+  "en": "Radiant Moongecko",
+  "es": "Selenogeco Radiante"
+ },
+ "Геккон оставляет на арене Якорь из лунного камня с многослойным Гео-щитом, запрыгивает наверх и заряжает мощную атаку по площади. Сломайте якорь — заряд сорвётся, а босс потеряет большую долю HP; Гео урон по якорю увеличивает её": {
+  "en": "The Moongecko leaves a Moonstone Anchor with a multi-layered Geo ward on the arena, leaps to high ground and charges a powerful AoE attack. Break the Anchor to interrupt the charge and make the boss lose a large share of HP; Geo DMG dealt to the Anchor increases it",
+  "es": "El Selenogeco deja en la arena un Ancla de piedra lunar con un escudo Geo de varias capas, salta a lo alto y carga un potente ataque en área. Rompe el ancla: la carga se interrumpe y el jefe pierde una gran parte de sus PV; el daño Geo al ancla la aumenta"
+ },
+ "Не успели сломать якорь — босс бьёт по всей арене и поднимает все сопротивления": {
+  "en": "Fail to break the Anchor in time and the boss hits the whole arena and raises all RES",
+  "es": "Si no rompes el ancla a tiempo, el jefe golpea toda la arena y sube todas sus RES"
+ },
+ "Лучезарный кокон: пойманные персонажи теряют HP, наносят вдвое меньше урона, хуже лечатся и не могут критовать. Вылечите персонажа до полного HP — кокон спадёт, а он на время получит бонус к урону и шансу крита": {
+  "en": "Radiant Cocoon: captured characters lose HP, deal half damage, receive less healing and cannot crit. Heal a character to full HP and the Cocoon drops, briefly granting a DMG and CRIT Rate bonus",
+  "es": "Capullo radiante: los personajes atrapados pierden PV, hacen la mitad de daño, reciben menos curación y no pueden asestar críticos. Cura al personaje hasta el máximo de PV y el capullo desaparece, con un bono temporal de daño y Prob. CRIT"
+ },
+ "Пока кто-то в коконе, у босса повышено Гео-сопротивление": {
+  "en": "While anyone is in a Cocoon, the boss has increased Geo RES",
+  "es": "Mientras alguien esté en el capullo, el jefe tiene RES Geo aumentada"
+ },
+ "Щит якоря быстрее всего снимают Гео-атаки, Лунная кристаллизация, двуручные мечи и атаки в падении": {
+  "en": "Geo attacks, Lunar-Crystallize, claymores and Plunging Attacks strip the Anchor's ward fastest",
+  "es": "El escudo del ancla cae más rápido con ataques Geo, Cristalización Lunar, mandobles y ataques descendentes"
+ },
+ "Возьмите лекаря с сильным разовым лечением (Кокоми, Сянь Юнь, Барбара): лечение в коконе ослаблено, мелкими порциями его не снять. Беннет лечит только до 70% HP и здесь не подходит": {
+  "en": "Bring a healer with a big burst heal (Kokomi, Xianyun, Barbara): healing is reduced inside the Cocoon, so small ticks won't clear it. Bennett only heals up to 70% HP and doesn't work here",
+  "es": "Lleva un sanador con una curación fuerte de golpe (Kokomi, Xianyun, Barbara): dentro del capullo la curación está reducida y con pequeñas dosis no se quita. Bennett solo cura hasta el 70 % de PV y aquí no sirve"
+ },
+ "Этот отряд нужен последним — на зловещей и выше не тратьте Гео-персонажей и лекаря в первых боях": {
+  "en": "This team is needed last — on Menacing and above, don't spend your Geo characters and healer in the earlier fights",
+  "es": "Este equipo se usa al final: en Amenazante o más, no gastes a tus personajes Geo ni al sanador en los combates anteriores"
+ },
+ "Линнея лечит отряд": {
+  "en": "Linnea heals the party",
+  "es": "Linnea cura al equipo"
+ },
+ "Электро или Звёздный блеск нужны в первом бою, Гидро — во втором, Гео и лекарь — в третьем. С зловещей сложности персонажей нельзя повторять: заранее соберите три разных отряда. Страница собрана до старта цикла по официальному анонсу и данным вики — команды уточним после первых прохождений.": {
+  "en": "Electro or Stellar Glimmer is needed in fight 1, Hydro in fight 2, Geo and a healer in fight 3. From Menacing difficulty characters cannot be repeated: prepare three different teams in advance. This page was put together before the cycle started, from the official announcement and wiki data — we'll refine the teams after the first clears.",
+  "es": "Electro o Destello Estelar se necesitan en el combate 1, Hydro en el 2, y Geo y un sanador en el 3. Desde la dificultad Amenazante no se pueden repetir personajes: prepara tres equipos distintos de antemano. La página se preparó antes del inicio del ciclo con el anuncio oficial y datos de la wiki; ajustaremos los equipos tras las primeras partidas."
  }
 }
