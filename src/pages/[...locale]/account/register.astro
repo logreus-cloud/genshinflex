@@ -46,7 +46,7 @@ const labels = {
 </Layout>
 
 <script>
-  import { authUrl, errorText, getSupabase, labelsOf, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
+  import { authUrl, errorText, getSupabase, labelsOf, markAuthPending, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
   onPage('#register', (root) => {
     root.querySelector<HTMLAnchorElement>('[data-page]')!.href = authUrl(root.dataset.base || '', 'login', pageNext());
     const form = root.querySelector('form')!;
@@ -103,6 +103,7 @@ const labels = {
           },
         });
         if (error && error.code !== 'user_already_exists' && error.message !== 'User already registered') throw error;
+        if (!error) markAuthPending({ kind: 'email', email });
         form.hidden = true;
         success.hidden = false;
         success.querySelector<HTMLElement>('.lead')!.textContent = `${root.dataset.sent} ${email}`;
@@ -119,6 +120,7 @@ const labels = {
       try {
         const { error } = await getSupabase().auth.resend({ type: 'signup', email });
         if (error) throw error;
+        markAuthPending({ kind: 'email', email });
         startTimer();
       } catch (error) {
         const message = success.querySelector<HTMLElement>('.status')!;

@@ -17,10 +17,19 @@ const labels = {
 <Layout title={t('Сменить пароль')} noindex>
   <div class="auth-page" id="reset" data-base={base} data-labels={JSON.stringify(labels)}
     data-expired={t('Ссылка устарела.')} data-mismatch={t('Пароли не совпадают.')}
-    data-done={t('Пароль изменён.')} data-loading={t('Проверяем ссылку…')}>
+    data-done={t('Пароль изменён.')} data-loading={t('Проверяем ссылку…')}
+    data-confirm={t('Вход в аккаунт {email} по ссылке. Если вы не запрашивали эту ссылку — отмените.')}
+    data-declined={t('Вход отменён.')}>
     <h1>{t('Сменить пароль')}</h1>
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite">{t('Проверяем ссылку…')}</p>
+      <div class="auth-confirm" data-auth-confirm hidden>
+        <p class="small" data-auth-confirm-message></p>
+        <div class="auth-actions">
+          <button class="btn primary" type="button" data-auth-continue>{t('Продолжить')}</button>
+          <button class="btn" type="button" data-auth-cancel>{t('Отменить')}</button>
+        </div>
+      </div>
       <form class="auth-form" hidden>
         <label>{t('Новый пароль')}<input class="input" name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
         <label>{t('Повторите пароль')}<input class="input" name="confirm" type="password" autocomplete="new-password" required /></label>
@@ -28,35 +37,73 @@ const labels = {
       </form>
       <a data-page="forgot" href={`${base}/account/forgot/`} hidden>{t('Запросить новую ссылку')}</a>
       <a data-page="account" href={`${base}/account/`} hidden>{t('Перейти в аккаунт')}</a>
+      <a data-page="login" href={`${base}/account/login/`} hidden>{t('Вернуться ко входу')}</a>
     </div>
   </div>
 </Layout>
 
 <script>
-  import { authUrl, errorText, getSupabase, labelsOf, onPage } from '../../../scripts/auth';
+  import { authUrl, confirmUrlSession, consumeUrlSession, errorText, getSupabase, labelsOf, onPage } from '../../../scripts/auth';
+  import { SUPABASE_KEY, SUPABASE_URL } from '../../../lib/platform';
   onPage('#reset', (root) => {
     const base = root.dataset.base || '';
     const form = root.querySelector('form')!;
     const status = root.querySelector<HTMLElement>('.status')!;
     const forgot = root.querySelector<HTMLAnchorElement>('[data-page="forgot"]')!;
     const account = root.querySelector<HTMLAnchorElement>('[data-page="account"]')!;
+    const login = root.querySelector<HTMLAnchorElement>('[data-page="login"]')!;
     forgot.href = authUrl(base, 'forgot');
     account.href = authUrl(base, '');
+    login.href = authUrl(base, 'login');
     const auth = getSupabase().auth;
     let active = true;
+    // Форма открыта для одного аккаунта: если сессия сменилась, пароль чужого аккаунта не меняем
+    let formUser: string | null = null;
+    const showExpired = () => {
+      form.hidden = true;
+      forgot.hidden = false;
+      status.textContent = root.dataset.expired || '';
+      status.className = 'status small bad';
+    };
     const showSession = async () => {
       const { data } = await auth.getSession();
       if (!root.isConnected || !active) return;
-      form.hidden = !data.session;
-      forgot.hidden = !!data.session;
-      status.textContent = data.session ? '' : root.dataset.expired || '';
-      status.className = data.session ? 'status small' : 'status small bad';
+      const user = data.session?.user.id ?? null;
+      if (!user || (formUser && formUser !== user)) { showExpired(); return; }
+      formUser = user;
+      form.hidden = false;
+      forgot.hidden = true;
+      status.textContent = '';
+      status.className = 'status small';
     };
-    const { data: listener } = auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') void showSession();
-    });
-    void showSession();
-    document.addEventListener('astro:before-swap', () => { active = false; listener.subscription.unsubscribe(); }, { once: true });
+    let unsubscribe = () => {};
+    document.addEventListener('astro:before-swap', () => { active = false; unsubscribe(); }, { once: true });
+    void (async () => {
+      // Ссылка вернулась с ошибкой (устарела, уже использована): форму не показываем даже при открытой сессии
+      const linkError = [new URLSearchParams(location.hash.slice(1)), new URLSearchParams(location.search)]
+        .some((params) => params.has('error') || params.has('error_code') || params.has('error_description'));
+      if (linkError) { showExpired(); return; }
+      const result = await consumeUrlSession({ confirm: (email) => confirmUrlSession(root, email) });
+      if (!active || !root.isConnected) return;
+      if (result === 'declined') {
+        status.textContent = root.dataset.declined || '';
+        status.className = 'status small';
+        login.hidden = false;
+        return;
+      }
+      if (result === 'error') {
+        status.textContent = root.dataset.expired || '';
+        status.className = 'status small bad';
+        forgot.hidden = false;
+        return;
+      }
+      const { data: listener } = auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') void showSession();
+        if (event === 'SIGNED_OUT') showExpired();
+      });
+      unsubscribe = () => listener.subscription.unsubscribe();
+      void showSession();
+    })();
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!form.reportValidity()) return;
@@ -70,8 +117,18 @@ const labels = {
       const button = form.querySelector('button')!;
       button.disabled = true;
       try {
-        const { error } = await auth.updateUser({ password });
-        if (error) throw error;
+        const { data: current } = await auth.getSession();
+        if (!formUser || current.session?.user.id !== formUser) { showExpired(); return; }
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          method: 'PUT',
+          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${current.session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        if (!response.ok) {
+          let body: { error_code?: string; code?: string; msg?: string; message?: string } = {};
+          try { body = await response.json() || {}; } catch {}
+          throw { code: body.error_code || body.code, message: body.msg || body.message, status: response.status };
+        }
         form.hidden = true;
         account.hidden = false;
         status.textContent = root.dataset.done || '';

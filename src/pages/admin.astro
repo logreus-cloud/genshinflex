@@ -445,19 +445,27 @@ onPage(async (signal) => {
     return { label: `Персонаж: ${names.get(t) ?? t}`, href: `/characters/${t}/` };
   };
   const sitePath = (page: string) => page.startsWith('/') && page[1] !== '/' && page[1] !== '\\' && !/[\\\u0000-\u001f\u007f-\u009f]/.test(page);
+  const linkHref = (value: string) => {
+    try { const url = new URL(value, location.origin); return url.protocol === 'http:' || url.protocol === 'https:' ? value : null; }
+    catch { return null; }
+  };
 
   const guideCard = (g: Guide) => {
     const tg = target(g), p = g.payload, id = esc(String(g.id));
+    // Ответ API не типизирован на деле: длину берём только у настоящих массивов, иначе в разметку попала бы строка
+    const count = (value: unknown) => (Array.isArray(value) ? value.length : 0);
+    const weapons = Array.isArray(p.weapons) ? p.weapons : [];
     const extra = [
-      p.role && `Роль: ${esc(p.role)}`,
-      p.weapons?.length && `Оружие: ${p.weapons.map((w) => esc(names.get(w.slug) ?? w.slug)).join(', ')}`,
-      p.artifacts?.length && `Сеты: ${p.artifacts.length} вар.`,
-      p.teams?.length && `Команд: ${p.teams.length}`,
-      p.external?.length && `Ссылок: ${p.external.length}`,
+      p.role && `Роль: ${esc(String(p.role))}`,
+      weapons.length && `Оружие: ${weapons.map((w) => esc(String(names.get(w?.slug) ?? w?.slug ?? ''))).join(', ')}`,
+      count(p.artifacts) && `Сеты: ${count(p.artifacts)} вар.`,
+      count(p.teams) && `Команд: ${count(p.teams)}`,
+      count(p.external) && `Ссылок: ${count(p.external)}`,
     ].filter(Boolean).join(' · ');
+    const tgHref = linkHref(tg.href);
     return `<article class="panel card" data-id="${id}">
       <header>
-        <b>#${id}</b> <a href="${esc(tg.href)}" target="_blank" rel="noopener">${esc(tg.label)}</a>
+        <b>#${id}</b> ${tgHref ? `<a href="${esc(tgHref)}" target="_blank" rel="noopener">${esc(tg.label)}</a>` : `<span>${esc(tg.label)}</span>`}
         <span class="chip ${g.status === 'pending' ? 'gold' : ''}">${esc(STATUS[g.status] ?? g.status)}</span>
         <span class="chip">${esc(g.mode === 'edit' ? 'правка' : 'новый')}</span>
         <span class="chip">${esc((p.lang ?? 'ru').toUpperCase())}</span>
@@ -483,7 +491,7 @@ onPage(async (signal) => {
       <header>
         <b>#${esc(String(f.id))}</b> <span class="chip">${esc(KIND[f.kind] ?? f.kind)}</span>
         <span class="chip ${f.status === 'new' ? 'gold' : ''}">${esc(STATUS[f.status] ?? f.status)}</span>
-        ${f.page ? sitePath(f.page) ? `<a class="small" href="${esc(f.page)}" target="_blank" rel="noopener">${esc(f.page)}</a>` : `<span class="small">${esc(f.page)}</span>` : ''}
+        ${f.page ? sitePath(f.page) && linkHref(f.page) ? `<a class="small" href="${esc(f.page)}" target="_blank" rel="noopener">${esc(f.page)}</a>` : `<span class="small">${esc(f.page)}</span>` : ''}
         <span class="muted small">${esc(when(f.created_at))}</span>
       </header>
       <p class="msg">${esc(f.message)}</p>

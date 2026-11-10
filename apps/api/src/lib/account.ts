@@ -145,12 +145,16 @@ export async function exportAccount(client: AdminClient, id: string) {
   };
 }
 
-export function deletionCheck(confirm: unknown, claims: TokenClaims, now = Date.now()) {
-  if (confirm !== 'DELETE') return 'confirmation_required';
+export function reauthRequired(claims: TokenClaims, now = Date.now()): boolean {
   // Время создания JWT не заменяет время последнего входа.
   const latest = Math.max(...claims.amr.map((entry) => entry.timestamp));
   const age = now / 1000 - latest;
-  if (!Number.isFinite(age) || age < 0 || age > 15 * 60) return 'reauth_required';
+  return !Number.isFinite(age) || age < 0 || age > 15 * 60;
+}
+
+export function deletionCheck(confirm: unknown, claims: TokenClaims, now = Date.now()) {
+  if (confirm !== 'DELETE') return 'confirmation_required';
+  if (reauthRequired(claims, now)) return 'reauth_required';
   return null;
 }
 

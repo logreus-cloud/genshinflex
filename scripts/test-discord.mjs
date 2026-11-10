@@ -41,7 +41,7 @@ try {
   }
   assert.ok(!JSON.stringify(bug[1].body).includes('/admin/'));
   assert.ok(!JSON.stringify(bug[1].body).includes('#42'));
-  assert.match(bug[0].body.embeds[0].fields[0].value, /^https:\/\/genshinflex\.com/);
+  assert.match(bug[0].body.embeds[0].fields[0].value, /^<https:\/\/genshinflex\.com\/[^<>\s]*>$/);
 
   const long = feedbackMessages(env, { ...feedback, message: '@everyone ' + 'я'.repeat(5000) });
   for (const item of long) {

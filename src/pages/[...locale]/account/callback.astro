@@ -8,17 +8,26 @@ const { base, t } = useData(Astro.currentLocale);
   <div class="auth-page" id="callback" data-base={base}
     data-loading={t('Подтверждаем вход…')} data-done={t('Почта подтверждена.')}
     data-error={t('Не удалось подтвердить вход. Запросите новую ссылку или войдите снова.')}
-    data-identity-taken={t('Этот аккаунт Discord или Google уже привязан к другому аккаунту GenshinFlex. Войдите в тот аккаунт и отвяжите его там или удалите тот аккаунт.')}>
+    data-identity-taken={t('Этот аккаунт Discord или Google уже привязан к другому аккаунту GenshinFlex. Войдите в тот аккаунт и отвяжите его там или удалите тот аккаунт.')}
+    data-confirm={t('Вход в аккаунт {email} по ссылке. Если вы не запрашивали эту ссылку — отмените.')}
+    data-declined={t('Вход отменён.')}>
     <h1>{t('Подтверждение входа')}</h1>
     <div class="panel auth-panel">
       <p class="status small" aria-live="polite">{t('Подтверждаем вход…')}</p>
+      <div class="auth-confirm" data-auth-confirm hidden>
+        <p class="small" data-auth-confirm-message></p>
+        <div class="auth-actions">
+          <button class="btn primary" type="button" data-auth-continue>{t('Продолжить')}</button>
+          <button class="btn" type="button" data-auth-cancel>{t('Отменить')}</button>
+        </div>
+      </div>
       <a data-page="login" href={`${base}/account/login/`} hidden>{t('Вернуться ко входу')}</a>
     </div>
   </div>
 </Layout>
 
 <script>
-  import { authUrl, getSupabase, onPage, pageNext, safeNext } from '../../../scripts/auth';
+  import { authUrl, confirmUrlSession, consumeUrlSession, getSupabase, onPage, pageNext, safeNext } from '../../../scripts/auth';
   import { notifySessionChanged } from '../../../scripts/user-data/session';
   onPage('#callback', (root) => {
     const status = root.querySelector<HTMLElement>('.status')!;
@@ -33,7 +42,7 @@ const { base, t } = useData(Astro.currentLocale);
       status.className = 'status small bad';
       login.hidden = false;
     };
-    if (query.has('error') || query.has('error_description') || hash.has('error') || hash.has('error_description')) {
+    if (query.has('error') || query.has('error_code') || query.has('error_description') || hash.has('error') || hash.has('error_code') || hash.has('error_description')) {
       failed();
       // Привязка Discord/Google, который уже принадлежит другому аккаунту
       if ((query.get('error_code') || hash.get('error_code')) === 'identity_already_exists') {
@@ -42,23 +51,35 @@ const { base, t } = useData(Astro.currentLocale);
       }
       return;
     }
-    const auth = getSupabase().auth;
-    let done = false;
-    const finish = () => {
-      if (done || !root.isConnected) return;
-      done = true;
-      status.textContent = root.dataset.done || '';
-      status.className = 'status small ok';
-      notifySessionChanged();
-      location.replace(next ? safeNext(next) : authUrl(base, ''));
-    };
-    const { data: listener } = auth.onAuthStateChange((event, session) => {
-      if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED')) finish();
-    });
-    void auth.getSession().then(({ data, error }) => {
-      if (data.session) finish();
-      else if (error || root.isConnected) failed();
-    }).catch(failed);
-    document.addEventListener('astro:before-swap', () => listener.subscription.unsubscribe(), { once: true });
+    void (async () => {
+      const result = await consumeUrlSession({ confirm: (email) => confirmUrlSession(root, email) });
+      if (!root.isConnected) return;
+      if (result === 'declined') {
+        status.textContent = root.dataset.declined || '';
+        status.className = 'status small';
+        login.hidden = false;
+        return;
+      }
+      if (result === 'error') { failed(); return; }
+      status.textContent = root.dataset.loading || '';
+      const auth = getSupabase().auth;
+      let done = false;
+      const finish = () => {
+        if (done || !root.isConnected) return;
+        done = true;
+        status.textContent = root.dataset.done || '';
+        status.className = 'status small ok';
+        notifySessionChanged();
+        location.replace(next ? safeNext(next) : authUrl(base, ''));
+      };
+      const { data: listener } = auth.onAuthStateChange((event, session) => {
+        if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED')) finish();
+      });
+      void auth.getSession().then(({ data, error }) => {
+        if (data.session) finish();
+        else if (error || root.isConnected) failed();
+      }).catch(failed);
+      document.addEventListener('astro:before-swap', () => listener.subscription.unsubscribe(), { once: true });
+    })();
   });
 </script>

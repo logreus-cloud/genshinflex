@@ -4,7 +4,7 @@ import type { Context } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { claimsFromToken } from './lib/auth.ts';
 import type { TokenClaims } from './lib/auth.ts';
-import { deleteAccount, exportAccount } from './lib/account.ts';
+import { deleteAccount, exportAccount, reauthRequired } from './lib/account.ts';
 import type { AdminClient } from './lib/account.ts';
 import {
   AccountError, adminDeleteAccount, banAccount, getAccount, listAccounts, unbanAccount,
@@ -36,7 +36,7 @@ import {
 import type { TitleClient } from './lib/titles.ts';
 
 const app = new Hono<ApiEnv>();
-const version = '0.25.0';
+const version = '0.26.0';
 
 export type ServiceClient = AdminClient & AccountClient & TitleClient & Parameters<typeof telegramLogin>[0];
 type ApiEnv = {
@@ -107,6 +107,24 @@ async function limitedBody(c: ApiContext, limit: number): Promise<string | Respo
   return new TextDecoder().decode(bytes);
 }
 
+async function replayClaim(client: ServiceClient, key: string, ttl: number): Promise<boolean | null> {
+  try {
+    const { data, error } = await client.rpc('replay_guard_claim', { p_key: key, p_ttl_seconds: ttl });
+    return error ? null : data === true;
+  } catch {
+    return null;
+  }
+}
+
+async function rateLimited(limiter: Env['EXPORT_LIMITER'], key: string): Promise<boolean> {
+  if (!limiter) return false;
+  try {
+    return !(await limiter.limit({ key })).success;
+  } catch {
+    return false;
+  }
+}
+
 async function banFailure(c: ApiContext, user: string): Promise<Response | null> {
   const client = serviceClient(c);
   if (client instanceof Response) return client;
@@ -159,8 +177,10 @@ function titleFailure(c: ApiContext, error: unknown): Response {
 }
 
 async function titleBody(c: ApiContext): Promise<unknown> {
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) throw new TitleError('Слишком большое тело запроса', 413);
   try {
-    return await c.req.json();
+    return JSON.parse(raw);
   } catch {
     throw new TitleError('Неверный JSON', 400);
   }
@@ -172,8 +192,10 @@ function rewardFailure(c: ApiContext, error: unknown): Response {
 }
 
 async function rewardBody(c: ApiContext): Promise<unknown> {
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) throw new RewardError('Слишком большое тело запроса', 413);
   try {
-    return await c.req.json();
+    return JSON.parse(raw);
   } catch {
     throw new RewardError('Неверный JSON', 400);
   }
@@ -557,8 +579,10 @@ app.post('/admin/accounts/:id/ban', async (c) => {
   const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   let body: unknown;
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) return raw;
   try {
-    body = await c.req.json();
+    body = JSON.parse(raw);
   } catch {
     return c.json({ error: 'Неверный JSON' }, 400);
   }
@@ -591,8 +615,10 @@ app.delete('/admin/accounts/:id', async (c) => {
   const admin = await requireAdmin(c, client, c.get('claims'));
   if (admin instanceof Response) return admin;
   let body: unknown;
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) return raw;
   try {
-    body = await c.req.json();
+    body = JSON.parse(raw);
   } catch {
     return c.json({ error: 'Требуется подтверждение' }, 400);
   }
@@ -610,6 +636,11 @@ app.delete('/admin/accounts/:id', async (c) => {
 app.get('/me/export', async (c) => {
   const claims = await requireUser(c, c.get('claims'));
   if (claims instanceof Response) return claims;
+  const banned = await banFailure(c, claims.sub);
+  if (banned) return banned;
+  if (await rateLimited(c.env.EXPORT_LIMITER, claims.sub)) {
+    return c.json({ error: 'Слишком много запросов' }, 429);
+  }
   const supabase = serviceClient(c);
   if (supabase instanceof Response) return supabase;
   try {
@@ -628,8 +659,10 @@ app.delete('/me', async (c) => {
   const claims = await requireUser(c, c.get('claims'));
   if (claims instanceof Response) return claims;
   let body: unknown;
+  const raw = await limitedBody(c, 8 * 1024);
+  if (raw instanceof Response) return raw;
   try {
-    body = await c.req.json();
+    body = JSON.parse(raw);
   } catch {
     return c.json({ error: 'Требуется подтверждение' }, 400);
   }
@@ -667,6 +700,9 @@ function telegramFailure(c: ApiContext, error: unknown): Response {
 app.post('/me/telegram', async (c) => {
   const claims = await requireUser(c, c.get('claims'));
   if (claims instanceof Response) return claims;
+  if (reauthRequired(claims)) {
+    return c.json({ error: 'Войдите заново, чтобы изменить способ входа', code: 'reauth_required' }, 403);
+  }
   const supabase = serviceClient(c);
   if (supabase instanceof Response) return supabase;
   if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
@@ -681,6 +717,10 @@ app.post('/me/telegram', async (c) => {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return c.json({ error: 'Неверные данные' }, 400);
   const telegram = await verifyTelegram((body as { auth?: unknown }).auth, c.env.TELEGRAM_BOT_TOKEN, Date.now(), 3_600_000);
   if (!telegram) return c.json({ error: 'Неверная подпись Telegram' }, 401);
+  const auth = (body as { auth: { hash: string } }).auth;
+  const claimed = await replayClaim(supabase, `tg:${auth.hash.toLowerCase()}`, 4200);
+  if (claimed === null) return c.json({ error: 'Сервис недоступен' }, 503);
+  if (!claimed) return c.json({ error: 'Подтверждение Telegram уже использовано. Войдите через Telegram ещё раз' }, 401);
   try {
     await linkTelegram(supabase, claims.sub, telegram);
     return c.json({ ok: true });
@@ -692,6 +732,9 @@ app.post('/me/telegram', async (c) => {
 app.delete('/me/telegram', async (c) => {
   const claims = await requireUser(c, c.get('claims'));
   if (claims instanceof Response) return claims;
+  if (reauthRequired(claims)) {
+    return c.json({ error: 'Войдите заново, чтобы изменить способ входа', code: 'reauth_required' }, 403);
+  }
   const supabase = serviceClient(c);
   if (supabase instanceof Response) return supabase;
   try {
@@ -703,6 +746,9 @@ app.delete('/me/telegram', async (c) => {
 });
 
 app.post('/auth/telegram', async (c) => {
+  if (await rateLimited(c.env.TELEGRAM_LOGIN_LIMITER, c.req.header('CF-Connecting-IP') || 'unknown')) {
+    return c.json({ error: 'Слишком много запросов' }, 429);
+  }
   const supabase = serviceClient(c);
   if (supabase instanceof Response) return supabase;
   if (!c.env.TELEGRAM_BOT_TOKEN) return c.json({ error: 'Сервис недоступен' }, 503);
@@ -719,6 +765,9 @@ app.post('/auth/telegram', async (c) => {
   const telegram = await verifyTelegram(input.auth, c.env.TELEGRAM_BOT_TOKEN, Date.now(), 3_600_000);
   if (!telegram) return c.json({ error: 'Неверная подпись Telegram' }, 401);
   const auth = input.auth as Record<string, unknown>;
+  const claimed = await replayClaim(supabase, `tg:${String(auth.hash).toLowerCase()}`, 4200);
+  if (claimed === null) return c.json({ error: 'Сервис недоступен' }, 503);
+  if (!claimed) return c.json({ error: 'Подтверждение Telegram уже использовано. Войдите через Telegram ещё раз' }, 401);
   try {
     const token_hash = await telegramLogin(supabase, {
       ...telegram,
@@ -738,10 +787,21 @@ app.post('/hooks/sanity', async (c) => {
   }
   const body = await limitedBody(c, 256 * 1024);
   if (body instanceof Response) return body;
+  const signature = c.req.header('sanity-webhook-signature') || null;
   const valid = await verifySanityWebhook(
-    body, c.req.header('sanity-webhook-signature') || null, c.env.SANITY_WEBHOOK_SECRET,
+    body, signature, c.env.SANITY_WEBHOOK_SECRET,
   );
   if (!valid) return c.json({ error: 'Неверная подпись Sanity' }, 401);
+
+  const supabase = serviceClient(c);
+  let replayKey: string | null = null;
+  if (!(supabase instanceof Response)) {
+    const match = /^t=\d+[, ]+v1=([A-Za-z0-9_-]+)$/.exec(signature!.trim());
+    const key = `sanity:${match![1]}`;
+    const claimed = await replayClaim(supabase, key, 600);
+    if (claimed === false) return c.json({ ok: true, duplicate: true });
+    if (claimed) replayKey = key;
+  }
 
   let document: unknown;
   try {
@@ -757,6 +817,10 @@ app.post('/hooks/sanity', async (c) => {
       ...(typeof data._id === 'string' ? { id: data._id } : {}),
     });
   } catch {
+    // Сборка не запущена: снимаем отметку, чтобы повторная доставка Sanity не считалась дублем
+    if (replayKey && !(supabase instanceof Response)) {
+      try { await supabase.from('replay_guard').delete().eq('key', replayKey); } catch {}
+    }
     return c.json({ error: 'Не удалось запустить сборку' }, 502);
   }
   return c.json({ ok: true });

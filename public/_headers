@@ -4,3 +4,9 @@ https://:project.pages.dev/*
   X-Robots-Tag: noindex
 https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex
+
+# Защита от встраивания во фрейм (кликджекинг), подмены <base> и плагинов; HTTPS закрепляется на год
+/*
+  Content-Security-Policy: frame-ancestors 'self'; base-uri 'self'; object-src 'none'
+  X-Frame-Options: SAMEORIGIN
+  Strict-Transport-Security: max-age=31536000

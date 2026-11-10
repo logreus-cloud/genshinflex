@@ -4,8 +4,8 @@ export type TitleClient = Pick<SupabaseClient, 'from' | 'rpc'>;
 
 export class TitleError extends Error {
   // Без parameter properties: тесты запускаются через node --experimental-strip-types
-  readonly status: 400 | 404 | 409;
-  constructor(message: string, status: 400 | 404 | 409) {
+  readonly status: 400 | 404 | 409 | 413;
+  constructor(message: string, status: 400 | 404 | 409 | 413) {
     super(message);
     this.status = status;
   }

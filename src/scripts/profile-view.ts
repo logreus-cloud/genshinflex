@@ -1,3 +1,4 @@
+import { SUPABASE_URL } from '../lib/platform';
 import { BASE, t } from './search';
 import type { MediaKey } from './profile-media';
 import type { Entry } from './common';
@@ -19,7 +20,9 @@ type MediaSource = (key: MediaKey) => string | null;
 type EffectView = ReturnType<typeof createEffect>;
 
 export const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', label = '') => { const node = document.createElement(tag); node.className = className; node.textContent = label; return node; };
-export const iconUrl = (value: unknown) => { if (typeof value !== 'string') return null; try { const url = new URL(value, location.origin); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } };
+// Иконки персонажей и предметов сайт берёт с enka.network и gi.yatta.moe
+const ICON_ORIGINS = new Set([location.origin, new URL(SUPABASE_URL).origin, 'https://enka.network', 'https://gi.yatta.moe']);
+export const iconUrl = (value: unknown) => { if (typeof value !== 'string') return null; try { const url = new URL(value, location.origin); return ['http:', 'https:'].includes(url.protocol) && ICON_ORIGINS.has(url.origin) ? url.href : null; } catch { return null; } };
 export const img = (src: string, size: number) => { const node = document.createElement('img'); node.src = src; node.alt = ''; node.width = size; node.height = size; node.loading = 'lazy'; node.decoding = 'async'; return node; };
 export const colors = ['accent', 'pyro', 'hydro', 'anemo', 'electro', 'dendro', 'cryo', 'geo'] as const;
 export const colorNames = ['Золото сайта', 'Пиро', 'Гидро', 'Анемо', 'Электро', 'Дендро', 'Крио', 'Гео'];

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { deleteAccount, exportAccount } from '../src/lib/account.ts';
+import { deleteAccount, exportAccount, reauthRequired } from '../src/lib/account.ts';
 import type { AdminClient } from '../src/lib/account.ts';
 import type { TokenClaims } from '../src/lib/auth.ts';
 
@@ -89,6 +89,14 @@ test('requires a new sign-in when the last authentication is old', async () => {
   const { client, calls } = deletionClient();
   assert.equal(await deleteAccount(client, id, 'DELETE', claims(901), now), 'reauth_required');
   assert.deepEqual(calls, []);
+});
+
+test('проверяет возраст последней аутентификации', () => {
+  assert.equal(reauthRequired(claims(60), now), false);
+  assert.equal(reauthRequired(claims(900), now), false);
+  assert.equal(reauthRequired(claims(901), now), true);
+  assert.equal(reauthRequired({ ...claims(60), amr: [] }, now), true);
+  assert.equal(reauthRequired(claims(-1), now), true);
 });
 
 test('requires the exact confirmation', async () => {

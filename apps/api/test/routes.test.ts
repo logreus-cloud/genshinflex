@@ -98,6 +98,8 @@ test('забаненный пользователь читает профиль,
   assert.equal(response.status, 403);
   assert.deepEqual(await response.json(), { error: 'Аккаунт заблокирован' });
   assert.equal(checks, 1);
+  assert.equal((await send(app, { method: 'GET', path: '/me/export' }, 'user')).status, 403);
+  assert.equal(checks, 2);
 });
 
 test('выгружает данные через подставленный клиент', async () => {
@@ -157,21 +159,116 @@ test('удаляет аккаунт только после подтвержде
   assert.deepEqual(deleted, [userId]);
 });
 
-test('проверяет подпись Telegram перед входом', async () => {
-  const { client } = fakeClient();
-  const app = createApp({ adminClient: () => client, claims });
+async function telegramAuth() {
   const data = { id: '12345', username: 'traveler', auth_date: Math.floor(Date.now() / 1000) };
   const secret = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(botToken));
   const key = await crypto.subtle.importKey('raw', secret, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const text = Object.entries(data).map(([name, value]) => `${name}=${value}`).sort().join('\n');
   const bytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(text));
   const hash = Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
-  const auth = { ...data, hash };
+  return { ...data, hash };
+}
+
+test('требует свежий вход для привязки и отвязки Telegram', async () => {
+  const { client } = fakeClient();
+  const linkedClient = {
+    ...client,
+    rpc: async (name: string) => ({ data: name === 'replay_guard_claim' ? true : 'ok', error: null }),
+  } as typeof client;
+  const app = createApp({ adminClient: () => linkedClient, claims });
+  const auth = await telegramAuth();
+  for (const route of [
+    { method: 'POST', path: '/me/telegram', body: { auth } },
+    { method: 'DELETE', path: '/me/telegram' },
+  ] as Route[]) {
+    const stale = await send(app, route, 'stale');
+    assert.equal(stale.status, 403);
+    assert.deepEqual(await stale.json(), {
+      error: 'Войдите заново, чтобы изменить способ входа', code: 'reauth_required',
+    });
+    const fresh = await send(app, route, 'user');
+    assert.equal(fresh.status, 200);
+    assert.deepEqual(await fresh.json(), { ok: true });
+  }
+});
+
+test('проверяет подпись Telegram и отклоняет повторное подтверждение', async () => {
+  const { client } = fakeClient();
+  const used = new Set<string>();
+  const replayClient = {
+    ...client,
+    rpc: async (name: string, args: { p_key: string }) => {
+      if (name !== 'replay_guard_claim') return { data: 'ok', error: null };
+      const claimed = !used.has(args.p_key);
+      used.add(args.p_key);
+      return { data: claimed, error: null };
+    },
+  } as typeof client;
+  const app = createApp({ adminClient: () => replayClient, claims });
+  const auth = await telegramAuth();
   const invalid = await send(app, { method: 'POST', path: '/auth/telegram', body: { auth: { ...auth, username: 'attacker' } } });
   assert.equal(invalid.status, 401);
   const valid = await send(app, { method: 'POST', path: '/auth/telegram', body: { auth } });
   assert.equal(valid.status, 200);
   assert.deepEqual(await valid.json(), { ok: true, token_hash: 'fake-token-hash' });
+  const repeated = await send(app, { method: 'POST', path: '/auth/telegram', body: { auth } });
+  assert.equal(repeated.status, 401);
+  assert.deepEqual(await repeated.json(), {
+    error: 'Подтверждение Telegram уже использовано. Войдите через Telegram ещё раз',
+  });
+});
+
+test('ограничивает размер JSON в маршруте титула', async () => {
+  const { client } = fakeClient();
+  const app = createApp({ adminClient: () => client, claims });
+  const response = await send(app, {
+    method: 'POST', path: '/me/title', body: { title: 'a'.repeat(8 * 1024) },
+  }, 'user');
+  assert.equal(response.status, 413);
+  assert.deepEqual(await response.json(), { error: 'Слишком большое тело запроса' });
+});
+
+test('повтор вебхука Sanity не запускает сборку снова', async () => {
+  const { client } = fakeClient();
+  let claimsCount = 0;
+  let dispatches = 0;
+  const replayClient = {
+    ...client,
+    rpc: async () => ({ data: ++claimsCount === 1, error: null }),
+  } as typeof client;
+  const app = createApp({ adminClient: () => replayClient });
+  const webhookEnv = {
+    ...env, SANITY_WEBHOOK_SECRET: 'test-secret',
+    GITHUB_REPO: 'owner/repo', GITHUB_DISPATCH_TOKEN: 'test-token',
+  };
+  const body = JSON.stringify({ _type: 'post', _id: 'post-1' });
+  const timestamp = Date.now();
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(webhookEnv.SANITY_WEBHOOK_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
+  );
+  const bytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${timestamp}.${body}`));
+  const v1 = btoa(String.fromCharCode(...new Uint8Array(bytes)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async () => {
+    dispatches++;
+    return new Response(null, { status: 204 });
+  }) as typeof fetch;
+  try {
+    const request = () => app.request('/hooks/sanity', {
+      method: 'POST', headers: { 'sanity-webhook-signature': `t=${timestamp},v1=${v1}` }, body,
+    }, webhookEnv as Env);
+    const first = await request();
+    assert.equal(first.status, 200);
+    assert.deepEqual(await first.json(), { ok: true });
+    const duplicate = await request();
+    assert.equal(duplicate.status, 200);
+    assert.deepEqual(await duplicate.json(), { ok: true, duplicate: true });
+    assert.equal(dispatches, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('повторная выдача с активацией завершает прерванную выдачу', async () => {

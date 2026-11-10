@@ -6918,5 +6918,21 @@
  "Древняя священная гора": {
   "en": "Ancient Sacred Mountain",
   "es": "Antigua Montaña Sagrada"
+ },
+ "Вход в аккаунт {email} по ссылке. Если вы не запрашивали эту ссылку — отмените.": {
+  "en": "Signing in to {email} via a link. If you did not request this link, cancel.",
+  "es": "Inicio de sesión en {email} mediante un enlace. Si no solicitaste este enlace, cancela."
+ },
+ "Продолжить": {
+  "en": "Continue",
+  "es": "Continuar"
+ },
+ "Отменить": {
+  "en": "Cancel",
+  "es": "Cancelar"
+ },
+ "Вход отменён.": {
+  "en": "Sign-in cancelled.",
+  "es": "Inicio de sesión cancelado."
  }
 }

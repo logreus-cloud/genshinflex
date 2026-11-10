@@ -69,7 +69,7 @@ const { base, t } = useData(Astro.currentLocale);
 </Layout>
 
 <script>
-  import { authUrl, getSupabase, onPage, signOut } from '../../../scripts/auth';
+  import { authUrl, getSupabase, markAuthPending, onPage, signOut } from '../../../scripts/auth';
   import { API_URL } from '../../../lib/platform';
   import { notifySessionChanged, onSessionChange } from '../../../scripts/user-data/session';
 
@@ -223,6 +223,7 @@ const { base, t } = useData(Astro.currentLocale);
         try {
           const callback = new URL(authUrl(base, 'callback', `${base}/account/`), location.origin).toString();
           if (!await sameUser(expected)) { refreshAccount(); return; }
+          markAuthPending({ kind: 'user', id: expected });
           const { error } = await getSupabase().auth.linkIdentity({
             provider: button.dataset.link as 'discord' | 'google',
             options: { redirectTo: callback },

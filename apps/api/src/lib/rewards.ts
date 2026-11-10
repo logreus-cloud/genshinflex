@@ -4,8 +4,8 @@ export type RewardClient = Pick<SupabaseClient, 'from'>;
 
 export class RewardError extends Error {
   // Без parameter properties: тесты запускаются через node --experimental-strip-types
-  readonly status: 400 | 404;
-  constructor(message: string, status: 400 | 404) {
+  readonly status: 400 | 404 | 413;
+  constructor(message: string, status: 400 | 404 | 413) {
     super(message);
     this.status = status;
   }

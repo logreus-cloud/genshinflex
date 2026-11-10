@@ -11,9 +11,28 @@ declare class HTMLRewriter {
   transform(response: Response): Response;
 }
 
-interface Ctx { request: Request; next: () => Promise<Response>; env: { ASSETS: { fetch: typeof fetch } } }
+interface Ctx { request: Request; next: () => Promise<Response>; env: { ASSETS: { fetch: typeof fetch } }; waitUntil?: (p: Promise<unknown>) => void }
 
-export async function onRequest({ request, next, env }: Ctx) {
+const storePage = async (
+  response: Response, cache: Cache | undefined, key: Request | undefined, ttl: number,
+  waitUntil?: (p: Promise<unknown>) => void,
+) => {
+  if (cache && key) {
+    const copy = new Response(response.clone().body, { status: response.status, headers: response.headers });
+    copy.headers.set('Cache-Control', `public, s-maxage=${ttl}`);
+    const pending = cache.put(key, copy).catch(() => undefined);
+    if (waitUntil) waitUntil(pending);
+    else await pending;
+  }
+  return response;
+};
+const browserPage = (response: Response) => {
+  const headers = new Headers(response.headers);
+  headers.set('Cache-Control', 'public, max-age=60');
+  return new Response(response.body, { status: response.status, headers });
+};
+
+export async function onRequest({ request, next, env, waitUntil }: Ctx) {
   const url = new URL(request.url);
   if (url.hostname === 'www.genshinflex.com') {
     url.hostname = 'genshinflex.com';
@@ -27,9 +46,15 @@ export async function onRequest({ request, next, env }: Ctx) {
     });
   }
 
+  const cache = request.method === 'GET' && !request.headers.has('Cookie') && !request.headers.has('Authorization') && typeof caches !== 'undefined'
+    ? (caches as unknown as { default?: Cache }).default : undefined;
+  const key = cache ? new Request(new URL(url.pathname.replace(/\/?$/, '/'), url.origin).toString()) : undefined;
+
   const match = url.pathname.match(/^\/(?:(en|es)\/)?u\/([^/]+)\/?$/);
   if (match) {
     const prefix = match[1] ? `/${match[1]}` : '';
+    const hit = cache && key ? await cache.match(key).catch(() => undefined) : undefined;
+    if (hit) return browserPage(hit);
     const shell = await env.ASSETS.fetch(new URL(`${prefix}/u/`, request.url));
     const headers = new Headers(shell.headers);
     headers.set('Cache-Control', 'public, max-age=60');
@@ -43,7 +68,7 @@ export async function onRequest({ request, next, env }: Ctx) {
       if (!response.ok) throw new Error();
       const rows: unknown = await response.json();
       if (!Array.isArray(rows)) throw new Error();
-      if (!rows.length) return page(404);
+      if (!rows.length) return storePage(page(404), cache, key, 30, waitUntil);
       const row = rows[0] as { nickname?: unknown; display_name?: unknown; custom?: unknown };
       const custom = row.custom && typeof row.custom === 'object' && !Array.isArray(row.custom) ? row.custom as { nick?: unknown; about?: unknown } : {};
       const name = (typeof custom.nick === 'string' && custom.nick) || (typeof row.display_name === 'string' && row.display_name) || String(row.nickname || nick);
@@ -52,7 +77,7 @@ export async function onRequest({ request, next, env }: Ctx) {
         match[1] === 'es' ? `Perfil del jugador ${name} en GenshinFlex.` : `Профиль игрока ${name} на GenshinFlex.`;
       const description = (typeof custom.about === 'string' && custom.about ? custom.about : fallback).slice(0, 160);
       const canonical = new URL(url.pathname.replace(/\/?$/, '/'), url.origin).toString();
-      return new HTMLRewriter()
+      return storePage(new HTMLRewriter()
         .on('title', { element(element) { element.setInnerContent(title, { html: false }); } })
         .on('meta[property="og:title"]', { element(element) { element.setAttribute('content', title); } })
         .on('meta[name="twitter:title"]', { element(element) { element.setAttribute('content', title); } })
@@ -60,16 +85,19 @@ export async function onRequest({ request, next, env }: Ctx) {
         .on('meta[property="og:description"]', { element(element) { element.setAttribute('content', description); } })
         .on('link[rel="canonical"]', { element(element) { element.setAttribute('href', canonical); } })
         .on('meta[property="og:url"]', { element(element) { element.setAttribute('content', canonical); } })
-        .transform(page(200));
+        .transform(page(200)), cache, key, 60, waitUntil);
     } catch { return page(200); }
   }
-  const forum = url.pathname.match(/^\/(?:(en|es)\/)?forum\/t\/(\d+)\/?$/);
+  const forum = url.pathname.match(/^\/(?:(en|es)\/)?forum\/t\/([^/]+)\/?$/);
   if (forum) {
     const prefix = forum[1] ? `/${forum[1]}` : '';
+    const hit = cache && key ? await cache.match(key).catch(() => undefined) : undefined;
+    if (hit) return browserPage(hit);
     const shell = await env.ASSETS.fetch(new URL(`${prefix}/forum/t/`, request.url));
     const headers = new Headers(shell.headers);
     headers.set('Cache-Control', 'public, max-age=60');
     const page = (status: number) => new Response(shell.body, { status, headers });
+    if (!/^\d{1,15}$/.test(forum[2])) return storePage(page(404), cache, key, 30, waitUntil);
     const rpc = async (name: string, body: Record<string, unknown>) => {
       const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
         method: 'POST',
@@ -82,13 +110,13 @@ export async function onRequest({ request, next, env }: Ctx) {
     };
     try {
       const thread = (await rpc('forum_thread', { p_id: Number(forum[2]) }))[0];
-      if (!thread) return page(404);
+      if (!thread) return storePage(page(404), cache, key, 30, waitUntil);
       const post = (await rpc('forum_posts', { p_thread: Number(forum[2]), p_limit: 1 }))[0];
       const snippet = String(post?.body ?? '').replace(/\|\|[\s\S]*?\|\|/g, '[спойлер]').replace(/```[\s\S]*?```/g, ' ').replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, '$1').replace(/(?:^|\n)[>*-] ?/g, ' ').replace(/[*_~`]/g, '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
       const forumLabel = forum[1] === 'en' ? 'Forum' : forum[1] === 'es' ? 'Foro' : 'Форум';
       const title = `${String(thread.title)} — ${forumLabel} GenshinFlex`;
       const canonical = new URL(`/forum/t/${Number(forum[2])}/`, url.origin).toString();
-      return new HTMLRewriter()
+      return storePage(new HTMLRewriter()
         .on('meta[name="robots"]', { element(element) { element.remove(); } })
         .on('link[rel="alternate"][hreflang]', { element(element) { element.remove(); } })
         .on('title', { element(element) { element.setInnerContent(title, { html: false }); } })
@@ -96,7 +124,7 @@ export async function onRequest({ request, next, env }: Ctx) {
         .on('meta[name="description"], meta[property="og:description"]', { element(element) { element.setAttribute('content', snippet); } })
         .on('link[rel="canonical"]', { element(element) { element.setAttribute('href', canonical); } })
         .on('meta[property="og:url"]', { element(element) { element.setAttribute('content', canonical); } })
-        .transform(page(200));
+        .transform(page(200)), cache, key, 60, waitUntil);
     } catch { headers.set('Cache-Control', 'no-store'); headers.set('Retry-After', '120'); return page(503); }
   }
   return next();

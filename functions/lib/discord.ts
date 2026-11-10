@@ -11,12 +11,29 @@ export interface DiscordEnv {
 type Message = { url: string; body: object };
 const SITE = 'https://genshinflex.com';
 const GOLD = 0xE3B04B;
+export function escapeMarkdown(value: string): string {
+  return value.replace(/[\\*_~`|>\[\]()#@]/g, '\\$&');
+}
 const clip = (value: string, limit: number) => {
   const chars = Array.from(value);
-  return chars.length <= limit ? value : `${chars.slice(0, limit - 1).join('')}…`;
+  if (chars.length <= limit) return value;
+  const cut = chars.slice(0, limit - 1);
+  let slashes = 0;
+  for (let i = cut.length - 1; cut[i] === '\\'; i--) slashes++;
+  if (slashes % 2) cut.pop();
+  return `${cut.join('')}…`;
 };
-const pageValue = (page: string | null) =>
-  page ? page.startsWith('/') ? `${SITE}${page}` : page : 'Не указана';
+const pageValue = (page: string | null) => {
+  if (!page) return 'Не указана';
+  // Только адрес своего сайта и в угловых скобках: так Discord не разбирает в нём разметку и не строит ссылку с чужой подписью
+  try {
+    const url = new URL(page, SITE);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return 'Не указана';
+    if (url.origin !== new URL(SITE).origin) return 'Не указана';
+    const value = `<${url.toString().replace(/[<>\s]/g, encodeURIComponent)}>`;
+    return value.length > 1024 ? 'Не указана' : value;
+  } catch { return 'Не указана'; }
+};
 const tags = (...ids: (string | undefined)[]) => ids.filter((id): id is string => Boolean(id));
 const title = (label: string, id?: number) => `${label}${id == null ? '' : ` #${id}`}`;
 
@@ -40,7 +57,7 @@ export function feedbackMessages(
       allowed_mentions: { parse: [] },
       embeds: [{
         title: clip(`Отзыв${item.id == null ? '' : ` #${item.id}`}: ${kind.name}`, 256),
-        description: clip(item.message, 4096),
+        description: clip(escapeMarkdown(item.message), 4096),
         color: kind.color,
         fields: [{ name: 'Страница', value: page }],
         footer: { text: 'Контакт — в админке' },
@@ -58,12 +75,13 @@ export function feedbackMessages(
     messages.push({
       url: forum,
       body: {
-        thread_name: clip(`${kind.thread}: ${Array.from(item.message).slice(0, 60).join('')}`, 100),
+        // Название треда — обычный текст, разметку в нём Discord не разбирает
+        thread_name: clip(`${kind.thread}: ${clip(item.message, 60)}`, 100),
         // id тегов у каждого форума свои: «Новый» (DISCORD_TAG_NEW) есть только в форуме багов
         applied_tags: item.kind === 'idea' ? tags(tag) : tags(env.DISCORD_TAG_NEW, tag),
         allowed_mentions: { parse: [] },
         embeds: [{
-          description: clip(item.message, 4096),
+          description: clip(escapeMarkdown(item.message), 4096),
           color: kind.color,
           fields: [{ name: 'Страница', value: page }],
           footer: { text: 'Отправлено через форму на сайте' },
@@ -81,11 +99,11 @@ export function guideMessages(
   if (!env.DISCORD_WEBHOOK_TEAM) return [];
   const kinds: Record<string, string> = { char: 'Персонаж', weapon: 'Оружие', endgame: 'Эндгейм' };
   const fields = [
-    { name: 'Что', value: clip(`${kinds[item.kind] ?? item.kind}: ${item.target}`, 1024) },
+    { name: 'Что', value: clip(escapeMarkdown(`${kinds[item.kind] ?? item.kind}: ${item.target}`), 1024) },
     { name: 'Тип', value: item.mode === 'edit' ? 'Правка' : 'Новый' },
-    { name: 'Автор', value: clip(item.author, 1024) },
+    { name: 'Автор', value: clip(escapeMarkdown(item.author), 1024) },
   ];
-  if (item.comment) fields.push({ name: 'Комментарий', value: clip(item.comment, 1024) });
+  if (item.comment) fields.push({ name: 'Комментарий', value: clip(escapeMarkdown(item.comment), 1024) });
   return [{
     url: env.DISCORD_WEBHOOK_TEAM,
     body: {

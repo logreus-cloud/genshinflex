@@ -28,8 +28,12 @@ export async function onRequestGet({ request, env, data }: Ctx) {
 }
 
 export async function onRequestPost({ request, env }: Ctx) {
+  if (request.headers.get('Origin') !== new URL(request.url).origin
+    || !request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) return json({ error: 'Нет доступа' }, 403);
   const body = (await request.json().catch(() => null)) as { type?: string; id?: number; status?: string } | null;
   if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Не удалось прочитать запрос' }, 400);
+  if (typeof body.id !== 'number' && typeof body.id !== 'string') return json({ error: 'Нет номера' }, 400);
+  if (typeof body.id === 'string') body.id = Number(body.id);
   const id = body.id;
   if (typeof id !== 'number' || !Number.isSafeInteger(id) || id <= 0) return json({ error: 'Нет номера' }, 400);
   if (body.type === 'guide' && GUIDE_STATUS.has(body.status ?? '')) {

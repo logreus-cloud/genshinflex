@@ -22,7 +22,7 @@ const { base, t } = useData(Astro.currentLocale);
 </Layout>
 
 <script>
-  import { authUrl, getSupabase, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
+  import { authUrl, getSupabase, markAuthPending, mountCaptcha, onPage, pageNext } from '../../../scripts/auth';
   onPage('#forgot', (root) => {
     root.querySelector<HTMLAnchorElement>('[data-page]')!.href = authUrl(root.dataset.base || '', 'login', pageNext());
     const form = root.querySelector('form')!;
@@ -41,10 +41,12 @@ const { base, t } = useData(Astro.currentLocale);
       try {
         if (!captcha) throw new Error('captcha');
         const email = String((form.elements.namedItem('email') as HTMLInputElement).value).trim();
-        await getSupabase().auth.resetPasswordForEmail(email, {
+        const { error } = await getSupabase().auth.resetPasswordForEmail(email, {
           redirectTo: new URL(authUrl(root.dataset.base || '', 'reset'), location.origin).toString(),
           captchaToken: captcha.token(),
         });
+        if (error) throw error;
+        markAuthPending({ kind: 'email', email });
         status.textContent = root.dataset.sent || '';
         status.className = 'status small ok';
       } catch (error) {

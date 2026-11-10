@@ -4,6 +4,8 @@ export interface Env {
   SUPABASE_ANON_KEY: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
   SUPABASE_JWT_SECRET?: string;
+  TELEGRAM_LOGIN_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
+  EXPORT_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
   TELEGRAM_BOT_TOKEN: string;
   SANITY_PROJECT_ID: string;
   SANITY_DATASET: string;

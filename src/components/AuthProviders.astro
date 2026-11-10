@@ -17,7 +17,7 @@ const { base, lang, t } = useData(Astro.currentLocale);
 
 <script>
   import { API_URL } from '../lib/platform';
-  import { authUrl, getSupabase, onPage, pageNext } from '../scripts/auth';
+  import { authUrl, getSupabase, markAuthPending, onPage, pageNext } from '../scripts/auth';
   import { notifySessionChanged } from '../scripts/user-data/session';
 
   declare global {
@@ -36,6 +36,7 @@ const { base, lang, t } = useData(Astro.currentLocale);
         button.disabled = true;
         try {
           const callback = new URL(authUrl(base, 'callback', next), location.origin).toString();
+          markAuthPending({ kind: 'oauth' });
           const { error: authError } = await getSupabase().auth.signInWithOAuth({
             provider: button.dataset.provider as 'discord' | 'google',
             options: { redirectTo: callback },
