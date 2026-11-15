@@ -4,8 +4,8 @@
     {
       "id": "ann-21988",
       "kind": "version",
-      "start": "2026-11-03T18:00",
-      "end": "2026-12-15T17:00",
+      "start": "2026-11-04T00:00",
+      "end": "2026-12-15T23:00",
       "image": "https://sdk.hoyoverse.com/upload/ann/2026/11/02/b143065e5a3273202f4796ab5943eb99_7972061260441773084_transformed.jpg",
       "title": {
         "en": "Version 7.2 Update Details",
@@ -17,7 +17,7 @@
     {
       "id": "ann-21168",
       "kind": "event",
-      "start": "2026-11-08T23:00",
+      "start": "2026-11-09T05:00",
       "end": "2026-12-15T03:59",
       "image": "https://sdk.hoyoverse.com/upload/ann/2025/10/23/40da7ab1ce17afd008e7a10c6ee6e67b_3372052251159312794_transformed.jpg",
       "title": {
@@ -29,8 +29,8 @@
     {
       "id": "ann-21969",
       "kind": "event",
-      "start": "2026-11-01T23:00",
-      "end": "2026-12-15T18:00",
+      "start": "2026-11-02T05:00",
+      "end": "2026-12-16T00:00",
       "image": "https://sdk.hoyoverse.com/upload/ann/2026/10/22/24d48be1e7998ca6e5f43f6771aedff5_2455336246588177925_transformed.png",
       "title": {
         "en": "The Grand Defense: Defy the Unjust Judgment",
@@ -41,7 +41,7 @@
     {
       "id": "ann-21970",
       "kind": "event",
-      "start": "2026-11-01T23:00",
+      "start": "2026-11-02T05:00",
       "end": "2026-12-15T14:59",
       "image": "https://sdk.hoyoverse.com/upload/ann/2026/10/22/087457d4e71c622ef4310ac47ceaefbd_37499916569621753_transformed.png",
       "title": {
@@ -53,7 +53,7 @@
     {
       "id": "ann-21973",
       "kind": "event",
-      "start": "2026-11-01T23:00",
+      "start": "2026-11-02T05:00",
       "end": "2026-11-18T23:59",
       "image": "https://sdk.hoyoverse.com/upload/ann/2026/10/22/7315906b39d517cbdc148e650c926c65_5837513735044723651_transformed.png",
       "title": {
@@ -65,7 +65,7 @@
     {
       "id": "ann-21972",
       "kind": "event",
-      "start": "2026-11-01T23:00",
+      "start": "2026-11-02T05:00",
       "end": "2026-12-15T14:59",
       "image": "https://sdk.hoyoverse.com/upload/ann/2026/10/22/537714f9a2caf9483166a9145e1998fe_2394825375141082324_transformed.png",
       "title": {
@@ -77,7 +77,7 @@
     {
       "id": "ann-21974",
       "kind": "event",
-      "start": "2026-11-01T23:00",
+      "start": "2026-11-02T05:00",
       "end": "2026-12-14T03:59",
       "image": "https://sdk.hoyoverse.com/upload/ann/2026/10/22/f386a39d6c016a8e9713fefde65263e0_7946567089703729544_transformed.png",
       "title": {
@@ -89,8 +89,8 @@
     {
       "id": "ann-20834",
       "kind": "event",
-      "start": "2026-11-01T23:00",
-      "end": "2026-12-15T18:00",
+      "start": "2026-11-02T05:00",
+      "end": "2026-12-16T00:00",
       "image": "https://sdk.hoyoverse.com/upload/ann/2024/11/05/cf324597e5d687e26d86f297e59c9ebd_2179973999643752178.jpg",
       "title": {
         "en": "Genius Invokation TCG - The Forge Realm's Temper",
