@@ -1,0 +1,23 @@
+---
+import { useData, LANGS } from '../../lib/data';
+import Layout from '../../layouts/Layout.astro';
+export const getStaticPaths = () => LANGS.map((l) => ({ params: { locale: l === 'ru' ? undefined : l } }));
+const { base, t } = useData(Astro.currentLocale);
+---
+<Layout title={t('Страница не найдена')} noindex>
+  <div class="not-found" data-pagefind-ignore="all">
+    <h1>{t('Страница не найдена')}</h1>
+    <p>{t('Такой страницы нет: возможно, адрес изменился или в ссылке опечатка.')}</p>
+    <p>
+      <a href={`${base}/`}>{t('На главную')}</a>
+      · <a href={`${base}/forum/`}>{t('Форум')}</a>
+      · <a href={`${base}/privacy/`}>{t('Политика конфиденциальности')}</a>
+      · <a href={`${base}/feedback/`}>{t('Форма обратной связи')}</a>
+    </p>
+  </div>
+</Layout>
+
+<style>
+  .not-found { max-width: 75ch; overflow-wrap: anywhere; }
+  .not-found h1 { margin-bottom: .3rem; }
+</style>

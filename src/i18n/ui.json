@@ -6934,5 +6934,13 @@
  "Вход отменён.": {
   "en": "Sign-in cancelled.",
   "es": "Inicio de sesión cancelado."
+ },
+ "Страница не найдена": {
+  "en": "Page not found",
+  "es": "Página no encontrada"
+ },
+ "Такой страницы нет: возможно, адрес изменился или в ссылке опечатка.": {
+  "en": "There is no such page: the address may have changed, or the link has a typo.",
+  "es": "Esta página no existe: puede que la dirección haya cambiado o que el enlace tenga un error."
  }
 }

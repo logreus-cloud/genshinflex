@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import i18nReport from './src/i18n/report.mjs';
+import locale404 from './src/integrations/locale-404.mjs';
 
 const build = Date.now().toString(36);
 
@@ -10,6 +11,6 @@ export default defineConfig({
   site: 'https://genshinflex.com',
   // Русский — в корне, английский и испанский — /en/ и /es/
   i18n: { defaultLocale: 'ru', locales: ['ru', 'en', 'es'], routing: { prefixDefaultLocale: false } },
-  integrations: [i18nReport()],
+  integrations: [i18nReport(), locale404()],
   vite: { define: { __GF_BUILD__: JSON.stringify(build) } },
 });
