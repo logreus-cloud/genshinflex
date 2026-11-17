@@ -3582,5 +3582,145 @@
  "Электро или Звёздный блеск нужны в первом бою, Гидро — во втором, Гео и лекарь — в третьем. С зловещей сложности персонажей нельзя повторять: заранее соберите три разных отряда. Страница собрана до старта цикла по официальному анонсу и данным вики — команды уточним после первых прохождений.": {
   "en": "Electro or Stellar Glimmer is needed in fight 1, Hydro in fight 2, Geo and a healer in fight 3. From Menacing difficulty characters cannot be repeated: prepare three different teams in advance. This page was put together before the cycle started, from the official announcement and wiki data — we'll refine the teams after the first clears.",
   "es": "Electro o Destello Estelar se necesitan en el combate 1, Hydro en el 2, y Geo y un sanador en el 3. Desde la dificultad Amenazante no se pueden repetir personajes: prepara tres equipos distintos de antemano. La página se preparó antes del inicio del ciclo con el anuncio oficial y datos de la wiki; ajustaremos los equipos tras las primeras partidas."
+ },
+ "Версия 7.2 — этажи 9–12": {
+  "en": "Version 7.2 — Floors 9–12",
+  "es": "Versión 7.2 — pisos 9–12"
+ },
+ "Благословение Бездны: Сверхпроводник и Звёздный проводник дают заряд; на 3 зарядах — ударная волна с истинным уроном (не чаще раза в 4 с.)": {
+  "en": "Blessing of the Abyss: Superconduct and Stellar-Conduct grant a stack; at 3 stacks a shockwave deals True DMG (at most once every 4s)",
+  "es": "Bendición del Abismo: Superconductor y Superconductor Estelar otorgan un acumulado; con 3 acumulados, una onda expansiva inflige Daño Verdadero (como máximo una vez cada 4 s)"
+ },
+ "Бонус Электро урона +60%": {
+  "en": "Electro DMG Bonus +60%",
+  "es": "Bonificación de Daño Electro +60%"
+ },
+ "Бонус Гео урона +60%": {
+  "en": "Geo DMG Bonus +60%",
+  "es": "Bonificación de Daño Geo +60%"
+ },
+ "1-я половина: урон Лунной кристаллизации +75%": {
+  "en": "1st half: Lunar-Crystallize DMG +75%",
+  "es": "1.ª mitad: Daño de Cristalización Lunar +75%"
+ },
+ "2-я половина: мастерство стихий отряда +200": {
+  "en": "2nd half: party Elemental Mastery +200",
+  "es": "2.ª mitad: Maestría Elemental del equipo +200"
+ },
+ "3 волны по одному врагу; Дракон руин поглощает стихию и крепчает, если бой затянуть": {
+  "en": "3 waves of one enemy each; the Ruin Drake absorbs an element and gets tougher if the fight drags on",
+  "es": "3 oleadas de un enemigo; el Dragón de las Ruinas absorbe un elemento y se fortalece si el combate se alarga"
+ },
+ "по 4 одновременно; сломанный щит оглушает всю четвёрку": {
+  "en": "4 at a time; breaking a shield staggers all four",
+  "es": "de 4 en 4; romper un escudo aturde a los cuatro"
+ },
+ "2 волны, нужен урон по площади": {
+  "en": "2 waves, bring AoE damage",
+  "es": "2 oleadas, hace falta daño en área"
+ },
+ "один враг; удары когтями больно бьют хрупких персонажей": {
+  "en": "single enemy; its claw strikes hit fragile characters hard",
+  "es": "un solo enemigo; sus zarpazos golpean fuerte a los personajes frágiles"
+ },
+ "по 4 одновременно; не берите Крио — отражения к нему неуязвимы": {
+  "en": "4 at a time; skip Cryo — the Reflections are immune to it",
+  "es": "de 4 en 4; no lleves Cryo: los Reflejos son inmunes a él"
+ },
+ "один враг; лунные реакции помогают пропустить вторую полосу HP": {
+  "en": "single enemy; Lunar reactions help skip its second HP bar",
+  "es": "un solo enemigo; las reacciones lunares ayudan a saltarse su segunda barra de vida"
+ },
+ "1-я половина: Навия": {
+  "en": "1st half: Navia",
+  "es": "1.ª mitad: Navia"
+ },
+ "1-я половина: Лунная кристаллизация": {
+  "en": "1st half: Lunar-Crystallize",
+  "es": "1.ª mitad: Cristalización Lunar"
+ },
+ "1-я половина: Цзы Бай и Горо": {
+  "en": "1st half: Zibai and Gorou",
+  "es": "1.ª mitad: Zibai y Gorou"
+ },
+ "2-я половина: Сандроне": {
+  "en": "2nd half: Sandrone",
+  "es": "2.ª mitad: Sandrone"
+ },
+ "2-я половина: Арлекино": {
+  "en": "2nd half: Arlecchino",
+  "es": "2.ª mitad: Arlecchino"
+ },
+ "Бонус Гео урона этажа, без Крио против Ледяных отражений": {
+  "en": "Uses the floor Geo DMG Bonus, no Cryo against the Icebound Reflections",
+  "es": "Aprovecha la bonificación Geo del piso, sin Cryo contra los Reflejos Congelados"
+ },
+ "Бонус Электро урона этажа и благословение": {
+  "en": "Floor Electro DMG Bonus and the blessing",
+  "es": "Bonificación Electro del piso y la bendición"
+ },
+ "один босс; копирует стихию активного персонажа и становится к ней неуязвим — чередуйте стихии": {
+  "en": "single boss; copies the active character's element and becomes immune to it — rotate elements",
+  "es": "un solo jefe; copia el elemento del personaje activo y se vuelve inmune a él: alterna elementos"
+ },
+ "один босс; шкалу храбрости сбивают Электро и Звёздное сияние, лучше всего Звёздный проводник": {
+  "en": "single boss; Electro and Stellar Glimmer drain its Courage gauge, Stellar-Conduct works best",
+  "es": "un solo jefe; Electro y Destello Estelar vacían su barra de valor, Superconductor Estelar es lo mejor"
+ },
+ "один босс; при полной ярости становится неуязвим к стихии, нанёсшей больше урона — опирайтесь на лунные реакции": {
+  "en": "single boss; at full Fury it becomes immune to the element that dealt the most damage — rely on Lunar reactions",
+  "es": "un solo jefe; con la furia llena se vuelve inmune al elemento que más daño hizo: apóyate en reacciones lunares"
+ },
+ "один босс; на 50% HP запирается в ледяном гробу — разбейте его за 16 с., иначе она вылечится. Помогают Звёздное сияние и Пиро": {
+  "en": "single boss; at 50% HP she seals herself in an ice coffin — break it within 16s or she heals. Stellar Glimmer and Pyro help",
+  "es": "un solo jefe; al 50% de vida se encierra en un ataúd de hielo: rómpelo en 16 s o se curará. Ayudan Destello Estelar y Pyro"
+ },
+ "один босс; купол-якорь ломают двуручники, кокон снимается лечением до полного HP": {
+  "en": "single boss; claymores break the Anchor dome, the Cocoon goes away when healed to full HP",
+  "es": "un solo jefe; los mandobles rompen la cúpula del Ancla, el capullo desaparece al curar la vida al máximo"
+ },
+ "один босс; высокое сопротивление физ. урону, бейте подсвеченного Стража руин — это оглушает массив": {
+  "en": "single boss; high Physical RES, hit the highlighted Ruin Sentinel to stun the Array",
+  "es": "un solo jefe; alta RES Física, golpea al Centinela de las Ruinas resaltado para aturdir la Maquinaria"
+ },
+ "Главный выбор: аномалия этажа даёт +75% урона Лунной кристаллизации": {
+  "en": "Top pick: the floor disorder gives Lunar-Crystallize +75% DMG",
+  "es": "Mejor opción: la anomalía del piso da +75% de daño a la Cristalización Lunar"
+ },
+ "Если нет Цзы Бай: двуручник ломает купол геккона": {
+  "en": "If you don't have Zibai: the claymore breaks the gecko's dome",
+  "es": "Si no tienes a Zibai: el mandoble rompe la cúpula del geco"
+ },
+ "Главный выбор: сбивает шкалу Удерживающего волны и запускает благословение": {
+  "en": "Top pick: drains the Wavebinder's gauge and triggers the blessing",
+  "es": "Mejor opción: vacía la barra del Anclamareas y activa la bendición"
+ },
+ "Пиро помогает разбить ледяной гроб Разящей вьюги": {
+  "en": "Pyro helps break the Guardian Blade's ice coffin",
+  "es": "Pyro ayuda a romper el ataúd de hielo de la Espadachina Protectora"
+ },
+ "Нужны Гео и Гидро: этаж даёт +75% урона Лунной кристаллизации, а запускают её Цзы Бай, Линнея и Коломбина. Против геккона возьмите хилера и двуручника, против Призматического слайма чередуйте стихии.": {
+  "en": "Bring Geo and Hydro: the floor gives Lunar-Crystallize +75% DMG, and Zibai, Linnea and Columbina enable it. Bring a healer and a claymore for the gecko, and rotate elements against the Prism Slime.",
+  "es": "Lleva Geo e Hydro: el piso da +75% de daño a la Cristalización Lunar, que activan Zibai, Linnea y Columbina. Contra el geco lleva un sanador y un mandoble; contra el Slime Iridiscente alterna elementos."
+ },
+ "Нужны Электро и Крио: Звёздный проводник сбивает шкалу Удерживающего волны, ломает ледяной гроб Разящей вьюги и копит заряды благословения. Этаж даёт отряду +200 мастерства стихий; физический урон против механического массива не берите.": {
+  "en": "Bring Electro and Cryo: Stellar-Conduct drains the Wavebinder's gauge, breaks the Guardian Blade's ice coffin and builds blessing stacks. The floor gives the party +200 Elemental Mastery; skip Physical damage against the Mechanical Array.",
+  "es": "Lleva Electro y Cryo: el Superconductor Estelar vacía la barra del Anclamareas, rompe el ataúd de hielo de la Espadachina Protectora y acumula cargas de la bendición. El piso da +200 de Maestría Elemental al equipo; no lleves daño Físico contra la Maquinaria Eterna."
+ },
+ "Fandom — Витая Бездна, 16.11.2026": {
+  "en": "Fandom — Spiral Abyss, 2026-11-16",
+  "es": "Fandom — Abismo de Espiral, 16/11/2026"
+ },
+ "Insider Gaming — этажи 11 и 12": {
+  "en": "Insider Gaming — Floors 11 and 12",
+  "es": "Insider Gaming — pisos 11 y 12"
+ },
+ "Timesaver — этаж 12": {
+  "en": "Timesaver — Floor 12",
+  "es": "Timesaver — piso 12"
+ },
+ "U7BUY — Бездна 7.2": {
+  "en": "U7BUY — Spiral Abyss 7.2",
+  "es": "U7BUY — Abismo de Espiral 7.2"
  }
 }

@@ -1,0 +1,610 @@
+{
+  "mode": "abyss",
+  "version": "7.1",
+  "cycle": "Версия 7.1 — этажи 9–12",
+  "start": "2026-10-16",
+  "end": "2026-11-16",
+  "tags": [
+    "Звёздное сияние",
+    "Крио"
+  ],
+  "buffs": [
+    "Благословение Бездны: Сверхпроводник, Звёздный проводник, Крио-рассеивание, Звёздное рассеивание, Заморозка и Раскол вызывают ударную волну с истинным уроном (раз в 2 с.)"
+  ],
+  "floors": [
+    {
+      "floor": 9,
+      "levels": "72–76",
+      "disorder": [
+        "Урон Звёздного рассеивания +50%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 9-1",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Halberd-Knight"
+                },
+                {
+                  "id": "Winged Soarer Knight"
+                }
+              ],
+              "note": "15 врагов, 3 волны"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 9-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Winged Halberd-Knight"
+                },
+                {
+                  "id": "Volkodlak Basher"
+                }
+              ],
+              "note": "12 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser",
+                  "n": 2
+                }
+              ],
+              "note": "появляются по очереди"
+            }
+          ]
+        },
+        {
+          "name": "Зал 9-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Rugged Elder Leshy"
+                },
+                {
+                  "id": "Juvenile Tree Segment"
+                }
+              ],
+              "note": "5 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Cutting Edge Fire Support Ground Effect Landcruiser"
+                },
+                {
+                  "id": "Cutting Edge All-Purpose Storm Landcruiser"
+                }
+              ],
+              "note": "появляются одновременно"
+            }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздное рассеивание",
+          "members": [
+            "yumemizuki-mizuki",
+            "odette",
+            "sucrose",
+            "alyosha"
+          ],
+          "note": "Прямо под аномалию этажа"
+        },
+        {
+          "name": "1-я половина: без 5★",
+          "members": [
+            "traveler-cryo",
+            "sucrose",
+            "faruzan",
+            "diona"
+          ],
+          "note": "Бесплатный вариант Звёздного рассеивания"
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ]
+        },
+        {
+          "name": "2-я половина: Перегрузка без 5★",
+          "members": [
+            "razor",
+            "fischl",
+            "bennett",
+            "xiangling"
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 10,
+      "levels": "80–85",
+      "disorder": [
+        "Урон Звёздного проводника +50%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 10-1",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Volkodlak Lobber"
+                },
+                {
+                  "id": "Volkodlak Raider"
+                }
+              ],
+              "note": "15 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 10-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Leomastiff Guard"
+                },
+                {
+                  "id": "Channel Contact"
+                }
+              ],
+              "note": "8 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya",
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Зал 10-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Glaciomancer"
+                },
+                {
+                  "id": "Glacial Warden"
+                }
+              ],
+              "note": "5 врагов"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya"
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper"
+                },
+                {
+                  "id": "Oprichniki Medic"
+                }
+              ],
+              "note": "5 врагов"
+            }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздный проводник",
+          "members": [
+            "sandrone",
+            "odette",
+            "qiqi",
+            "yae-miko"
+          ],
+          "note": "Прямо под аномалию этажа"
+        },
+        {
+          "name": "1-я половина: Мавуика",
+          "members": [
+            "mavuika",
+            "citlali",
+            "xilonen",
+            "bennett"
+          ],
+          "note": "Пиро быстро снимает щиты Стражника льдов в зале 10-3"
+        },
+        {
+          "name": "2-я половина: Лунный заряд",
+          "members": [
+            "flins",
+            "columbina",
+            "ineffa",
+            "sucrose"
+          ]
+        },
+        {
+          "name": "2-я половина: Лунная бутонизация",
+          "members": [
+            "nefer",
+            "lauma",
+            "columbina",
+            "kuki-shinobu"
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 11,
+      "levels": "88–92",
+      "disorder": [
+        "1-я половина: бонус Анемо урона +60%",
+        "2-я половина: бонус Крио урона +60%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 11-1",
+          "stars": "Прочность монолита выше 20 / 40 / 60%",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Grenadier",
+                  "n": 4
+                },
+                {
+                  "id": "Oprichniki Line Trooper",
+                  "n": 8
+                },
+                {
+                  "id": "Close Combat Storm Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Force Recon Scout Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Close Combat Scout Landcruiser",
+                  "n": 2
+                },
+                {
+                  "id": "Force Recon Ground Effect Landcruiser",
+                  "n": 6
+                }
+              ],
+              "note": "защита монолита, 8 волн по 3 врага"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Large Hydro Slime",
+                  "n": 24
+                }
+              ],
+              "note": "защита монолита: нужен сбор врагов или провокация и частое Крио"
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-2",
+          "stars": "Осталось больше 60 / 180 / 300 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Hydro Hilichurl Rogue",
+                  "n": 2
+                },
+                {
+                  "id": "Radiant Bladehorn"
+                }
+              ],
+              "note": "кокон Лучезарного мечерога снимается лечением"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Rockfond Rifthound"
+                },
+                {
+                  "id": "Thundercraven Rifthound"
+                }
+              ],
+              "note": "4 врага, 2 волны; нужен хилер против разъедания"
+            }
+          ]
+        },
+        {
+          "name": "Зал 11-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Oprichniki Thunderblitz Gvardiya"
+                },
+                {
+                  "id": "Oprichniki Fireblade Shock Trooper"
+                },
+                {
+                  "id": "Radiant Antelope"
+                }
+              ]
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Millennial Pearl Seahorse"
+                }
+              ],
+              "note": "жемчужину снимают Крио-атаки или Звёздный проводник"
+            }
+          ]
+        }
+      ],
+      "teams": [
+        {
+          "name": "1-я половина: Звёздное рассеивание",
+          "members": [
+            "vesna",
+            "faruzan",
+            "traveler-cryo",
+            "qiqi"
+          ],
+          "note": "Бонус Анемо урона этажа и благословение"
+        },
+        {
+          "name": "1-я половина: Мидзуки",
+          "members": [
+            "yumemizuki-mizuki",
+            "odette",
+            "sucrose",
+            "alyosha"
+          ],
+          "note": "Сахароза собирает врагов у монолита"
+        },
+        {
+          "name": "2-я половина: Крио Скирк",
+          "members": [
+            "skirk",
+            "escoffier",
+            "furina",
+            "vodyanitsa"
+          ],
+          "note": "Бонус Крио урона этажа ровно под неё"
+        },
+        {
+          "name": "2-я половина: Звёздный проводник",
+          "members": [
+            "sandrone",
+            "odette",
+            "yae-miko",
+            "qiqi"
+          ]
+        }
+      ]
+    },
+    {
+      "floor": 12,
+      "levels": "95–100",
+      "disorder": [
+        "1-я половина: урон реакций Звёздного сияния +75%",
+        "2-я половина: бонус Крио урона +75%"
+      ],
+      "chambers": [
+        {
+          "name": "Зал 12-1",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Furiosa"
+                }
+              ],
+              "note": "один босс; бейте корни, как только появляются"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Iniquitous Baptist"
+                },
+                {
+                  "id": "Shadowy Husk: Standard Bearer"
+                },
+                {
+                  "id": "Shadowy Husk: Defender"
+                }
+              ],
+              "note": "Креститель меняет щиты Электро → Гидро → Пиро; их снимают Заморозка и Звёздный проводник"
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-2",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Radiant Moonfly"
+                }
+              ],
+              "note": "один босс; кокон снимается лечением"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Hiljetta"
+                }
+              ],
+              "note": "один босс; посреди боя надевает доспех — его ломают Заморозка или Перегрузка"
+            }
+          ]
+        },
+        {
+          "name": "Зал 12-3",
+          "stars": "Осталось больше 180 / 300 / 420 с.",
+          "halves": [
+            {
+              "enemies": [
+                {
+                  "id": "Chimeric Winged Lion"
+                }
+              ],
+              "note": "один босс; сначала снимите Электро-щит"
+            },
+            {
+              "enemies": [
+                {
+                  "id": "Secret Source Automaton: Overseer Device"
+                }
+              ],
+              "note": "один босс; заряд сбивает частота Крио-ударов, а не урон"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "teams": [
+    {
+      "name": "1-я половина: Звёздное рассеивание",
+      "members": [
+        "vesna",
+        "odette",
+        "faruzan",
+        "vodyanitsa"
+      ],
+      "note": "Бафф этажа на Звёздное сияние и благословение"
+    },
+    {
+      "name": "1-я половина: Звёздный проводник",
+      "members": [
+        "sandrone",
+        "odette",
+        "yae-miko",
+        "alyosha"
+      ],
+      "note": "Быстро снимает Электро-щит химеры-льва"
+    },
+    {
+      "name": "1-я половина: Мидзуки",
+      "members": [
+        "yumemizuki-mizuki",
+        "odette",
+        "sucrose",
+        "alyosha"
+      ]
+    },
+    {
+      "name": "2-я половина: Крио Скирк",
+      "members": [
+        "skirk",
+        "escoffier",
+        "furina",
+        "vodyanitsa"
+      ],
+      "note": "Главный выбор: бонус Крио урона этажа и частые Крио-удары против Надсмотрщика"
+    },
+    {
+      "name": "2-я половина: Заморозка Аяки",
+      "members": [
+        "kamisato-ayaka",
+        "furina",
+        "escoffier",
+        "vodyanitsa"
+      ],
+      "note": "Заморозка ломает доспех Хильетты и щиты Крестителя"
+    },
+    {
+      "name": "2-я половина: Звёздный проводник",
+      "members": [
+        "sandrone",
+        "odette",
+        "yae-miko",
+        "qiqi"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "Game8 — этаж 12",
+      "url": "https://game8.co/games/Genshin-Impact/archives/326326"
+    },
+    {
+      "title": "Game8 — этаж 11",
+      "url": "https://game8.co/games/Genshin-Impact/archives/326290"
+    },
+    {
+      "title": "Game8 — этаж 9",
+      "url": "https://game8.co/games/Genshin-Impact/archives/324575"
+    },
+    {
+      "title": "Game8 — этаж 10",
+      "url": "https://game8.co/games/Genshin-Impact/archives/324621"
+    }
+  ],
+  "halves": [
+    {
+      "half": 1,
+      "label": "1-я половина: Звёздное сияние",
+      "need": [
+        [
+          "cryo"
+        ],
+        [
+          "anemo",
+          "electro"
+        ]
+      ],
+      "tip": "Нужны Крио и Анемо или Электро: этаж усиливает реакции Звёздного сияния на 75%, а благословение срабатывает от Звёздного рассеивания и Звёздного проводника. Все враги — одиночные боссы, химера-лев закрывается Электро-щитом."
+    },
+    {
+      "half": 2,
+      "label": "2-я половина: Крио",
+      "need": [
+        [
+          "cryo"
+        ]
+      ],
+      "tip": "Нужен Крио-отряд: этаж даёт +75% бонуса Крио урона, благословение срабатывает от Заморозки и Раскола, а Надсмотрщик и доспех Хильетты слабеют именно от частых Крио-ударов."
+    }
+  ]
+}
