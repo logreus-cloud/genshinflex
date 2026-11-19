@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-18",
+  "updated": "2026-11-19",
   "items": [
     {
       "id": "ann-21988",
@@ -60,18 +60,6 @@
         "en": "Hour of Ruin",
         "ru": "Час погибели",
         "es": "Misión de Arconte «La hora de la destrucción»"
-      }
-    },
-    {
-      "id": "ann-21973",
-      "kind": "event",
-      "start": "2026-11-02T05:00",
-      "end": "2026-11-18T23:59",
-      "image": "https://sdk.hoyoverse.com/upload/ann/2026/10/22/7315906b39d517cbdc148e650c926c65_5837513735044723651_transformed.png",
-      "title": {
-        "en": "Adventurer's Booster Bundles",
-        "ru": "Наборы помощи приключенцам",
-        "es": "Paquetes de apoyo al aventurero"
       }
     },
     {
