@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.genshinflex.android",
+      "sha256_cert_fingerprints": [
+        "61:04:E5:BE:B1:7B:CB:F1:CE:8B:33:49:D5:C4:41:FA:5C:41:BD:BA:E0:A7:76:D2:8C:57:88:A1:AE:DD:A4:3D",
+        "A3:31:17:63:B4:96:F8:C9:A2:77:99:B7:58:49:E7:44:A7:6F:7F:DD:40:57:5F:6B:4F:EE:B5:4E:9B:26:8D:C3"
+      ]
+    }
+  }
+]
