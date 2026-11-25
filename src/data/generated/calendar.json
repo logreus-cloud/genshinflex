@@ -15,6 +15,18 @@
       "version": "7.2"
     },
     {
+      "id": "ann-21979",
+      "kind": "event",
+      "start": "2026-11-25T05:00",
+      "end": "2026-12-07T03:59",
+      "image": "https://sdk.hoyoverse.com/upload/ann/2026/11/10/bd067e18ac1d6203eba38a07fc477863_6235007342202945544_transformed.png",
+      "title": {
+        "en": "Frames of Fierce Splendor",
+        "ru": "Хроника застывших теней",
+        "es": "Evento «Capturando lo épico»"
+      }
+    },
+    {
       "id": "ann-20663",
       "kind": "event",
       "start": "2026-11-19T05:00",
