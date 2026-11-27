@@ -2,6 +2,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Lang } from './discord-i18n.ts';
 import { notificationParts, type NotificationItem } from './telegram-notify.ts';
 
+// Текст пользователя в embed: экранируем markdown, чтобы [подпись](ссылка) не превратилась в кликабельную ссылку от бота
+const escapeMarkdown = (value: string) => value.replace(/[\\*_~`|>\[\]()#@]/g, '\\$&');
+
 export type DiscordNotification = NotificationItem & { discord_id: string };
 
 export function parseLangRoles(value?: string): Map<string, Lang> {
@@ -120,7 +123,7 @@ export async function deliverDiscordNotifications(
       const response = await discordRequest(fetchImpl, botToken, `https://discord.com/api/v10/channels/${channelId}/messages`, {
         embeds: [{
           title: Array.from(heading).slice(0, 256).join(''),
-          ...(snippet ? { description: snippet } : {}),
+          ...(snippet ? { description: escapeMarkdown(snippet) } : {}),
           url: href,
           color: 0xD3BC8E,
           footer: { text: 'GenshinFlex' },

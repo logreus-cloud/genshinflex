@@ -39,7 +39,7 @@ async function verify(token: string, env: Env): Promise<string | null> {
   const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
   const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(sig), new TextEncoder().encode(`${h}.${p}`));
   const aud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-  if (!ok || !aud.includes(env.ACCESS_AUD) || payload.exp * 1000 < Date.now()) return null;
+  if (!ok || !aud.includes(env.ACCESS_AUD) || typeof payload.exp !== 'number' || payload.exp * 1000 < Date.now()) return null;
   if (payload.iss !== `https://${env.ACCESS_TEAM}.cloudflareaccess.com`) return null;
   return typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
 }
